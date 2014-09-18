@@ -70,7 +70,7 @@ class Cream():
                 else:
                     val_list = raw_value.split(self.__LIST_SEP)
                     if len(val_list) > 1:
-                        value = val_list
+                        value = [e for e in val_list if e != '']
                     else:
                         value = raw_value
                     request[field] = value

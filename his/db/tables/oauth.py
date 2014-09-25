@@ -1,16 +1,16 @@
 """
-Database tables
+Tables concerning OAuth
 """
 __author__ = 'Richard Neumann <r.neumann@homeinfo.de>'
 __date__ = '18.09.2014'
 
-from .config import CreamModel
+from .abc import HISModel
 from peewee import TextField, DateTimeField, BooleanField, ForeignKeyField
     
 #===============================================================================
 # OAuth 2.0 entities
 #===============================================================================
-class Consumer(CreamModel):
+class Consumer(HISModel):
     """
     An OAuth version 2.0 consumer
     """
@@ -59,7 +59,7 @@ class Consumer(CreamModel):
         self.save()
         
         
-class Service(CreamModel):
+class Service(HISModel):
     """
     Describes an OAuth-protected web-service
     """
@@ -69,7 +69,7 @@ class Service(CreamModel):
     access_token_url = TextField()  # The OAuth 2.0 Access Token URL
     
     
-class ConsumerService(CreamModel):
+class ConsumerService(HISModel):
     """
     Many-to-many mapping for Consumers and Services
     """

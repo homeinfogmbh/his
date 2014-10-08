@@ -22,7 +22,7 @@ class Client(OAuth2Model):
     """
     The client interested in accessing protected resources.
     """
-    cid = TextField()
+    client_id = TextField()
     """Required. 
     The identifier the client will use during the OAuth workflow. 
     Structure is up to you and may be a simple UUID."""

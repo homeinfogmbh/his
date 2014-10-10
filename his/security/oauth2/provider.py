@@ -6,7 +6,7 @@ __date__ = '08.10.2014'
 
 from rauth import OAuth2Service
 from oauthlib.oauth2 import RequestValidator
-from .models import Client
+from .models import OAuth2Client
 
 class HISRequestValidator(RequestValidator):
     """
@@ -16,7 +16,7 @@ class HISRequestValidator(RequestValidator):
         """
         Validates a client ID
         """
-        matches = [c for c in Client.select().where(client_id=client_id)]
+        matches = [c for c in OAuth2Client.select().where(client_id=client_id)]
         if matches:
             if len(matches) == 1:
                 return True

@@ -5,10 +5,10 @@ __author__ = 'Richard Neumann <r.neumann@homeinfo.de>'
 __date__ = '08.10.2014'
 __credits__ = 'To the oauthlib documentation at <https://oauthlib.readthedocs.org>'
 
-from .abc import OAuth2Model
+from his.db import HISModel
 from peewee import TextField, ForeignKeyField, DateTimeField
 
-class User(OAuth2Model):
+class OAuth2User(HISModel):
     """
     The user of your site which resources might be access by clients upon \
     authorization from the user. In our example we will re-use the User model \
@@ -18,7 +18,7 @@ class User(OAuth2Model):
     pass
 
 
-class Client(OAuth2Model):
+class OAuth2Client(HISModel):
     """
     The client interested in accessing protected resources.
     """
@@ -26,7 +26,7 @@ class Client(OAuth2Model):
     """Required. 
     The identifier the client will use during the OAuth workflow. 
     Structure is up to you and may be a simple UUID."""
-    user = ForeignKeyField(User, related_name='client')
+    user = ForeignKeyField(OAuth2User, related_name='client')
     """Recommended. 
     It is common practice to link each client with one of your existing users. 
     Whether you do associate clients and users or not, ensure you are able \
@@ -55,7 +55,7 @@ class Client(OAuth2Model):
     previously been registered."""
     
     
-class BearerToken(OAuth2Model):
+class OAuth2BearerToken(HISModel):
     """
     The most common type of OAuth 2 token. Through the documentation this \
     will be considered an object with several properties, such as token type \
@@ -63,9 +63,9 @@ class BearerToken(OAuth2Model):
     Think of OAuth 2 tokens as containers and access tokens and refresh \
     tokens as text.
     """
-    client = ForeignKeyField(Client, related_name='bearer_token')
+    client = ForeignKeyField(OAuth2Client, related_name='bearer_token')
     """Association with the client to whom the token was given."""
-    user = ForeignKeyField(User, related_name='bearer_token')
+    user = ForeignKeyField(OAuth2User, related_name='bearer_token')
     """Association with the user to which protected \
     resources this token grants access."""
     scopes = TextField()
@@ -82,7 +82,7 @@ class BearerToken(OAuth2Model):
     """Exact time of expiration. Commonly this is one hour after creation."""
         
         
-class AuthorizationCode(OAuth2Model):
+class OAuth2AuthorizationCode(HISModel):
     """
     This is specific to the Authorization Code grant and represent the \
     temporary credential granted to the client upon successful authorization. \
@@ -92,9 +92,9 @@ class AuthorizationCode(OAuth2Model):
     This model is similar to the Bearer Token as it mainly acts a temporary \
     storage of properties to later be transferred to the token.
     """
-    client = ForeignKeyField(Client, related_name='authorization_code')
+    client = ForeignKeyField(OAuth2Client, related_name='authorization_code')
     """Association with the client to whom the token was given."""
-    user = ForeignKeyField(User, related_name='authorization_code')
+    user = ForeignKeyField(OAuth2User, related_name='authorization_code')
     """Association with the user to which protected \
     resources this token grants access."""
     scopes = TextField()
@@ -108,7 +108,7 @@ class AuthorizationCode(OAuth2Model):
     Commonly this is under ten minutes after creation."""
     
 
-class OAuth2Service(OAuth2Model):
+class OOAuth2Auth2Service(HISModel):
     """
     Describes an OAuth-protected web-service
     """

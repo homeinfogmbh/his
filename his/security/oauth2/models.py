@@ -108,7 +108,7 @@ class OAuth2AuthorizationCode(HISModel):
     Commonly this is under ten minutes after creation."""
     
 
-class OOAuth2Auth2Service(HISModel):
+class OAuth2Auth2Service(HISModel):
     """
     Describes an OAuth-protected web-service
     """

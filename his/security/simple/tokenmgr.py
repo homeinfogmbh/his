@@ -4,7 +4,7 @@ Token management
 __author__ = 'Richard Neumann <r.neumann@homeinfo.de>'
 __date__ = '10.10.2014'
 
-from .models import STAClient
+
 
 class ClientAuthenticator():
     """

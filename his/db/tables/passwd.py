@@ -7,7 +7,7 @@ __date__ = '09.10.2014'
 __all__ = ['Group', 'User']
 
 from .abc import HISModel, Resource
-from peewee import TextField, ForeignKeyField
+from peewee import TextField, ForeignKeyField, CharField
        
 class Group(Resource):
     """
@@ -50,6 +50,9 @@ class User(Resource):
     """The user's login password"""
     group = ForeignKeyField(Group)
     """The primary group of the user"""
+    session_token = CharField(36)
+    """A token to indicate and verify a running session"""
+    
     @property
     def groups(self):
         """Fetch all users that are in this group"""
@@ -74,3 +77,27 @@ class GroupMembers(HISModel):
     """
     group = ForeignKeyField(Group)
     member = ForeignKeyField(User)
+        
+  
+#===============================================================================
+# Exceptions      
+#===============================================================================
+class InvalidPassword(Exception):
+    """Indicates an invalid password"""
+    pass
+            
+class NoSuchUser(Exception):
+    """Indicates an invalid / non-existing user"""
+    pass
+            
+class AmbiguousUserName(Exception):
+    """Indicates ambiguous user names"""
+    pass
+            
+class AlreadyLoggedIn(Exception):
+    """Indicates that a user is already logged in"""
+    pass
+            
+class EmptyPassword(Exception):
+    """Indicates that an empty password has been provided"""
+    pass

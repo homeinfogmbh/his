@@ -7,7 +7,7 @@ __date__ = '09.10.2014'
 __all__ = ['HISModel', 'Resource']
 
 from peewee import MySQLDatabase, Model, CharField, DateTimeField, \
-    BooleanField, TextField, ForeignKeyField
+    BooleanField
 
 db = MySQLDatabase()
 

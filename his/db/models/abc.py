@@ -6,17 +6,15 @@ __date__ = '09.10.2014'
 
 __all__ = ['HISModel', 'Resource']
 
-from peewee import MySQLDatabase, Model, CharField, DateTimeField, \
-    BooleanField
-
-db = MySQLDatabase()
+from peewee import Model, CharField, DateTimeField, BooleanField
+from ..config import database
 
 class HISModel(Model):
     """
     Generic HOMEINFO Integrated Service database model
     """
     class Meta:
-        database = db
+        database = database
         
         
 class Resource(HISModel):

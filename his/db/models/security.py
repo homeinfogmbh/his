@@ -3,7 +3,7 @@ Created on 09.10.2014
 
 @author: neumannr
 '''
-from .abc import HISModel
+from his.db.models import HISModel
 from his.db.tables.passwd import User
 from peewee import ForeignKeyField, BooleanField, TextField
 

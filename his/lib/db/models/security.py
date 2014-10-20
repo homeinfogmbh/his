@@ -3,8 +3,8 @@ Created on 09.10.2014
 
 @author: neumannr
 '''
-from his.db.models import HISModel
-from his.db.tables.passwd import User
+from .abc import HISModel
+from .passwd import User
 from peewee import ForeignKeyField, BooleanField, TextField
 
 class Permissions(HISModel):

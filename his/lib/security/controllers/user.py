@@ -54,6 +54,22 @@ class UserAuthenticator():
 #===============================================================================
 # Exceptions
 #===============================================================================
+class InvalidPassword(Exception):
+    """Indicates an invalid password"""
+    pass
+            
 class NoSuchUser(Exception):
+    """Indicates an invalid / non-existing user"""
+    pass
+            
+class AmbiguousUserName(Exception):
+    """Indicates ambiguous user names"""
+    pass
+            
+class AlreadyLoggedIn(Exception):
     """Indicates that a user is already logged in"""
+    pass
+            
+class EmptyPassword(Exception):
+    """Indicates that an empty password has been provided"""
     pass

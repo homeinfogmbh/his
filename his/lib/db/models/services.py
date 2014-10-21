@@ -6,23 +6,21 @@ __date__ = '09.10.2014'
 
 __all__ = ['Service', 'UserServices', 'GroupServices']
 
-from .abc import Resource, HISModel
+from .abc import HISModel
 from .passwd import User, Group
-from peewee import TextField, CharField, ForeignKeyField
+from peewee import CharField, ForeignKeyField
 
-class Service(Resource):
+class Service(HISModel):
     """
     A HIS-service
     """
-    name = TextField()
+    name = CharField(16)
     """A representative name"""
-    description = TextField()
+    description = CharField(256)
     """A description of the service"""
-    uuid = CharField(36)
-    """A universally unique identifier"""
     
     
-class UserServices(HISModel):
+class UserService(HISModel):
     """
     Many-to-many mapping for users and services
     """
@@ -30,7 +28,7 @@ class UserServices(HISModel):
     service = ForeignKeyField(Service, related_name='users')
     
     
-class GroupServices(HISModel):
+class GroupService(HISModel):
     """
     Many-to-many mapping for groups and services
     """

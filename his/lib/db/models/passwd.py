@@ -4,16 +4,19 @@ Group and user definitions
 __author__ = 'Richard Neumann <r.neumann@homeinfo.de>'
 __date__ = '09.10.2014'
 
-__all__ = ['Group', 'User']
+__all__ = ['Group', 'User', 'GroupMembers']
 
 from .abc import HISModel
-from peewee import TextField, ForeignKeyField, CharField
+from homeinfodb import Customer
+from peewee import ForeignKeyField, CharField, IntegerField
        
 class Group(HISModel):
     """
     A HOMEINFO Integrated Services group
     """
-    name = TextField()
+    cid = IntegerField()
+    """Customer identifier of the corresponding customer"""
+    name = CharField(64)
     """A representative name"""
     @property
     def users(self):
@@ -38,20 +41,40 @@ class Group(HISModel):
             .where(GroupMembers.group == self \
                    and GroupMembers.member == user):
             gm.delete_instance()
+            
+    @property
+    def customer(self):
+        """Returns the corresponding customer"""
+        return Customer.select.where(Customer.cid == self.cid)
+    
+    @customer.setter
+    def customer(self, customer):
+        """Sets the corresponding customer"""
+        self.cid = customer.cid
         
 
 class User(HISModel):
     """
     A HOMEINFO Integrated Services user
     """
-    name = TextField()
+    name = CharField(64)
     """A representative name"""
-    passwd = TextField()
-    """The user's login password"""
+    sha512passwd = CharField(128)
+    """The user's encrypted login password"""
     group = ForeignKeyField(Group)
     """The primary group of the user"""
     session_token = CharField(36)
     """A token to indicate and verify a running session"""
+    
+    @property
+    def passwd(self):
+        """Returns the user's password"""
+        return self.sha512passwd
+    
+    @passwd.setter
+    def passwd(self, passwd):
+        """Sets the password"""
+        self.sha512passwd = passwd
     
     @property
     def groups(self):
@@ -77,27 +100,3 @@ class GroupMembers(HISModel):
     """
     group = ForeignKeyField(Group)
     member = ForeignKeyField(User)
-        
-  
-#===============================================================================
-# Exceptions      
-#===============================================================================
-class InvalidPassword(Exception):
-    """Indicates an invalid password"""
-    pass
-            
-class NoSuchUser(Exception):
-    """Indicates an invalid / non-existing user"""
-    pass
-            
-class AmbiguousUserName(Exception):
-    """Indicates ambiguous user names"""
-    pass
-            
-class AlreadyLoggedIn(Exception):
-    """Indicates that a user is already logged in"""
-    pass
-            
-class EmptyPassword(Exception):
-    """Indicates that an empty password has been provided"""
-    pass

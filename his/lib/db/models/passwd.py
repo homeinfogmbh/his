@@ -8,7 +8,7 @@ __all__ = ['Group', 'User', 'GroupMembers']
 
 from .abc import HISModel
 from homeinfodb import Customer
-from peewee import ForeignKeyField, CharField, IntegerField
+from peewee import ForeignKeyField, CharField, IntegerField, BooleanField
        
 class Group(HISModel):
     """
@@ -63,7 +63,7 @@ class User(HISModel):
     """The user's encrypted login password"""
     group = ForeignKeyField(Group)
     """The primary group of the user"""
-    session_token = CharField(36)
+    logged_in = BooleanField()
     """A token to indicate and verify a running session"""
     
     @property

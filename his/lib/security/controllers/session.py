@@ -6,7 +6,7 @@ __date__ = '10.10.2014'
 
 __all__ = ['SessionManager', 'AlreadyLoggedIn', 'WrongPassword']
 
-from .user import *
+from his.lib.db.models import User
 from datetime import datetime, timedelta
 from uuid import uuid4
 
@@ -64,20 +64,9 @@ class SessionManager():
     """
     Class to manage sessions
     """
-    __user_auth = None
-    """A user authenticator"""
     __sessions = {}
     """A nested dictionary of active sessions:
     {uid: session_token}"""
-    
-    def __init__(self):
-        """Creates new instance of the session manager"""
-        self.__user_auth = UserAuthenticator()
-        
-    @property
-    def user_auth(self):
-        """Returns the user authenticator"""
-        return self.__user_auth
         
     @property
     def sessions(self):
@@ -87,6 +76,16 @@ class SessionManager():
     def active(self, uid):
         """Determine whether a user is having an active session"""
         return uid in self.sessions
+    
+    def user(self, name):
+        """Fetches a user by its user identifier"""
+        users = [u for u in User.select().where(User.name == name)]
+        if len(users) == 1:
+            return users[0]
+        elif len(users) == 0:
+            raise NoSuchUser()
+        else:
+            raise AmbiguousUserName()
                 
     def _set_session(self, uid, session_token):
         """Set a session token for a user"""
@@ -101,6 +100,10 @@ class SessionManager():
         else:
             return True
         
+    def _chkpwd(self, user, passwd):
+        """Verify password of a user"""
+        return user.passwd == passwd
+        
     def validate(self, uid, session_token):
         """Validate a session by user name"""
         if uid in self.sessions:
@@ -111,23 +114,29 @@ class SessionManager():
         else:
             return False
         
-    def login(self, uid, passwd, hashfunc=None):
+    def login(self, uid, passwd):
         """Login a user"""
         if self.active(uid):
             raise AlreadyLoggedIn(uid)
         else:
             if self.exists(uid):
-                if self._chkpwd(uid, passwd, hashfunc):
-                    session_token_ttl = self._gen_session_token()
-                    self._set_session(uid, session_token_ttl)
+                user = self.user(uid)
+                if self._chkpwd(user, passwd):
+                    init_session_token = self._gen_session_token()
+                    self._set_session(uid, init_session_token)
                 else:
                     raise WrongPassword()
             else:
                 raise NoSuchUser()
+            
         
 #===============================================================================
 # Exception
 #===============================================================================
+class NoSuchUser(Exception):
+    """Indicates that a user does not exist"""
+    pass
+
 class AlreadyLoggedIn(Exception):
     """Indicates that a user is already logged in"""
     pass
@@ -138,4 +147,8 @@ class WrongPassword(Exception):
 
 class InvalidSessionToken(Exception):
     """Indicates that a user provided a wrong session token"""
+    pass
+
+class AmbiguousUserName(Exception):
+    """Indicates an ambiguous user name"""
     pass

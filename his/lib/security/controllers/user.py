@@ -6,7 +6,7 @@ __date__ = '10.10.2014'
 
 __all__ = ['UserAuthenticator', 'NoSuchUser']
 
-from his.db.tables.passwd import User
+from his.lib.db.models.passwd import User
 
 class UserAuthenticator():
     """

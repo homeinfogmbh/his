@@ -6,10 +6,10 @@ __date__ = '09.10.2014'
 
 __all__ = ['Group', 'User']
 
-from .abc import HISModel, Resource
+from .abc import HISModel
 from peewee import TextField, ForeignKeyField, CharField
        
-class Group(Resource):
+class Group(HISModel):
     """
     A HOMEINFO Integrated Services group
     """
@@ -40,7 +40,7 @@ class Group(Resource):
             gm.delete_instance()
         
 
-class User(Resource):
+class User(HISModel):
     """
     A HOMEINFO Integrated Services user
     """

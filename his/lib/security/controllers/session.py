@@ -20,10 +20,8 @@ class SessionToken():
     def __init__(self, ttl=60, deadline=None):
         """Creates a new session token"""
         self.__uuid = uuid4()
-        if deadline:
-            self.__deadline = deadline
-        else:
-            self.__deadline = datetime.now() + timedelta(seconds=ttl)
+        self.__deadline = deadline if deadline \
+            else datetime.now() + timedelta(seconds=ttl)
         
     @property
     def uuid(self):
@@ -46,7 +44,7 @@ class SessionToken():
     
     def __repr__(self):
         """Converts the session token into a unique string"""
-        return self.uuid + ' ' + str(self.deadline)
+        return self.uuid + '@' + str(self.deadline)
     
     def __eq__(self, other):
         """Equals comparison"""
@@ -70,7 +68,7 @@ class SessionManager():
     """A user authenticator"""
     __sessions = {}
     """A nested dictionary of active sessions:
-    {user_name: {session_token: timeout}}"""
+    {uid: session_token}"""
     
     def __init__(self):
         """Creates new instance of the session manager"""
@@ -86,45 +84,42 @@ class SessionManager():
         """Returns the currently active sessions"""
         return self.__sessions
     
-    def active(self, user_name):
+    def active(self, uid):
         """Determine whether a user is having an active session"""
-        for user in self.sessions:
-            if user == user_name:
-                return True
-        return False
+        return uid in self.sessions
                 
-    def _set_session(self, user_name, session_token_ttl):
-        """Set a session token and TTL in seconds for a user"""
-        self.__sessions[user_name] = session_token_ttl
+    def _set_session(self, uid, session_token):
+        """Set a session token for a user"""
+        self.__sessions[uid] = session_token
         
-    def _gen_session_token(self, ttl=60):
-        """Generates a session token"""
-        return {uuid4(): datetime.now() + timedelta(seconds=ttl)}
-        
-    def validate(self, user_name, session_token):
-        """Validate a session by user name"""
-        for session in self.sessions:
-            if session == user_name:
-                for token in session:
-                    if token == session_token:
-                        return True
-                # No session token match
-                return False
-            else:
-                # User not logged in
-                return False
-        # No sessions
-        return False
-        
-    def login(self, user_name, passwd, hashfunc=None):
-        """Login a user"""
-        if self.active(user_name):
-            raise AlreadyLoggedIn(user_name)
+    def _del_session(self, uid):
+        """Delete a session for a user"""
+        try:
+            del self.__sessions[uid]
+        except KeyError:
+            return False
         else:
-            if self.exists(user_name):
-                if self._chkpwd(user_name, passwd, hashfunc):
+            return True
+        
+    def validate(self, uid, session_token):
+        """Validate a session by user name"""
+        if uid in self.sessions:
+            if self.sessions[uid] == session_token:
+                return True
+            else:
+                raise InvalidSessionToken()
+        else:
+            return False
+        
+    def login(self, uid, passwd, hashfunc=None):
+        """Login a user"""
+        if self.active(uid):
+            raise AlreadyLoggedIn(uid)
+        else:
+            if self.exists(uid):
+                if self._chkpwd(uid, passwd, hashfunc):
                     session_token_ttl = self._gen_session_token()
-                    self._set_session(user_name, session_token_ttl)
+                    self._set_session(uid, session_token_ttl)
                 else:
                     raise WrongPassword()
             else:
@@ -139,4 +134,8 @@ class AlreadyLoggedIn(Exception):
 
 class WrongPassword(Exception):
     """Indicates that a user provided a wrong password on login"""
+    pass
+
+class InvalidSessionToken(Exception):
+    """Indicates that a user provided a wrong session token"""
     pass

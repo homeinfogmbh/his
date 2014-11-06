@@ -1,14 +1,38 @@
 """
 Session management
 """
-__author__ = 'Richard Neumann <r.neumann@homeinfo.de>'
-__date__ = '10.10.2014'
-
-__all__ = ['SessionManager', 'AlreadyLoggedIn', 'WrongPassword']
-
-from his.lib.db.models import User
+from his.lib.db import User
 from datetime import datetime, timedelta
 from uuid import uuid4
+
+__author__ = 'Richard Neumann <r.neumann@homeinfo.de>'
+__date__ = '10.10.2014'
+__all__ = ['SessionManager', 'AlreadyLoggedIn', 'WrongPassword']
+
+class NoSuchUser(Exception):
+    """Indicates that a user does not exist"""
+    pass
+
+
+class AlreadyLoggedIn(Exception):
+    """Indicates that a user is already logged in"""
+    pass
+
+
+class WrongPassword(Exception):
+    """Indicates that a user provided a wrong password on login"""
+    pass
+
+
+class InvalidSessionToken(Exception):
+    """Indicates that a user provided a wrong session token"""
+    pass
+
+
+class AmbiguousUserName(Exception):
+    """Indicates an ambiguous user name"""
+    pass
+
 
 class SessionToken():
     """
@@ -128,27 +152,3 @@ class SessionManager():
                     raise WrongPassword()
             else:
                 raise NoSuchUser()
-            
-        
-#===============================================================================
-# Exception
-#===============================================================================
-class NoSuchUser(Exception):
-    """Indicates that a user does not exist"""
-    pass
-
-class AlreadyLoggedIn(Exception):
-    """Indicates that a user is already logged in"""
-    pass
-
-class WrongPassword(Exception):
-    """Indicates that a user provided a wrong password on login"""
-    pass
-
-class InvalidSessionToken(Exception):
-    """Indicates that a user provided a wrong session token"""
-    pass
-
-class AmbiguousUserName(Exception):
-    """Indicates an ambiguous user name"""
-    pass

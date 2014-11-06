@@ -11,7 +11,6 @@ setup(
 			'his.core',
 			'his.lib',
 			'his.lib.db',
-			'his.lib.db.models',
 			'his.lib.http',
 			'his.lib.security',
 			'his.lib.security.controllers',

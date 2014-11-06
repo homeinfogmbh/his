@@ -1,10 +1,18 @@
 """
 Handles the request_uri from the environ dictionary
 """
+from string import printable
+
 __author__ = 'Richard Neumann <r.neumann@homeinfo.de>'
 __date__ = '25.09.2014'
+__all__ = ['InvalidURI', 'RequestHandler']
+                                
+class InvalidURI(Exception):
+    """
+    Indicate an invalid URI
+    """
+    pass
 
-from string import printable
 
 class RequestHandler():
     """
@@ -15,16 +23,13 @@ class RequestHandler():
     __PARAM_SEP = '&'
     __ASS_SEP = '='
     __LIST_SEP = ','
-    __request_uri = None
     
     def __init__(self, request_uri, 
                  min_path_len=None, max_path_len=None,
                  min_argc=None, max_argc=None,
                  min_list_len=None, max_list_len=None,
                  valid_chars=None, invalid_chars=None):
-        """
-        Initializes with a request URI to process
-        """
+        """Initializes with a request URI to process"""
         self.__request_uri = request_uri
         self.extensive_validate(request_uri,
                                 min_path_len=min_path_len, 
@@ -37,9 +42,7 @@ class RequestHandler():
                                 invalid_chars=invalid_chars)
         
     def validate(self, request_uri):
-        """
-        Validate a request_uri
-        """
+        """Validate a request_uri"""
         return self.__validate(request_uri)
     
     def extensive_validate(self, request_uri,
@@ -47,6 +50,7 @@ class RequestHandler():
                            min_argc=None, max_argc=None,
                            min_list_len=None, max_list_len=None,
                            valid_chars=None, invalid_chars=None):
+        """validate a request URI more thoroughly"""
         return self.validate(request_uri) \
             and self.__extensive_validate(request_uri,
                                           min_path_len=min_path_len, 
@@ -60,98 +64,70 @@ class RequestHandler():
             
     @property
     def PATH_SEP(self):
-        """
-        Returns the path separator
-        """
+        """Returns the path separator"""
         return self.__PATH_SEP
     
     @property
     def REQ_SEP(self):
-        """
-        Returns the request separator
-        """
+        """Returns the request separator"""
         return self.__REQ_SEP
     
     @property
     def PARAM_SEP(self):
-        """
-        Returns the parameter (= argument) separator
-        """
+        """Returns the parameter (= argument) separator"""
         return self.__PARAM_SEP
     
     @property
     def ASS_SEP(self):
-        """
-        Returns the assignment separator
-        """
+        """Returns the assignment separator"""
         return self.__ASS_SEP
 
     @property
     def LIST_SEP(self):
-        """
-        Returns the list separator
-        """
+        """Returns the list separator"""
         return self.__LIST_SEP
     
     @property
     def request_uri(self):
-        """
-        Returns the request_uri
-        """
+        """Returns the request_uri"""
         return self.__request_uri
     
     @property
     def path_req(self):
-        """
-        Returns a list of [path, requests]
-        """
+        """Returns a list of [path, requests]"""
         return self.request_uri.split(self.REQ_SEP)
     
     @property
     def path(self):
-        """
-        Returns the path of the request_uri
-        """
+        """Returns the path of the request_uri"""
         return self.path_req[0].split(self.PATH_SEP)
     
     @property
     def request(self):
-        """
-        Returns the request of the request_uri
-        """
+        """Returns the request of the request_uri"""
         return self.path_req[1]
     
     @property
     def paramlist(self):
-        """
-        Returns a list of parameter assignments
-        """
+        """Returns a list of parameter assignments"""
         return self.request.split(self.PARAM_SEP)
     
     @property
     def params(self):
-        """
-        Returns a dictionary of {parameter: value}
-        """
+        """Returns a dictionary of {parameter: value}"""
         return {self._key(p): self._val(p) for p in self.paramlist}
     
     @property
     def valid_chars(self):
-        """
-        Returns a string of valid characters
-        """
+        """Returns a string of valid characters"""
         return printable.strip()    #@UndefinedVariable
     
     def _key(self, param):
-        """
-        Extracts the key of a parameter
-        """
+        """Extracts the key of a parameter"""
         return param.split(self.ASS_SEP)[0]
     
     def _val(self, param):
-        """
-        Extracts the value of a parameter
-        """
+        """Extracts the value of a parameter"""
         l = param.split(self.ASS_SEP)
         if len(l) > 1:
             return self.__genlist(self.ASS_SEP.join([l[1:]]))
@@ -159,10 +135,8 @@ class RequestHandler():
             return True
         
     def __genlist(self, s):
-        """
-        Generate a list from a string if it \
-        contains the predefined list separator
-        """
+        """Generate a list from a string if it \
+        contains the predefined list separator"""
         l = s.split(self.LIST_SEP)
         if len(l) > 1:
             return l
@@ -170,9 +144,7 @@ class RequestHandler():
             return s
         
     def __validate(self, request_uri):
-        """
-        Actually validates a request URI
-        """
+        """Actually validates a request URI"""
         # Checks for invalid characters
         remainder = request_uri
         for c in self.valid_chars:
@@ -194,6 +166,7 @@ class RequestHandler():
                              min_argc=None, max_argc=None,
                              min_list_len=None, max_list_len=None,
                              valid_chars=None, invalid_chars=None):
+        """Perform extensive request validation"""
         # Checks for valid characters
         if valid_chars != None:
             remainder = request_uri
@@ -215,12 +188,12 @@ class RequestHandler():
         if min_path_len != None:
             if len(path) < min_path_len:
                 raise InvalidURI('Request URI path is too short: ' 
-                                     + str(len(path)) + '/' + str(min_path_len))
+                                 + str(len(path)) + '/' + str(min_path_len))
         # Checks maximum path length
         if max_path_len != None:
             if len(path) > max_path_len:
                 raise InvalidURI('Request URI path is too long: ' 
-                                     + str(len(path)) + '/' + str(max_path_len))
+                                 + str(len(path)) + '/' + str(max_path_len))
         if len(l) > 1:
             params = self.REQ_SEP.join(l[1:]).split(self.PARAM_SEP)
             # Checks minimal argument count
@@ -241,22 +214,15 @@ class RequestHandler():
                     # Checks minimal list length
                     if min_list_len != None:
                         if len(lst) < min_list_len:
-                            raise InvalidURI('Request URI parameter contains '\
-                                             + 'a too short list: ' 
-                                             + str(len(lst)) + '/' 
-                                             + str(min_list_len))
+                            raise InvalidURI('Request URI parameter contains '
+                                                'a too short list: ' 
+                                                + str(len(lst)) + '/' 
+                                                + str(min_list_len))
                     # Checks maximum list length
                     if max_list_len != None:
                         if len(lst) > max_list_len:
-                            raise InvalidURI('Request URI parameter contains '\
-                                             + 'a too long list: ' 
-                                             + str(len(lst)) + '/' 
-                                             + str(max_list_len))
-        return True     
-                                
-
-class InvalidURI(Exception):
-    """
-    Indicate an invalid URI
-    """
-    pass
+                            raise InvalidURI('Request URI parameter contains '
+                                                'a too long list: ' 
+                                                + str(len(lst)) + '/' 
+                                                + str(max_list_len))
+        return True

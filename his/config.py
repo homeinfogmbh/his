@@ -1,8 +1,13 @@
 """
 Basic HIS system configuration
 """
+from configparser import ConfigParser
+
 __date__= '06.11.2014'
 __author__ = 'Richard Neumann <r.neumann@homeinfo.de>'
-__all__ = ['MASTER_DB']
+__all__ = ['db']
 
-MASTER_DB = 'his'
+CONFIG_FILE = '/usr/local/etc/his.conf'
+config = ConfigParser()
+config.read(CONFIG_FILE)
+db = config['db']

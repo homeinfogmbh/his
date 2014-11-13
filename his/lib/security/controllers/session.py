@@ -66,11 +66,11 @@ class SessionToken():
 
     def __str__(self):
         """Converts the session token into a string"""
-        return self.uuid
+        return str(self.uuid)
 
     def __repr__(self):
         """Converts the session token into a unique string"""
-        return self.uuid + '@' + str(self.deadline)
+        return str(self) + '@' + str(self.deadline)
 
     def __eq__(self, other):
         """Equals comparison"""
@@ -81,7 +81,7 @@ class SessionToken():
                 else:
                     return False
             else:
-                return True if self.uuid == str(other) else False
+                return True if str(self) == str(other) else False
         else:
             return False
 
@@ -130,7 +130,7 @@ class SessionManager():
         """Verify password of a user"""
         return user.passwd == passwd
 
-    def validate(self, uid, session_token):
+    def _validate(self, uid, session_token):
         """Validate a session by user name"""
         if uid in self.sessions:
             if self.sessions[uid] == session_token:
@@ -140,8 +140,8 @@ class SessionManager():
         else:
             return False
 
-    def login(self, uid, passwd):
-        """Login a user"""
+    def start(self, uid, passwd):
+        """Starts a user's session"""
         if self.active(uid):
             raise AlreadyLoggedIn(uid)
         else:
@@ -150,7 +150,24 @@ class SessionManager():
                 if self._chkpwd(user, passwd):
                     init_session_token = self._gen_session_token()
                     self._set_session(uid, init_session_token)
+                    return init_session_token
                 else:
                     raise WrongPassword()
             else:
                 raise NoSuchUser()
+
+    def _logout(self, uid):
+        """Force user logout"""
+        if uid in self.sessions:
+            del self.sessions[uid]
+            return True
+        else:
+            return False
+
+    def terminate(self, uid, session_token):
+        """Terminate a user's session"""
+        if self._validate(uid, session_token):
+            self._logout(uid)
+            return True
+        else:
+            return False

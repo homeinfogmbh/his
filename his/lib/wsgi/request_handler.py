@@ -227,3 +227,15 @@ class RequestHandler():
                                              + str(len(lst)) + '/'
                                              + str(max_list_len))
         return True
+
+
+class LoginHandler():
+    """
+    Handles user logins
+    """
+    def __init__(self, requests):
+        """Initializes with a request dictionary"""
+        self.__user_name = requests.get('user_name', None)
+        self.__password = requests.get('passwd', None)
+
+    def 

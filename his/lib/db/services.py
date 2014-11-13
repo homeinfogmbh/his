@@ -10,6 +10,7 @@ from .abc import HISModel
 from .passwd import User, Group
 from peewee import CharField, ForeignKeyField
 
+
 class Service(HISModel):
     """
     A HIS-service
@@ -18,16 +19,16 @@ class Service(HISModel):
     """A representative name"""
     description = CharField(256)
     """A description of the service"""
-    
-    
+
+
 class UserService(HISModel):
     """
     Many-to-many mapping for users and services
     """
     user = ForeignKeyField(User, related_name='services')
     service = ForeignKeyField(Service, related_name='users')
-    
-    
+
+
 class GroupService(HISModel):
     """
     Many-to-many mapping for groups and services

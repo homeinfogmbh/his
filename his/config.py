@@ -3,7 +3,7 @@ Basic HIS system configuration
 """
 from configparser import ConfigParser
 
-__date__= '06.11.2014'
+__date__ = '06.11.2014'
 __author__ = 'Richard Neumann <r.neumann@homeinfo.de>'
 __all__ = ['db']
 

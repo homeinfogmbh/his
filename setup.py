@@ -7,6 +7,8 @@ setup(
     version='0.0.1-indev',
     author='Richard Neumann, Nikos Zizopoulos',
     author_email='mail@richard-neumann.de',
+    requires=['homeinfo',
+              'homeinfo.crm'],
     package_dir={'homeinfo': ''},
     packages=['homeinfo.his',
               'homeinfo.his.core',

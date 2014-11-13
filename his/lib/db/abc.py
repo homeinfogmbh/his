@@ -8,9 +8,9 @@ __author__ = 'Richard Neumann <r.neumann@homeinfo.de>'
 __date__ = '09.10.2014'
 __all__ = ['HISModel']
 
-DB = 'his'
+DB = 'homeinfo_his'
 HOST = 'mysql.homeinfo.de'
-USER = 'his'
+USER = 'homeinfo_his'
 PASSWD = '3=w,&7>_u8}oO0y'
 
 

@@ -23,3 +23,8 @@ setup(
     description='HOMEINFO Integrated Services',
     long_description=open('README.txt').read(),
     )
+
+from homeinfo.his.db import __tables__
+for table in __tables__:
+    print('Creating table', table)
+    table.create_table(fail_silently=True)

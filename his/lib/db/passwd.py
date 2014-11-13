@@ -7,7 +7,7 @@ __date__ = '09.10.2014'
 __all__ = ['Group', 'User', 'GroupMembers']
 
 from .abc import HISModel
-from homeinfodb import Customer
+from homeinfo.crm import Customer
 from peewee import ForeignKeyField, CharField, IntegerField, BooleanField
 
 

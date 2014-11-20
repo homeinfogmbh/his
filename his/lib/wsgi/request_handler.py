@@ -237,5 +237,3 @@ class LoginHandler():
         """Initializes with a request dictionary"""
         self.__user_name = requests.get('user_name', None)
         self.__password = requests.get('passwd', None)
-
-    def 

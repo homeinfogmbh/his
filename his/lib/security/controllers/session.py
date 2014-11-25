@@ -1,7 +1,7 @@
 """
 Session management
 """
-from his.lib.db import User
+from homeinfo.his.db import User
 from datetime import datetime, timedelta
 from uuid import uuid4
 

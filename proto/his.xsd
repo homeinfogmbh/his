@@ -1,0 +1,138 @@
+<xs:schema  xmlns="http://xml.homeinfo.de/schema/his"
+            xmlns:xs="http://www.w3.org/2001/XMLSchema" version="1.0"
+            targetNamespace="http://xml.homeinfo.de/schema/his">
+            
+    <!-- Root element -->
+    <xs:element name="his" type="HIS"/>
+
+
+    <!-- The root node -->
+    <xs:complexType name="HIS">
+        <xs:annotation>
+            <xs:documentation xml:lang="en">
+                The HOMEINFO integrated services root node
+            </xs:documentation>
+        </xs:annotation>
+        <xs:sequence>
+        	<xs:choice>
+       	    	<xs:element name="service" type="Service" minOccurs="0" maxOccurs="unbounded"/>
+            	<xs:element name="user" type="User" minOccurs="0" maxOccurs="unbounded"/>
+            	<xs:element name="profile" type="Profile"/>
+        	</xs:choice>
+        </xs:sequence>
+    </xs:complexType>
+
+
+    <!-- A CRUD object -->
+    <xs:complexType name="CRUD">
+        <xs:annotation>
+            <xs:documentation xml:lang="en">
+                An object that can be CRUDed
+            </xs:documentation>
+        </xs:annotation>
+        <xs:sequence>
+        	<xs:element name="action" type="Action" minOccurs="0"/>
+        	<!-- Only on request -->
+        </xs:sequence>
+    </xs:complexType>
+
+
+    <!-- A HIS-Service -->
+    <xs:complexType name="Service">
+        <xs:annotation>
+            <xs:documentation xml:lang="en">
+                A Service of the HIS
+            </xs:documentation>
+        </xs:annotation>
+        <xs:complexContent>
+            <xs:extension base="CRUD">
+        		<xs:sequence>
+            		<xs:element name="id" type="xs:integer"/>
+            		<xs:element name="name" type="xs:string"/>
+            		<xs:element name="enabled" type="xs:boolean"/>
+            		<xs:element name="uri" type="xs:string" minOccurs="0"/>
+            		<!-- Only on response -->
+        		</xs:sequence>
+			</xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
+
+    <!-- A HIS-User -->
+    <xs:complexType name="User">
+        <xs:annotation>
+            <xs:documentation xml:lang="en">
+                A User of the HIS
+            </xs:documentation>
+        </xs:annotation>
+        <xs:complexContent>
+            <xs:extension base="CRUD">
+        		<xs:sequence>
+            		<xs:element name="id" type="xs:integer"/>
+            		<xs:element name="name" type="xs:string"/>
+            		<xs:element name="admin" type="xs:boolean"/>
+            		<xs:element name="locked" type="xs:boolean"/>
+            		<xs:element name="service" type="Service" minOccurs="0" maxOccurs="unbounded"/>
+            		<!-- Services the user is allowed to access -->
+        		</xs:sequence>
+			</xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
+
+    <!-- A HIS-Profile -->
+    <xs:complexType name="Profile">
+        <xs:annotation>
+            <xs:documentation xml:lang="en">
+                A Profile of the HIS
+            </xs:documentation>
+        </xs:annotation>
+        <xs:complexContent>
+            <xs:extension base="CRUD">
+        		<xs:sequence>
+            		<xs:element name="id" type="xs:integer"/>
+            		<xs:element name="cid" type="xs:integer"/>
+            		<!-- The HOMEINFO customer ID -->
+            		<xs:element name="name" type="xs:string"/>
+            		<xs:element name="service" type="Service" minOccurs="0" maxOccurs="unbounded"/>
+            		<!-- Services the company has actually bought -->
+        		</xs:sequence>
+			</xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
+
+    <!-- Modification actions -->
+    <xs:simpleType name="Action">
+        <xs:annotation>
+            <xs:documentation xml:lang="en">
+                A set of modification actions
+            </xs:documentation>
+        </xs:annotation>
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="CREATE">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">
+                        Signalize the service to create stuff
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="UPDATE">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">
+                        Signalize the service to update stuff
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="DELETE">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">
+                        Signalize the service to delete stuff
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+        </xs:restriction>
+    </xs:simpleType>
+    
+ 
+</xs:schema>

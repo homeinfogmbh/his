@@ -20,6 +20,7 @@ setup(
               'homeinfo.his.lib.security.controllers',
               'homeinfo.his.lib.wsgi',
               'homeinfo.his.services'],
+    data_files=[('/usr/local/etc', ['files/etc/his.conf'])],
     license=open('LICENSE.txt').read(),
     description='HOMEINFO Integrated Services',
     long_description=open('README.txt').read(),

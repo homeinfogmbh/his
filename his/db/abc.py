@@ -19,5 +19,5 @@ class HISModel(Model):
     Generic HOMEINFO Integrated Service database model
     """
     class Meta:
-        database = PooledMySQLDatabase('his', host=HOST, user=USER,
-                                       passwd=PASSWD, threadlocals=True)
+        database = PooledMySQLDatabase('his', host=HOST,
+                                       user=USER, passwd=PASSWD)

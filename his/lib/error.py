@@ -6,7 +6,7 @@ from pcp import pcp
 __author__ = 'Richard Neumann <r.neumann@homeinfo.de>'
 __date__ = '25.09.2014'
 __all__ = ['InvalidCredentialsError', 'SessionTimeoutError',
-           'SessionExistsError']
+           'SessionExistsError', 'NoSuchUser']
 
 
 class Message(Exception):
@@ -62,3 +62,9 @@ class SessionExistsError(Message):
     """Indicates that a session for a user is already running"""
     def __init__(self):
         super().__init__(3, 'SESSION_EXISTS')
+
+
+class NoSuchUser(Message):
+    """Indicates that there is no such user"""
+    def __init__(self, ident):
+        super().__init__(4, ' '.join(['NO_SUCH_USER:', str(ident)]))

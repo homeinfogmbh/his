@@ -1,32 +1,33 @@
 """
 Handles the request_uri from the environ dictionary
 """
+from .session import SessionController
+from homeinfo.his.db import User
+from homeinfo.his.lib.err import NoSuchUser
+
 __author__ = 'Richard Neumann <r.neumann@homeinfo.de>'
 __date__ = '25.09.2014'
-__all__ = ['ResourceHandler']
+__all__ = ['ResourceController']
 
 
-class ResourceHandler():
+class ResourceController():
     """
-    Handles queries
+    Handles resources
     """
-    __PATH_SEP = '/'
-
-    def __init__(self, path):
-        """Initializes with a request URI to process"""
-        self.__path = path
-
-    @property
-    def PATH_SEP(self):
-        """Returns the path separator"""
-        return self.__PATH_SEP
-
-    @property
-    def path(self):
-        """Returns the request path"""
-        return self.__path
-
-    @property
-    def resource(self):
-        """Returns a list of resource path nodes"""
-        return self.path.split(self.PATH_SEP)
+    @classmethod
+    def handle(cls, resource, params):
+        """Checks access rights on the resource for a user"""
+        if resource == ['login']:
+            hashed_user_name = params.get('user_name', None)
+            passwd = params.get('user_pass', None)
+            return SessionController.login(hashed_user_name, passwd)
+        else:
+            uid_str = params.get('uid', None)
+            try:
+                uid = int(uid_str)
+            except:
+                raise NoSuchUser()
+            session_token = params.get('session_token', None)
+            if SessionController.valid(hashed_user_name, session_token):
+                user = User.by_id(uid)
+                # access_service(

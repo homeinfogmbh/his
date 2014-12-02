@@ -16,22 +16,25 @@ class SessionController():
     A class handle sessions
     """
     @classmethod
-    def active(cls, user):
+    def valid(cls, hashed_user_name, session_token):
         """Determines whether a user is running an active, valid session"""
-        if not user.locked:
-            return cls._logged_in(user)
-        else:
-            return False
+        for user in (User.select().limit(1)
+                     .where(User.hashed_name == hashed_user_name)):
+            if not user.locked:
+                return cls._session_valid(user, session_token)
+            else:
+                return False
 
     @classmethod
-    def _logged_in(cls, user):
+    def _session_valid(cls, user, session_token):
         """Determines whether a user is logged in"""
         for session in Session.select().where(Session.user == user):
-            if session.valid:
-                return True
-            else:
-                session.terminate()
-                raise SessionTimeoutError()
+            if session.token == session_token:
+                if session.valid:
+                    return True
+                else:
+                    session.terminate()
+                    raise SessionTimeoutError()
         return False
 
     @classmethod

@@ -1,6 +1,7 @@
 #! /usr/bin/env python3
 
 from distutils.core import setup
+from peewee import OperationalError
 
 setup(
     name='homeinfo-his',
@@ -25,4 +26,7 @@ setup(
 from homeinfo.his.db import __tables__
 for table in __tables__:
     print('Creating table', table)
-    table.create_table(fail_silently=True)
+    try:
+        table.create_table(fail_silently=True)
+    except OperationalError:
+        print('Could not create table:', str(table))

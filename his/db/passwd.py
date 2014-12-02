@@ -63,3 +63,9 @@ class User(HISModel):
         """Determines whether the user is a super-user aka. root"""
         if self.admin and self.group.customer.id == 1000:
             return True
+
+    @classmethod
+    def by_id(cls, ident):
+        """Returns a user by its ID"""
+        for user in cls.select().limit(1).where(cls.id == ident):
+            return user

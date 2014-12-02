@@ -6,6 +6,7 @@ from homeinfo.his.db import UserService, GroupService
 
 __author__ = 'Richard Neumann <r.neumann@homeinfo.de>'
 __date__ = '25.09.2014'
+__all__ = ['GroupServiceController', 'SessionController']
 
 
 class GroupServiceController():

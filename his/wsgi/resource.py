@@ -1,8 +1,6 @@
 """
 Handles the request_uri from the environ dictionary
 """
-from string import printable
-
 __author__ = 'Richard Neumann <r.neumann@homeinfo.de>'
 __date__ = '25.09.2014'
 __all__ = ['ResourceHandler']

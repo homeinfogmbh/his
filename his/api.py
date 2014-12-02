@@ -22,4 +22,4 @@ class HISServiceDatabase(MySQLDatabase):
         """Changes the name to create a '_'-separated namespace"""
         super().__init__('_'.join([db.get('master_db'), str(service)]),
                          host=host, user=user, passwd=passwd,
-                         threadlocals=threadlocals, kwargs)
+                         threadlocals=threadlocals, **kwargs)

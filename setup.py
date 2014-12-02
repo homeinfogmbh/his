@@ -9,7 +9,7 @@ setup(
     author_email='mail@richard-neumann.de',
     requires=['homeinfo',
               'homeinfo.crm',
-              'pypcp'],
+              'pcp'],
     package_dir={'homeinfo': ''},
     packages=['homeinfo.his',
               'homeinfo.his.wsgi',

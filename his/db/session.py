@@ -9,20 +9,7 @@ from datetime import datetime, timedelta
 
 __author__ = 'Richard Neumann <r.neumann@homeinfo.de>'
 __date__ = '02.11.2014'
-__all__ = ['SessionExistsError', 'Session']
-
-
-class SessionExistsError(Exception):
-    """An exception to indicate that a
-    session for a user is already running"""
-    def __init__(self, session):
-        """Sets the already-running session"""
-        self.__session = session
-
-    @property
-    def session(self):
-        """Returns the already-running session"""
-        return self.__session
+__all__ = ['Session']
 
 
 class Session(HISModel):
@@ -39,8 +26,6 @@ class Session(HISModel):
     @classmethod
     def start(cls, user, lifetime=600):
         """Start a session for a user"""
-        for session in cls.select().where(cls.user == user):
-            raise SessionExistsError(session)
         session = cls()
         session.user = user
         session.token = str(uuid4())

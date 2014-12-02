@@ -11,7 +11,7 @@ setup(
               'homeinfo.crm'],
     package_dir={'homeinfo': ''},
     packages=['homeinfo.his',
-              'homeinfo.his.core',
+              'homeinfo.his.wsgi',
               'homeinfo.his.db',
               'homeinfo.his.lib',
               'homeinfo.his.services'],

@@ -3,7 +3,7 @@ Group and user definitions
 """
 from .abc import HISModel
 from homeinfo.crm import Customer
-from peewee import ForeignKeyField, CharField
+from peewee import ForeignKeyField, CharField, BooleanField
 from hashlib import sha256
 
 __author__ = 'Richard Neumann <r.neumann@homeinfo.de>'
@@ -31,22 +31,20 @@ class User(HISModel):
     """
     name = CharField(64)
     """A representative name"""
-    sha512passwd = CharField(128)
-    """The user's encrypted login password"""
+    passwd = CharField(128, db_column='passwd')
+    """The user's SHA-512 encrypted login password"""
     group = ForeignKeyField(Group, db_column='group')
     """The primary group of the user"""
+    admin = BooleanField()
+    """Flag, whether the user is an administrator"""
 
     @property
-    def sha256name(self):
+    def hashed_name(self):
         """Returns the SHA-256 encoded name"""
         return str(sha256(self.name.encode()))
 
     @property
-    def passwd(self):
-        """Returns the user's password"""
-        return self.sha512passwd
-
-    @passwd.setter
-    def passwd(self, passwd):
-        """Sets the password"""
-        self.sha512passwd = passwd
+    def root(self):
+        """Determines whether the user is a super-user aka. root"""
+        if self.admin and self.group.customer.id == 1000:
+            return True

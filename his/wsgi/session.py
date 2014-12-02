@@ -28,12 +28,12 @@ class SessionController():
         return False
 
     @classmethod
-    def login(cls, hashed_user_name, hashed_passwd):
+    def login(cls, hashed_user_name, passwd):
         """Login a user"""
-        for user in User.select().where(User.sha256name == hashed_user_name):
+        for user in User.select().where(User.hashed_name == hashed_user_name):
             for session in cls.select().where(cls.user == user):
                 raise SessionExistsError(session)
-            if user.sha512passwd == hashed_passwd:
+            if user.passwd == passwd:
                 Session.start(user)
                 return True
         return False

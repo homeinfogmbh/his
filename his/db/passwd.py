@@ -3,7 +3,8 @@ Group and user definitions
 """
 from .abc import HISModel
 from homeinfo.crm import Customer
-from peewee import ForeignKeyField, CharField, BooleanField
+from peewee import ForeignKeyField, CharField, BooleanField, DateTimeField,\
+    IntegerField
 from hashlib import sha256
 
 __author__ = 'Richard Neumann <r.neumann@homeinfo.de>'
@@ -37,6 +38,20 @@ class User(HISModel):
     """The primary group of the user"""
     admin = BooleanField()
     """Flag, whether the user is an administrator"""
+    last_login = DateTimeField()
+    """Date and time of the last login"""
+    failed_logins = IntegerField()
+    """Number of failed login attempts"""
+    disabled = BooleanField()
+    """Flag to disable the user for login"""
+
+    @property
+    def locked(self):
+        """Determines whether the user is locked"""
+        if self.disabled or self.failed_logins >= 3:
+            return True
+        else:
+            return False
 
     @property
     def hashed_name(self):

@@ -3,7 +3,7 @@ Service definitions
 """
 from .abc import HISModel
 from .passwd import User, Group
-from peewee import CharField, ForeignKeyField
+from peewee import CharField, ForeignKeyField, BooleanField
 
 __author__ = 'Richard Neumann <r.neumann@homeinfo.de>'
 __date__ = '09.10.2014'
@@ -18,6 +18,9 @@ class Service(HISModel):
     """A representative name"""
     description = CharField(256)
     """A description of the service"""
+    public = BooleanField()
+    """Flag whether the service is public
+    and thus requires no authentication"""
 
 
 class UserService(HISModel):

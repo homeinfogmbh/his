@@ -5,13 +5,15 @@ from pcp import pcp
 
 __author__ = 'Richard Neumann <r.neumann@homeinfo.de>'
 __date__ = '25.09.2014'
+__all__ = ['InvalidCredentialsError', 'SessionTimeoutError',
+           'SessionExistsError']
 
 
-class PcpError(Exception):
+class Message(Exception):
     """
     An error that can be rendered as a PCP exception
     """
-    def __init__(self, msg, code):
+    def __init__(self, code, msg):
         """Initializes with a code and a message"""
         self.__code = code
         self.__msg = msg
@@ -26,9 +28,37 @@ class PcpError(Exception):
         """Returns the error message"""
         return self.__msg
 
-    def __render__(self):
-        """Determines whether a user is allowed to access a certain resource"""
-        msg = pcp.ErrorMessage()
+    def __pcp__(self):
+        """Converts the message to a PCP Message"""
+        rsp = pcp.rsp()
+        msg = pcp.Message()
         msg.code = self.code
         msg.msg = self.msg
-        return msg.toxml(encoding='utf-8')
+        rsp.msg = msg
+        return rsp
+
+    def __render__(self):
+        """Renders itself as a PCP message to bytes"""
+        return self.__pcp__().toxml(encoding='utf-8')
+
+    def __str__(self):
+        """Converts the message to a PCP Message XML string"""
+        return self.__render__().decode()
+
+
+class InvalidCredentialsError(Message):
+    """Indicates that a user tried to log in with invalid credentials"""
+    def __init__(self):
+        super().__init__(1, 'INVALID_CREDENTIALS')
+
+
+class SessionTimeoutError(Message):
+    """Indicates that a user's session has times out"""
+    def __init__(self):
+        super().__init__(2, 'SESSION_TIMED_OUT')
+
+
+class SessionExistsError(Message):
+    """Indicates that a session for a user is already running"""
+    def __init__(self):
+        super().__init__(3, 'SESSION_EXISTS')

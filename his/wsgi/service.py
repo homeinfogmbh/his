@@ -29,7 +29,7 @@ class UserServiceController():
     @classmethod
     def allowed(cls, user, service):
         """Determines whether a user is allowed to access a certain resource"""
-        if SessionController.logged_in(user):
+        if SessionController.active(user):
             for user_service in (UserService.select()
                                  .where(UserService.user == user)):
                 if user_service.service == service:

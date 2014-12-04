@@ -32,7 +32,8 @@ class ResourceType():
     @property
     def path(self):
         """Returns the resource's path"""
-        '/'.join(['' if self.parent is None else self.parent.path, self.name])
+        return '/'.join(['' if self.parent is None else self.parent.path,
+                         self.name])
 
     @property
     def requires_authentication(self):

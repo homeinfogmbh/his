@@ -49,6 +49,10 @@ class ResourceType():
         """Returns whether the resource requires administrative privileges"""
         return self.__administrative
 
+    def __str__(self):
+        """Returns the path"""
+        return self.path
+
 
 class Resource():
     """
@@ -77,5 +81,5 @@ class Resource():
                             administrative=False)
     SERVICES = ResourceType(HIS, 'service',
                             requires_authentication=True,
-                            equires_authorization=True,
+                            requires_authorization=True,
                             administrative=False)

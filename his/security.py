@@ -51,8 +51,11 @@ def authenticate(func):
             for session in Session.select().limit(1).where(Session.user
                                                            == user):
                 if session.valid:
-                    session = session.refresh()
-                    return func(*args, **kwargs), session.token
+                    if session.token == session_token:
+                        session = session.refresh()
+                        return func(*args, **kwargs), session.token
+                    else:
+                        raise InvalidCredentials()
                 else:
                     session.terminate()
                     raise SessionTimeout()

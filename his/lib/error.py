@@ -37,7 +37,7 @@ class Error(Exception):
         msg.code = self.code
         msg.msg = self.msg
         rsp.msg = msg
-        rsp.signal = pcp.Signal.ACK
+        rsp.signal = pcp.Signal.NACK    # @UndefinedVariable
         return rsp
 
     def __xml__(self):

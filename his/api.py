@@ -1,7 +1,7 @@
 """
 Defines the HIS service databases
 """
-from his.config import db
+from .config import db
 from peewee import MySQLDatabase
 
 __date__ = '06.11.2014'

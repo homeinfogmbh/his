@@ -1,8 +1,8 @@
 """
 Handles service access
 """
-from homeinfo.his.db import Service, UserService, GroupService, User, Session
-from homeinfo.his.lib.error import *
+from .db import Service, UserService, GroupService, User, Session
+from .lib.error import *
 
 __author__ = 'Richard Neumann <r.neumann@homeinfo.de>'
 __date__ = '04.12.2014'

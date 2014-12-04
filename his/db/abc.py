@@ -1,7 +1,7 @@
 """
 Basic HIS database definitions
 """
-from his.config import db
+from ..config import db
 from peewee import Model, MySQLDatabase
 
 __author__ = 'Richard Neumann <r.neumann@homeinfo.de>'

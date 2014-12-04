@@ -10,18 +10,29 @@ class ResourceType():
     """
     An abstract, basic resource type
     """
-    def __init__(self, name, requires_authentication=True,
+    def __init__(self, parent, name, requires_authentication=True,
                  requires_authorization=False, administrative=False):
         """Initializes the resource's path and protection flag"""
+        self.__parent = parent
         self.__name = name
         self.__requires_authentication = requires_authentication
         self.__requires_authorization = requires_authorization
         self.__administrative = administrative
 
     @property
+    def parent(self):
+        """Returns the resource's parent"""
+        return self.__parent
+
+    @property
     def name(self):
         """Returns the resource's name"""
         return self.__name
+
+    @property
+    def path(self):
+        """Returns the resource's path"""
+        '/'.join(['' if self.parent is None else self.parent.path, self.name])
 
     @property
     def requires_authentication(self):
@@ -43,23 +54,28 @@ class Resource():
     """
     HISs' resources
     """
-    OVERVIEW = ResourceType('overview',
+    HIS = ResourceType(None, 'overview',
+                       requires_authentication=True,
+                       requires_authorization=False,
+                       administrative=False)
+
+    OVERVIEW = ResourceType(HIS, 'overview',
                             requires_authentication=True,
-                            requires_authorization=True,
+                            requires_authorization=False,
                             administrative=False)
-    COMPANY_PREFS = ResourceType('company',
+    COMPANY_PREFS = ResourceType(HIS, 'company',
                                  requires_authentication=True,
                                  requires_authorization=True,
                                  administrative=True)
-    USER_PREFS = ResourceType('user',
+    USER_PREFS = ResourceType(HIS, 'user',
                               requires_authentication=True,
                               requires_authorization=True,
                               administrative=False)
-    PREVIEWS = ResourceType('preview',
+    PREVIEWS = ResourceType(HIS, 'preview',
                             requires_authentication=False,
                             requires_authorization=False,
                             administrative=False)
-    SERVICES = ResourceType('service',
+    SERVICES = ResourceType(HIS, 'service',
                             requires_authentication=True,
                             equires_authorization=True,
                             administrative=False)

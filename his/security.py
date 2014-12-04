@@ -15,7 +15,7 @@ def login(func):
         """Login a user"""
         if user_name is None or user_pass is None:
             raise NotAuthenticated()
-        user = User.by_hashed_name(user_name)
+        user = User.by_user_name(user_name)
         if user is None:
             raise NoSuchUser()
         elif user.locked:
@@ -44,7 +44,7 @@ def authenticate(func):
         """Refresh a session for a user"""
         if user_name is None or session_token is None:
             raise NotAuthenticated()
-        user = User.by_hashed_name(user_name)
+        user = User.by_user_name(user_name)
         if user is None:
             raise NoSuchUser()
         elif user.locked:
@@ -84,7 +84,7 @@ def authorize(func):
         """Determines whether a user is allowed to access a certain resource"""
         if user_name is None or service_name is None:
             raise NotAuthorized()
-        user = User.by_hashed_name(user_name)
+        user = User.by_user_name(user_name)
         if user is None:
             raise NoSuchUser()
         elif user.locked:

@@ -27,7 +27,9 @@ def login(func):
                 user.failed_logins = 0
                 user.save()
                 session = Session.start(user)
-                return func(*args, **kwargs), session.token
+                result = func(*args, **kwargs)
+                result.session_token = session.token
+                return result
         else:
             user.failed_logins += 1
             user.save()
@@ -53,7 +55,9 @@ def authenticate(func):
                 if session.valid:
                     if session.token == session_token:
                         session = session.refresh()
-                        return func(*args, **kwargs), session.token
+                        result = func(*args, **kwargs)
+                        result.session_token = session.token
+                        return result
                     else:
                         raise InvalidCredentials()
                 else:

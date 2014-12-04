@@ -37,7 +37,7 @@ class User(HISModel):
     """A representative name"""
     _passwd = CharField(69, db_column='passwd')
     """The user's SHA-512 encrypted login password"""
-    group = ForeignKeyField(Group, db_column='group', realted_name='members')
+    group = ForeignKeyField(Group, db_column='group', related_name='members')
     """The primary group of the user"""
     admin = BooleanField()
     """Flag, whether the user is an administrator"""

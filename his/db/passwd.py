@@ -35,9 +35,9 @@ class User(HISModel):
     """
     email = CharField(64)
     """A unique email address"""
-    first_name = CharField(32)
+    first_name = CharField(32, null=True)
     """The user's first name"""
-    last_name = CharField(32)
+    last_name = CharField(32, null=True)
     """The user's last name"""
     _passwd = CharField(69, db_column='passwd')
     """The user's SHA-512 encrypted login password"""

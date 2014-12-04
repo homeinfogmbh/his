@@ -33,8 +33,12 @@ class User(HISModel):
     """
     A HOMEINFO Integrated Services user
     """
-    name = CharField(64)
-    """A representative name"""
+    email = CharField(64)
+    """A unique email address"""
+    first_name = CharField(32)
+    """The user's first name"""
+    last_name = CharField(32)
+    """The user's last name"""
     _passwd = CharField(69, db_column='passwd')
     """The user's SHA-512 encrypted login password"""
     group = ForeignKeyField(Group, db_column='group', related_name='members')
@@ -47,6 +51,16 @@ class User(HISModel):
     """Number of failed login attempts"""
     disabled = BooleanField()
     """Flag to disable the user for login"""
+
+    @property
+    def name(self):
+        """Returns the user's name"""
+        return self.email
+
+    @name.setter
+    def name(self, name):
+        """Sets the user's name"""
+        self.email = name
 
     @property
     def passwd(self):

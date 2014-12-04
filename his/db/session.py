@@ -46,7 +46,7 @@ class Session(HISModel):
         self.token = str(uuid4())
         self.timeout = datetime.now() + timedelta(seconds=lifetime)
         self.save()
-        return self.token
+        return self
 
     def terminate(self):
         """Terminates the session"""

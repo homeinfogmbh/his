@@ -5,12 +5,13 @@ import pcp
 
 __author__ = 'Richard Neumann <r.neumann@homeinfo.de>'
 __date__ = '25.09.2014'
-__all__ = ['InvalidCredentialsError', 'SessionTimeoutError',
-           'SessionExistsError', 'NoSuchUser', 'UserLocked', 'NotLoggedIn',
-           'NoSuchService', 'UnauthorizedUser', 'UnauthorizedGroup']
+__all__ = ['InvalidCredentials', 'SessionTimeout',  'SessionExists',
+           'NoSuchUser', 'UserLocked', 'NotLoggedIn', 'NoSuchService',
+           'UnauthorizedUser', 'UnauthorizedGroup', 'NotAuthenticated',
+           'NotAuthorized']
 
 
-class Message(Exception):
+class Error(Exception):
     """
     An error that can be rendered as a PCP exception
     """
@@ -30,7 +31,7 @@ class Message(Exception):
         return self.__msg
 
     def __pcp__(self):
-        """Converts the message to a PCP Message"""
+        """Converts the message to a PCP Error"""
         rsp = pcp.rsp()
         msg = pcp.Message()
         msg.code = self.code
@@ -51,7 +52,7 @@ class Message(Exception):
         return self.code
 
     def __str__(self):
-        """Converts the message to a PCP Message XML string"""
+        """Converts the message to a PCP Error XML string"""
         return self.__xml__().decode()
 
     def __eq__(self, other):
@@ -75,55 +76,72 @@ class Message(Exception):
         return self.__lt__(other) or self.__eq__(other)
 
 
-class InvalidCredentialsError(Message):
+class InvalidCredentials(Error):
     """Indicates that a user tried to log in with invalid credentials"""
     def __init__(self):
         super().__init__(1, 'INVALID_CREDENTIALS')
 
 
-class SessionTimeoutError(Message):
+class SessionTimeout(Error):
     """Indicates that a user's session has times out"""
     def __init__(self):
         super().__init__(2, 'SESSION_TIMED_OUT')
 
 
-class SessionExistsError(Message):
-    """Indicates that a session for a user is already running"""
+class SessionExists(Error):
+    """Indicates that a session for
+    a user is already running"""
     def __init__(self):
         super().__init__(3, 'SESSION_EXISTS')
 
 
-class NoSuchUser(Message):
+class NoSuchUser(Error):
     """Indicates that there is no such user"""
     def __init__(self):
         super().__init__(4, 'NO_SUCH_USER')
 
 
-class UserLocked(Message):
+class UserLocked(Error):
     """Indicates that a user has been locked"""
     def __init__(self):
         super().__init__(5, 'USER_LOCKED')
 
 
-class NotLoggedIn(Message):
+class NotLoggedIn(Error):
     """Indicates that a user has no active session"""
     def __init__(self):
         super().__init__(6, 'NOT_LOGGED_IN')
 
 
-class NoSuchService (Message):
+class NoSuchService (Error):
     """Indicates that a service does not exist"""
     def __init__(self):
         super().__init__(7, 'NO_SUCH_SERVICE')
 
 
-class UnauthorizedUser (Message):
-    """Indicates that a user is not allowed to access a service"""
+class UnauthorizedUser (Error):
+    """Indicates that a user is not
+    allowed to access a service"""
     def __init__(self):
         super().__init__(8, 'UNAUTHORIZED_USER')
 
 
-class UnauthorizedGroup (Message):
-    """Indicates that a user is not allowed to access a service"""
+class UnauthorizedGroup (Error):
+    """Indicates that a group is not
+    allowed to access a service"""
     def __init__(self):
         super().__init__(9, 'UNAUTHORIZED_GROUP')
+
+
+class NotAuthenticated (Error):
+    """Indicates that a protected resource was
+    accessed without authentication information"""
+    def __init__(self):
+        super().__init__(10, 'NOT_AUTHENTICATED')
+
+
+class NotAuthorized (Error):
+    """Indicates that a protected resource was
+    accessed without authorization information"""
+    def __init__(self):
+        super().__init__(11, 'NOT_AUTHORIZED')

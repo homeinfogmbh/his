@@ -12,7 +12,6 @@ setup(
               'pcp'],
     package_dir={'homeinfo': ''},
     packages=['homeinfo.his',
-              'homeinfo.his.ctrl',
               'homeinfo.his.wsgi',
               'homeinfo.his.db',
               'homeinfo.his.lib',

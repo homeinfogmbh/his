@@ -59,7 +59,7 @@ class Resource():
     """
     HISs' resources
     """
-    HIS = ResourceType(None, 'overview',
+    HIS = ResourceType(None, 'his',
                        requires_authentication=True,
                        requires_authorization=False,
                        administrative=False)

@@ -41,6 +41,13 @@ class Session(HISModel):
         else:
             return False
 
+    def refresh(self, lifetime=600):
+        """Refreshes the session"""
+        self.token = str(uuid4())
+        self.timeout = datetime.now() + timedelta(seconds=lifetime)
+        self.save()
+        return self.token
+
     def terminate(self):
         """Terminates the session"""
         cls = self.__class__

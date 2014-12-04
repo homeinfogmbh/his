@@ -8,9 +8,9 @@ __date__ = '08.10.2014'
 __all__ = ['render', 'Status', 'ContentType', 'HTTPResponse']
 
 
-def render(renderable):
+def render(renderable, json=False):
     """Renders a renderable object"""
-    return renderable.__render__()
+    return renderable.__json__() if json else renderable.__xml__()
 
 
 class Status():
@@ -33,7 +33,7 @@ class HTTPResponse():
     """
     Generates an HTTP response
     """
-    def __init__(self, content, content_type=ContentType.TEXT_HTML,
+    def __init__(self, content, content_type=ContentType.APPLICATION_XML,
                  charset='UTF-8', status=Status.OK):
         """
         Create a new HTTP response
@@ -91,7 +91,7 @@ class HTTPResponse():
     def headers(self):
         """Returns the headers"""
         return [('Content-Type',
-                 ''.join([self._raw_content_type,
+                 ''.join([self.content_type,
                           '; charset=', self.charset])),
                 self.length]
 

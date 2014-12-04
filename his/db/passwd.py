@@ -20,10 +20,13 @@ class Group(HISModel):
     """Customer identifier of the corresponding customer"""
     name = CharField(64)
     """A representative name"""
+
     @property
-    def members(self):
-        """Fetch all users that are in this group"""
-        return (User.select().where(User.group == self))
+    def admins(self):
+        """Fetches all admins of the group"""
+        for member in self.members:
+            if member.admin:
+                yield member
 
 
 class User(HISModel):
@@ -32,9 +35,9 @@ class User(HISModel):
     """
     name = CharField(64)
     """A representative name"""
-    passwd = CharField(128, db_column='passwd')
+    _passwd = CharField(69, db_column='passwd')
     """The user's SHA-512 encrypted login password"""
-    group = ForeignKeyField(Group, db_column='group')
+    group = ForeignKeyField(Group, db_column='group', realted_name='members')
     """The primary group of the user"""
     admin = BooleanField()
     """Flag, whether the user is an administrator"""
@@ -44,6 +47,16 @@ class User(HISModel):
     """Number of failed login attempts"""
     disabled = BooleanField()
     """Flag to disable the user for login"""
+
+    @property
+    def passwd(self):
+        """Returns the password"""
+        return self._passwd
+
+    @passwd.setter
+    def passwd(self, passwd):
+        """Encrypts and sets the password"""
+        self._passwd = str(sha256(passwd.encode()).hexdigest())
 
     @property
     def locked(self):
@@ -56,16 +69,41 @@ class User(HISModel):
     @property
     def hashed_name(self):
         """Returns the SHA-256 encoded name"""
-        return str(sha256(self.name.encode()))
+        return str(sha256(self.name.encode()).hexdigest())
 
     @property
-    def root(self):
-        """Determines whether the user is a super-user aka. root"""
+    def superadmin(self):
+        """Determines whether the user is a super-administrator"""
         if self.admin and self.group.customer.id == 1000:
             return True
+        else:
+            return False
 
     @classmethod
     def by_id(cls, ident):
         """Returns a user by its ID"""
         for user in cls.select().limit(1).where(cls.id == ident):
             return user
+
+    @classmethod
+    def by_name(cls, name):
+        """Returns a user by its ID"""
+        for user in cls.select().limit(1).where(cls.name == name):
+            return user
+
+    @classmethod
+    def by_hashed_name(cls, sha256name):
+        """Returns a user by its hashed name"""
+        for user in cls.select().where(True):
+            if str(sha256(user.name.encode()).hexdigest()) == sha256name:
+                return user
+
+    @classmethod
+    def admins(cls):
+        """Returns all administrators"""
+        return cls.select().where(cls.admin == 1)
+
+    @classmethod
+    def superadmins(cls):
+        """Returns all super-administrators"""
+        return cls.select().where(cls.superadmin is True)

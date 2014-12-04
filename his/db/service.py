@@ -22,6 +22,12 @@ class Service(HISModel):
     """Flag whether the service is public
     and thus requires no authentication"""
 
+    @classmethod
+    def by_name(cls, name):
+        """Fetches a service by its name"""
+        for service in cls.select().limit(1).where(cls.name == name):
+            return service
+
 
 class UserService(HISModel):
     """

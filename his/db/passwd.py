@@ -41,7 +41,7 @@ class User(HISModel):
     """The primary group of the user"""
     admin = BooleanField()
     """Flag, whether the user is an administrator"""
-    last_login = DateTimeField()
+    last_login = DateTimeField(null=True)
     """Date and time of the last login"""
     failed_logins = IntegerField()
     """Number of failed login attempts"""

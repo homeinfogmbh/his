@@ -20,19 +20,18 @@ def login(func):
             raise NoSuchUser()
         elif user.locked:
             raise UserLocked()
-        else:
+        elif user.passwd == user_pass:
             for _ in Session.select().limit(1).where(Session.user == user):
                 raise SessionExists()
             else:
-                if user.passwd == user_pass:
-                    user.failed_logins = 0
-                    user.save()
-                    session = Session.start(user)
-                    return func(*args, **kwargs), session.token
-                else:
-                    user.failed_logins += 1
-                    user.save()
-                    raise InvalidCredentials()
+                user.failed_logins = 0
+                user.save()
+                session = Session.start(user)
+                return func(*args, **kwargs), session.token
+        else:
+            user.failed_logins += 1
+            user.save()
+            raise InvalidCredentials()
 
     return _login
 

@@ -7,7 +7,8 @@ __author__ = 'Richard Neumann <r.neumann@homeinfo.de>'
 __date__ = '25.09.2014'
 __all__ = ['InvalidCredentials', 'SessionTimeout',  'SessionExists',
            'UserLocked', 'NotLoggedIn', 'NoSuchService', 'UnauthorizedUser',
-           'UnauthorizedGroup', 'NotAuthenticated', 'NotAuthorized']
+           'UnauthorizedGroup', 'NotAuthenticated', 'NotAuthorized',
+           'InternalServerError']
 
 
 class Error(Exception):
@@ -185,3 +186,13 @@ class NotAuthorized (Error):
 
     def __init__(self):
         super().__init__(10, 'NOT_AUTHORIZED')
+
+
+class InternalServerError (Error):
+    """Indicates that an unexpected error
+    occurred within the system"""
+    _lang = {'EN': 'Internal server error.',
+             'DE': 'Interner Server-Fehler.'}
+
+    def __init__(self):
+        super().__init__(11, 'INTERNAL_SERVER_ERROR')

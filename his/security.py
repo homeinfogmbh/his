@@ -3,6 +3,7 @@ Handles service access
 """
 from .db import Service, UserService, GroupService, User, Session
 from .lib.error import *
+from datetime import datetime
 
 __author__ = 'Richard Neumann <r.neumann@homeinfo.de>'
 __date__ = '04.12.2014'
@@ -39,10 +40,16 @@ def authenticate(func):
                 # Reset failed logins to zero
                 # after successful login
                 user.failed_logins = 0
+                # Set last login of the user to now
+                user.last_login = datetime.now()
                 user.save()
                 result = func(*args, **kwargs)
-                result.session_token = session.token
-                return result
+                try:
+                    result.session_token = session.token
+                except AttributeError:
+                    raise InternalServerError()
+                else:
+                    return result
         else:
             # User has provided an invalid password
             # so raise amount of failed logins

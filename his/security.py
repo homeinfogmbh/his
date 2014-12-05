@@ -6,7 +6,7 @@ from .lib.error import *
 
 __author__ = 'Richard Neumann <r.neumann@homeinfo.de>'
 __date__ = '04.12.2014'
-__all__ = ['login', 'authenticate', 'authorize']
+__all__ = ['authenticate', 'authorize']
 
 
 def authenticate(func):

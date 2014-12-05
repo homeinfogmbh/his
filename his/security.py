@@ -15,24 +15,37 @@ def authenticate(func):
         """Create a session for a user"""
         user = User.by_user_name(user_name)
         if user is None:
+            # User with specified name has
+            # not been found in the database
             raise InvalidCredentials()
         elif user.locked:
+            # User is marked as locked
             raise UserLocked()
         elif user.passwd == user_pass:
             for session in Session.select().limit(1).where(Session.user
                                                            == user):
                 if session.valid:
+                    # An active session has been found
+                    # and double login is not allowed
                     raise SessionExists()
                 else:
+                    # A time-outed session has been found
+                    # so just remove it
                     session.terminate()
             else:
+                # No active session have been found
+                # so start a new one
                 session = Session.start(user)
+                # Reset failed logins to zero
+                # after successful login
                 user.failed_logins = 0
                 user.save()
                 result = func(*args, **kwargs)
                 result.session_token = session.token
                 return result
         else:
+            # User has provided an invalid password
+            # so raise amount of failed logins
             user.failed_logins += 1
             user.save()
             raise InvalidCredentials()
@@ -41,24 +54,34 @@ def authenticate(func):
         """Refresh a session for a user"""
         user = User.by_user_name(user_name)
         if user is None:
+            # User with specified name has
+            # not been found in the database
             raise InvalidCredentials()
         elif user.locked:
+            # User is marked as locked
             raise UserLocked()
         else:
             for session in Session.select().limit(1).where(Session.user
                                                            == user):
                 if session.valid:
+                    # A valid session has been found
                     if session.token == session_token:
+                        # Session token matches, so refresh session
                         session = session.refresh()
                         result = func(*args, **kwargs)
                         result.session_token = session.token
                         return result
                     else:
+                        # The session token is invalid
+                        # Does somebody try to intrude?
                         raise InvalidCredentials()
                 else:
+                    # The session has timed out
+                    # So terminate it an raise appropriate error
                     session.terminate()
                     raise SessionTimeout()
             else:
+                # There is no session for the user
                 raise NotLoggedIn()
 
     def authenticate(*args, user_name=None, session_token=None,
@@ -71,11 +94,13 @@ def authenticate(func):
                 if user_pass is None:
                     raise InvalidCredentials()
                 else:
-                    return _login(*args, user_name=user_name,
-                                  user_pass=user_pass, **kwargs)
+                    return _login(user_name, user_pass, *args, **kwargs)
             else:
-                return _session(*args, user_name=user_name,
-                                session_token=session_token, **kwargs)
+                if user_pass is None:
+                    return _session(user_name, session_token,
+                                    *args, **kwargs)
+                else:
+                    raise InvalidCredentials()
 
     return authenticate
 

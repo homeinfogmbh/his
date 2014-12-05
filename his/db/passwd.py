@@ -35,9 +35,9 @@ class User(HISModel):
     """
     email = CharField(64)
     """A unique email address"""
-    first_name = CharField(32)
+    first_name = CharField(32, null=True)
     """The user's first name"""
-    last_name = CharField(32)
+    last_name = CharField(32, null=True)
     """The user's last name"""
     _passwd = CharField(69, db_column='passwd')
     """The user's SHA-512 encrypted login password"""
@@ -55,12 +55,16 @@ class User(HISModel):
     @property
     def name(self):
         """Returns the user's name"""
-        return self.email
-
-    @name.setter
-    def name(self, name):
-        """Sets the user's name"""
-        self.email = name
+        if self.first_name is None:
+            if self.last_name is None:
+                return None
+            else:
+                return self.last_name
+        else:
+            if self.last_name is None:
+                return self.first_name
+            else:
+                return ' '.join([self.first_name, self.last_name])
 
     @property
     def passwd(self):
@@ -81,9 +85,9 @@ class User(HISModel):
             return False
 
     @property
-    def hashed_name(self):
-        """Returns the SHA-256 encoded name"""
-        return str(sha256(self.name.encode()).hexdigest())
+    def user_name(self):
+        """Returns the SHA-256 encoded email"""
+        return str(sha256(self.email.encode()).hexdigest())
 
     @property
     def superadmin(self):
@@ -100,16 +104,16 @@ class User(HISModel):
             return user
 
     @classmethod
-    def by_name(cls, name):
+    def by_email(cls, email):
         """Returns a user by its ID"""
-        for user in cls.select().limit(1).where(cls.name == name):
+        for user in cls.select().limit(1).where(cls.email == email):
             return user
 
     @classmethod
-    def by_hashed_name(cls, sha256name):
+    def by_user_name(cls, user_name):
         """Returns a user by its hashed name"""
         for user in cls.select().where(True):
-            if str(sha256(user.name.encode()).hexdigest()) == sha256name:
+            if user.user_name == user_name:
                 return user
 
     @classmethod

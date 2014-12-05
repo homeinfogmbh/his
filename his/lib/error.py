@@ -37,7 +37,7 @@ class Error(Exception):
         msg.code = self.code
         msg.msg = self.msg
         rsp.msg = msg
-        rsp.signal = pcp.Signal.ACK
+        rsp.signal = pcp.Signal.NACK    # @UndefinedVariable
         return rsp
 
     def __xml__(self):
@@ -94,12 +94,6 @@ class SessionExists(Error):
     a user is already running"""
     def __init__(self):
         super().__init__(3, 'SESSION_EXISTS')
-
-
-class NoSuchUser(Error):
-    """Indicates that there is no such user"""
-    def __init__(self):
-        super().__init__(4, 'NO_SUCH_USER')
 
 
 class UserLocked(Error):

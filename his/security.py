@@ -26,13 +26,13 @@ class NoPassword(Exception):
 def authenticate(func):
     """Authenticate for a method"""
     def login(*args, user_name=None, user_pass=None, **kwargs):
-        """Login a user"""
+        """Create a session for a user"""
         if user_name is None:
             raise NoSuchUser()
         elif user_pass is None:
             raise NoPassword()
         else:
-            user = User.by_hashed_name(user_name)
+            user = User.by_user_name(user_name)
             if user is None:
                 raise NoSuchUser()
             elif user.locked:
@@ -63,7 +63,7 @@ def authenticate(func):
         elif session_token is None:
             raise NoSessionToken()
         else:
-            user = User.by_hashed_name(user_name)
+            user = User.by_user_name(user_name)
             if user is None:
                 raise NoSuchUser()
             elif user.locked:
@@ -87,9 +87,9 @@ def authenticate(func):
 
     def authenticate(*args, user_name=None, session_token=None,
                      user_pass=None, **kwargs):
-        """Authenticate the user via active session or else password"""
+        """Authenticate the user via active session or login"""
         if user_name is None:
-            raise InvalidCredentials()
+            raise NotAuthenticated()
         else:
             if session_token is None:
                 if user_pass is None:
@@ -119,7 +119,7 @@ def authorize(func):
         """Determines whether a user is allowed to access a certain resource"""
         if user_name is None or service_name is None:
             raise NotAuthorized()
-        user = User.by_hashed_name(user_name)
+        user = User.by_user_name(user_name)
         if user is None:
             raise NoSuchUser()
         elif user.locked:

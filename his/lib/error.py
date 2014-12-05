@@ -6,9 +6,8 @@ import pcp
 __author__ = 'Richard Neumann <r.neumann@homeinfo.de>'
 __date__ = '25.09.2014'
 __all__ = ['InvalidCredentials', 'SessionTimeout',  'SessionExists',
-           'NoSuchUser', 'UserLocked', 'NotLoggedIn', 'NoSuchService',
-           'UnauthorizedUser', 'UnauthorizedGroup', 'NotAuthenticated',
-           'NotAuthorized']
+           'UserLocked', 'NotLoggedIn', 'NoSuchService', 'UnauthorizedUser',
+           'UnauthorizedGroup', 'NotAuthenticated', 'NotAuthorized']
 
 
 class Error(Exception):
@@ -99,44 +98,44 @@ class SessionExists(Error):
 class UserLocked(Error):
     """Indicates that a user has been locked"""
     def __init__(self):
-        super().__init__(5, 'USER_LOCKED')
+        super().__init__(4, 'USER_LOCKED')
 
 
 class NotLoggedIn(Error):
     """Indicates that a user has no active session"""
     def __init__(self):
-        super().__init__(6, 'NOT_LOGGED_IN')
+        super().__init__(5, 'NOT_LOGGED_IN')
 
 
 class NoSuchService (Error):
     """Indicates that a service does not exist"""
     def __init__(self):
-        super().__init__(7, 'NO_SUCH_SERVICE')
+        super().__init__(6, 'NO_SUCH_SERVICE')
 
 
 class UnauthorizedUser (Error):
     """Indicates that a user is not
     allowed to access a service"""
     def __init__(self):
-        super().__init__(8, 'UNAUTHORIZED_USER')
+        super().__init__(7, 'UNAUTHORIZED_USER')
 
 
 class UnauthorizedGroup (Error):
     """Indicates that a group is not
     allowed to access a service"""
     def __init__(self):
-        super().__init__(9, 'UNAUTHORIZED_GROUP')
+        super().__init__(8, 'UNAUTHORIZED_GROUP')
 
 
 class NotAuthenticated (Error):
     """Indicates that a protected resource was
     accessed without authentication information"""
     def __init__(self):
-        super().__init__(10, 'NOT_AUTHENTICATED')
+        super().__init__(9, 'NOT_AUTHENTICATED')
 
 
 class NotAuthorized (Error):
     """Indicates that a protected resource was
     accessed without authorization information"""
     def __init__(self):
-        super().__init__(11, 'NOT_AUTHORIZED')
+        super().__init__(10, 'NOT_AUTHORIZED')

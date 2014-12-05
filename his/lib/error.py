@@ -44,9 +44,8 @@ class Error(Exception):
         msg.code = self.code
         msg.msg = self.msg
         for lang, text in self.lang.items():
-            t = pcp.MessageText()
+            t = pcp.MessageText(text)
             t.lang = lang
-            t.text = text
             msg.text.append(t)
         rsp.msg = msg
         rsp.signal = pcp.Signal.NACK    # @UndefinedVariable

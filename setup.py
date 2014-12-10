@@ -4,7 +4,7 @@ from distutils.core import setup
 from peewee import OperationalError
 
 setup(
-    name='homeinfo-his',
+    name='homeinfo.his',
     version='0.0.1-indev',
     author='Richard Neumann, Nikos Zizopoulos',
     author_email='mail@richard-neumann.de',

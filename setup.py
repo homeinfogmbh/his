@@ -1,6 +1,7 @@
 #! /usr/bin/env python3
 
 from distutils.core import setup
+from peewee import OperationalError
 
 setup(
     name='homeinfo-his',
@@ -14,8 +15,7 @@ setup(
     packages=['homeinfo.his',
               'homeinfo.his.wsgi',
               'homeinfo.his.db',
-              'homeinfo.his.lib',
-              'homeinfo.his.services'],
+              'homeinfo.his.lib'],
     data_files=[('/usr/local/etc', ['files/etc/his.conf'])],
     license=open('LICENSE.txt').read(),
     description='HOMEINFO Integrated Services',
@@ -25,8 +25,8 @@ setup(
 
 try:
     from homeinfo.his.db import __tables__
-except:
-    print('Cannot import __tables__')
+except OperationalError:
+    print('WARNING: No database access - Won\'t create any tables')
 else:
     for table in __tables__:
         try:

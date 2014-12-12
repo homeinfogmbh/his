@@ -3,28 +3,27 @@ Group and user definitions
 """
 from .abc import HISModel
 from homeinfo.crm import Customer
-from peewee import ForeignKeyField, CharField, BooleanField, DateTimeField,\
-    IntegerField
+from peewee import (ForeignKeyField, CharField, BooleanField,
+                    DateTimeField, IntegerField)
 from hashlib import sha256
 
 __author__ = 'Richard Neumann <r.neumann@homeinfo.de>'
 __date__ = '09.10.2014'
-__all__ = ['Group', 'User', 'GroupMembers']
+__all__ = ['Group', 'User']
 
 
-class Group(HISModel):
+class Group(Customer):
     """
     A HOMEINFO Integrated Services group
+    XXX: Virtual extension of homeinfo.crm.Customer
     """
-    customer = ForeignKeyField(Customer, db_column='customer')
-    """Customer identifier of the corresponding customer"""
-    name = CharField(64)
-    """A representative name"""
+    class Meta:
+        db_table = Customer._meta.db_table  # @UndefinedVariable
 
     @property
     def admins(self):
         """Fetches all admins of the group"""
-        for member in self.members:
+        for member in self.members:  # related_name of User.group
             if member.admin:
                 yield member
 

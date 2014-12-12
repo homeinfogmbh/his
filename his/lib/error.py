@@ -5,10 +5,7 @@ import pcp
 
 __author__ = 'Richard Neumann <r.neumann@homeinfo.de>'
 __date__ = '25.09.2014'
-__all__ = ['InvalidCredentials', 'SessionTimeout',  'SessionExists',
-           'UserLocked', 'NotLoggedIn', 'NoSuchService', 'UnauthorizedUser',
-           'UnauthorizedGroup', 'NotAuthenticated', 'NotAuthorized',
-           'InternalServerError']
+__all__ = ['Error']
 
 
 class Error(Exception):
@@ -136,7 +133,7 @@ class NotLoggedIn(Error):
         super().__init__(5, 'NOT_LOGGED_IN')
 
 
-class NoSuchService (Error):
+class NoSuchService(Error):
     """Indicates that a service does not exist"""
     _lang = {'EN': 'The requested service does not exist.',
              'DE': 'Der angeforderte Dienst existiert nicht.'}
@@ -145,7 +142,7 @@ class NoSuchService (Error):
         super().__init__(6, 'NO_SUCH_SERVICE')
 
 
-class UnauthorizedUser (Error):
+class UnauthorizedUser(Error):
     """Indicates that a user is not
     allowed to access a service"""
     _lang = {'EN': 'You are not allowed to access the requested resource.',
@@ -156,7 +153,7 @@ class UnauthorizedUser (Error):
         super().__init__(7, 'UNAUTHORIZED_USER')
 
 
-class UnauthorizedGroup (Error):
+class UnauthorizedGroup(Error):
     """Indicates that a group is not
     allowed to access a service"""
     _lang = {'EN': 'Your group are not allowed to'
@@ -168,7 +165,7 @@ class UnauthorizedGroup (Error):
         super().__init__(8, 'UNAUTHORIZED_GROUP')
 
 
-class NotAuthenticated (Error):
+class NotAuthenticated(Error):
     """Indicates that a protected resource was
     accessed without authentication information"""
     _lang = {'EN': 'Go away!',
@@ -178,7 +175,7 @@ class NotAuthenticated (Error):
         super().__init__(9, 'NOT_AUTHENTICATED')
 
 
-class NotAuthorized (Error):
+class NotAuthorized(Error):
     """Indicates that a protected resource was
     accessed without authorization information"""
     _lang = {'EN': 'Go away!',
@@ -188,7 +185,7 @@ class NotAuthorized (Error):
         super().__init__(10, 'NOT_AUTHORIZED')
 
 
-class InternalServerError (Error):
+class InternalServerError(Error):
     """Indicates that an unexpected error
     occurred within the system"""
     _lang = {'EN': 'Internal server error.',
@@ -196,3 +193,24 @@ class InternalServerError (Error):
 
     def __init__(self):
         super().__init__(11, 'INTERNAL_SERVER_ERROR')
+
+
+class NoSuchResource(Error):
+    """Indicates that a non-existent
+    resource has been requested"""
+    _lang = {'EN': 'No such resource.',
+             'DE': 'Keine solche Ressource.'}
+
+    def __init__(self):
+        super().__init__(12, 'NO_SUCH_RESOURCE')
+
+
+class UnsupportedAction(Error):
+    """Indicates that an unsupported action
+    (GET, POST, PUT, DELETE)
+    has been tried to apply on a certain resource"""
+    _lang = {'EN': 'Unsupported action.',
+             'DE': 'Nicht-unterstützte Aktion.'}
+
+    def __init__(self):
+        super().__init__(13, 'UNSUPPORTED_ACTION')

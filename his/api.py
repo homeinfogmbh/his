@@ -2,6 +2,7 @@
 Defines the HIS service databases
 """
 from .config import db, wsgi
+from .lib.error import UnsupportedAction
 from peewee import MySQLDatabase
 from os.path import join
 
@@ -26,14 +27,56 @@ class HISServiceDatabase(MySQLDatabase):
                          threadlocals=threadlocals, **kwargs)
 
 
-class Service():
-    """Common service class"""
+class Resource():
+    """
+    A REST-capable resource
+    """
+    def __init__(self, parent):
+        """Initializes relative to parent resource"""
+        self.__parent = parent
+
+    @property
+    def parent(self):
+        """Returns the parent resource"""
+        return self.__parent
+
     @property
     def name(self):
-        """Returns the service's name"""
+        """Returns the resource's name"""
         return self.__class__.__name__
 
     @property
-    def root(self):
-        """Returns the service's root path"""
-        return join(wsgi.get('root'), self.name.lower())
+    def path(self):
+        """Returns the resource's path"""
+        return join(wsgi.get('root') if self.parent is None
+                    else self.parent.path, self.name.lower())
+
+    def get(self, **kwargs):
+        """Reaction GET request"""
+        raise UnsupportedAction()
+
+    def post(self, data, **kwargs):
+        """Reaction POST request"""
+        raise UnsupportedAction()
+
+    def put(self, data, **kwargs):
+        """Reaction PUT request"""
+        raise UnsupportedAction()
+
+    def delete(self, **kwargs):
+        """Reaction DELETE request"""
+        raise UnsupportedAction()
+
+
+class Service(Resource):
+    """Common service class"""
+    def __init__(self):
+        """Initializes relative to parent resource"""
+        super().__init__(None)
+
+    @property
+    def resources(self):
+        """Returns a generator of all the service's resources"""
+        for attr in dir(self):
+            if type(attr) is Resource:
+                yield getattr(self, attr)

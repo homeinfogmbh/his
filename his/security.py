@@ -2,7 +2,10 @@
 Handles service access
 """
 from .db import Service, UserService, GroupService, User, Session
-from .lib.error import *
+from .lib.error import (InvalidCredentials, UserLocked, SessionExists,
+                        InternalServerError, SessionTimeout, NotLoggedIn,
+                        NotAuthenticated, UnauthorizedGroup, NotAuthorized,
+                        NoSuchService, UnauthorizedUser)
 from datetime import datetime
 
 __author__ = 'Richard Neumann <r.neumann@homeinfo.de>'
@@ -12,7 +15,7 @@ __all__ = ['authenticate', 'authorize']
 
 def authenticate(func):
     """Authenticate for a method"""
-    def _login(user_name, user_pass, *args, **kwargs):
+    def _login(user_name, passwd, *args, **kwargs):
         """Create a session for a user"""
         user = User.by_user_name(user_name)
         if user is None:
@@ -22,7 +25,7 @@ def authenticate(func):
         elif user.locked:
             # User is marked as locked
             raise UserLocked()
-        elif user.passwd == user_pass:
+        elif user.passwd == passwd:
             for session in Session.select().limit(1).where(Session.user
                                                            == user):
                 if session.valid:
@@ -76,8 +79,12 @@ def authenticate(func):
                         # Session token matches, so refresh session
                         session = session.refresh()
                         result = func(*args, **kwargs)
-                        result.session_token = session.token
-                        return result
+                        try:
+                            result.session_token = session.token
+                        except AttributeError:
+                            raise InternalServerError()
+                        else:
+                            return result
                     else:
                         # The session token is invalid
                         # Does somebody try to intrude?
@@ -91,19 +98,19 @@ def authenticate(func):
                 # There is no session for the user
                 raise NotLoggedIn()
 
-    def authenticate(*args, user_name=None, session_token=None,
-                     user_pass=None, **kwargs):
+    def authenticate(user_name, *args, session_token=None,
+                     passwd=None, **kwargs):
         """Authenticate the user via active session or login"""
         if user_name is None:
             raise NotAuthenticated()
         else:
             if session_token is None:
-                if user_pass is None:
+                if passwd is None:
                     raise InvalidCredentials()
                 else:
-                    return _login(user_name, user_pass, *args, **kwargs)
+                    return _login(user_name, passwd, *args, **kwargs)
             else:
-                if user_pass is None:
+                if passwd is None:
                     return _session(user_name, session_token,
                                     *args, **kwargs)
                 else:

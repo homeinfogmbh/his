@@ -1,12 +1,13 @@
 """
 Defines the HIS service databases
 """
-from .config import db
+from .config import db, wsgi
 from peewee import MySQLDatabase
+from os.path import join
 
 __date__ = '06.11.2014'
 __author__ = 'Richard Neumann <r.neumann@homeinfo.de>'
-__all__ = ['HISServiceDatabase']
+__all__ = ['HISServiceDatabase', 'Service']
 
 
 class HISServiceDatabase(MySQLDatabase):
@@ -23,3 +24,16 @@ class HISServiceDatabase(MySQLDatabase):
         super().__init__('_'.join([db.get('master_db'), str(service)]),
                          host=host, user=user, passwd=passwd,
                          threadlocals=threadlocals, **kwargs)
+
+
+class Service():
+    """Common service class"""
+    @property
+    def name(self):
+        """Returns the service's name"""
+        return self.__class__.__name__
+
+    @property
+    def root(self):
+        """Returns the service's root path"""
+        return join(wsgi.get('root'), self.name.lower())

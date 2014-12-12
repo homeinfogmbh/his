@@ -39,7 +39,7 @@ class User(HISModel):
     last_name = CharField(32, null=True)
     """The user's last name"""
     _passwd = CharField(69, db_column='passwd')
-    """The user's SHA-512 encrypted login password"""
+    """The user's SHA-256 encrypted login password"""
     group = ForeignKeyField(Group, db_column='group', related_name='members')
     """The primary group of the user"""
     admin = BooleanField()

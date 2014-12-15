@@ -2,7 +2,7 @@
 Defines the HIS basic Resource template
 """
 from ..config import wsgi
-from ..lib.error import UnsupportedAction
+from ..lib.error import UnsupportedHTTPAction
 from os.path import join
 
 __date__ = '06.11.2014'
@@ -36,16 +36,16 @@ class Resource():
 
     def get(self, **kwargs):
         """Reaction GET request"""
-        raise UnsupportedAction()
+        raise UnsupportedHTTPAction()
 
     def post(self, data, **kwargs):
         """Reaction POST request"""
-        raise UnsupportedAction()
+        raise UnsupportedHTTPAction()
 
     def put(self, data, **kwargs):
         """Reaction PUT request"""
-        raise UnsupportedAction()
+        raise UnsupportedHTTPAction()
 
     def delete(self, **kwargs):
         """Reaction DELETE request"""
-        raise UnsupportedAction()
+        raise UnsupportedHTTPAction()

@@ -205,12 +205,12 @@ class NoSuchResource(Error):
         super().__init__(12, 'NO_SUCH_RESOURCE')
 
 
-class UnsupportedAction(Error):
+class UnsupportedHTTPAction(Error):
     """Indicates that an unsupported action
     (GET, POST, PUT, DELETE)
     has been tried to apply on a certain resource"""
-    _lang = {'EN': 'Unsupported action.',
-             'DE': 'Nicht-unterstützte Aktion.'}
+    _lang = {'EN': 'Unsupported HTTP action.',
+             'DE': 'Nicht-unterstützte HTTP-Aktion.'}
 
     def __init__(self):
-        super().__init__(13, 'UNSUPPORTED_ACTION')
+        super().__init__(13, 'UNSUPPORTED_HTTP_ACTION')

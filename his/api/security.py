@@ -89,7 +89,7 @@ def session(func):
                         if session.token == session_token:
                             # Session token matches, so refresh session
                             session = session.refresh()
-                            result = func(*args, **kwargs)
+                            result = func(*args, user_name=user_name, **kwargs)
                             try:
                                 result.session_token = session.token
                             except AttributeError:

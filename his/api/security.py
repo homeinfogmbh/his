@@ -27,7 +27,7 @@ def login(func):
                 raise InvalidCredentials()
             elif user.locked:
                 # User is marked as locked
-                raise UserLocked()
+                raise InvalidCredentials()
             elif user.passwd == user_pass:
                 for session in Session.select().limit(1).where(Session.user
                                                                == user):
@@ -137,10 +137,10 @@ def authorize(func):
             if service is None:
                 raise NoSuchService()
             elif authorize_group(user.group, service):
-                for _ in (UserService.select()
+                for _ in (UserService.select().limit(1)
                           .where(UserService.user == user
                                  and UserService.service == service)):
-                    return func(*args, **kwargs)
+                    return func(*args, user_name=user_name, **kwargs)
                 else:
                     raise UnauthorizedUser()
             else:

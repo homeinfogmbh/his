@@ -1,11 +1,11 @@
 """
-Handles service access
+Security checks
 """
-from .db import Service, UserService, GroupService, User, Session
-from .lib.error import (InvalidCredentials, UserLocked, SessionExists,
-                        InternalServerError, SessionTimeout, NotLoggedIn,
-                        NotAuthenticated, UnauthorizedGroup, NotAuthorized,
-                        NoSuchService, UnauthorizedUser)
+from ..db import Service, UserService, GroupService, User, Session
+from ..lib.error import (InvalidCredentials, UserLocked, SessionExists,
+                         InternalServerError, SessionTimeout, NotLoggedIn,
+                         NotAuthenticated, UnauthorizedGroup, NotAuthorized,
+                         NoSuchService, UnauthorizedUser)
 from datetime import datetime
 
 __author__ = 'Richard Neumann <r.neumann@homeinfo.de>'

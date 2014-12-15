@@ -1,30 +1,13 @@
 """
-Defines the HIS service databases
+Defines the HIS basic Resource template
 """
-from .config import db, wsgi
-from .lib.error import UnsupportedAction
-from peewee import MySQLDatabase
+from ..config import wsgi
+from ..lib.error import UnsupportedAction
 from os.path import join
 
 __date__ = '06.11.2014'
 __author__ = 'Richard Neumann <r.neumann@homeinfo.de>'
 __all__ = ['HISServiceDatabase', 'Service']
-
-
-class HISServiceDatabase(MySQLDatabase):
-    """A HIS service database"""
-    def __init__(self, service, host=None, user=None,
-                 passwd=None, threadlocals=False, **kwargs):
-        if host is None:
-            host = db.get('host')
-        if user is None:
-            user = db.get('user')
-        if passwd is None:
-            passwd = db.get('passwd')
-        """Changes the name to create a '_'-separated namespace"""
-        super().__init__('_'.join([db.get('master_db'), str(service)]),
-                         host=host, user=user, passwd=passwd,
-                         threadlocals=threadlocals, **kwargs)
 
 
 class Resource():
@@ -66,17 +49,3 @@ class Resource():
     def delete(self, **kwargs):
         """Reaction DELETE request"""
         raise UnsupportedAction()
-
-
-class Service(Resource):
-    """Common service class"""
-    def __init__(self):
-        """Initializes relative to parent resource"""
-        super().__init__(None)
-
-    @property
-    def resources(self):
-        """Returns a generator of all the service's resources"""
-        for attr in dir(self):
-            if type(attr) is Resource:
-                yield getattr(self, attr)

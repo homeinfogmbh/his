@@ -10,113 +10,106 @@ from datetime import datetime
 
 __author__ = 'Richard Neumann <r.neumann@homeinfo.de>'
 __date__ = '04.12.2014'
-__all__ = ['authenticate', 'authorize']
+__all__ = ['login', 'session', 'authorize']
 
 
-def authenticate(func):
+def login(func):
     """Authenticate for a method"""
-    def _login(user_name, passwd, *args, **kwargs):
+    def _login(*args, user_name=None, user_pass=None, **kwargs):
         """Create a session for a user"""
-        user = User.by_user_name(user_name)
-        if user is None:
-            # User with specified name has
-            # not been found in the database
-            raise InvalidCredentials()
-        elif user.locked:
-            # User is marked as locked
-            raise UserLocked()
-        elif user.passwd == passwd:
-            for session in Session.select().limit(1).where(Session.user
-                                                           == user):
-                if session.valid:
-                    # An active session has been found
-                    # and double login is not allowed
-                    raise SessionExists()
-                else:
-                    # A time-outed session has been found
-                    # so just remove it
-                    session.terminate()
-            else:
-                # No active session have been found
-                # so start a new one
-                session = Session.start(user)
-                # Reset failed logins to zero
-                # after successful login
-                user.failed_logins = 0
-                # Set last login of the user to now
-                user.last_login = datetime.now()
-                user.save()
-                result = func(*args, **kwargs)
-                try:
-                    result.session_token = session.token
-                except AttributeError:
-                    raise InternalServerError()
-                else:
-                    return result
-        else:
-            # User has provided an invalid password
-            # so raise amount of failed logins
-            user.failed_logins += 1
-            user.save()
-            raise InvalidCredentials()
-
-    def _session(user_name, session_token, *args, **kwargs):
-        """Refresh a session for a user"""
-        user = User.by_user_name(user_name)
-        if user is None:
-            # User with specified name has
-            # not been found in the database
-            raise InvalidCredentials()
-        elif user.locked:
-            # User is marked as locked
-            raise UserLocked()
-        else:
-            for session in Session.select().limit(1).where(Session.user
-                                                           == user):
-                if session.valid:
-                    # A valid session has been found
-                    if session.token == session_token:
-                        # Session token matches, so refresh session
-                        session = session.refresh()
-                        result = func(*args, **kwargs)
-                        try:
-                            result.session_token = session.token
-                        except AttributeError:
-                            raise InternalServerError()
-                        else:
-                            return result
-                    else:
-                        # The session token is invalid
-                        # Does somebody try to intrude?
-                        raise InvalidCredentials()
-                else:
-                    # The session has timed out
-                    # So terminate it an raise appropriate error
-                    session.terminate()
-                    raise SessionTimeout()
-            else:
-                # There is no session for the user
-                raise NotLoggedIn()
-
-    def authenticate(user_name, *args, session_token=None,
-                     passwd=None, **kwargs):
-        """Authenticate the user via active session or login"""
-        if user_name is None:
+        if user_name is None or user_pass is None:
             raise NotAuthenticated()
         else:
-            if session_token is None:
-                if passwd is None:
-                    raise InvalidCredentials()
+            user = User.by_user_name(user_name)
+            if user is None:
+                # User with specified name has
+                # not been found in the database
+                raise InvalidCredentials()
+            elif user.locked:
+                # User is marked as locked
+                raise UserLocked()
+            elif user.passwd == user_pass:
+                for session in Session.select().limit(1).where(Session.user
+                                                               == user):
+                    if session.valid:
+                        # An active session has been found
+                        # and double login is not allowed
+                        raise SessionExists()
+                    else:
+                        # A time-outed session has been found
+                        # so just remove it
+                        session.terminate()
                 else:
-                    return _login(user_name, passwd, *args, **kwargs)
+                    # No active session have been found
+                    # so start a new one
+                    session = Session.start(user)
+                    # Reset failed logins to zero
+                    # after successful login
+                    user.failed_logins = 0
+                    # Set last login of the user to now
+                    user.last_login = datetime.now()
+                    user.save()
+                    result = func(*args, user_name=user_name, **kwargs)
+                    try:
+                        result.session_token = session.token
+                    except AttributeError:
+                        raise InternalServerError()
+                    else:
+                        return result
             else:
-                if passwd is None:
-                    return _session(user_name, session_token,
-                                    *args, **kwargs)
-                else:
-                    raise InvalidCredentials()
+                # User has provided an invalid password
+                # so raise amount of failed logins
+                user.failed_logins += 1
+                user.save()
+                raise InvalidCredentials()
 
-    return authenticate
+    return _login
+
+
+def session(func):
+    """Authenticate for a method"""
+    def _session(*args, user_name=None, session_token=None, **kwargs):
+        """Refresh a session for a user"""
+        if user_name is None or session_token is None:
+            raise NotAuthenticated()
+        else:
+            user = User.by_user_name(user_name)
+            if user is None:
+                # User with specified name has
+                # not been found in the database
+                raise InvalidCredentials()
+            elif user.locked:
+                # User is marked as locked
+                raise UserLocked()
+            else:
+                for session in Session.select().limit(1).where(Session.user
+                                                               == user):
+                    if session.valid:
+                        # A valid session has been found
+                        if session.token == session_token:
+                            # Session token matches, so refresh session
+                            session = session.refresh()
+                            result = func(*args, **kwargs)
+                            try:
+                                result.session_token = session.token
+                            except AttributeError:
+                                raise InternalServerError()
+                            else:
+                                return result
+                        else:
+                            # The session token is invalid
+                            # Does somebody try to intrude?
+                            raise InvalidCredentials()
+                    else:
+                        # The session has timed out
+                        # So terminate it an raise appropriate error
+                        session.terminate()
+                        raise SessionTimeout()
+                else:
+                    # There is no session for the user
+                    raise NotLoggedIn()
+
+    return _session
 
 
 def authorize(func):

@@ -23,7 +23,6 @@ setup(
     long_description=open('README.txt').read(),
     )
 
-
 try:
     from homeinfo.his.db import __tables__
 except OperationalError:

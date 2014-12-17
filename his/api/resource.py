@@ -26,7 +26,7 @@ class Resource():
     @property
     def name(self):
         """Returns the resource's name"""
-        return self.__class__.__name__
+        return self.__class__.__name__.lower()
 
     @property
     def path(self):

@@ -17,8 +17,7 @@ class Group(Customer):
     A HOMEINFO Integrated Services group
     XXX: Virtual extension of homeinfo.crm.Customer
     """
-    class Meta:
-        db_table = Customer._meta.db_table  # @UndefinedVariable
+    customer = ForeignKeyField(Customer, db_column='customer')
 
     @property
     def admins(self):

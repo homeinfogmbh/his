@@ -30,7 +30,9 @@ except OperationalError:
 else:
     for table in __tables__:
         try:
-            print('Creating table', table)
+            print('Creating table', table, '\t')
             table.create_table(fail_silently=True)
         except:
-            print('Could not create table:', str(table))
+            print('[ok]')
+        else:
+            print('[failed]')

@@ -29,6 +29,7 @@ except OperationalError:
     print('WARNING: No database access - Won\'t create any tables')
 else:
     for table in __tables__:
+        table.create_table(fail_silently=True)
         try:
             print('Creating table', table, end='\t')
             table.create_table(fail_silently=True)

@@ -12,7 +12,7 @@ __date__ = '09.10.2014'
 __all__ = ['Group', 'User']
 
 
-class Group(Customer):
+class Group(HISModel):
     """
     A HOMEINFO Integrated Services group
     XXX: Virtual extension of homeinfo.crm.Customer

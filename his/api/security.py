@@ -24,15 +24,9 @@ def login(func):
             if user is None:
                 # User with specified name has
                 # not been found in the database
-                icl = InvalidCredentials._lang
-                icl['DE'] = 'user is None'
-                InvalidCredentials._lang = icl
                 raise InvalidCredentials()
             elif user.locked:
                 # User is marked as locked
-                icl = InvalidCredentials._lang
-                icl['DE'] = 'user is locked'
-                InvalidCredentials._lang = icl
                 raise InvalidCredentials()
             elif user.passwd == user_pass:
                 for session in Session.select().limit(1).where(Session.user
@@ -67,9 +61,6 @@ def login(func):
                 # so raise amount of failed logins
                 user.failed_logins += 1
                 user.save()
-                icl = InvalidCredentials._lang
-                icl['DE'] = 'wrong password'
-                InvalidCredentials._lang = icl
                 raise InvalidCredentials()
 
     return _login

@@ -14,9 +14,9 @@ __all__ = ['login', 'session', 'authorize']
 
 
 def login(func):
-    """Authenticate for a method"""
+    """A login decorator"""
     def _login(*args, user_name=None, user_pass=None, **kwargs):
-        """Create a session for a user"""
+        """Creates a session for a user"""
         if user_name is None or user_pass is None:
             raise NotAuthenticated()
         else:
@@ -67,7 +67,7 @@ def login(func):
 
 
 def session(func):
-    """Authenticate for a method"""
+    """A session decorator"""
     def _session(*args, user_name=None, session_token=None, **kwargs):
         """Refresh a session for a user"""
         if user_name is None or session_token is None:
@@ -113,7 +113,7 @@ def session(func):
 
 
 def authorize(func):
-    """Adds authorization to a method"""
+    """An authorization decorator"""
     def authorize_group(group, service):
         """Determines whether a user is allowed to access a certain resource"""
         for _ in (GroupService.select()

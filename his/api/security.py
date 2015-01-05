@@ -115,7 +115,8 @@ def session(func):
 def authorize(func):
     """An authorization decorator"""
     def authorize_group(group, service):
-        """Determines whether a user is allowed to access a certain resource"""
+        """Determines whether a user is allowed
+        to access a certain resource"""
         for _ in (GroupService.select()
                   .where(GroupService.group == group
                          and GroupService.service == service)):
@@ -124,7 +125,8 @@ def authorize(func):
             raise UnauthorizedGroup()
 
     def authorize(*args, user_name=None, service_name=None, **kwargs):
-        """Determines whether a user is allowed to access a certain resource"""
+        """Determines whether a user is allowed
+        to access a certain resource"""
         if user_name is None or service_name is None:
             raise NotAuthorized()
         user = User.by_user_name(user_name)

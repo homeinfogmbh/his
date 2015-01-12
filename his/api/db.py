@@ -12,7 +12,7 @@ __all__ = ['HISServiceDatabase', 'Service']
 class HISServiceDatabase(MySQLDatabase):
     """A HIS service database"""
     def __init__(self, service, host=None, user=None,
-                 passwd=None, threadlocals=False, **kwargs):
+                 passwd=None, threadlocals=True, **kwargs):
         if host is None:
             host = db.get('host')
         if user is None:

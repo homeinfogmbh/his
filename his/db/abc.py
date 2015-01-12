@@ -18,4 +18,4 @@ class HISModel(HIModel):
                                  user=db.get('USER'),
                                  passwd=db.get('PASSWD'),
                                  threadlocals=True)
-        schema = db.get('db')
+        schema = database.database

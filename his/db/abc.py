@@ -3,7 +3,6 @@ Basic HIS database definitions
 """
 from ..config import db
 from peewee import Model, MySQLDatabase
-from pymysql.err import Error
 
 __author__ = 'Richard Neumann <r.neumann@homeinfo.de>'
 __date__ = '09.10.2014'
@@ -30,5 +29,5 @@ class HISModel(Model):
         """Closes a connection if existent"""
         try:
             self._meta.database.close()
-        except Error:
+        except:
             pass

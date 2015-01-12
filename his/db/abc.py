@@ -14,6 +14,8 @@ class HISModel(Model):
     Generic HOMEINFO Integrated Service database model
     """
     class Meta:
-        database = MySQLDatabase(db.get('db'), host=db.get('HOST'),
+        database = MySQLDatabase(db.get('db'),
+                                 host=db.get('HOST'),
                                  user=db.get('USER'),
-                                 passwd=db.get('PASSWD'))
+                                 passwd=db.get('PASSWD'),
+                                 threadlocals=True)

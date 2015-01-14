@@ -61,7 +61,7 @@ class QueryHandler():
             return True
 
     def __genlist(self, s):
-        """Generate a list from a string if it \
+        """Generate a list from a string if it
         contains the predefined list separator"""
         l = s.split(self.LIST_SEP)
         if len(l) > 1:

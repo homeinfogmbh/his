@@ -117,9 +117,11 @@ class User(HISModel):
     @classmethod
     def admins(cls):
         """Returns all administrators"""
-        return cls.select().where(cls.admin == 1)
+        return cls.select().where(cls.admin)
 
     @classmethod
     def superadmins(cls):
         """Returns all super-administrators"""
-        return cls.select().where(cls.superadmin)
+        for user in cls.select().where(True):
+            if user.superadmin:
+                yield user

@@ -122,4 +122,4 @@ class User(HISModel):
     @classmethod
     def superadmins(cls):
         """Returns all super-administrators"""
-        return cls.select().where(cls.superadmin is True)
+        return cls.select().where(cls.superadmin)

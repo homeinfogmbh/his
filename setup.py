@@ -7,7 +7,7 @@ setup(
     name='homeinfo.his',
     version='0.0.1-indev',
     author='Richard Neumann, Nikos Zizopoulos',
-    author_email='mail@richard-neumann.de',
+    author_email='r.neumann@homeinfo.de',
     requires=['homeinfo',
               'homeinfo.crm',
               'pcp'],

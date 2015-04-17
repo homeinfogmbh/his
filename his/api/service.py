@@ -1,22 +1,29 @@
 """
 Defines the HIS service template
 """
-from .resource import Resource
+from homeinfolib.wsgi import WsgiController
 
 __date__ = '06.11.2014'
 __author__ = 'Richard Neumann <r.neumann@homeinfo.de>'
 __all__ = ['HISServiceDatabase', 'Service']
 
 
-class Service(Resource):
-    """Common service class"""
-    def __init__(self):
-        """Initializes relative to parent resource"""
-        super().__init__(None)
+class LoginHandler(WsgiController):
+    """Service that handles logins"""
 
     @property
-    def resources(self):
-        """Returns a generator of all the service's resources"""
-        for attr in dir(self):
-            if type(attr) is Resource:
-                yield getattr(self, attr)
+    def user_name(self):
+        """Returns the provided user name"""
+        return self.qd.get('user_name')
+
+    @property
+    def passwd(self):
+        """Returns the provided password"""
+        return self.qd.get('passwd')
+
+    def login(self):
+        """Login to HIS"""
+        if self.user_name:
+            if self.passwd:
+                try:
+                    user = User.iget(User.name == )

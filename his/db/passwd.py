@@ -6,41 +6,49 @@ from homeinfo.crm import Customer
 from peewee import (ForeignKeyField, CharField, BooleanField,
                     DateTimeField, IntegerField)
 from hashlib import sha256
+from datetime import datetime
 
 __author__ = 'Richard Neumann <r.neumann@homeinfo.de>'
 __date__ = '09.10.2014'
 __all__ = ['Group', 'User']
 
 
-class Group(HISModel):
-    """
-    A HOMEINFO Integrated Services group
-    XXX: Virtual extension of homeinfo.crm.Customer
-    """
-    customer = ForeignKeyField(Customer, db_column='customer')
+class Account(HISModel):
+    """A HIS account"""
 
-    @property
-    def admins(self):
-        """Fetches all admins of the group"""
-        for member in self.members:  # related_name of User.group
-            if member.admin:
-                yield member
+    customer = ForeignKeyField(Customer, db_column='customer',
+                               related_name='his_accounts')
+    """The respective customer who owns this account"""
+    created = DateTimeField(default=datetime.now())
+    """The date and time when the account was created"""
+    deleted = DateTimeField(null=True)
+    """The date and time when the account was deleted"""
+    locked = BooleanField(default=False)
+    """Flag whether the account has been locked"""
 
 
-class User(HISModel):
-    """
-    A HOMEINFO Integrated Services user
-    """
+class Login(HISModel):
+    """A HIS login account"""
+
+    name = CharField(64)
+    """The login name"""
+    passwd = CharField(64)
+    """The SHA-256 hash of the password"""
+    account = ForeignKeyField(Account, db_column='account',
+                              related_name='logins')
+    """The account this login belongs to"""
+    created = DateTimeField(default=datetime.now())
+    """The date and time when the login was created"""
+    deleted = DateTimeField(null=True)
+    """The date and time when the login was deleted"""
+    locked = BooleanField(default=False)
+    """Flag whether the login has been locked"""
     email = CharField(64)
     """A unique email address"""
     first_name = CharField(32, null=True)
     """The user's first name"""
     last_name = CharField(32, null=True)
     """The user's last name"""
-    _passwd = CharField(69, db_column='passwd')
-    """The user's SHA-256 encrypted login password"""
-    group = ForeignKeyField(Group, db_column='group', related_name='members')
-    """The primary group of the user"""
     admin = BooleanField()
     """Flag, whether the user is an administrator"""
     last_login = DateTimeField(null=True)

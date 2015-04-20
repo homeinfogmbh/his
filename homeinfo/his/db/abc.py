@@ -1,16 +1,13 @@
-"""
-Basic HIS database definitions
-"""
-from ..config import db
+"""Basic HIS database definitions"""
+
 from peewee import Model, MySQLDatabase
-from homeinfolib import improved
+from ..config import db
 
 __author__ = 'Richard Neumann <r.neumann@homeinfo.de>'
 __date__ = '09.10.2014'
 __all__ = ['HISModel']
 
 
-@improved
 class HISModel(Model):
     """Generic HOMEINFO Integrated Service database model"""
     class Meta:

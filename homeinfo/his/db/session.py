@@ -1,10 +1,8 @@
-"""
-Service definitions
-"""
+"""Service definitions"""
+
 from uuid import uuid4
 from datetime import datetime, timedelta
-from peewee import CharField, ForeignKeyField, DateTimeField
-from homeinfolib.db import create, improved
+from peewee import CharField, ForeignKeyField, DateTimeField, create
 from .abc import HISModel
 from .passwd import User
 
@@ -14,7 +12,6 @@ __all__ = ['Session']
 
 
 @create
-@improved
 class Session(HISModel):
     """A session of a user using the system"""
 

@@ -1,12 +1,13 @@
-"""
-HTTP response classes
-"""
+"""HTTP response classes"""
+
 from html import escape
 
 __author__ = 'Richard Neumann <r.neumann@homeinfo.de>'
 __date__ = '08.10.2014'
 __all__ = ['render', 'Status', 'ContentType', 'HTTPResponse']
 
+
+# TODO: Replace with homeinfolib.http
 
 def render(renderable, json=False):
     """Renders a renderable object"""

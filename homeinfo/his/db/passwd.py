@@ -1,6 +1,5 @@
-"""
-Group and user definitions
-"""
+"""Group and user definitions"""
+
 from .abc import HISModel
 from homeinfo.crm import Customer
 from peewee import (ForeignKeyField, CharField, BooleanField,

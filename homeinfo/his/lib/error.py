@@ -1,6 +1,5 @@
-"""
-Handles service access
-"""
+"""Handles service access"""
+
 import pcp
 
 __author__ = 'Richard Neumann <r.neumann@homeinfo.de>'
@@ -8,10 +7,11 @@ __date__ = '25.09.2014'
 __all__ = ['Error']
 
 
+# TODO: Let HTTP errors be handles by homeinfolib.wsgi.Error
+
 class Error(Exception):
-    """
-    An error that can be rendered as a PCP exception
-    """
+    """An error that can be rendered as a PCP exception"""
+
     def __init__(self, code, msg):
         """Initializes with a code and a message"""
         self.__code = code
@@ -88,7 +88,9 @@ class Error(Exception):
 
 class InvalidCredentials(Error):
     """Indicates that a user tried to
-    log in with invalid credentials"""
+    log in with invalid credentials
+    """
+
     _lang = {'EN': 'User name and / or password are invalid.',
              'DE': 'Benutzername und / oder Passwort ungültig.'}
 
@@ -98,6 +100,7 @@ class InvalidCredentials(Error):
 
 class SessionTimeout(Error):
     """Indicates that a user's session has times out"""
+
     _lang = {'EN': 'Session timed out.',
              'DE': 'Sitzung abgelaufen.'}
 
@@ -107,7 +110,9 @@ class SessionTimeout(Error):
 
 class SessionExists(Error):
     """Indicates that a session for
-    a user is already running"""
+    a user is already running
+    """
+
     _lang = {'EN': 'You are already logged in.',
              'DE': 'Sie sind bereits angemeldet.'}
 
@@ -117,6 +122,7 @@ class SessionExists(Error):
 
 class UserLocked(Error):
     """Indicates that a user has been locked"""
+
     _lang = {'EN': 'User account locked.',
              'DE': 'Benutzerkonto gesperrt.'}
 
@@ -126,6 +132,7 @@ class UserLocked(Error):
 
 class NotLoggedIn(Error):
     """Indicates that a user has no active session"""
+
     _lang = {'EN': 'You are not logged in.',
              'DE': 'Sie sind nicht angemeldet.'}
 
@@ -135,6 +142,7 @@ class NotLoggedIn(Error):
 
 class NoSuchService(Error):
     """Indicates that a service does not exist"""
+
     _lang = {'EN': 'The requested service does not exist.',
              'DE': 'Der angeforderte Dienst existiert nicht.'}
 
@@ -144,7 +152,9 @@ class NoSuchService(Error):
 
 class UnauthorizedUser(Error):
     """Indicates that a user is not
-    allowed to access a service"""
+    allowed to access a service
+    """
+
     _lang = {'EN': 'You are not allowed to access the requested resource.',
              'DE': 'Sie sind nicht berechtigt, auf die'
              'angeforderte Ressource zuzugreifen.'}
@@ -155,7 +165,9 @@ class UnauthorizedUser(Error):
 
 class UnauthorizedGroup(Error):
     """Indicates that a group is not
-    allowed to access a service"""
+    allowed to access a service
+    """
+
     _lang = {'EN': 'Your group are not allowed to'
              'access the requested resource.',
              'DE': 'Ihre Gruppe ist nicht berechtigt, auf die'
@@ -167,7 +179,9 @@ class UnauthorizedGroup(Error):
 
 class NotAuthenticated(Error):
     """Indicates that a protected resource was
-    accessed without authentication information"""
+    accessed without authentication information
+    """
+
     _lang = {'EN': 'Go away!',
              'DE': 'Geh weg!'}
 
@@ -177,7 +191,9 @@ class NotAuthenticated(Error):
 
 class NotAuthorized(Error):
     """Indicates that a protected resource was
-    accessed without authorization information"""
+    accessed without authorization information
+    """
+
     _lang = {'EN': 'Go away!',
              'DE': 'Geh weg!'}
 
@@ -187,7 +203,9 @@ class NotAuthorized(Error):
 
 class InternalServerError(Error):
     """Indicates that an unexpected error
-    occurred within the system"""
+    occurred within the system
+    """
+
     _lang = {'EN': 'Internal server error.',
              'DE': 'Interner Server-Fehler.'}
 
@@ -197,7 +215,9 @@ class InternalServerError(Error):
 
 class NoSuchResource(Error):
     """Indicates that a non-existent
-    resource has been requested"""
+    resource has been requested
+    """
+
     _lang = {'EN': 'No such resource.',
              'DE': 'Keine solche Ressource.'}
 
@@ -208,7 +228,9 @@ class NoSuchResource(Error):
 class UnsupportedHTTPAction(Error):
     """Indicates that an unsupported action
     (GET, POST, PUT, DELETE)
-    has been tried to apply on a certain resource"""
+    has been tried to apply on a certain resource
+    """
+
     _lang = {'EN': 'Unsupported HTTP action.',
              'DE': 'Nicht-unterstützte HTTP-Aktion.'}
 

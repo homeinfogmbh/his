@@ -13,6 +13,7 @@ __date__ = '04.12.2014'
 __all__ = ['login', 'session', 'authorize']
 
 
+# TODO: rewrite!!!
 def login(func):
     """A login decorator"""
     def _login(*args, user_name=None, user_pass=None, **kwargs):

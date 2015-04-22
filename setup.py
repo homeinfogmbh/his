@@ -1,7 +1,6 @@
 #! /usr/bin/env python3
 
 from distutils.core import setup
-from peewee import OperationalError
 
 setup(
     name='homeinfo.his',
@@ -11,6 +10,7 @@ setup(
     requires=['pcp',
               'homeinfo',
               'homeinfo.crm'],
+    package_dir={'homeinfo': ''},
     packages=['homeinfo.his',
               'homeinfo.his.api',
               'homeinfo.his.db',
@@ -21,17 +21,3 @@ setup(
     description='HOMEINFO Integrated Services',
     long_description=open('README.txt').read(),
     )
-
-try:
-    from homeinfo.his.db import __tables__
-except OperationalError:
-    print('WARNING: No database access - Won\'t create any tables')
-else:
-    for table in __tables__:
-        try:
-            print('Creating table', table, end='\t')
-            table.create_table(fail_silently=True)
-        except:
-            print('[failed]')
-        else:
-            print('[ok]')

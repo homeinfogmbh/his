@@ -8,7 +8,6 @@ setup(
     author='Richard Neumann, Nikos Zizopoulos',
     author_email='r.neumann@homeinfo.de',
     requires=['pcp',
-              'homeinfo',
               'homeinfo.crm'],
     package_dir={'homeinfo': ''},
     packages=['homeinfo.his',

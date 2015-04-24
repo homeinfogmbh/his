@@ -9,7 +9,9 @@ __all__ = ['HISServiceDatabase']
 
 
 class HISServiceDatabase(MySQLDatabase):
-    """A HIS service database"""
+    """A HIS service database
+    Gets the name of the service, prefixed by the master database
+    """
 
     def __init__(self, service, host=None, user=None, passwd=None, **kwargs):
         """Initializes the database with the respective service's
@@ -22,5 +24,5 @@ class HISServiceDatabase(MySQLDatabase):
         if passwd is None:
             passwd = db.get('passwd')
         # Change the name to create a '_'-separated namespace
-        super().__init__('_'.join([db.get('master_db'), str(service)]),
+        super().__init__('_'.join([db.get('master_db'), repr(service)]),
                          host=host, user=user, passwd=passwd, **kwargs)

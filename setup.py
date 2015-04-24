@@ -1,12 +1,15 @@
 #! /usr/bin/env python3
 
 from distutils.core import setup
+from homeinfo.lib.misc import GitInfo
+
+version, author, author_email, *_ = GitInfo()
 
 setup(
-    name='homeinfo.his',
-    version='0.0.1-indev',
-    author='Richard Neumann, Nikos Zizopoulos',
-    author_email='r.neumann@homeinfo.de',
+    name='HOMEINFO Integrated Services',
+    version=version,
+    author=author,
+    author_email=author_email,
     requires=['pcp',
               'homeinfo.crm'],
     package_dir={'homeinfo': ''},
@@ -17,6 +20,5 @@ setup(
               'homeinfo.his.wsgi'],
     data_files=[('/usr/local/etc', ['files/etc/his.conf'])],
     license=open('LICENSE.txt').read(),
-    description='HOMEINFO Integrated Services',
-    long_description=open('README.txt').read(),
+    description='Main library for the HOMEINFO Integrated Services',
     )

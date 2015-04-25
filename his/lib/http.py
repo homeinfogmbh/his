@@ -2,8 +2,6 @@
 
 from html import escape
 
-__author__ = 'Richard Neumann <r.neumann@homeinfo.de>'
-__date__ = '08.10.2014'
 __all__ = ['render', 'Status', 'ContentType', 'HTTPResponse']
 
 

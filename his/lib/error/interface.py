@@ -2,8 +2,6 @@
 
 from pcp import pcp
 
-__author__ = 'Richard Neumann <r.neumann@homeinfo.de>'
-__date__ = '24.04.2015'
 __all__ = ['InterfaceError']
 
 

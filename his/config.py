@@ -1,11 +1,22 @@
 """HIS configuration"""
 
-from configparser import ConfigParser
+from homeinfo.lib.config import Configuration
 
-__all__ = ['db', 'wsgi']
+__all__ = ['homie_config']
 
-CONFIG_FILE = '/usr/local/etc/his.conf'
-config = ConfigParser()
-config.read(CONFIG_FILE)
-db = config['db']
-wsgi = config['wsgi']
+
+class HISConfig(Configuration):
+    """HIS's main configuration"""
+
+    @property
+    def db(self):
+        self.load()
+        return self['db']
+
+    @property
+    def wsgi(self):
+        self.load()
+        return self['wsgi']
+
+
+his_config = HISConfig('/etc/his.conf')

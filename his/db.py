@@ -1,6 +1,5 @@
 """Group and user definitions"""
 
-from hashlib import sha256
 from datetime import datetime, timedelta
 from uuid import uuid4
 
@@ -10,11 +9,17 @@ from peewee import Model, MySQLDatabase, PrimaryKeyField, ForeignKeyField,\
 from homeinfo.lib.misc import classproperty
 from homeinfo.crm import Customer, Employee
 
-from .lib.error.internal import SecurityError
 from .config import his_config
 
-__all__ = ['HISServiceDatabase', 'HISModel', 'Service', 'CustomerServices',
-           'Account', 'AccountServices', 'User', 'Login']
+__all__ = ['his_db', 'HISServiceDatabase', 'HISModel', 'Service',
+           'CustomerServices', 'Account', 'AccountServices', 'User', 'Login']
+
+
+his_db = MySQLDatabase(
+    his_config.db['db'],
+    host=his_config.db['HOST'],
+    user=his_config.db['USER'],
+    passwd=his_config.db['PASSWD'])
 
 
 class HISServiceDatabase(MySQLDatabase):
@@ -33,19 +38,16 @@ class HISServiceDatabase(MySQLDatabase):
         if passwd is None:
             passwd = his_config.db['passwd']
         # Change the name to create a '_'-separated namespace
-        super().__init__('_'.join([his_config.db['master_db'], repr(service)]),
-                         host=host, user=user, passwd=passwd, **kwargs)
+        super().__init__(
+            '_'.join([his_config.db['master_db'], repr(service)]),
+            host=host, user=user, passwd=passwd, **kwargs)
 
 
 class HISModel(Model):
     """Generic HOMEINFO Integrated Service database model"""
 
     class Meta:
-        database = MySQLDatabase(
-            his_config.db['db'],
-            host=his_config.db['HOST'],
-            user=his_config.db['USER'],
-            passwd=his_config.db['PASSWD'])
+        database = his_db
         schema = database.database
 
     id = PrimaryKeyField()
@@ -86,8 +88,8 @@ class Account(HISModel):
     """A HIS login account"""
 
     name = CharField(64)
-    pwhash = CharField(64, db_column='passwd')  # SHA-256 hash
-    salt = CharField(36)  # Password salt (UUID4)
+    pwhash = CharField(64)  # SHA-256 hash
+    salt = CharField(32)  # Password salt (HMAC)
     email = CharField(64)
     customer = ForeignKeyField(
         Customer, db_column='customer',
@@ -132,22 +134,6 @@ class Account(HISModel):
         return cls.select().where(cls.root == 1)
 
     @property
-    def passwd(self):
-        """Returns the clear text password"""
-        raise SecurityError('Cannot return clear text password')
-
-    @passwd.setter
-    def passwd(self, passwd):
-        """Encrypts a clear text password and
-        sets it as the user's password
-        """
-        salt = str(uuid4())
-        pepper = his_config.crypto['PEPPER']
-        passwd = salt + pepper + passwd
-        self.salt = salt
-        self.pwhash = sha256(passwd.encode()).hexdigest()
-
-    @property
     def locked(self):
         """Determines whether the user is locked"""
         if not self.passwd:
@@ -160,14 +146,6 @@ class Account(HISModel):
             return True
         else:
             return False
-
-    def chkpw(self, passwd):
-        """Checks password"""
-        salt = self.salt
-        pepper = his_config.crypto['PEPPER']
-        passwd = salt + pepper + passwd
-        pwhash = sha256(passwd.encode()).hexdigest()
-        return True if pwhash == self.pwhash else False
 
 
 @create

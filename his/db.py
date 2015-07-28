@@ -86,7 +86,8 @@ class Account(HISModel):
     """A HIS login account"""
 
     name = CharField(64)
-    passwd = CharField(64)  # SHA-256 hash
+    pwhash = CharField(64, db_column='passwd')  # SHA-256 hash
+    salt = CharField(36)  # Password salt (UUID4)
     email = CharField(64)
     customer = ForeignKeyField(
         Customer, db_column='customer',
@@ -140,7 +141,11 @@ class Account(HISModel):
         """Encrypts a clear text password and
         sets it as the user's password
         """
-        self._passwd = sha256(passwd.encode()).hexdigest()
+        salt = str(uuid4())
+        pepper = his_config.crypto['PEPPER']
+        passwd = salt + pepper + passwd
+        self.salt = salt
+        self.pwhash = sha256(passwd.encode()).hexdigest()
 
     @property
     def locked(self):
@@ -155,6 +160,14 @@ class Account(HISModel):
             return True
         else:
             return False
+
+    def chkpw(self, passwd):
+        """Checks password"""
+        salt = self.salt
+        pepper = his_config.crypto['PEPPER']
+        passwd = salt + pepper + passwd
+        pwhash = sha256(passwd.encode()).hexdigest()
+        return True if pwhash == self.pwhash else False
 
 
 @create

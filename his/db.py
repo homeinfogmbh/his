@@ -41,7 +41,7 @@ class HISServiceDatabase(MySQLDatabase):
         # Change the name to create a '_'-separated namespace
         super().__init__(
             '_'.join([his_config.db['master_db'], repr(service)]),
-            host=host, user=user, passwd=passwd, **kwargs)
+            host=host, user=user, passwd=passwd, closing=True, **kwargs)
 
 
 class HISModel(Model):

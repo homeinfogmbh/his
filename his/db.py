@@ -19,7 +19,8 @@ his_db = MySQLDatabase(
     his_config.db['db'],
     host=his_config.db['HOST'],
     user=his_config.db['USER'],
-    passwd=his_config.db['PASSWD'])
+    passwd=his_config.db['PASSWD'],
+    closing=True)
 
 
 class HISServiceDatabase(MySQLDatabase):

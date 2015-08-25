@@ -3,10 +3,11 @@
 from datetime import datetime, timedelta
 from uuid import uuid4
 
-from peewee import Model, MySQLDatabase, PrimaryKeyField, ForeignKeyField,\
-    CharField, BooleanField, DateTimeField, IntegerField, create, DoesNotExist
+from peewee import Model, PrimaryKeyField, ForeignKeyField,\
+    CharField, BooleanField, DateTimeField, IntegerField, DoesNotExist
 
 from homeinfo.lib.misc import classproperty
+from homeinfo.peewee import MySQLDatabase, create
 from homeinfo.crm import Customer, Employee
 
 from .config import his_config

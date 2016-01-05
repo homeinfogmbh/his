@@ -17,10 +17,6 @@ def login(name, passwd, duration=None):
         if Session.exists(account):
             return False
         else:
-            try:
-                duration = int(duration)
-            except (ValueError, TypeError):
-                duration = None
             return Session.open(account, duration=duration)
 
 

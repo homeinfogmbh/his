@@ -10,7 +10,7 @@ from homeinfo.lib.misc import classproperty
 from homeinfo.peewee import MySQLDatabase, create
 from homeinfo.crm import Customer, Employee
 
-from .config import his_config
+from ..config import his_config
 
 __all__ = ['his_db', 'HISServiceDatabase', 'HISModel', 'Service',
            'CustomerServices', 'Account', 'AccountServices', 'User', 'Login']
@@ -89,23 +89,24 @@ class CustomerServices(HISModel):
 class Account(HISModel):
     """A HIS login account"""
 
-    name = CharField(64)
-    pwhash = CharField(64)  # SHA-256 hash
-    salt = CharField(32)  # Password salt (HMAC)
-    email = CharField(64)
     customer = ForeignKeyField(
         Customer, db_column='customer',
         related_name='accounts')
     user = ForeignKeyField(
         Employee, db_column='user', null=True,
         related_name='accounts')
+    name = CharField(64)  # Login name
+    pwhash = CharField(64)  # SHA-256 hash
+    salt = CharField(32)  # Password salt (HMAC)
+    email = CharField(64)
     created = DateTimeField()
     deleted = DateTimeField(null=True)
     last_login = DateTimeField(null=True)
     failed_logins = IntegerField()
     locked_until = DateTimeField(null=True, default=None)
     disabled = BooleanField(default=True)
-    # Flag, whether the user is an administrator of the respective account
+    # Flag, whether the account is an
+    # administrator of the respective customer
     admin = BooleanField(default=False)
     # Flag, whether the user is a super-admin of the system
     # XXX: Such accounts can do ANYTHING!
@@ -116,24 +117,32 @@ class Account(HISModel):
         return self.id
 
     def __repr__(self):
-        """Returns the login's name"""
+        """Returns the login name"""
         return self.name
 
-    def __bool__(self):
-        """Returns whether the user is locked (False) or unlocked (True)"""
-        return not self.locked
+    def __str__(self):
+        """Returns the login name and appropriate customer"""
+        return '{0}@{1}'.format(repr(self), repr(self.customer))
 
-    @classproperty
-    @classmethod
-    def admins(cls):
-        """Returns all administrators"""
-        return cls.select().where(cls.admin == 1)
+    def __bool__(self):
+        """Returns whether the user is not locked"""
+        return not self.locked
 
     @classproperty
     @classmethod
     def superadmins(cls):
         """Returns all super-administrators"""
         return cls.select().where(cls.root == 1)
+
+    @classmethod
+    def admins(cls, customer=None):
+        """Yields administrators"""
+        if customer is None:
+            return cls.select().where(cls.admin == 1)
+        else:
+            return cls.select().where(
+                (cls.customer == customer) &
+                (cls.admin == 1))
 
     @property
     def locked(self):
@@ -162,10 +171,7 @@ class Session(HISModel):
 
     def __bool__(self):
         """Returns a boolean representation"""
-        if (datetime.now() - self.end) > timedelta(0):
-            return True
-        else:
-            return False
+        return (datetime.now() - self.end) > timedelta(0)
 
     def __repr__(self):
         """Returns a unique string representation"""
@@ -173,10 +179,10 @@ class Session(HISModel):
 
     def __str__(self):
         """Returns a human-readable representation"""
-        return ' '.join([': '.join([' - '.join([str(self.start),
-                                                str(self.end)]),
-                                    repr(self)]),
-                         ''.join(['(', str(self.login), ')'])])
+        return ' '.join(
+            [': '.join(
+                [' - '.join([str(self.start), str(self.end)]), repr(self)]),
+             ''.join(['(', str(self.login), ')'])])
 
     @classmethod
     def exists(cls, account):
@@ -206,7 +212,9 @@ class Session(HISModel):
 
     @classmethod
     def open(cls, account, duration=None):
-        """Opens a login session for the specified account"""
+        """Opens a login session for the specified account
+        XXX: This must only be done after successful login
+        """
         try:
             active_session = cls.get(cls.account == account)
         except DoesNotExist:
@@ -235,7 +243,6 @@ class Session(HISModel):
             self.end = now + duration
             self.token = str(uuid4())
             self.login = False
-            self.save()
-            return True
+            return self.save()
         else:
             return False

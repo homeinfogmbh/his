@@ -2,6 +2,8 @@
 
 from pcp import pcp
 
+from ..locale import Language
+
 __all__ = ['InterfaceError']
 
 
@@ -99,8 +101,8 @@ class InvalidCredentials(InterfaceError):
     def __init__(self):
         super().__init__(
             1, 'INVALID_CREDENTIALS',
-            {'EN': 'User name and / or password are invalid.',
-             'DE': 'Benutzername und / oder Passwort ungültig.'},
+            {Language.EN_US: 'User name and / or password are invalid.',
+             Language.DE_DE: 'Benutzername und / oder Passwort ungültig.'},
             http_status=400)
 
 
@@ -110,8 +112,8 @@ class SessionTimeout(InterfaceError):
     def __init__(self):
         super().__init__(
             2, 'SESSION_TIMED_OUT',
-            {'EN': 'Session timed out.',
-             'DE': 'Sitzung abgelaufen.'},
+            {Language.EN_US: 'Session timed out.',
+             Language.DE_DE: 'Sitzung abgelaufen.'},
             http_status=403)
 
 
@@ -123,8 +125,8 @@ class SessionExists(InterfaceError):
     def __init__(self):
         super().__init__(
             3, 'SESSION_EXISTS',
-            {'EN': 'You are already logged in.',
-             'DE': 'Sie sind bereits angemeldet.'},
+            {Language.EN_US: 'You are already logged in.',
+             Language.DE_DE: 'Sie sind bereits angemeldet.'},
             http_status=400)
 
 
@@ -134,8 +136,8 @@ class UserLocked(InterfaceError):
     def __init__(self):
         super().__init__(
             4, 'USER_LOCKED',
-            {'EN': 'User account locked.',
-             'DE': 'Benutzerkonto gesperrt.'},
+            {Language.EN_US: 'User account locked.',
+             Language.DE_DE: 'Benutzerkonto gesperrt.'},
             http_status=403)
 
 
@@ -145,8 +147,8 @@ class NotLoggedIn(InterfaceError):
     def __init__(self):
         super().__init__(
             5, 'NOT_LOGGED_IN',
-            {'EN': 'You are not logged in.',
-             'DE': 'Sie sind nicht angemeldet.'},
+            {Language.EN_US: 'You are not logged in.',
+             Language.DE_DE: 'Sie sind nicht angemeldet.'},
             http_status=403)
 
 
@@ -156,8 +158,8 @@ class NoSuchService(InterfaceError):
     def __init__(self):
         super().__init__(
             6, 'NO_SUCH_SERVICE',
-            {'EN': 'The requested service does not exist.',
-             'DE': 'Der angeforderte Dienst existiert nicht.'},
+            {Language.EN_US: 'The requested service does not exist.',
+             Language.DE_DE: 'Der angeforderte Dienst existiert nicht.'},
             http_status=404)
 
 
@@ -169,9 +171,9 @@ class UnauthorizedUser(InterfaceError):
     def __init__(self):
         super().__init__(
             7, 'UNAUTHORIZED_USER',
-            {'EN': 'You are not allowed to access'
+            {Language.EN_US: 'You are not allowed to access'
              ' the requested resource.',
-             'DE': 'Sie sind nicht berechtigt, auf die'
+             Language.DE_DE: 'Sie sind nicht berechtigt, auf die'
              ' angeforderte Ressource zuzugreifen.'},
             http_status=401)
 
@@ -184,10 +186,10 @@ class UnauthorizedGroup(InterfaceError):
     def __init__(self):
         super().__init__(
             8, 'UNAUTHORIZED_GROUP',
-            {'EN': 'Your group are not allowed to'
+            {Language.EN_US: 'Your group are not allowed to'
              'access the requested resource.',
-             'DE': 'Ihre Gruppe ist nicht berechtigt, auf die'
-             ' angeforderte Ressource zuzugreifen.'},
+             Language.DE_DE: 'Ihre Gruppe ist nicht berechtigt, auf '
+             'die angeforderte Ressource zuzugreifen.'},
             http_status=401)
 
 
@@ -199,8 +201,8 @@ class NotAuthenticated(InterfaceError):
     def __init__(self):
         super().__init__(
             9, 'NOT_AUTHENTICATED',
-            {'EN': 'Go away!',
-             'DE': 'Geh weg!'},
+            {Language.EN_US: 'Go away!',
+             Language.DE_DE: 'Geh weg!'},
             http_status=403)
 
 
@@ -212,8 +214,10 @@ class NotAuthorized(InterfaceError):
     def __init__(self):
         super().__init__(
             10, 'NOT_AUTHORIZED',
-            {'EN': 'Go away!',
-             'DE': 'Geh weg!'},
+            {Language.EN_US: 'You are not authorized to '
+             'access the requested resource.',
+             Language.DE_DE: 'Sie sind nicht berechtigt, auf die '
+             'angeforderte Ressource zuzugreifen.'},
             http_status=401)
 
 
@@ -225,8 +229,8 @@ class InternalServerError(InterfaceError):
     def __init__(self):
         super().__init__(
             11, 'INTERNAL_SERVER_ERROR',
-            {'EN': 'Internal server error.',
-             'DE': 'Interner Server-Fehler.'},
+            {Language.EN_US: 'Internal server error.',
+             Language.DE_DE: 'Interner Server-Fehler.'},
             http_status=500)
 
 
@@ -238,8 +242,8 @@ class NoSuchResource(InterfaceError):
     def __init__(self):
         super().__init__(
             12, 'NO_SUCH_RESOURCE',
-            {'EN': 'No such resource.',
-             'DE': 'Keine solche Ressource.'},
+            {Language.EN_US: 'No such resource.',
+             Language.DE_DE: 'Keine solche Ressource.'},
             http_status=404)
 
 
@@ -252,6 +256,6 @@ class UnsupportedHTTPAction(InterfaceError):
     def __init__(self):
         super().__init__(
             13, 'UNSUPPORTED_HTTP_ACTION',
-            {'EN': 'Unsupported HTTP action.',
-             'DE': 'Nicht-unterstützte HTTP-Aktion.'},
+            {Language.EN_US: 'Unsupported HTTP action.',
+             Language.DE_DE: 'Nicht-unterstützte HTTP-Aktion.'},
             http_status=405)

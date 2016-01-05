@@ -1,1 +1,1 @@
-"""The main library for HIS"""
+"""HIS' main library"""

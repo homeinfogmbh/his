@@ -12,7 +12,7 @@ class NotAModule(Exception):
 
 
 class HISController(WsgiApp):
-    """Main HIS controller"""
+    """HIS' main WSGI controller"""
 
     def __init__(self, root):
         super().__init__()

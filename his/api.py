@@ -45,7 +45,7 @@ def keepalive(name, duration=None):
     try:
         account = Account.get(Account.name == name)
     except DoesNotExist:
-        return False
+        raise NoSuchAccount() from None
     else:
         try:
             session = Session.get(Session.account == account)

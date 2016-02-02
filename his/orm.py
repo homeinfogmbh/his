@@ -24,6 +24,18 @@ his_db = MySQLDatabase(
     closing=True)
 
 
+class InconsistencyError(Exception):
+    """Indicates inconsistencies in database configuration"""
+
+    pass
+
+
+class AlreadyLoggedIn(Exception):
+    """Indicates that a session is already open for the respective account"""
+
+    pass
+
+
 class HISServiceDatabase(MySQLDatabase):
     """A HIS service database
     Gets the name of the service, prefixed by the master database
@@ -74,8 +86,11 @@ class Service(HISModel):
 
 
 @create
-class CustomerServices(HISModel):
+class CustomerService(HISModel):
     """Many-to-many Account <-> Services mapping"""
+
+    class Meta:
+        db_table = customer_service
 
     customer = ForeignKeyField(
         Customer, db_column='account',
@@ -84,10 +99,57 @@ class CustomerServices(HISModel):
         Service, db_column='service',
         related_name='service_customers')
 
+    @classmethod
+    def services(cls, customer):
+        """Yields services of the respective customer"""
+        for customer_service in cls.select().where(cls.customer == customer):
+            yield customer_service.service
+
+    def remove(self):
+        """Safely removes a customer service and its dependencies"""
+        for account_service in AccountService.select().where(
+                (AccountService.account.customer == self.customer) &
+                (AccountService.service == self.service)):
+            account_service.delete_instance()
+
 
 @create
 class Account(HISModel):
     """A HIS login account"""
+
+    class ServicesWrapper():
+        """Wraps service mappings with manipulation options"""
+
+        def __init__(self, account):
+            self.account = account
+
+        def __iter__(self):
+            for account_service in AccountService.select().where(
+                    AccountServices.account == self.account):
+                yield account_service.service
+
+        def add(self, service):
+            """Adds a service to the mapping"""
+            if service not in self:
+                if service in CustomerService.services(self.account.customer):
+                    account_service = AccountService()
+                    account_service.account = self.account
+                    account_service.service = service
+                    return account_service.save()
+                else:
+                    raise InconsistencyError(
+                        'Cannot enable service {0} for account {1}, '
+                        'because the respective customer {2} is not '
+                        'enabled for it'.format(
+                            service, self.account, self.account.customer))
+
+        def remove(self, service):
+            """Removes a service from the mapping"""
+            if service in self:
+                account_service = AccountService.get(
+                    (AccountService.account == self.account) &
+                    (AccountService.service == service))
+                account_service.delete_instance()
 
     customer = ForeignKeyField(
         Customer, db_column='customer',
@@ -158,6 +220,21 @@ class Account(HISModel):
         else:
             return False
 
+    @property
+    def services(self):
+        """Yields appropriate services"""
+        return ServicesWrapper(self)
+
+
+class AccountService(HISModel):
+    """Many-to-many Account <-> Service mapping"""
+
+    class Meta:
+        db_table = account_service
+
+    account = ForeignKeyField(Account, db_column='account')
+    service = ForeignKeyField(Service, db_column='service')
+
 
 @create
 class Session(HISModel):
@@ -171,7 +248,12 @@ class Session(HISModel):
 
     def __bool__(self):
         """Returns a boolean representation"""
-        return (datetime.now() - self.end) > timedelta(0)
+        try:
+            myself = self.refresh()
+        except DoesNotExist:
+            return False
+        else:
+            return (datetime.now() - myself.end) > timedelta(0)
 
     def __repr__(self):
         """Returns a unique string representation"""
@@ -179,10 +261,9 @@ class Session(HISModel):
 
     def __str__(self):
         """Returns a human-readable representation"""
-        return ' '.join(
-            [': '.join(
-                [' - '.join([str(self.start), str(self.end)]), repr(self)]),
-             ''.join(['(', str(self.login), ')'])])
+        return ' '.join([': '.join(
+            [' - '.join([str(self.start), str(self.end)]), repr(self)]),
+            ''.join(['(', str(self.login), ')'])])
 
     @classmethod
     def exists(cls, account):
@@ -221,15 +302,20 @@ class Session(HISModel):
             return cls._open(account, duration=duration)
         else:
             if active_session:
-                return False
+                raise AlreadyLoggedIn()
             else:
                 active_session.close()
                 return cls._open(account, duration=duration)
 
-    def update(self):
-        """Updates the session information from the database"""
+    def refresh(self):
+        """Refreshes the session information from the database"""
         cls = self.__class__
-        return cls.get(cls.id == self.id)
+        return cls.get(
+            (cls.account == self.account) &
+            (cls.token == self.token) &
+            (cls.start == self.start) &
+            (cls.end == self.end) &
+            (cls.login == self.login))
 
     def close(self):
         """Closes the session"""

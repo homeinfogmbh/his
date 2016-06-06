@@ -12,8 +12,16 @@ from homeinfo.crm import Customer, Employee
 
 from ..config import his_config
 
-__all__ = ['his_db', 'HISServiceDatabase', 'HISModel', 'Service',
-           'CustomerServices', 'Account', 'AccountServices', 'User', 'Login']
+__all__ = [
+    'his_db',
+    'HISServiceDatabase',
+    'HISModel',
+    'Service',
+    'CustomerServices',
+    'Account',
+    'AccountServices',
+    'User',
+    'Login']
 
 
 his_db = MySQLDatabase(
@@ -47,13 +55,16 @@ class HISServiceDatabase(MySQLDatabase):
         """
         if host is None:
             host = his_config.db['host']
+
         if user is None:
             user = his_config.db['user']
+
         if passwd is None:
             passwd = his_config.db['passwd']
+
         # Change the name to create a '_'-separated namespace
         super().__init__(
-            '_'.join([his_config.db['master_db'], repr(service)]),
+            '_'.join((his_config.db['db'], repr(service))),
             host=host, user=user, passwd=passwd, closing=True, **kwargs)
 
 
@@ -67,12 +78,11 @@ class HISModel(Model):
     id = PrimaryKeyField()
 
 
-@create
 class Service(HISModel):
     """Registers services of HIS"""
 
     name = CharField(32)
-    description = CharField(255)
+    description = CharField(255, null=True, default=None)
     # Flag whether the service shall be promoted
     promote = BooleanField(default=True)
 
@@ -82,7 +92,10 @@ class Service(HISModel):
 
     def __str__(self):
         """Returns the service's name"""
-        return self.name
+        if self.description is not None:
+            return '{0} ({1})'.format(self.name, self.description)
+        else:
+            return self.name
 
 
 @create
@@ -98,12 +111,6 @@ class CustomerService(HISModel):
     service = ForeignKeyField(
         Service, db_column='service',
         related_name='service_customers')
-
-    @classmethod
-    def services(cls, customer):
-        """Yields services of the respective customer"""
-        for customer_service in cls.select().where(cls.customer == customer):
-            yield customer_service.service
 
     def remove(self):
         """Safely removes a customer service and its dependencies"""

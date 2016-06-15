@@ -23,10 +23,26 @@ class HISMetaHandler(RequestHandler):
     CLASS_NAME = 'Handler'
     HANDLER_NA = InternalServerError('Handler not available.')
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, root, *args, **kwargs):
         """Sets a logger"""
-        super().__init__(*args, **kwargs)
         self.logger = getLogger('HIS')
+        super().__init__(*args, **kwargs)
+        self.root = root
+
+    @property
+    def rela_path(self):
+        """Returns the path nodes relative to the root"""
+        rela_path = self.path
+
+        for node in self.root:
+            # XXX: This may throw an IndexError
+            if rela_path[0] == node:
+                rela_path = rela_path[1:]
+            else:
+                raise ValueError(
+                    'Unexpected path node: {actual_node}. '
+                    'Expected {desired_node}'.format(
+                        actual_node=rela_path[0], desired_node=node))
 
     def get(self):
         """Processes GET requests"""
@@ -90,10 +106,19 @@ class HIS(WsgiApp):
     REQUEST_HANDLER = HISMetaHandler
     DEBUG = True
 
-    def __init__(self):
+    def __init__(self, root=None):
         """Use library defaults, but always enable CORS"""
-        super().__init__(cors=True)
         basicConfig(level=INFO)
+        super().__init__(cors=True)
 
-    def get_handler(self, environ):
-        """Gets the appropriate service handler"""
+        if root is None:
+            self.root = []
+        else:
+            self.root = [node for node in root.split('/') if node]
+
+        self.REQUEST_HANDLER.ROOT = self.root
+
+    def handler(self, environ):
+        """Returns the handler instance"""
+        return self.REQUEST_HANDLER(
+            environ, self.root, self.cors, self.date_format, self.debug)

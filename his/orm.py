@@ -7,7 +7,7 @@ from peewee import Model, PrimaryKeyField, ForeignKeyField,\
     CharField, BooleanField, DateTimeField, IntegerField, DoesNotExist
 
 from homeinfo.lib.misc import classproperty
-from homeinfo.peewee import MySQLDatabase, create
+from homeinfo.peewee import MySQLDatabase
 from homeinfo.crm import Customer, Employee
 
 from his.config import config
@@ -20,8 +20,8 @@ __all__ = [
     'CustomerService',
     'Account',
     'AccountService',
-    'User',
-    'Login']
+    'Session',
+    'tables']
 
 
 his_db = MySQLDatabase(
@@ -104,7 +104,6 @@ class Service(HISModel):
         return self.name
 
 
-@create
 class CustomerService(HISModel):
     """Many-to-many Account <-> Services mapping"""
 
@@ -142,7 +141,6 @@ class CustomerService(HISModel):
                 return self.begin <= datetime.now() < self.end
 
 
-@create
 class Account(HISModel):
     """A HIS login account"""
 
@@ -264,7 +262,6 @@ class AccountService(HISModel):
     service = ForeignKeyField(Service, db_column='service')
 
 
-@create
 class Session(HISModel):
     """A session related to a login"""
 
@@ -358,3 +355,6 @@ class Session(HISModel):
             return self.save()
         else:
             return False
+
+
+tables = [Service, CustomerService, Account, AccountService, Session]

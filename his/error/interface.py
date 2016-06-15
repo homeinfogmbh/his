@@ -2,7 +2,7 @@
 
 from pcp import pcp
 
-from ..locale import Language
+from his.locale import Language
 
 __all__ = ['InterfaceError']
 

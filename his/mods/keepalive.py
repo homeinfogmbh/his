@@ -26,7 +26,7 @@ class Service(HISService):
             else:
                 if session.active:
                     if session.renew():
-                        return JSON(session.tojson())
+                        return JSON(session.todict())
                     else:
                         return Error('Could not renew session.', status=500)
                 else:

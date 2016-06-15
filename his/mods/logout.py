@@ -23,7 +23,7 @@ class Service(HISService):
         session_token = self.query_dict.get('token')
         account_name = self.query_dict.get('account')
 
-        if session_token is not None account_name is not None:
+        if session_token is not None and account_name is not None:
             return self.PARAMETER_ERROR
         elif session_token is not None:
             try:

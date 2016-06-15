@@ -70,13 +70,16 @@ class Handler(HISService):
                                             return OK(
                                                 'Service added for customer.')
                                         else:
-                                            Error('Could not add service.',
-                                                  status=500)
+                                            return Error(
+                                                'Could not add service.',
+                                                status=500)
                                     else:
-                                        Error('Service already enabled.',
-                                              status=400)
+                                        return Error(
+                                            'Service already enabled.',
+                                            status=400)
                         else:
-                            Error('You are not a root user.', status=400)
+                            return Error('You are not a root user.',
+                                         status=400)
 
                     if account_name is not None:
                         if account.admin:

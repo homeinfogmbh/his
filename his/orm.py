@@ -108,7 +108,7 @@ class CustomerService(HISModel):
     """Many-to-many Account <-> Services mapping"""
 
     class Meta:
-        db_table = customer_service
+        db_table = 'customer_service'
 
     customer = ForeignKeyField(
         Customer, db_column='account',

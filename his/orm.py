@@ -188,9 +188,9 @@ class Account(HISModel):
     salt = CharField(32)  # Password salt (HMAC)
     email = CharField(64)
     created = DateTimeField()
-    deleted = DateTimeField(null=True)
-    last_login = DateTimeField(null=True)
-    failed_logins = IntegerField()
+    deleted = DateTimeField(null=True, default=None)
+    last_login = DateTimeField(null=True, default=None)
+    failed_logins = IntegerField(default=0)
     locked_until = DateTimeField(null=True, default=None)
     disabled = BooleanField(default=True)
     # Flag, whether the account is an

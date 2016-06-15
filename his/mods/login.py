@@ -30,7 +30,7 @@ class Service(HISService):
                     pwmgr = load()
 
                     if pwmgr.verify(passwd, account.pwhash, account.salt):
-                        Session.open(account, duration=duration)
+                        Session.open(account)
                         return OK('Session opened.')
                     else:
                         return Error('Invalid credentials.', status=400)

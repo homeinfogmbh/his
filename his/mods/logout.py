@@ -5,7 +5,7 @@ from peewee import DoesNotExist
 from homeinfo.lib.wsgi import Error, JSON
 
 from his.api import HISService
-from his.orm import Session
+from his.orm import Account, Session
 from his.crypto import load
 
 

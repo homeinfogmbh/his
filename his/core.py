@@ -91,13 +91,14 @@ class HISMetaHandler(RequestHandler):
             raise HandlerNotAvailable()
 
     @property
+    def next_handler(self):
+        """Returns the next handler's name"""
+        return self.path[-1]
+
+    @property
     def handler(self):
         """Returns the appropriate request handler's instance"""
-        return self.handler_class(
-            self.environ,
-            self.cors,
-            self.date_format,
-            self.debug)
+        return self.handler_class(self.next_handler)
 
 
 class HIS(WsgiApp):

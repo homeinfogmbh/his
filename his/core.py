@@ -20,7 +20,7 @@ class HISMetaHandler(RequestHandler):
     """Generic HIS service template"""
 
     BASE_PACKAGE = 'his.mods'
-    CLASS_NAME = 'Service'
+    CLASS_NAME = 'Handler'
     HANDLER_NA = InternalServerError('Handler not available.')
 
     def __init__(self, *args, **kwargs):

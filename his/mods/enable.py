@@ -11,7 +11,7 @@ from his.orm import InconsistencyError, AlreadyLoggedIn, CustomerService, \
 from his.crypto import load
 
 
-class Service(HISService):
+class Handler(HISService):
     """Handles logins"""
 
     def get(self):

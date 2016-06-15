@@ -27,4 +27,4 @@ setup(
 from his.orm import tables
 
 for table in tables:
-    table.create_table()
+    table.create_table(fail_silently=True)

@@ -53,6 +53,40 @@ def check_service_consistency(customer=None):
     pass  # TODO: Implement
 
 
+class ServicesWrapper():
+    """Wraps service mappings with manipulation options"""
+
+    def __init__(self, account):
+        self.account = account
+
+    def __iter__(self):
+        for account_service in AccountService.select().where(
+                AccountService.account == self.account):
+            yield account_service.service
+
+    def add(self, service):
+        """Adds a service to the mapping"""
+        if service not in self:
+            if service in CustomerService.services(self.account.customer):
+                account_service = AccountService()
+                account_service.account = self.account
+                account_service.service = service
+                return account_service.save()
+            else:
+                raise InconsistencyError(
+                    'Cannot enable service {0} for account {1}, '
+                    'because the respective customer {2} is not '
+                    'enabled for it'.format(
+                        service, self.account, self.account.customer))
+
+    def remove(self, service):
+        """Removes a service from the mapping"""
+        for account_service in AccountService.select().where(
+                (AccountService.account == self.account) &
+                (AccountService.service == service)):
+            account_service.delete_instance()
+
+
 class HISServiceDatabase(MySQLDatabase):
     """A HIS service database
     Gets the name of the service, prefixed by the master database
@@ -146,39 +180,6 @@ class CustomerService(HISModel):
 
 class Account(HISModel):
     """A HIS login account"""
-
-    class ServicesWrapper():
-        """Wraps service mappings with manipulation options"""
-
-        def __init__(self, account):
-            self.account = account
-
-        def __iter__(self):
-            for account_service in AccountService.select().where(
-                    AccountService.account == self.account):
-                yield account_service.service
-
-        def add(self, service):
-            """Adds a service to the mapping"""
-            if service not in self:
-                if service in CustomerService.services(self.account.customer):
-                    account_service = AccountService()
-                    account_service.account = self.account
-                    account_service.service = service
-                    return account_service.save()
-                else:
-                    raise InconsistencyError(
-                        'Cannot enable service {0} for account {1}, '
-                        'because the respective customer {2} is not '
-                        'enabled for it'.format(
-                            service, self.account, self.account.customer))
-
-        def remove(self, service):
-            """Removes a service from the mapping"""
-            for account_service in AccountService.select().where(
-                    (AccountService.account == self.account) &
-                    (AccountService.service == service)):
-                account_service.delete_instance()
 
     customer = ForeignKeyField(
         Customer, db_column='customer',

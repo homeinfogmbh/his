@@ -32,7 +32,7 @@ class Service(HISService):
                 return Error('No such session.', status=400)
             else:
                 session.close()
-                return JSON({'sessions_closed': session.token})
+                return JSON({'closed': [session.token]})
         elif account_name is not None:
             try:
                 account = Account.get(Account.name == account_name)
@@ -46,6 +46,6 @@ class Service(HISService):
                     session.close()
                     sessions_closed.append(session.token)
 
-                return JSON({'sessions_closed': sessions_closed})
+                return JSON({'closed': sessions_closed})
         else:
             return self.PARAMETER_ERROR

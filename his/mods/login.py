@@ -13,12 +13,12 @@ class Service(HISService):
     def get(self):
         """Logs in the user"""
         try:
-            account_name = self.qd['account']
+            account_name = self.query_dict['account']
         except KeyError:
             return Error('No account specified.', status=400)
 
         try:
-            passwd = self.qd['passwd']
+            passwd = self.query_dict['passwd']
         except KeyError:
             return Error('No password specified.', status=400)
 

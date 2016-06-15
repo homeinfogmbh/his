@@ -1,6 +1,7 @@
 """Core services"""
 
 from itertools import chain
+from importlib import import_module
 
 from homeinfo.lib.wsgi import InternalServerError, RequestHandler, WsgiApp
 

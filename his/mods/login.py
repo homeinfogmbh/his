@@ -23,7 +23,7 @@ class Service(HISService):
             try:
                 account = Account.get(Account.name == account_name)
             except DoesNotExist:
-                return Error('Invalid credentials.', status=400)
+                return Error('No such account.', status=400)
             else:
                 # Verify credentials
                 pwmgr = load()

@@ -23,9 +23,9 @@ class HISMetaHandler(RequestHandler):
     CLASS_NAME = 'Service'
     HANDLER_NA = InternalServerError('Handler not available.')
 
-    def __init__(self):
+    def __init__(self, *args, **kwargs):
         """Sets a logger"""
-        super().__init__()
+        super().__init__(*args, **kwargs)
         self.logger = getLogger('HIS')
 
     def get(self):

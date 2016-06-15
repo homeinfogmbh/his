@@ -2,6 +2,7 @@
 
 from json import dumps
 
+from homeinfo.lib.config import Configuration
 from homeinfo.lib.wsgi import OK, RequestHandler
 
 from his.config import config

@@ -36,7 +36,9 @@ his_db = MySQLDatabase(
 class InconsistencyError(Exception):
     """Indicates inconsistencies in database configuration"""
 
-    pass
+    def __init__(self, msg):
+        super().__init__(msg)
+        self.msg = msg
 
 
 class AlreadyLoggedIn(Exception):

@@ -7,6 +7,7 @@ from os.path import relpath
 
 from homeinfo.lib.wsgi import InternalServerError, RequestHandler, WsgiApp
 
+from his.config import config
 
 __all__ = ['HIS']
 
@@ -107,11 +108,11 @@ class HIS(WsgiApp):
     REQUEST_HANDLER = HISMetaHandler
     DEBUG = True
 
-    def __init__(self, root=None):
+    def __init__(self):
         """Use library defaults, but always enable CORS"""
         basicConfig(level=INFO)
         super().__init__(cors=True)
-        self.root = root
+        self.root = config.wsgi['ROOT']
 
         self.REQUEST_HANDLER.ROOT = self.root
 

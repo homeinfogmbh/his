@@ -122,5 +122,6 @@ class HIS(WsgiApp):
             environ['PATH_INFO'] = relpath(path, self.root)
             return super().handler(environ)
         else:
-            raise ValueError('Path "{path}" not in root "{root}"'.format(
-                path=environ['PATH_INFO'], root=self.root))
+            raise InternalServerError(
+                'Path "{path}" not in root "{root}"'.format(
+                    path=environ['PATH_INFO'], root=self.root))

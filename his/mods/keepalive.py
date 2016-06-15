@@ -16,21 +16,16 @@ class Service(HISService):
             session_token = self.query_dict['session_token']
         except KeyError:
             return Error('No session token specified.', status=400)
-
-        try:
-            passwd = self.qd['passwd']
-        except KeyError:
-            return Error('No password specified.', status=400)
-
-        try:
-            session = Session.get(Session.token == session_token)
-        except DoesNotExist:
-            return Error('No such session.', status=400)
         else:
-            if session.active:
-                if session.renew():
-                    return OK('Session has been renewed.')
-                else:
-                    return Error('Could not renew session.', status=500)
+            try:
+                session = Session.get(Session.token == session_token)
+            except DoesNotExist:
+                return Error('No such session.', status=400)
             else:
-                return Error('Session has already expired.', status=400)
+                if session.active:
+                    if session.renew():
+                        return OK('Session has been renewed.')
+                    else:
+                        return Error('Could not renew session.', status=500)
+                else:
+                    return Error('Session has already expired.', status=400)

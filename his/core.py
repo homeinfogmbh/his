@@ -3,6 +3,7 @@
 from itertools import chain
 from importlib import import_module
 from logging import INFO, getLogger, basicConfig
+from os.path import relpath
 
 from homeinfo.lib.wsgi import InternalServerError, RequestHandler, WsgiApp
 
@@ -110,15 +111,15 @@ class HIS(WsgiApp):
         """Use library defaults, but always enable CORS"""
         basicConfig(level=INFO)
         super().__init__(cors=True)
-
-        if root is None:
-            self.root = []
-        else:
-            self.root = [node for node in root.split('/') if node]
+        self.root = root
 
         self.REQUEST_HANDLER.ROOT = self.root
 
     def handler(self, environ):
         """Returns the handler instance"""
-        return self.REQUEST_HANDLER(
-            environ, self.root, self.cors, self.date_format, self.debug)
+        if environ['PATH_INFO'].startswith(self.root):
+            environ['PATH_INFO'] = relpath(path, self.root)
+            return super().handler(environ)
+        else:
+            raise ValueError('Path "{path}" not in root "{root}"'.format(
+                path=environ['PATH_INFO'], root=self.root))

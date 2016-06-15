@@ -2,6 +2,7 @@
 
 from itertools import chain
 from importlib import import_module
+from logging import INFO, getLogger, basicConfig
 
 from homeinfo.lib.wsgi import InternalServerError, RequestHandler, WsgiApp
 
@@ -21,6 +22,11 @@ class HISMetaHandler(RequestHandler):
     BASE_PACKAGE = 'his.mods'
     CLASS_NAME = 'Service'
     HANDLER_NA = InternalServerError('Handler not available.')
+
+    def __init__(self):
+        """Sets a logger"""
+        super().__init__()
+        self.logger = getLogger('HIS')
 
     def get(self):
         """Processes GET requests"""
@@ -78,6 +84,7 @@ class HIS(WsgiApp):
     def __init__(self):
         """Use library defaults, but always enable CORS"""
         super().__init__(cors=True)
+        basicConfig(level=INFO)
 
     def get_handler(self, environ):
         """Gets the appropriate service handler"""

@@ -25,9 +25,18 @@ class HISMetaHandler(RequestHandler):
     CLASS_NAME = 'Handler'
     HANDLER_NA = InternalServerError('Handler not available.')
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, environ, *args, **kwargs):
         """Sets a logger"""
         self.logger = getLogger('HIS')
+
+        if environ['PATH_INFO'].startswith(self.root):
+            environ['PATH_INFO'] = relpath(environ['PATH_INFO'], self.root)
+            return super().handler(environ)
+        else:
+            raise InternalServerError(
+                'Path "{path}" not in root "{root}"'.format(
+                    path=environ['PATH_INFO'], root=self.root))
+
         super().__init__(*args, **kwargs)
 
     def get(self):
@@ -57,6 +66,11 @@ class HISMetaHandler(RequestHandler):
             return self.handler.delete()
         except HandlerNotAvailable:
             return self.HANDLER_NA
+
+    @property
+    def root(self):
+        """Returns the WSGI root path"""
+        return config.wsgi['ROOT']
 
     @property
     def handler_class(self):
@@ -96,16 +110,3 @@ class HIS(WsgiApp):
         """Use library defaults, but always enable CORS"""
         basicConfig(level=INFO)
         super().__init__(cors=True)
-        self.root = config.wsgi['ROOT']
-
-        self.REQUEST_HANDLER.ROOT = self.root
-
-    def handler(self, environ):
-        """Returns the handler instance"""
-        if environ['PATH_INFO'].startswith(self.root):
-            environ['PATH_INFO'] = relpath(environ['PATH_INFO'], self.root)
-            return super().handler(environ)
-        else:
-            raise InternalServerError(
-                'Path "{path}" not in root "{root}"'.format(
-                    path=environ['PATH_INFO'], root=self.root))

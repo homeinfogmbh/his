@@ -72,6 +72,7 @@ class HIS(WsgiApp):
     """HIS meta service"""
 
     REQUEST_HANDLER = HISMetaHandler
+    DEBUG = True
 
     def __init__(self):
         """Use library defaults, but always enable CORS"""

@@ -163,6 +163,12 @@ class CustomerService(HISModel):
                 (AccountService.service == self.service)):
             account_service.delete_instance()
 
+    @classmethod
+    def services(cls, customer):
+        """Yields services for the respective customer"""
+        for customer_service in cls.select().where(cls.customer == customer):
+            yield customer_service.service
+
     @property
     def active(self):
         """Determines whether the service mapping is active"""

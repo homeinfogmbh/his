@@ -27,11 +27,11 @@ class HISMetaHandler(RequestHandler):
 
     def __init__(self, environ, *args, **kwargs):
         """Sets a logger"""
+        basicConfig(level=INFO)
         self.logger = getLogger('HIS')
 
         if environ['PATH_INFO'].startswith(self.root):
             environ['PATH_INFO'] = relpath(environ['PATH_INFO'], self.root)
-            return super().handler(environ)
         else:
             raise InternalServerError(
                 'Path "{path}" not in root "{root}"'.format(
@@ -108,5 +108,4 @@ class HIS(WsgiApp):
 
     def __init__(self):
         """Use library defaults, but always enable CORS"""
-        basicConfig(level=INFO)
         super().__init__(cors=True)

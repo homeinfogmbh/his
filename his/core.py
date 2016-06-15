@@ -31,28 +31,28 @@ class HISMetaHandler(RequestHandler):
     def get(self):
         """Processes GET requests"""
         try:
-            return self.handler.get()
+            return self.handler(self.environ).get()
         except HandlerNotAvailable:
             return self.HANDLER_NA
 
     def post(self):
         """Processes POST requests"""
         try:
-            return self.handler.post()
+            return self.handler(self.environ).post()
         except HandlerNotAvailable:
             return self.HANDLER_NA
 
     def put(self):
         """Processes PUT requests"""
         try:
-            return self.handler.put()
+            return self.handler(self.environ).put()
         except HandlerNotAvailable:
             return self.HANDLER_NA
 
     def delete(self):
         """Processes DELETE requests"""
         try:
-            return self.handler.delete()
+            return self.handler(self.environ).delete()
         except HandlerNotAvailable:
             return self.HANDLER_NA
 

@@ -1,5 +1,6 @@
 """Meta-services for HIS"""
 
+from os.path import join
 from json import dumps
 
 from homeinfo.lib.config import Configuration

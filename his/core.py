@@ -25,26 +25,10 @@ class HISMetaHandler(RequestHandler):
     CLASS_NAME = 'Handler'
     HANDLER_NA = InternalServerError('Handler not available.')
 
-    def __init__(self, root, *args, **kwargs):
+    def __init__(self, *args, **kwargs):
         """Sets a logger"""
         self.logger = getLogger('HIS')
         super().__init__(*args, **kwargs)
-        self.root = root
-
-    @property
-    def rela_path(self):
-        """Returns the path nodes relative to the root"""
-        rela_path = self.path
-
-        for node in self.root:
-            # XXX: This may throw an IndexError
-            if rela_path[0] == node:
-                rela_path = rela_path[1:]
-            else:
-                raise ValueError(
-                    'Unexpected path node: {actual_node}. '
-                    'Expected {desired_node}'.format(
-                        actual_node=rela_path[0], desired_node=node))
 
     def get(self):
         """Processes GET requests"""

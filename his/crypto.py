@@ -6,6 +6,8 @@ from itertools import repeat
 from string import printable
 from random import choice
 
+from his.config import config
+
 __all__ = ['PasswordGenerationError', 'load', 'PasswordManager']
 
 
@@ -18,7 +20,7 @@ class PasswordGenerationError(Exception):
 def load():
     """Loads the password manager"""
     try:
-        iters = int(his_config.crypto['ITERS'])
+        iters = int(his_cconfigonfig.crypto['ITERS'])
     except (KeyError):
         raise ValueError('Missing iterations value in crypto config') from None
     except (ValueError, TypeError):
@@ -26,7 +28,7 @@ def load():
     else:
         if iters > 0:
             try:
-                pepper = his_config.crypto['PEPPER']
+                pepper = config.crypto['PEPPER']
             except (KeyError):
                 raise ValueError(
                     'Missing pepper value in crypto config') from None

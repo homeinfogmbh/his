@@ -10,7 +10,7 @@ from homeinfo.lib.misc import classproperty
 from homeinfo.peewee import MySQLDatabase, create
 from homeinfo.crm import Customer, Employee
 
-from ..config import his_config
+from his.config import config
 
 __all__ = [
     'his_db',
@@ -25,10 +25,10 @@ __all__ = [
 
 
 his_db = MySQLDatabase(
-    his_config.db['db'],
-    host=his_config.db['HOST'],
-    user=his_config.db['USER'],
-    passwd=his_config.db['PASSWD'],
+    config.db['db'],
+    host=config.db['HOST'],
+    user=config.db['USER'],
+    passwd=config.db['PASSWD'],
     closing=True)
 
 
@@ -60,17 +60,17 @@ class HISServiceDatabase(MySQLDatabase):
         name and optional diverging database configuration
         """
         if host is None:
-            host = his_config.db['host']
+            host = config.db['host']
 
         if user is None:
-            user = his_config.db['user']
+            user = config.db['user']
 
         if passwd is None:
-            passwd = his_config.db['passwd']
+            passwd = config.db['passwd']
 
         # Change the name to create a '_'-separated namespace
         super().__init__(
-            '_'.join((his_config.db['db'], str(service).lower())),
+            '_'.join((config.db['db'], str(service).lower())),
             host=host, user=user, passwd=passwd, closing=True, **kwargs)
 
 

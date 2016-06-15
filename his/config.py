@@ -2,7 +2,7 @@
 
 from homeinfo.lib.config import Configuration
 
-__all__ = ['homie_config']
+__all__ = ['config']
 
 
 class HISConfig(Configuration):
@@ -24,4 +24,4 @@ class HISConfig(Configuration):
         return self['wsgi']
 
 
-his_config = HISConfig('/etc/his.conf')
+config = HISConfig('/etc/his.conf')

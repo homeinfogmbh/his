@@ -31,34 +31,34 @@ class HISMetaHandler(RequestHandler):
     def get(self):
         """Processes GET requests"""
         try:
-            return self.handler(self.environ).get()
+            return self.handler.get()
         except HandlerNotAvailable:
             return self.HANDLER_NA
 
     def post(self):
         """Processes POST requests"""
         try:
-            return self.handler(self.environ).post()
+            return self.handler.post()
         except HandlerNotAvailable:
             return self.HANDLER_NA
 
     def put(self):
         """Processes PUT requests"""
         try:
-            return self.handler(self.environ).put()
+            return self.handler.put()
         except HandlerNotAvailable:
             return self.HANDLER_NA
 
     def delete(self):
         """Processes DELETE requests"""
         try:
-            return self.handler(self.environ).delete()
+            return self.handler.delete()
         except HandlerNotAvailable:
             return self.HANDLER_NA
 
     @property
-    def handler(self):
-        """Returns the appropriate request handler"""
+    def handler_class(self):
+        """Returns the appropriate request handler class"""
         try:
             module_path = '.'.join(chain([self.BASE_PACKAGE], self.path))
             module = import_module(module_path)
@@ -73,6 +73,15 @@ class HISMetaHandler(RequestHandler):
                 'Could not get attribute {cls} from module {module}'.format(
                     cls=self.CLASS_NAME, module=module))
             raise HandlerNotAvailable()
+
+    @property
+    def handler(self):
+        """Returns the appropriate request handler's instance"""
+        return self.handler_class(
+            self.environ,
+            self.cors,
+            self.date_format,
+            self.debug)
 
 
 class HIS(WsgiApp):

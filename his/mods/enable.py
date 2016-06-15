@@ -37,11 +37,10 @@ class Handler(HISService):
                     customer_id = self.query_dict.get('customer')
                     account_name = self.query_dict.get('account')
 
-                    if customer_id is None and account_name is None:
-                        return Error('No customer or accout specified.',
+                    if customer_id is not None and account_name is not None:
+                        return Error('Must specify either customer or accout.',
                                      status=400)
-
-                    if customer_id is not None:
+                    elif customer_id is not None:
                         if account.root:
                             try:
                                 cid = int(customer_id)
@@ -80,8 +79,7 @@ class Handler(HISService):
                         else:
                             return Error('You are not a root user.',
                                          status=400)
-
-                    if account_name is not None:
+                    elif account_name is not None:
                         if account.admin:
                             try:
                                 account = Account.get(
@@ -97,5 +95,8 @@ class Handler(HISService):
                                     return OK('Service added for account.')
                         else:
                             return Error('You are not an admin.', status=400)
+                    else:
+                        return Error('No customer or accout specified.',
+                                     status=400)
                 else:
                     return Error('Not logged in.', status=400)

@@ -2,30 +2,74 @@
 
 from itertools import chain
 
-from homeinfo.lib.wsgi import WsgiApp
+from homeinfo.lib.wsgi import InternalServerError, RequestHandler, WsgiApp
 
 
-def get_service(path_info):
-    """Tries to get a service handler by the provided path info"""
+class HandlerNotAvailable(Exception):
+    """Indicates that a given handler is not available"""
 
-    module_base = 'his.mods'
-    class_name = 'Service'
-    nodes = path_info.split('/')
-    module_path = '.'.join(chain([module_base], nodes))
-    module = import_module(module_path)
-    return getattr(module, class_name)
+    pass
 
 
 class HIS(WsgiApp):
     """HIS meta service"""
 
-    def get(self, environ):
-        path_info = self.path_info(environ)
+    def __init__(self):
+        """Use library defaults, but always enable CORS"""
+        super().__init__(cors=True)
 
+    def get_handler(self, environ):
+        """Gets the appropriate service handler"""
+
+
+class HISHandler(RequestHandler):
+    """Generic HIS service template"""
+
+    BASE_PACKAGE = 'his.mods'
+    CLASS_NAME = 'Service'
+
+    def get(self):
+        """Processes GET requests"""
         try:
-            service = get_service(path_info)
+            return self.handler.get()
+        except HandlerNotAvailable:
+            return InternalServerError('Handler not available.')
+
+    def post(self):
+        """Processes POST requests"""
+        try:
+            return self.handler.post()
+        except HandlerNotAvailable:
+            return InternalServerError('Handler not available.')
+
+    def put(self):
+        """Processes PUT requests"""
+        try:
+            return self.handler.put()
+        except HandlerNotAvailable:
+            return InternalServerError('Handler not available.')
+
+    def delete(self):
+        """Processes DELETE requests"""
+        try:
+            return self.handler.delete()
+        except HandlerNotAvailable:
+            return InternalServerError('Handler not available.')
+
+    @property
+    def handler(self):
+        """Returns the appropriate request handler"""
+        try:
+            module_path = '.'.join(chain([self.BASE_PACKAGE], self.path))
+            module = import_module(module_path)
+            return getattr(module, self.CLASS_NAME)
         except ImportError:
-            self.logger.critical('Could not import module path: {}'.format(
-                path_info))
+            self.logger.critical(
+                'Could not import module from path: {path}'.format(
+                    path=module_path))
+            raise HandlerNotAvailable()
         except AttributeError:
-            pass  # TODO
+            self.logger.critical(
+                'Could not get attribute {cls} from module {module}'.format(
+                    cls=self.CLASS_NAME, module=module))
+            raise HandlerNotAvailable()

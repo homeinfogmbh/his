@@ -17,9 +17,9 @@ __all__ = [
     'HISServiceDatabase',
     'HISModel',
     'Service',
-    'CustomerServices',
+    'CustomerService',
     'Account',
-    'AccountServices',
+    'AccountService',
     'User',
     'Login']
 
@@ -44,6 +44,12 @@ class AlreadyLoggedIn(Exception):
     pass
 
 
+def check_service_consistency(customer=None):
+    """Check service assignment consistency"""
+
+    pass  # TODO: Implement
+
+
 class HISServiceDatabase(MySQLDatabase):
     """A HIS service database
     Gets the name of the service, prefixed by the master database
@@ -64,7 +70,7 @@ class HISServiceDatabase(MySQLDatabase):
 
         # Change the name to create a '_'-separated namespace
         super().__init__(
-            '_'.join((his_config.db['db'], repr(service))),
+            '_'.join((his_config.db['db'], str(service).lower())),
             host=host, user=user, passwd=passwd, closing=True, **kwargs)
 
 
@@ -88,14 +94,14 @@ class Service(HISModel):
 
     def __repr__(self):
         """Returns the service's ID as a string"""
-        return str(self.id)
-
-    def __str__(self):
-        """Returns the service's name"""
         if self.description is not None:
             return '{0} ({1})'.format(self.name, self.description)
         else:
             return self.name
+
+    def __str__(self):
+        """Returns the service's name"""
+        return self.name
 
 
 @create
@@ -111,6 +117,8 @@ class CustomerService(HISModel):
     service = ForeignKeyField(
         Service, db_column='service',
         related_name='service_customers')
+    begin = DateTimeField(null=True, default=None)
+    end = DateTimeField(null=True, default=None)
 
     def remove(self):
         """Safely removes a customer service and its dependencies"""
@@ -118,6 +126,20 @@ class CustomerService(HISModel):
                 (AccountService.account.customer == self.customer) &
                 (AccountService.service == self.service)):
             account_service.delete_instance()
+
+    @property
+    def active(self):
+        """Determines whether the service mapping is active"""
+        if self.begin is None:
+             if self.end is None:
+                 return True
+             else:
+                 return datetime.now() < self.end
+        else:
+            if self.end is None:
+                return datetime.now() >= self.begin
+            else:
+                return self.begin <= datetime.now() < self.end
 
 
 @create
@@ -132,7 +154,7 @@ class Account(HISModel):
 
         def __iter__(self):
             for account_service in AccountService.select().where(
-                    AccountServices.account == self.account):
+                    AccountService.account == self.account):
                 yield account_service.service
 
         def add(self, service):
@@ -152,10 +174,9 @@ class Account(HISModel):
 
         def remove(self, service):
             """Removes a service from the mapping"""
-            if service in self:
-                account_service = AccountService.get(
+            for account_service in AccountService.select().where(
                     (AccountService.account == self.account) &
-                    (AccountService.service == service))
+                    (AccountService.service == service)):
                 account_service.delete_instance()
 
     customer = ForeignKeyField(
@@ -222,7 +243,7 @@ class Account(HISModel):
             return True
         elif self.disabled:
             return True
-        elif self.locked_until - datetime.now() > timedelta(0):
+        elif self.locked_until > datetime.now():
             return True
         else:
             return False
@@ -247,20 +268,13 @@ class AccountService(HISModel):
 class Session(HISModel):
     """A session related to a login"""
 
+    DEFAULT_DURATION_MINUTES = 5
+
     account = ForeignKeyField(Account, db_column='account')
     token = CharField(64)   # A uuid4
     start = DateTimeField()
     end = DateTimeField()
     login = BooleanField()  # Login session or keep-alive?
-
-    def __bool__(self):
-        """Returns a boolean representation"""
-        try:
-            myself = self.refresh()
-        except DoesNotExist:
-            return False
-        else:
-            return (datetime.now() - myself.end) > timedelta(0)
 
     def __repr__(self):
         """Returns a unique string representation"""
@@ -288,7 +302,7 @@ class Session(HISModel):
     def _open(cls, account, duration=None):
         """Actually opens a new login session"""
         now = datetime.now()
-        duration = duration or timedelta(minutes=5)
+        duration = duration or timedelta(minutes=cls.DEFAULT_DURATION_MINUTES)
         session = cls()
         session.account = account
         session.token = str(uuid4())
@@ -314,8 +328,13 @@ class Session(HISModel):
                 active_session.close()
                 return cls._open(account, duration=duration)
 
-    def refresh(self):
-        """Refreshes the session information from the database"""
+    @property
+    def active(self):
+        """Determines whether the session is active"""
+        return myself.start <= datetime.now() < myself.end
+
+    def reload(self):
+        """Re-loads the session information from the database"""
         cls = self.__class__
         return cls.get(
             (cls.account == self.account) &
@@ -330,10 +349,10 @@ class Session(HISModel):
 
     def renew(self, duration=None):
         """Renews the session"""
-        if self:
-            now = datetime.now()
-            duration = duration or timedelta(minutes=5)
-            self.end = now + duration
+        if self.active:
+            duration = duration or timedelta(
+                minutes=self.DEFAULT_DURATION_MINUTES)
+            self.end = datetime.now() + duration
             self.token = str(uuid4())
             self.login = False
             return self.save()

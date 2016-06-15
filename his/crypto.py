@@ -60,9 +60,11 @@ class PasswordManager():
     def _iter_hash(self, passwd, salt):
         """Hashes the password self._iters times"""
         pwhash = self._hash_pw(passwd, salt)
+
         # Loop hashes, compensating for one already performed hash
         for _ in repeat(None, self._iters - 1):
             pwhash = self._hash_pw(pwhash, salt)
+
         return pwhash
 
     def hash(self, plaintext):
@@ -84,12 +86,16 @@ class PasswordManager():
                 'password with less than 8 characters')
         else:
             password = ''
+
             for _ in repeat(None, length):
                 password += choice(printable)
+
             pwlen = len(password)
+
             if pwlen == length:
                 return password
             else:
                 raise PasswordGenerationError(
-                    'Expected password of length {0} but got '
-                    'password of length {1}'.format(length, pwlen))
+                    'Expected password of length {desired_length} but got '
+                    'password of length {actual_length}'.format(
+                        desired_length=length, actual_length=pwlen))

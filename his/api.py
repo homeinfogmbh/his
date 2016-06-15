@@ -22,24 +22,6 @@ class InvalidCredentials(Exception):
     pass
 
 
-def login(name, passwd, duration=None):
-    """Logs in a user"""
-    try:
-        account = Account.get(Account.name == name)
-    except DoesNotExist:
-        raise NoSuchAccount() from None
-    else:
-        if Session.exists(account):
-            raise AlreadyLoggedIn()
-        else:
-            # Verify credentials
-            pwmgr = load()
-            if pwmgr.verify(passwd, account.pwhash, account.salt):
-                return Session.open(account, duration=duration)
-            else:
-                raise InvalidCredentials() from None
-
-
 def keepalive(name, duration=None):
     """Keeps a session alive"""
     try:
@@ -53,3 +35,9 @@ def keepalive(name, duration=None):
             return False
         else:
             return session.renew(duration=duration)
+
+
+class HISService(RequestHandler):
+    """A generic HIS service"""
+
+    pass

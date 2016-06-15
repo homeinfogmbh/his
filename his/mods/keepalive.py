@@ -9,7 +9,7 @@ from his.orm import Session
 from his.crypto import load
 
 
-class Service(HISService):
+class Handler(HISService):
     """Handles keepalive requests"""
 
     def get(self):

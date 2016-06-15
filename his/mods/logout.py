@@ -9,7 +9,7 @@ from his.orm import Account, Session
 from his.crypto import load
 
 
-class Service(HISService):
+class Handler(HISService):
     """Closes sessions"""
 
     PARAMETER_ERROR = Error(

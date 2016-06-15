@@ -6,8 +6,8 @@ from homeinfo.crm import Customer
 from homeinfo.lib.wsgi import Error, JSON
 
 from his.api import HISService
-from his.orm import InconsistencyError, AlreadyLoggedIn, CustomerService, \
-    Account, Session
+from his.orm import InconsistencyError, AlreadyLoggedIn, Service, \
+    CustomerService, Account, Session
 from his.crypto import load
 
 

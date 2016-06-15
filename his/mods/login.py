@@ -5,11 +5,11 @@ from peewee import DoesNotExist
 from homeinfo.lib.wsgi import Error, JSON
 
 from his.api import HISService
-from his.orm import AlreadyLoggedIn, Service, Account, Session
+from his.orm import AlreadyLoggedIn, Account, Session
 from his.crypto import load
 
 
-class Service(HISService):
+class Handler(HISService):
     """Handles logins"""
 
     def get(self):

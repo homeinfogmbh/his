@@ -1,8 +1,6 @@
 """HIS login handler"""
 
-from json import dumps
-
-from homeinfo.lib.wsgi import Error, OK
+from homeinfo.lib.wsgi import Error, JSON
 
 from his.api import HISService
 from his.orm import AlreadyLoggedIn, Account, Session
@@ -34,7 +32,6 @@ class Service(HISService):
                     except AlreadyLoggedIn:
                         return Error('Already logged in.', status=400)
                     else:
-                        json = {'session_token': session.token}
-                        return OK(dumps(json), content_type='application/json')
+                        return JSON(session.todict())
                 else:
                     return Error('Invalid credentials.', status=400)

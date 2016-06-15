@@ -1,6 +1,8 @@
 """Meta-services for HIS"""
 
-from homeinfo.lib.wsgi import RequestHandler
+from json import dumps
+
+from homeinfo.lib.wsgi import OK, RequestHandler
 
 __all__ = ['HISService']
 

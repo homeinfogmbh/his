@@ -1,6 +1,6 @@
 """Keeping a session alive"""
 
-from homeinfo.lib.wsgi import Error, OK
+from homeinfo.lib.wsgi import Error, JSON
 
 from his.api import HISService
 from his.orm import Session
@@ -24,7 +24,7 @@ class Service(HISService):
             else:
                 if session.active:
                     if session.renew():
-                        return OK('Session has been renewed.')
+                        return JSON(session.tojson())
                     else:
                         return Error('Could not renew session.', status=500)
                 else:

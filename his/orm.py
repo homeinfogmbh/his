@@ -2,6 +2,7 @@
 
 from datetime import datetime, timedelta
 from uuid import uuid4
+from json import dumps
 
 from peewee import Model, PrimaryKeyField, ForeignKeyField,\
     CharField, BooleanField, DateTimeField, IntegerField, DoesNotExist
@@ -356,6 +357,20 @@ class Session(HISModel):
             return self.save()
         else:
             return False
+
+    def todict(self):
+        """Converts the session to a dictionary"""
+        result = {}
+        result['account'] = self.account.id
+        result['token'] = self.token
+        result['start'] = self.start
+        result['end'] = self.end
+        result['login'] = True if self.login else False
+        return result
+
+    def tojson(self):
+        """Converts the session to a JSON string"""
+        return dumps(self.todict())
 
 
 tables = [Service, CustomerService, Account, AccountService, Session]

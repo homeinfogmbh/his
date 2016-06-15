@@ -37,7 +37,7 @@ class HISMetaHandler(RequestHandler):
                 'Path "{path}" not in root "{root}"'.format(
                     path=environ['PATH_INFO'], root=self.root))
 
-        super().__init__(*args, **kwargs)
+        super().__init__(environ, *args, **kwargs)
 
     def get(self):
         """Processes GET requests"""

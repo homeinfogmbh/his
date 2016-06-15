@@ -3,7 +3,7 @@
 from peewee import DoesNotExist
 
 from homeinfo.crm import Customer
-from homeinfo.lib.wsgi import Error, JSON
+from homeinfo.lib.wsgi import Error, OK
 
 from his.api import HISService
 from his.orm import InconsistencyError, AlreadyLoggedIn, Service, \

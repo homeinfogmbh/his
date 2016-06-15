@@ -1,6 +1,6 @@
 """HIS login handler"""
 
-from homeinfo.lib.wsgi import Error
+from homeinfo.lib.wsgi import Error, OK
 
 from his.api import HISService
 from his.orm import Account, Session

@@ -39,5 +39,5 @@ class HISService(RequestHandler):
         """Returns the configuration section"""
         try:
             return self.config_parser[self.name]
-        except KeyError:
+        except (FileNotFoundError, KeyError):
             return {}  # Unconfigured

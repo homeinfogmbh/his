@@ -11,7 +11,14 @@ setup(
     author=author,
     author_email=author_email,
     requires=['homeinfo.crm'],
-    packages=['his', 'his.error'],
-    data_files=[('/usr/local/etc', ['files/etc/his.conf'])],
-    license=open('LICENSE.txt').read(),
+    packages=[
+        'his',
+        'his.error',
+        'his.mods'],
+    data_files=[
+        ('/etc', ['files/etc/his.conf'])
+        ('/etc/uwsgi/apps-available',
+         ['files/etc/uwsgi/apps-available/his.ini']),
+        ('/usr/share/his',
+         ['files/usr/share/his/his.wsgi'])],
     description='HOMEINFO Integrated Services')

@@ -5,56 +5,49 @@ from itertools import chain
 from homeinfo.lib.wsgi import InternalServerError, RequestHandler, WsgiApp
 
 
+__all__ = ['HIS']
+
+
 class HandlerNotAvailable(Exception):
     """Indicates that a given handler is not available"""
 
     pass
 
 
-class HIS(WsgiApp):
-    """HIS meta service"""
-
-    def __init__(self):
-        """Use library defaults, but always enable CORS"""
-        super().__init__(cors=True)
-
-    def get_handler(self, environ):
-        """Gets the appropriate service handler"""
-
-
-class HISHandler(RequestHandler):
+class HISMetaHandler(RequestHandler):
     """Generic HIS service template"""
 
     BASE_PACKAGE = 'his.mods'
     CLASS_NAME = 'Service'
+    HANDLER_NA = InternalServerError('Handler not available.')
 
     def get(self):
         """Processes GET requests"""
         try:
             return self.handler.get()
         except HandlerNotAvailable:
-            return InternalServerError('Handler not available.')
+            return self.HANDLER_NA
 
     def post(self):
         """Processes POST requests"""
         try:
             return self.handler.post()
         except HandlerNotAvailable:
-            return InternalServerError('Handler not available.')
+            return self.HANDLER_NA
 
     def put(self):
         """Processes PUT requests"""
         try:
             return self.handler.put()
         except HandlerNotAvailable:
-            return InternalServerError('Handler not available.')
+            return self.HANDLER_NA
 
     def delete(self):
         """Processes DELETE requests"""
         try:
             return self.handler.delete()
         except HandlerNotAvailable:
-            return InternalServerError('Handler not available.')
+            return self.HANDLER_NA
 
     @property
     def handler(self):
@@ -73,3 +66,16 @@ class HISHandler(RequestHandler):
                 'Could not get attribute {cls} from module {module}'.format(
                     cls=self.CLASS_NAME, module=module))
             raise HandlerNotAvailable()
+
+
+class HIS(WsgiApp):
+    """HIS meta service"""
+
+    REQUEST_HANDLER = HISMetaHandler
+
+    def __init__(self):
+        """Use library defaults, but always enable CORS"""
+        super().__init__(cors=True)
+
+    def get_handler(self, environ):
+        """Gets the appropriate service handler"""

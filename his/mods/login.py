@@ -1,5 +1,7 @@
 """HIS login handler"""
 
+from peewee import DoesNotExist
+
 from homeinfo.lib.wsgi import Error, JSON
 
 from his.api import HISService

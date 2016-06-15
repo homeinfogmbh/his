@@ -73,9 +73,7 @@ class Handler(HISService):
                                                 'Could not add service.',
                                                 status=500)
                                     else:
-                                        return Error(
-                                            'Service already enabled.',
-                                            status=400)
+                                        return OK('Service already enabled.')
                         else:
                             return Error('You are not a root user.',
                                          status=400)

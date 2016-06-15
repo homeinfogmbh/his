@@ -14,7 +14,7 @@ __all__ = ['HISService']
 class HISService(RequestHandler):
     """A generic HIS service"""
 
-    def __init__(self, name):
+    def __init__(self, name, environ):
         """Initializes the service handler"""
         self.name = name
         self.config_parser = Configuration(self.config_file_name, alert=True)

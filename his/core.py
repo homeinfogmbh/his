@@ -98,7 +98,7 @@ class HISMetaHandler(RequestHandler):
     @property
     def handler(self):
         """Returns the appropriate request handler's instance"""
-        return self.handler_class(self.next_handler)
+        return self.handler_class(self.next_handler, self.environ)
 
 
 class HIS(WsgiApp):

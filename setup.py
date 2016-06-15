@@ -16,7 +16,7 @@ setup(
         'his.error',
         'his.mods'],
     data_files=[
-        ('/etc', ['files/etc/his.conf'])
+        ('/etc', ['files/etc/his.conf']),
         ('/etc/uwsgi/apps-available',
          ['files/etc/uwsgi/apps-available/his.ini']),
         ('/usr/share/his',

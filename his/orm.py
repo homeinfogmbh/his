@@ -316,14 +316,14 @@ class Session(HISModel):
         XXX: This must only be done after successful login
         """
         try:
-            active_session = cls.get(cls.account == account)
+            session = cls.get(cls.account == account)
         except DoesNotExist:
             return cls._open(account, duration=duration)
         else:
-            if active_session:
+            if session.active:
                 raise AlreadyLoggedIn()
             else:
-                active_session.close()
+                session.close()
                 return cls._open(account, duration=duration)
 
     @property

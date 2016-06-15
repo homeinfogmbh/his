@@ -16,7 +16,7 @@ class HISService(RequestHandler):
     def __init__(self, name):
         """Initializes the service handler"""
         self.name = name
-        self.config_parser = Configuration(self.config_filename, alert=True)
+        self.config_parser = Configuration(self.config_file_name, alert=True)
 
         cors = self.config.get('CORS', 'false').lower() in ['true', '1']
         date_format = self.config.get('DEBUG')

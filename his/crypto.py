@@ -20,7 +20,7 @@ class PasswordGenerationError(Exception):
 def load():
     """Loads the password manager"""
     try:
-        iters = int(his_cconfigonfig.crypto['ITERS'])
+        iters = int(config.crypto['ITERS'])
     except (KeyError):
         raise ValueError('Missing iterations value in crypto config') from None
     except (ValueError, TypeError):

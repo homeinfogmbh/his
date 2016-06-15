@@ -20,7 +20,7 @@ class Service(HISService):
         all sessions for a certain account specified by its name
         """
 
-        session_token = self.query_dict.get('token')
+        session_token = self.query_dict.get('session')
         account_name = self.query_dict.get('account')
 
         if session_token is not None and account_name is not None:

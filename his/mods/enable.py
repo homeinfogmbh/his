@@ -17,7 +17,7 @@ class Service(HISService):
     def get(self):
         """Logs in the user"""
         try:
-            session_token = self.query_dict['token']
+            session_token = self.query_dict['session']
             session = Session.get(Session.token == session_token)
         except KeyError:
             return Error('No session specified.', status=400)

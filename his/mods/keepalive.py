@@ -15,7 +15,7 @@ class Service(HISService):
     def get(self):
         """Tries to keep a session alive"""
         try:
-            session_token = self.query_dict['token']
+            session_token = self.query_dict['session']
         except KeyError:
             return Error('No session token specified.', status=400)
         else:

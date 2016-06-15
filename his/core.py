@@ -119,7 +119,7 @@ class HIS(WsgiApp):
     def handler(self, environ):
         """Returns the handler instance"""
         if environ['PATH_INFO'].startswith(self.root):
-            environ['PATH_INFO'] = relpath(path, self.root)
+            environ['PATH_INFO'] = relpath(environ['PATH_INFO'], self.root)
             return super().handler(environ)
         else:
             raise InternalServerError(

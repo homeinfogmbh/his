@@ -14,6 +14,7 @@ from his.config import config
 
 __all__ = [
     'his_db',
+    'AlreadyLoggedIn',
     'HISServiceDatabase',
     'HISModel',
     'Service',
@@ -307,7 +308,7 @@ class Session(HISModel):
         session.end = now + duration
         session.login = True
         session.save()
-        return True
+        return session
 
     @classmethod
     def open(cls, account, duration=None):
@@ -328,7 +329,7 @@ class Session(HISModel):
     @property
     def active(self):
         """Determines whether the session is active"""
-        return myself.start <= datetime.now() < myself.end
+        return self.start <= datetime.now() < self.end
 
     def reload(self):
         """Re-loads the session information from the database"""

@@ -1,9 +1,11 @@
 """HIS login handler"""
 
+from json import dumps
+
 from homeinfo.lib.wsgi import Error, OK
 
 from his.api import HISService
-from his.orm import Account, Session
+from his.orm import AlreadyLoggedIn, Account, Session
 from his.crypto import load
 
 
@@ -23,14 +25,16 @@ class Service(HISService):
             except DoesNotExist:
                 return Error('Invalid credentials.', status=400)
             else:
-                if Session.exists(account):
-                    return Error('Already logged in.', status=400)
-                else:
-                    # Verify credentials
-                    pwmgr = load()
+                # Verify credentials
+                pwmgr = load()
 
-                    if pwmgr.verify(passwd, account.pwhash, account.salt):
-                        Session.open(account)
-                        return OK('Session opened.')
+                if pwmgr.verify(passwd, account.pwhash, account.salt):
+                    try:
+                        session = Session.open(account)
+                    except AlreadyLoggedIn:
+                        return Error('Already logged in.', status=400)
                     else:
-                        return Error('Invalid credentials.', status=400)
+                        json = {'session_token': session.token}
+                        return OK(dumps(json), content_type='application/json')
+                else:
+                    return Error('Invalid credentials.', status=400)

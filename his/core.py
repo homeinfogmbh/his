@@ -10,6 +10,7 @@ from homeinfo.lib.wsgi import Error, InternalServerError, RequestHandler, \
     WsgiApp
 
 from his.config import config
+from his.orm import Service
 
 __all__ = ['HIS']
 

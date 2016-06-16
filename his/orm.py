@@ -126,7 +126,7 @@ class Service(HISModel):
 
     path = CharField(255)
     module = CharField(255)
-    handler = CharField(16)
+    handler = CharField(32)
     name = CharField(32, null=True, default=None)
     description = CharField(255, null=True, default=None)
     # Flag whether the service shall be promoted

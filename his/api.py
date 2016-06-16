@@ -171,7 +171,9 @@ class CheckedAccountService(AccountService):
                 except DoesNotExist:
                     raise ServiceNotRegistered()
                 else:
-                    if service in self.account.services:
+                    # Allow call if account is root or account
+                    # is registered for the respective service
+                    if account.root or service in self.account.services:
                         return super().__call__()
                     else:
                         raise NotAuthorized()

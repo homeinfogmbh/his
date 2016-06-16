@@ -5,7 +5,7 @@ from peewee import DoesNotExist
 from homeinfo.crm import Customer
 from homeinfo.lib.wsgi import Error, OK, JSON
 
-from his.api import HISService
+from his.api.handlers import HISService
 from his.crypto import load
 from his.orm import InconsistencyError, AlreadyLoggedIn, Service, \
     CustomerService, Account, Session

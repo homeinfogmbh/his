@@ -53,7 +53,7 @@ def check_service_consistency(customer=None):
     pass  # TODO: Implement
 
 
-class ServicesWrapper():
+class AccountServicesWrapper():
     """Wraps service mappings with manipulation options"""
 
     def __init__(self, account):
@@ -173,10 +173,10 @@ class CustomerService(HISModel):
     def active(self):
         """Determines whether the service mapping is active"""
         if self.begin is None:
-             if self.end is None:
-                 return True
-             else:
-                 return datetime.now() < self.end
+            if self.end is None:
+                return True
+            else:
+                return datetime.now() < self.end
         else:
             if self.end is None:
                 return datetime.now() >= self.begin
@@ -259,7 +259,7 @@ class Account(HISModel):
     @property
     def services(self):
         """Yields appropriate services"""
-        return ServicesWrapper(self)
+        return AccountServicesWrapper(self)
 
 
 class AccountService(HISModel):

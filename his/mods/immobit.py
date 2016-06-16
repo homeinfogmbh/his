@@ -3,7 +3,7 @@
 from peewee import DoesNotExist
 
 from homeinfo.crm import Customer
-from homeinfo.lib.wsgi import Error, OK, JSON
+from homeinfo.lib.wsgi import Error, OK, XML, JSON
 
 from openimmo.factories import openimmo, uebertragung, anbieter
 from openimmo.openimmo import Umfang

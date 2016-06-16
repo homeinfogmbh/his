@@ -1,12 +1,8 @@
 """Meta-services for HIS"""
 
-from os.path import join
-from json import dumps
+from peewee import DoesNotExist
 
-from homeinfo.lib.config import Configuration
-from homeinfo.lib.wsgi import OK, RequestHandler
-
-from his.config import config
+from homeinfo.lib.wsgi import RequestHandler
 
 __all__ = ['IncompleteImplementationError', 'HISService']
 

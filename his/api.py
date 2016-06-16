@@ -177,10 +177,10 @@ class CheckedAccountService(AccountService):
                     #       2a) account is admin or
                     #       2b) account is enabled for the service
                     #
-                    if account.root:
+                    if self.account.root:
                         return super().__call__()
-                    elif service in CustomerService.services(account.customer):
-                        if account.admin:
+                    elif service in CustomerService.services(self.customer):
+                        if self.account.admin:
                             return super().__call__()
                         elif service in self.account.services:
                             return super().__call__()

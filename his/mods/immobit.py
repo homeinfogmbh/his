@@ -48,6 +48,3 @@ class ImmobitHandler(CheckedAccountService):
             anbieter_dom.immobilie.append(immobilie.dom)
 
         return XML(anbieter_dom)
-
-
-ImmoBit.install()

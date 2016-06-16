@@ -1,9 +1,10 @@
 """Core services"""
 
-from itertools import chain
 from importlib import import_module
 from logging import INFO, getLogger, basicConfig
 from os.path import relpath
+
+from peewee import DoesNotExist
 
 from homeinfo.lib.wsgi import Error, InternalServerError, RequestHandler, \
     WsgiApp

@@ -4,7 +4,7 @@ from peewee import DoesNotExist
 
 from homeinfo.lib.wsgi import Error, RequestHandler
 
-from his.orm import Service
+from his.orm import Service, Session
 
 __all__ = [
     'IncompleteImplementationError',

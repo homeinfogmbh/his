@@ -2,6 +2,8 @@
 
 from homeinfo.lib.wsgi import JSON
 
+from his.api.locale import Language
+
 __all__ = [
     'HISAPIError',
     'SessionError',
@@ -35,8 +37,8 @@ class NoSessionSpecified(SessionError):
     STATUS = 400
 
     LOCALE = {
-        'de_DE': 'Keine Sitzung angegeben.',
-        'en_US': 'No session specified.'}
+        Language.DE_DE: 'Keine Sitzung angegeben.',
+        Language.EN_US: 'No session specified.'}
 
 
 class NoSuchSession(SessionError):
@@ -45,8 +47,8 @@ class NoSuchSession(SessionError):
     STATUS = 400
 
     LOCALE = {
-        'de_DE': 'Keine solche Sitzung.',
-        'en_US': 'No such session.'}
+        Language.DE_DE: 'Keine solche Sitzung.',
+        Language.EN_US: 'No such session.'}
 
 
 class SessionExpired(SessionError):
@@ -55,8 +57,8 @@ class SessionExpired(SessionError):
     STATUS = 400
 
     LOCALE = {
-        'de_DE': 'Sitzung abgelaufen.',
-        'en_US': 'Session expired.'}
+        Language.DE_DE: 'Sitzung abgelaufen.',
+        Language.EN_US: 'Session expired.'}
 
 
 class ServiceNotRegistered(HISAPIError):
@@ -65,8 +67,8 @@ class ServiceNotRegistered(HISAPIError):
     STATUS = 500
 
     LOCALE = {
-        'de_DE': 'Dienst ist nicht registriert.',
-        'en_US': 'Service is not registered.'}
+        Language.DE_DE: 'Dienst ist nicht registriert.',
+        Language.EN_US: 'Service is not registered.'}
 
 
 class NotAuthorized(HISAPIError):
@@ -77,5 +79,5 @@ class NotAuthorized(HISAPIError):
     STATUS = 400
 
     LOCALE = {
-        'de_DE': 'Zugriff verweigert.',
-        'en_US': 'Not authorized.'}
+        Language.DE_DE: 'Zugriff verweigert.',
+        Language.EN_US: 'Not authorized.'}

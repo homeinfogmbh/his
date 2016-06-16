@@ -13,7 +13,7 @@ setup(
     requires=['homeinfo.crm'],
     packages=[
         'his',
-        'his.error',
+        'his.api',
         'his.mods'],
     data_files=[
         ('/etc', ['files/etc/his.conf']),

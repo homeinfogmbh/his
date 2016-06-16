@@ -4,7 +4,7 @@ from peewee import DoesNotExist
 
 from homeinfo.lib.wsgi import Error, RequestHandler
 
-from his.orm import Service, Session
+from his.orm import Service, CustomerService, Session
 
 __all__ = [
     'IncompleteImplementationError',
@@ -171,9 +171,20 @@ class CheckedAccountService(AccountService):
                 except DoesNotExist:
                     raise ServiceNotRegistered()
                 else:
-                    # Allow call if account is root or account
-                    # is registered for the respective service
-                    if account.root or service in self.account.services:
+                    # Allow call iff
+                    #   1) account is root or
+                    #   2) account's customer is enabled for the service and
+                    #       2a) account is admin or
+                    #       2b) account is enabled for the service
+                    #
+                    if account.root:
                         return super().__call__()
+                    elif service in CustomerService.services(account.customer):
+                        if account.admin:
+                            return super().__call__()
+                        elif service in self.account.services:
+                            return super().__call__()
+                        else:
+                            raise NotAuthorized()
                     else:
                         raise NotAuthorized()

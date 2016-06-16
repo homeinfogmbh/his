@@ -44,9 +44,9 @@ class HISService(RequestHandler):
                 service.promote = cls.PROMOTE
                 return service.save()
             else:
-                if service.name == self.name:
-                    if service.module == self.module:
-                        if service.handler == self.handler:
+                if service.name == cls.NAME:
+                    if service.module == module:
+                        if service.handler == classname:
                             return True
 
                 return False

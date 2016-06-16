@@ -25,10 +25,15 @@ class IncompleteImplementationError(NotImplementedError):
     pass
 
 
-class HISAPIError(Error):
+class HISAPIError(JSON):
     """Indicates errors for the WebAPI"""
 
-    pass
+    def __init__(self, charset='utf-8', cors=None):
+        super().__init__(
+            self.LOCALE,
+            charset=charset,
+            status=self.STATUS,
+            cors=cors)
 
 
 class SessionError(HISAPIError):
@@ -40,29 +45,41 @@ class SessionError(HISAPIError):
 class NoSessionSpecified(SessionError):
     """Indicates a missing session"""
 
-    def __init__(self):
-        super().__init__('No session specified.', status=400)
+    STATUS = 400
+
+    LOCALE = {
+        'de_DE': 'Keine Sitzung angegeben.'
+        'en_US': 'No session specified.'}
 
 
 class NoSuchSession(SessionError):
     """Indicates that the specified session does not exist"""
 
-    def __init__(self):
-        super().__init__('No such session.', status=400)
+    STATUS = 400
+
+    LOCALE = {
+        'de_DE': 'Keine solche Sitzung.'
+        'en_US': 'No such session.'}
 
 
 class SessionExpired(SessionError):
     """Indicates that the specified session has expired"""
 
-    def __init__(self):
-        super().__init__('Session expired.', status=400)
+    STATUS = 400
+
+    LOCALE = {
+        'de_DE': 'Sitzung abgelaufen.'
+        'en_US': 'Session expired.'}
 
 
 class ServiceNotRegistered(HISAPIError):
     """Indicates that the service is not registered"""
 
-    def __init__(self):
-        super().__init__('Service is not registered.', status=500)
+    STATUS = 500
+
+    LOCALE = {
+        'de_DE': 'Dienst ist nicht registriert.'
+        'en_US': 'Service is not registered.'}
 
 
 class NotAuthorized(HISAPIError):
@@ -70,8 +87,11 @@ class NotAuthorized(HISAPIError):
     is not authorized to use the service
     """
 
-    def __init__(self):
-        super().__init__('Not authorized.', status=400)
+    STATUS = 400
+
+    LOCALE = {
+        'de_DE': 'Zugriff verweigert.'
+        'en_US': 'Not authorized.'}
 
 
 class HISService(RequestHandler):

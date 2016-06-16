@@ -5,17 +5,19 @@ from importlib import import_module
 from logging import INFO, getLogger, basicConfig
 from os.path import relpath
 
-from homeinfo.lib.wsgi import InternalServerError, RequestHandler, WsgiApp
+from homeinfo.lib.wsgi import Error, InternalServerError, RequestHandler, \
+    WsgiApp
 
 from his.config import config
 
 __all__ = ['HIS']
 
 
-class HandlerNotAvailable(Exception):
+class HandlerNotAvailable(Error):
     """Indicates that a given handler is not available"""
 
-    pass
+    def __init__(self):
+        super().__init__('No handler available')
 
 
 class HISMetaHandler(RequestHandler):
@@ -23,49 +25,24 @@ class HISMetaHandler(RequestHandler):
 
     BASE_PACKAGE = 'his.mods'
     CLASS_NAME = 'Handler'
-    HANDLER_NA = InternalServerError('Handler not available.')
 
     def __init__(self, environ, *args, **kwargs):
         """Sets a logger"""
         basicConfig(level=INFO)
         self.logger = getLogger('HIS')
+        self._strip_root()
+        super().__init__(environ, *args, **kwargs)
 
-        if environ['PATH_INFO'].startswith(self.root):
-            environ['PATH_INFO'] = relpath(environ['PATH_INFO'], self.root)
+    def _strip_root(self):
+        """Strips the root prefix from the path info"""
+        path_info = self.environ['PATH_INFO']
+
+        if path_info.startswith(self.root):
+            self.environ['PATH_INFO'] = relpath(path_info, self.root)
         else:
             raise InternalServerError(
                 'Path "{path}" not in root "{root}"'.format(
-                    path=environ['PATH_INFO'], root=self.root))
-
-        super().__init__(environ, *args, **kwargs)
-
-    def get(self):
-        """Processes GET requests"""
-        try:
-            return self.handler.get()
-        except HandlerNotAvailable:
-            return self.HANDLER_NA
-
-    def post(self):
-        """Processes POST requests"""
-        try:
-            return self.handler.post()
-        except HandlerNotAvailable:
-            return self.HANDLER_NA
-
-    def put(self):
-        """Processes PUT requests"""
-        try:
-            return self.handler.put()
-        except HandlerNotAvailable:
-            return self.HANDLER_NA
-
-    def delete(self):
-        """Processes DELETE requests"""
-        try:
-            return self.handler.delete()
-        except HandlerNotAvailable:
-            return self.HANDLER_NA
+                    path=path_info, root=self.root))
 
     @property
     def root(self):
@@ -73,32 +50,51 @@ class HISMetaHandler(RequestHandler):
         return config.wsgi['ROOT']
 
     @property
-    def handler_class(self):
+    def handler(self):
         """Returns the appropriate request handler class"""
         try:
-            module_path = '.'.join(chain([self.BASE_PACKAGE], self.path))
-            module = import_module(module_path)
-            return getattr(module, self.CLASS_NAME)
-        except ImportError:
-            self.logger.critical(
-                'Could not import module from path: {path}'.format(
-                    path=module_path))
-            raise HandlerNotAvailable()
-        except AttributeError:
-            self.logger.critical(
-                'Could not get attribute {cls} from module {module}'.format(
-                    cls=self.CLASS_NAME, module=module))
-            raise HandlerNotAvailable()
+            service = Service.get(Service.path == self.path_info)
+        except DoesNotExist:
+            raise Error('No handler registered for path: {path}'.format(
+                path=self.path_info))
+        else:
+            module_path = service.module
+            class_name = service.handler
 
-    @property
-    def next_handler(self):
-        """Returns the next handler's name"""
-        return self.path[-1]
+            try:
+                module = import_module(module_path)
+                handler = getattr(module, class_name)
+            except ImportError:
+                msg = 'Module "{}" is not installed.'.format(module_path)
+                self.logger.critical(msg)
+                raise Error(msg)
+            except AttributeError:
+                msg = 'Module "{module}" has no handler "{handler}".'.format(
+                    module=module_path, handler=class_name)
+                self.logger.critical(msg)
+                raise Error(msg)
+            else:
+                return handler(
+                    self.environ,
+                    self.cors,
+                    self.date_format,
+                    self.debug)
 
-    @property
-    def handler(self):
-        """Returns the appropriate request handler's instance"""
-        return self.handler_class(self.next_handler, self.environ)
+    def get(self):
+        """Processes GET requests"""
+        return self.handler.get()
+
+    def post(self):
+        """Processes POST requests"""
+        return self.handler.post()
+
+    def put(self):
+        """Processes PUT requests"""
+        return self.handler.put()
+
+    def delete(self):
+        """Processes DELETE requests"""
+        return self.handler.delete()
 
 
 class HIS(WsgiApp):

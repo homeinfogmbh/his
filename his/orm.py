@@ -124,17 +124,17 @@ class HISModel(Model):
 class Service(HISModel):
     """Registers services of HIS"""
 
-    name = CharField(32)
+    path = CharField(255)
+    module = CharField(255)
+    handler = CharField(16)
+    name = CharField(32, null=True, default=None)
     description = CharField(255, null=True, default=None)
     # Flag whether the service shall be promoted
     promote = BooleanField(default=True)
 
     def __repr__(self):
         """Returns the service's ID as a string"""
-        if self.description is not None:
-            return '{0} ({1})'.format(self.name, self.description)
-        else:
-            return self.name
+        return '.'.join(self.module, self.handler)
 
     def __str__(self):
         """Returns the service's name"""

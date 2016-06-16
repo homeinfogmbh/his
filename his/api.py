@@ -8,36 +8,47 @@ from homeinfo.lib.wsgi import OK, RequestHandler
 
 from his.config import config
 
-__all__ = ['HISService']
+__all__ = ['IncompleteImplementationError', 'HISService']
+
+
+class IncompleteImplementationError(NotImplementedError):
+    """Indicates an incomplete implementation of the service"""
+
+    pass
 
 
 class HISService(RequestHandler):
     """A generic HIS service"""
 
-    def __init__(self, name, environ):
-        """Initializes the service handler"""
-        self.name = name
-        self.config_parser = Configuration(self.config_file_name, alert=True)
+    PATH = None
+    NAME = None
+    DESCRIPTION = None
+    PROMOTE = None
 
-        cors = self.config.get('CORS', 'false').lower() in ['true', '1']
-        date_format = self.config.get('DEBUG')
-        debug = self.config.get('DEBUG', 'false').lower() in ['true', '1']
+    @classmethod
+    def install(cls, path):
+        """Installs the service into the registered database"""
+        if cls.PATH is None or cls.NAME is None:
+            raise IncompleteImplementationError()
+        else:
+            module = cls.__module__
+            classname = cls.__name__
 
-        super().__init__(environ, cors, date_format, debug)
+            try:
+                service = Service.get(Service.path == path)
+            except DoesNotExist:
+                service = Service()
+                service.name = cls.NAME
+                service.path = path
+                service.module = module
+                service.handler = classname
+                service.description = cls.DESCRIPTION
+                service.promote = cls.PROMOTE
+                return service.save()
+            else:
+                if service.name == self.name:
+                    if service.module == self.module:
+                        if service.handler == self.handler:
+                            return True
 
-    @property
-    def config_file_basename(self):
-        return self.name + config.config['SUFFIX']
-
-    @property
-    def config_file_name(self):
-        """Returns the configuration file name"""
-        return join(config.config['BASEDIR'], self.config_file_basename)
-
-    @property
-    def config(self):
-        """Returns the configuration section"""
-        try:
-            return self.config_parser[self.name]
-        except (FileNotFoundError, KeyError):
-            return {}  # Unconfigured
+                return False

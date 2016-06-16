@@ -48,7 +48,7 @@ class NoSessionSpecified(SessionError):
     STATUS = 400
 
     LOCALE = {
-        'de_DE': 'Keine Sitzung angegeben.'
+        'de_DE': 'Keine Sitzung angegeben.',
         'en_US': 'No session specified.'}
 
 
@@ -58,7 +58,7 @@ class NoSuchSession(SessionError):
     STATUS = 400
 
     LOCALE = {
-        'de_DE': 'Keine solche Sitzung.'
+        'de_DE': 'Keine solche Sitzung.',
         'en_US': 'No such session.'}
 
 
@@ -68,7 +68,7 @@ class SessionExpired(SessionError):
     STATUS = 400
 
     LOCALE = {
-        'de_DE': 'Sitzung abgelaufen.'
+        'de_DE': 'Sitzung abgelaufen.',
         'en_US': 'Session expired.'}
 
 
@@ -78,7 +78,7 @@ class ServiceNotRegistered(HISAPIError):
     STATUS = 500
 
     LOCALE = {
-        'de_DE': 'Dienst ist nicht registriert.'
+        'de_DE': 'Dienst ist nicht registriert.',
         'en_US': 'Service is not registered.'}
 
 
@@ -90,7 +90,7 @@ class NotAuthorized(HISAPIError):
     STATUS = 400
 
     LOCALE = {
-        'de_DE': 'Zugriff verweigert.'
+        'de_DE': 'Zugriff verweigert.',
         'en_US': 'Not authorized.'}
 
 

@@ -26,7 +26,7 @@ class HISService(RequestHandler):
     PROMOTE = None
 
     @classmethod
-    def install(cls, path):
+    def install(cls):
         """Installs the service into the registered database"""
         if cls.PATH is None or cls.NAME is None:
             raise IncompleteImplementationError()
@@ -35,11 +35,11 @@ class HISService(RequestHandler):
             classname = cls.__name__
 
             try:
-                service = Service.get(Service.path == path)
+                service = Service.get(Service.path == cls.PATH)
             except DoesNotExist:
                 service = Service()
                 service.name = cls.NAME
-                service.path = path
+                service.path = cls.PATH
                 service.module = module
                 service.handler = classname
                 service.description = cls.DESCRIPTION

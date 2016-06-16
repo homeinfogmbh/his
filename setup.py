@@ -28,3 +28,9 @@ from his.orm import tables
 
 for table in tables:
     table.create_table(fail_silently=True)
+
+
+from his.mods.meta import install
+
+for handler in install:
+    handler.install()

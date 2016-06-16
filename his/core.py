@@ -26,12 +26,16 @@ class HISMetaHandler(RequestHandler):
     BASE_PACKAGE = 'his.mods'
     CLASS_NAME = 'Handler'
 
-    def __init__(self, environ, *args, **kwargs):
+    def __init__(self, environ, cors, date_format, debug):
         """Sets a logger"""
         basicConfig(level=INFO)
         self.logger = getLogger('HIS')
         self._strip_root()
-        super().__init__(environ, *args, **kwargs)
+        super().__init__(environ, cors, date_format, debug)
+
+    def __call__(self):
+        """Delegate to actual handler"""
+        return self.handler()
 
     def _strip_root(self):
         """Strips the root prefix from the path info"""

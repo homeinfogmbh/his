@@ -2,7 +2,7 @@
 
 from peewee import DoesNotExist
 
-from homeinfo.lib.wsgi import Error, RequestHandler
+from homeinfo.lib.wsgi import JSON, RequestHandler
 
 from his.orm import Service, CustomerService, Session
 

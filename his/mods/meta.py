@@ -5,6 +5,10 @@ from peewee import DoesNotExist
 from homeinfo.crm import Customer
 from homeinfo.lib.wsgi import Error, OK, JSON
 
+from his.api.errors import MissingCredentials, NoSuchAccount, \
+    InvalidCredentials, AlreadyLoggedIn as AlreadyLoggedIn_, \
+    NoSessionSpecified, NoSuchSession, SessionExpired, NoServiceSpecified, \
+    NoSuchService, InvalidCustomerID, NoSuchCustomer, NotAuthorized
 from his.api.handlers import HISService
 from his.crypto import load
 from his.orm import InconsistencyError, AlreadyLoggedIn, Service, \
@@ -32,12 +36,12 @@ class LoginHandler(HISService):
             account_name = self.query_dict['account']
             passwd = self.query_dict['passwd']
         except KeyError:
-            return Error('No credentials specified.', status=400)
+            raise MissingCredentials()
         else:
             try:
                 account = Account.get(Account.name == account_name)
             except DoesNotExist:
-                return Error('No such account.', status=400)
+                raise NoSuchAccount()
             else:
                 # Verify credentials
                 pwmgr = load()
@@ -46,11 +50,11 @@ class LoginHandler(HISService):
                     try:
                         session = Session.open(account)
                     except AlreadyLoggedIn:
-                        return Error('Already logged in.', status=400)
+                        raise AlreadyLoggedIn_()
                     else:
                         return JSON(session.todict())
                 else:
-                    return Error('Invalid credentials.', status=400)
+                    raise InvalidCredentials()
 
 
 class KeepAliveHandler(HISService):
@@ -66,20 +70,20 @@ class KeepAliveHandler(HISService):
         try:
             session_token = self.query_dict['session']
         except KeyError:
-            return Error('No session token specified.', status=400)
+            raise NoSessionSpecified()
         else:
             try:
                 session = Session.get(Session.token == session_token)
             except DoesNotExist:
-                return Error('No such session.', status=400)
+                raise NoSuchSession()
             else:
                 if session.active:
                     if session.renew():
                         return JSON(session.todict())
                     else:
-                        return Error('Could not renew session.', status=500)
+                        raise SessionExpired()
                 else:
-                    return Error('Session has already expired.', status=400)
+                    raise SessionExpired()
 
 
 class LogoutHandler(HISService):
@@ -107,7 +111,7 @@ class LogoutHandler(HISService):
             try:
                 session = Session.get(Session.token == session_token)
             except DoesNotExist:
-                return Error('No such session.', status=400)
+                raise NoSuchSession()
             else:
                 session.close()
                 return JSON({'closed': [session.token]})
@@ -115,7 +119,7 @@ class LogoutHandler(HISService):
             try:
                 account = Account.get(Account.name == account_name)
             except DoesNotExist:
-                return Error('No such account.', status=400)
+                raise NoSuchAccount()
             else:
                 sessions_closed = []
 
@@ -143,17 +147,17 @@ class ServicePermissionsHandler(HISService):
             session_token = self.query_dict['session']
             session = Session.get(Session.token == session_token)
         except KeyError:
-            return Error('No session specified.', status=400)
+            raise NoSessionSpecified()
         except DoesNotExist:
-            return Error('No such session.', status=400)
+            raise NoSuchSession()
 
         try:
             service_name = self.query_dict['service']
             service = Service.get(Service.name == service_name)
         except KeyError:
-            return Error('No service specified.', status=400)
+            raise NoServiceSpecified()
         except DoesNotExist:
-            return Error('No such service.', status=400)
+            raise NoSuchService()
         else:
             if session.active:
                 account = session.account
@@ -168,13 +172,12 @@ class ServicePermissionsHandler(HISService):
                         try:
                             cid = int(customer_id)
                         except ValueError:
-                            return Error('Invalid customer ID.',
-                                         status=400)
+                            raise InvalidCustomerID()
 
                         try:
                             customer = Customer.get(Customer.id == cid)
                         except DoesNotExist:
-                            return Error('No such customer.', status=400)
+                            raise NoSuchCustomer()
 
                         try:
                             CustomerService.get(
@@ -210,7 +213,7 @@ class ServicePermissionsHandler(HISService):
                         else:
                             return OK('Service added for account.')
                     else:
-                        return Error('You are not an admin.', status=400)
+                        raise NotAuthorized()
                 else:
                     return Error('No customer or accout specified.',
                                  status=400)

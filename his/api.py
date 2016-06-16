@@ -4,6 +4,8 @@ from peewee import DoesNotExist
 
 from homeinfo.lib.wsgi import RequestHandler
 
+from his.orm import Service
+
 __all__ = ['IncompleteImplementationError', 'HISService']
 
 

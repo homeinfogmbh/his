@@ -30,8 +30,8 @@ class HISMetaHandler(RequestHandler):
         """Sets a logger"""
         basicConfig(level=INFO)
         self.logger = getLogger('HIS')
-        self._strip_root()
         super().__init__(environ, cors, date_format, debug)
+        self._strip_root()
 
     def __call__(self):
         """Delegate to actual handler"""

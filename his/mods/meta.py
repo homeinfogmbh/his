@@ -1,10 +1,10 @@
 """HIS meta services"""
 
 from peewee import DoesNotExist
+from argon2 import VerifyMismatchError, PasswordHasher
 
 from homeinfo.crm import Customer
 from homeinfo.lib.wsgi import Error, OK, JSON
-from homeinfo.lib.passwd import argon2sum
 
 from his.api.errors import MissingCredentials, NoSuchAccount, \
     InvalidCredentials, AlreadyLoggedIn as AlreadyLoggedIn_, \
@@ -44,7 +44,12 @@ class LoginHandler(HISService):
                 raise NoSuchAccount()
             else:
                 # Verify password with Argon2
-                if account.pwhash == argon2sum(passwd, account.salt):
+                try:
+                    ok = PasswordHasher.verify(account.pwhash, password)
+                except VerifyMismatchError:
+                    ok = False
+
+                if ok:
                     try:
                         session = Session.open(account)
                     except AlreadyLoggedIn:

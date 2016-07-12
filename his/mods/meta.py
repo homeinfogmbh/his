@@ -1,7 +1,8 @@
 """HIS meta services"""
 
 from peewee import DoesNotExist
-from argon2 import VerifyMismatchError, PasswordHasher
+from argon2 import PasswordHasher
+from argon2.exceptions import VerifyMismatchError
 
 from homeinfo.crm import Customer
 from homeinfo.lib.wsgi import Error, OK, JSON

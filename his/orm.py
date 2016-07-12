@@ -194,7 +194,7 @@ class Account(HISModel):
         Employee, db_column='user', null=True,
         related_name='accounts')
     name = CharField(64)  # Login name
-    pwhash = CharField(64)  # SHA-256 hash
+    pwhash = CharField(64)  # Argon2 hash
     salt = CharField(32)  # Password salt (HMAC)
     email = CharField(64)
     created = DateTimeField()

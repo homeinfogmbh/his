@@ -4,13 +4,13 @@ from peewee import DoesNotExist
 
 from homeinfo.crm import Customer
 from homeinfo.lib.wsgi import Error, OK, JSON
+from homeinfo.lib.passwd import argon2sum
 
 from his.api.errors import MissingCredentials, NoSuchAccount, \
     InvalidCredentials, AlreadyLoggedIn as AlreadyLoggedIn_, \
     NoSessionSpecified, NoSuchSession, SessionExpired, NoServiceSpecified, \
     NoSuchService, InvalidCustomerID, NoSuchCustomer, NotAuthorized
 from his.api.handlers import HISService
-from his.crypto import load
 from his.orm import InconsistencyError, AlreadyLoggedIn, Service, \
     CustomerService, Account, Session
 
@@ -43,10 +43,8 @@ class LoginHandler(HISService):
             except DoesNotExist:
                 raise NoSuchAccount()
             else:
-                # Verify credentials
-                pwmgr = load()
-
-                if pwmgr.verify(passwd, account.pwhash, account.salt):
+                # Verify password with Argon2
+                if account.pwhash == argon2sum(passwd, account.salt):
                     try:
                         session = Session.open(account)
                     except AlreadyLoggedIn:

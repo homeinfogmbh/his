@@ -29,5 +29,4 @@ class HISConfig(Configuration):
         return self['config']
 
 
-
 config = HISConfig('/etc/his.conf')

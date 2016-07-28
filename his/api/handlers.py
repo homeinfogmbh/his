@@ -12,9 +12,9 @@ from his.api.errors import NoSessionSpecified, NoSuchSession, SessionExpired, \
 __all__ = [
     'IncompleteImplementationError',
     'HISService',
-    'SessionService',
+    'AuthenticatedService',
     'AccountService',
-    'CheckedAccountService']
+    'AuthorizedService']
 
 
 class IncompleteImplementationError(NotImplementedError):
@@ -62,7 +62,7 @@ class HISService(RequestHandler):
                 return False
 
 
-class SessionService(HISService):
+class AuthenticatedService(HISService):
     """A HIS service that is session-aware"""
 
     @property
@@ -84,7 +84,7 @@ class SessionService(HISService):
                     raise SessionExpired()
 
 
-class AccountService(SessionService):
+class AccountService(AuthenticatedService):
     """A HIS service that is account- and customer-aware"""
 
     @property
@@ -98,7 +98,7 @@ class AccountService(SessionService):
         return self.session.account.customer
 
 
-class CheckedAccountService(AccountService):
+class AuthorizedService(AccountService):
     """A HIS service that checks whether
     the account is enabled for it
     """

@@ -42,11 +42,13 @@ class ImmobitHandler(AuthorizedService):
             data = self.file.read()
         except MemoryError:
             # TODO: handle
+            pass
         else:
             try:
                 return openimmo.CreateFromDocument(data)
             except PyXBException:
                 # TODO: Handle
+                pass
 
     def get(self):
         """Handles GET requests"""
@@ -72,11 +74,10 @@ class ImmobitHandler(AuthorizedService):
                     return OK(ident)
                 else:
                     # TODO: handle
-
-
-
-
+                    pass
         elif path[-1] == 'attachment':
             # TODO: implement
+            pass
         else:
             # TODO: handle
+            pass

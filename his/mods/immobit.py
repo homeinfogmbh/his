@@ -31,9 +31,9 @@ class ImmobitHandler(AuthorizedService):
         try:
             filter_str = self.query_dict['filter']
         except KeyError:
-            filters = []
+            return []
         else:
-            filters = [f for f in filter_str.split(',') if f]
+            return [f for f in filter_str.split(',') if f]
 
     @property
     def dom(self):

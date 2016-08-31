@@ -22,7 +22,7 @@ class HandlerNotAvailable(Error):
         super().__init__('No handler available')
 
 
-class HISMetaHandler(RequestHandler):
+class HISMeta(RequestHandler):
     """Generic HIS service template"""
 
     BASE_PACKAGE = 'his.mods'
@@ -44,7 +44,7 @@ class HISMetaHandler(RequestHandler):
         return config.wsgi['ROOT']
 
     @property
-    def relpath(self):
+    def relpath_info(self):
         """Returns the path info with the
         root prefix stripped from it
         """
@@ -56,13 +56,26 @@ class HISMetaHandler(RequestHandler):
                     path=self.path_info, root=self.root))
 
     @property
-    def module_path(self):
-        """Returns the module path"""
+    def relpath(self):
+        """Returns the relative path nodes"""
+        try:
+            return [node for node in self.relpath_info.split('/') if node]
+        except TypeError:
+            return []
+
+    @property
+    def modpath(self):
+        """Returns the module path nodes"""
         if self.request_method == 'PUT':
             # On PUT the last node is resource identifier.
             return self.relpath[:-1]
         else:
             return self.relpath
+
+    @property
+    def modpath_info(self):
+        """Returns the module path as a string"""
+        return '/'.join(self.modpath)
 
     @property
     def resource(self):
@@ -122,7 +135,7 @@ class HISMetaHandler(RequestHandler):
 class HIS(WsgiApp):
     """HIS meta service"""
 
-    REQUEST_HANDLER = HISMetaHandler
+    REQUEST_HANDLER = HISMeta
     DEBUG = True
 
     def __init__(self):

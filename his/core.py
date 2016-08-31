@@ -2,12 +2,13 @@
 
 from importlib import import_module
 from logging import INFO, getLogger, basicConfig
-from os.path import relpath
+from os.path import relpath, basedir
 
 from peewee import DoesNotExist
 
 from homeinfo.lib.wsgi import Error, InternalServerError, RequestHandler, \
     WsgiApp
+from homeinfo.lib.system import maxcommonpath
 
 from his.config import config
 from his.orm import Service
@@ -56,40 +57,43 @@ class HISMeta(RequestHandler):
                     path=self.path_info, root=self.root))
 
     @property
-    def resource(self):
-        """Returns the resource path"""
-        return relpath(self.relpath_info, self.PATH)
-
-    @property
     def handler(self):
         """Returns the appropriate request handler class"""
-        try:
-            service = Service.get(Service.path == self.PATH)
-        except DoesNotExist:
-            raise Error('No handler registered for path: {path}'.format(
-                path=self.modpath_info))
-        else:
-            module_path = service.module
-            class_name = service.handler
+        no_handler = Error('No handler registered for path: {path}'.format(
+            path=self.modpath_info))
+        service_paths = (service.path for service in Service)
+        best_match = maxcommonpath(self.relpath, service_paths)
+        self.logger.info('Found handler: {}'.format(best_match))
 
+        if not best_match:
+            raise no_handler
+        else:
             try:
-                module = import_module(module_path)
-                handler = getattr(module, class_name)
-            except ImportError:
-                msg = 'Module "{}" is not installed.'.format(module_path)
-                self.logger.critical(msg)
-                raise Error(msg)
-            except AttributeError:
-                msg = 'Module "{module}" has no handler "{handler}".'.format(
-                    module=module_path, handler=class_name)
-                self.logger.critical(msg)
-                raise Error(msg)
-            else:
-                return handler(
-                    self.environ,
-                    self.cors,
-                    self.date_format,
-                    self.debug)
+                service = Service.get(Service.path == best_match)
+            except DoesNotExist:
+                raise no_handler
+
+        module_path = service.module
+        class_name = service.handler
+
+        try:
+            module = import_module(module_path)
+            handler = getattr(module, class_name)
+        except ImportError:
+            msg = 'Module "{}" is not installed.'.format(module_path)
+            self.logger.critical(msg)
+            raise Error(msg)
+        except AttributeError:
+            msg = 'Module "{module}" has no handler "{handler}".'.format(
+                module=module_path, handler=class_name)
+            self.logger.critical(msg)
+            raise Error(msg)
+        else:
+            return handler(
+                self.environ,
+                self.cors,
+                self.date_format,
+                self.debug)
 
     def get(self):
         """Processes GET requests"""

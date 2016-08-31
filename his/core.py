@@ -33,22 +33,10 @@ class HISMetaHandler(RequestHandler):
         basicConfig(level=INFO)
         self.logger = getLogger('HIS')
         super().__init__(environ, cors, date_format, debug)
-        self._strip_root()
 
     def __call__(self):
         """Delegate to actual handler"""
         return self.handler()
-
-    def _strip_root(self):
-        """Strips the root prefix from the path info"""
-        path_info = self.environ['PATH_INFO']
-
-        if path_info.startswith(self.root):
-            self.environ['PATH_INFO'] = relpath(path_info, self.root)
-        else:
-            raise InternalServerError(
-                'Path "{path}" not in root "{root}"'.format(
-                    path=path_info, root=self.root))
 
     @property
     def root(self):
@@ -56,10 +44,38 @@ class HISMetaHandler(RequestHandler):
         return config.wsgi['ROOT']
 
     @property
+    def path_info(self):
+        """Returns the path info with the
+        root prefix stripped from it
+        """
+        if super().path_info.startswith(self.root):
+            return relpath(path_info, self.root)
+        else:
+            raise InternalServerError(
+                'Path "{path}" not in root "{root}"'.format(
+                    path=super().path_info, root=self.root))
+
+    @property
+    def module_path(self):
+        """Returns the module path"""
+        if self.request_method == 'PUT':
+            # On PUT the last node is resource identifier.
+            return self.path_info[:-1]
+        else:
+            return self.path_info
+
+    @property
+    def resource(self):
+        """Returns the respective resource identifier"""
+        if self.request_method == 'PUT':
+            # Last node is resource identifier
+            return self.path_info[-1]
+
+    @property
     def handler(self):
         """Returns the appropriate request handler class"""
         try:
-            service = Service.get(Service.path == self.path_info)
+            service = Service.get(Service.path == self.module_path)
         except DoesNotExist:
             raise Error('No handler registered for path: {path}'.format(
                 path=self.path_info))

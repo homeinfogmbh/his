@@ -230,6 +230,62 @@ class ServicePermissions(HISService):
                 return Error('Not logged in.', status=400)
 
 
+class Session(HISService):
+    """Session handling service"""
+
+    def post(self):
+        """Logs in the user"""
+        # XXX: Currently ignores posted data
+        try:
+            account = self.query_dict['account']
+            passwd = self.query_dict['passwd']
+        except KeyError:
+            raise MissingCredentials()
+        else:
+            try:
+                account = Account.get(Account.name == account)
+            except DoesNotExist:
+                raise NoSuchAccount()
+            else:
+                # Verify password with Argon2
+                try:
+                    match = password_hasher.verify(account.pwhash, passwd)
+                except VerifyMismatchError:
+                    raise InvalidCredentials()
+                else:
+                    if match:
+                        try:
+                            session = Session.open(account)
+                        except AlreadyLoggedIn:
+                            raise AlreadyLoggedIn_()
+                        else:
+                            return JSON(session.todict())
+                    else:
+                        raise InvalidCredentials()
+
+    def put(self):
+        """Tries to keep a session alive"""
+        try:
+            session = self.query_dict['session']
+        except KeyError:
+            raise NoSessionSpecified()
+        else:
+            try:
+                session = Session.get(Session.token == session)
+            except DoesNotExist:
+                raise NoSuchSession()
+            else:
+                if session.active:
+                    if session.renew():
+                        return JSON(session.todict())
+                    else:
+                        raise SessionExpired()
+                else:
+                    raise SessionExpired()
+
+
+
+
 install = [
     Login,
     KeepAlive,

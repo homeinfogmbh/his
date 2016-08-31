@@ -12,7 +12,6 @@ from openimmo.openimmo import Umfang
 from openimmodb3.db import Immobilie
 
 from his.api.handlers import AuthorizedService
-from his.crypto import load
 from his.orm import InconsistencyError, AlreadyLoggedIn, Service, \
     CustomerService, Account, Session
 

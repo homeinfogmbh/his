@@ -34,31 +34,28 @@ class Login(HISService):
     def get(self):
         """Logs in the user"""
         try:
-            account_name = self.query_dict['account']
+            account = self.query_dict['account']
             passwd = self.query_dict['passwd']
         except KeyError:
             raise MissingCredentials()
         else:
             try:
-                account = Account.get(Account.name == account_name)
+                account = Account.get(Account.name == account)
             except DoesNotExist:
                 raise NoSuchAccount()
             else:
                 # Verify password with Argon2
                 try:
-                    ok = PasswordHasher.verify(account.pwhash, password)
+                    PasswordHasher.verify(account.pwhash, passwd)
                 except VerifyMismatchError:
-                    ok = False
-
-                if ok:
+                    raise InvalidCredentials()
+                else:
                     try:
                         session = Session.open(account)
                     except AlreadyLoggedIn:
                         raise AlreadyLoggedIn_()
                     else:
                         return JSON(session.todict())
-                else:
-                    raise InvalidCredentials()
 
 
 class KeepAlive(HISService):

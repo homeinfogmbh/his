@@ -368,7 +368,7 @@ class Session(HISModel):
     def todict(self):
         """Converts the session to a dictionary"""
         result = {}
-        result['account'] = self.account.id
+        result['account'] = self.account.name
         result['token'] = self.token
         result['start'] = str(self.start)
         result['end'] = str(self.end)

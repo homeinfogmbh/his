@@ -16,9 +16,7 @@ from his.orm import InconsistencyError, AlreadyLoggedIn, Service, \
     CustomerService, Account, Session
 
 __all__ = [
-    'Login',
-    'KeepAlive',
-    'Logout',
+    'SessionManager',
     'ServicePermissions',
     'install']
 
@@ -26,16 +24,19 @@ __all__ = [
 password_hasher = PasswordHasher()
 
 
-class Login(HISService):
-    """Handles logins"""
+class SessionManager(HISService):
+    """Session handling service"""
 
-    PATH = 'login'
-    NAME = 'HIS Login Manager'
-    DESCRIPTION = 'Manages account logins'
+    PATH = 'session'
+    NAME = 'sessions manager'
+    DESCRIPTION = 'Manages account sessions'
     PROMOTE = False
+    PARAMETER_ERROR = Error(
+        'Must specify either account name or session token', status=400)
 
-    def get(self):
+    def post(self):
         """Logs in the user"""
+        # XXX: Currently ignores posted data
         try:
             account = self.query_dict['account']
             passwd = self.query_dict['passwd']
@@ -63,16 +64,7 @@ class Login(HISService):
                     else:
                         raise InvalidCredentials()
 
-
-class KeepAlive(HISService):
-    """Handles keepalive requests"""
-
-    PATH = 'keepalive'
-    NAME = 'keepalive'
-    DESCRIPTION = 'Keeps sessions alive'
-    PROMOTE = False
-
-    def get(self):
+    def put(self):
         """Tries to keep a session alive"""
         try:
             session = self.query_dict['session']
@@ -91,18 +83,6 @@ class KeepAlive(HISService):
                         raise SessionExpired()
                 else:
                     raise SessionExpired()
-
-
-class Logout(HISService):
-    """Closes sessions"""
-
-    PATH = 'logout'
-    NAME = 'logout manager'
-    DESCRIPTION = 'Manages account logouts'
-    PROMOTE = False
-
-    PARAMETER_ERROR = Error(
-        'Must specify either account name or session token', status=400)
 
     def get(self):
         """Tries to close a specific session identified by its token or
@@ -230,62 +210,4 @@ class ServicePermissions(HISService):
                 return Error('Not logged in.', status=400)
 
 
-class Session(HISService):
-    """Session handling service"""
-
-    def post(self):
-        """Logs in the user"""
-        # XXX: Currently ignores posted data
-        try:
-            account = self.query_dict['account']
-            passwd = self.query_dict['passwd']
-        except KeyError:
-            raise MissingCredentials()
-        else:
-            try:
-                account = Account.get(Account.name == account)
-            except DoesNotExist:
-                raise NoSuchAccount()
-            else:
-                # Verify password with Argon2
-                try:
-                    match = password_hasher.verify(account.pwhash, passwd)
-                except VerifyMismatchError:
-                    raise InvalidCredentials()
-                else:
-                    if match:
-                        try:
-                            session = Session.open(account)
-                        except AlreadyLoggedIn:
-                            raise AlreadyLoggedIn_()
-                        else:
-                            return JSON(session.todict())
-                    else:
-                        raise InvalidCredentials()
-
-    def put(self):
-        """Tries to keep a session alive"""
-        try:
-            session = self.query_dict['session']
-        except KeyError:
-            raise NoSessionSpecified()
-        else:
-            try:
-                session = Session.get(Session.token == session)
-            except DoesNotExist:
-                raise NoSuchSession()
-            else:
-                if session.active:
-                    if session.renew():
-                        return JSON(session.todict())
-                    else:
-                        raise SessionExpired()
-                else:
-                    raise SessionExpired()
-
-
-install = [
-    Login,
-    KeepAlive,
-    Logout,
-    ServicePermissions]
+install = [SessionManager, ServicePermissions]

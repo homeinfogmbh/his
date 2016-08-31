@@ -91,9 +91,9 @@ class SessionManager(HISService):
         session = self.query_dict.get('session')
         account = self.query_dict.get('account')
 
-        if session_token is not None and account_name is not None:
+        if session is not None and account is not None:
             return self.PARAMETER_ERROR
-        elif session_token is not None:
+        elif session is not None:
             try:
                 session = Session.get(Session.token == session)
             except DoesNotExist:
@@ -101,7 +101,7 @@ class SessionManager(HISService):
             else:
                 session.close()
                 return JSON({'closed': [session.token]})
-        elif account_name is not None:
+        elif account is not None:
             try:
                 account = Account.get(Account.name == account)
             except DoesNotExist:

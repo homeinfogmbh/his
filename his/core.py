@@ -44,32 +44,32 @@ class HISMetaHandler(RequestHandler):
         return config.wsgi['ROOT']
 
     @property
-    def path_info(self):
+    def relpath(self):
         """Returns the path info with the
         root prefix stripped from it
         """
-        if super().path_info.startswith(self.root):
-            return relpath(path_info, self.root)
+        if self.path_info.startswith(self.root):
+            return relpath(self.path_info, self.root)
         else:
             raise InternalServerError(
                 'Path "{path}" not in root "{root}"'.format(
-                    path=super().path_info, root=self.root))
+                    path=self.path_info, root=self.root))
 
     @property
     def module_path(self):
         """Returns the module path"""
         if self.request_method == 'PUT':
             # On PUT the last node is resource identifier.
-            return self.path_info[:-1]
+            return self.relpath[:-1]
         else:
-            return self.path_info
+            return self.relpath
 
     @property
     def resource(self):
         """Returns the respective resource identifier"""
         if self.request_method == 'PUT':
             # Last node is resource identifier
-            return self.path_info[-1]
+            return self.relpath[-1]
 
     @property
     def handler(self):
@@ -78,7 +78,7 @@ class HISMetaHandler(RequestHandler):
             service = Service.get(Service.path == self.module_path)
         except DoesNotExist:
             raise Error('No handler registered for path: {path}'.format(
-                path=self.path_info))
+                path=self.module_path))
         else:
             module_path = service.module
             class_name = service.handler

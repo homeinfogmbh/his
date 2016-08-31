@@ -194,7 +194,7 @@ class Account(HISModel):
         Employee, db_column='user', null=True,
         related_name='accounts')
     name = CharField(64)  # Login name
-    pwhash = CharField(64)  # Argon2 hash
+    pwhash = CharField(73)  # Argon2 hash
     email = CharField(64)
     created = DateTimeField()
     deleted = DateTimeField(null=True, default=None)

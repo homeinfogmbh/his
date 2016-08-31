@@ -23,6 +23,9 @@ __all__ = [
     'install']
 
 
+password_hasher = PasswordHasher()
+
+
 class Login(HISService):
     """Handles logins"""
 
@@ -46,16 +49,19 @@ class Login(HISService):
             else:
                 # Verify password with Argon2
                 try:
-                    PasswordHasher.verify(account.pwhash, passwd)
+                    match = password_hasher.verify(account.pwhash, passwd)
                 except VerifyMismatchError:
                     raise InvalidCredentials()
                 else:
-                    try:
-                        session = Session.open(account)
-                    except AlreadyLoggedIn:
-                        raise AlreadyLoggedIn_()
+                    if match:
+                        try:
+                            session = Session.open(account)
+                        except AlreadyLoggedIn:
+                            raise AlreadyLoggedIn_()
+                        else:
+                            return JSON(session.todict())
                     else:
-                        return JSON(session.todict())
+                        raise InvalidCredentials()
 
 
 class KeepAlive(HISService):

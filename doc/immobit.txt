@@ -1,0 +1,33 @@
+### Immobit ###
+
+* Web Application
+    * Backend: Python3
+    * Front-end: Pure HTML5
+
+* Manipulation von Immobiliendaten
+    * Erstellen
+    * Ändern
+    * Löschen
+    * Flaggen
+    * (Rechtesystem)?
+
+* Manipulation Anhangdaten zu Immobilien
+    * Erstellen
+    * Ändern
+    * Löschen
+    * Flaggen
+    * (Rechtesystem)?
+
+
+#### Backend ####
+
+* Integration in HIS
+    * Nutzung vorhandener Authentifizierung
+    * Zentrale Medienverwaltung
+    * Komplett HTTPS verschlüsselt
+
+* Hybrides ReST System
+    * API Aufruf über HTTP-Kommandos: GET, POST, PUT, DELETE
+    * Antworten:
+        * Nutzdaten: JSON, XML
+        * Fehler: JSON

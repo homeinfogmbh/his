@@ -75,12 +75,12 @@ class KeepAlive(HISService):
     def get(self):
         """Tries to keep a session alive"""
         try:
-            session_token = self.query_dict['session']
+            session = self.query_dict['session']
         except KeyError:
             raise NoSessionSpecified()
         else:
             try:
-                session = Session.get(Session.token == session_token)
+                session = Session.get(Session.token == session)
             except DoesNotExist:
                 raise NoSuchSession()
             else:
@@ -108,14 +108,14 @@ class Logout(HISService):
         """Tries to close a specific session identified by its token or
         all sessions for a certain account specified by its name
         """
-        session_token = self.query_dict.get('session')
-        account_name = self.query_dict.get('account')
+        session = self.query_dict.get('session')
+        account = self.query_dict.get('account')
 
         if session_token is not None and account_name is not None:
             return self.PARAMETER_ERROR
         elif session_token is not None:
             try:
-                session = Session.get(Session.token == session_token)
+                session = Session.get(Session.token == session)
             except DoesNotExist:
                 raise NoSuchSession()
             else:
@@ -123,7 +123,7 @@ class Logout(HISService):
                 return JSON({'closed': [session.token]})
         elif account_name is not None:
             try:
-                account = Account.get(Account.name == account_name)
+                account = Account.get(Account.name == account)
             except DoesNotExist:
                 raise NoSuchAccount()
             else:
@@ -134,7 +134,10 @@ class Logout(HISService):
                     session.close()
                     sessions_closed.append(session.token)
 
-                return JSON({'closed': sessions_closed})
+                if sessions_closed:
+                    return JSON({'closed': sessions_closed})
+                else:
+                    raise NoSuchSession()
         else:
             return self.PARAMETER_ERROR
 

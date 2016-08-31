@@ -62,7 +62,7 @@ class HISMeta(RequestHandler):
         no_handler = Error('No handler registered for path: {path}'.format(
             path=self.relpath))
         service_paths = (service.path for service in Service)
-        best_match = maxcommonpath(self.relpath, service_paths)
+        best_match = maxcommonpath(self.relpath, *service_paths)
         self.logger.info('Found handler: {}'.format(best_match))
 
         if not best_match:

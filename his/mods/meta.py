@@ -16,18 +16,18 @@ from his.orm import InconsistencyError, AlreadyLoggedIn, Service, \
     CustomerService, Account, Session
 
 __all__ = [
-    'LoginHandler',
-    'KeepAliveHandler',
-    'LogoutHandler',
-    'ServicePermissionsHandler',
+    'Login',
+    'KeepAlive',
+    'Logout',
+    'ServicePermissions',
     'install']
 
 
-class LoginHandler(HISService):
+class Login(HISService):
     """Handles logins"""
 
     PATH = 'login'
-    NAME = 'login manager'
+    NAME = 'HIS Login Manager'
     DESCRIPTION = 'Manages account logins'
     PROMOTE = False
 
@@ -61,7 +61,7 @@ class LoginHandler(HISService):
                     raise InvalidCredentials()
 
 
-class KeepAliveHandler(HISService):
+class KeepAlive(HISService):
     """Handles keepalive requests"""
 
     PATH = 'keepalive'
@@ -90,7 +90,7 @@ class KeepAliveHandler(HISService):
                     raise SessionExpired()
 
 
-class LogoutHandler(HISService):
+class Logout(HISService):
     """Closes sessions"""
 
     PATH = 'logout'
@@ -105,7 +105,6 @@ class LogoutHandler(HISService):
         """Tries to close a specific session identified by its token or
         all sessions for a certain account specified by its name
         """
-
         session_token = self.query_dict.get('session')
         account_name = self.query_dict.get('account')
 
@@ -137,7 +136,7 @@ class LogoutHandler(HISService):
             return self.PARAMETER_ERROR
 
 
-class ServicePermissionsHandler(HISService):
+class ServicePermissions(HISService):
     """Handles service permissions"""
 
     PATH = 'services'
@@ -226,7 +225,7 @@ class ServicePermissionsHandler(HISService):
 
 
 install = [
-    LoginHandler,
-    KeepAliveHandler,
-    LogoutHandler,
-    ServicePermissionsHandler]
+    Login,
+    KeepAlive,
+    Logout,
+    ServicePermissions]

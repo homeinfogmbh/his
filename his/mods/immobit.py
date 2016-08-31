@@ -17,7 +17,7 @@ from his.orm import InconsistencyError, AlreadyLoggedIn, Service, \
     CustomerService, Account, Session
 
 
-class ImmobitHandler(AuthorizedService):
+class Immobit(AuthorizedService):
     """Handles requests for ImmoBit"""
 
     PATH = 'immobit'

@@ -88,10 +88,10 @@ class HISMeta(RequestHandler):
     def handler(self):
         """Returns the appropriate request handler class"""
         try:
-            service = Service.get(Service.path == self.module_path)
+            service = Service.get(Service.path == self.modpath_info)
         except DoesNotExist:
             raise Error('No handler registered for path: {path}'.format(
-                path=self.module_path))
+                path=self.modpath_info))
         else:
             module_path = service.module
             class_name = service.handler

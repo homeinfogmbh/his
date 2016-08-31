@@ -284,8 +284,6 @@ class Session(HISService):
                     raise SessionExpired()
 
 
-
-
 install = [
     Login,
     KeepAlive,

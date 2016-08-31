@@ -44,7 +44,7 @@ class HISMeta(RequestHandler):
         return config.wsgi['ROOT']
 
     @property
-    def relpath_info(self):
+    def relpath(self):
         """Returns the path info with the
         root prefix stripped from it
         """
@@ -56,39 +56,15 @@ class HISMeta(RequestHandler):
                     path=self.path_info, root=self.root))
 
     @property
-    def relpath(self):
-        """Returns the relative path nodes"""
-        try:
-            return [node for node in self.relpath_info.split('/') if node]
-        except TypeError:
-            return []
-
-    @property
-    def modpath(self):
-        """Returns the module path nodes"""
-        if self.request_method == 'PUT':
-            # On PUT the last node is resource identifier.
-            return self.relpath[:-1]
-        else:
-            return self.relpath
-
-    @property
-    def modpath_info(self):
-        """Returns the module path as a string"""
-        return '/'.join(self.modpath)
-
-    @property
     def resource(self):
-        """Returns the respective resource identifier"""
-        if self.request_method == 'PUT':
-            # Last node is resource identifier
-            return self.relpath[-1]
+        """Returns the resource path"""
+        return relpath(self.relpath_info, self.PATH)
 
     @property
     def handler(self):
         """Returns the appropriate request handler class"""
         try:
-            service = Service.get(Service.path == self.modpath_info)
+            service = Service.get(Service.path == self.PATH)
         except DoesNotExist:
             raise Error('No handler registered for path: {path}'.format(
                 path=self.modpath_info))

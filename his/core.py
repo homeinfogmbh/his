@@ -2,7 +2,7 @@
 
 from importlib import import_module
 from logging import INFO, getLogger, basicConfig
-from os.path import relpath, basedir
+from os.path import relpath
 
 from peewee import DoesNotExist
 

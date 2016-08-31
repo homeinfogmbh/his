@@ -195,7 +195,6 @@ class Account(HISModel):
         related_name='accounts')
     name = CharField(64)  # Login name
     pwhash = CharField(64)  # Argon2 hash
-    salt = CharField(32)  # Password salt (HMAC)
     email = CharField(64)
     created = DateTimeField()
     deleted = DateTimeField(null=True, default=None)

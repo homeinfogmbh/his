@@ -42,13 +42,13 @@ class HISMessage(JSON):
             cors=cors)
 
 
-class HISServerError(HISAPIMessage):
+class HISServerError(HISMessage):
     """Indicates errors for the WebAPI"""
 
     STATUS = 500
 
 
-class HISAPIError(HISAPIMessage):
+class HISAPIError(HISMessage):
     """Indicates errors for the WebAPI"""
 
     STATUS = 400

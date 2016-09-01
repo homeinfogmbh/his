@@ -45,7 +45,7 @@ class HISMeta(RequestHandler):
         """Returns the path info with the
         root prefix stripped from it
         """
-        if commonprefix(self.path_info, self.root) == self.root:
+        if commonprefix([self.path_info, self.root]) == self.root:
             return relpath(self.path_info, self.root)
         else:
             raise InternalServerError(

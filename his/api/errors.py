@@ -130,7 +130,7 @@ class ServiceNotRegistered(HISServerError):
         Language.EN_US: 'Service is not registered.'}
 
 
-class NoServiceSpecified(ServiceError):
+class NoServiceSpecified(HISAPIError):
     """Indicates that no service was specified"""
 
     LOCALE = {

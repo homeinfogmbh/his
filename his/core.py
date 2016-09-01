@@ -8,7 +8,6 @@ from peewee import DoesNotExist
 
 from homeinfo.lib.wsgi import Error, InternalServerError, RequestHandler, \
     WsgiApp
-from homeinfo.lib.system import maxcommonpath
 
 from his.config import config
 from his.orm import Service

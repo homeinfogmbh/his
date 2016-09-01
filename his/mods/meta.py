@@ -45,7 +45,7 @@ class SessionManager(HISService):
                 raise NoSessionSpecified()
             else:
                 try:
-                    session = Session.get(Session.token == self.resource)
+                    session = Session.get(Session.token == session)
                 except DoesNotExist:
                     raise NoSuchSession()
                 else:

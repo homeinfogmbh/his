@@ -12,7 +12,7 @@ from homeinfo.lib.wsgi import Error, InternalServerError, RequestHandler, \
 from his.config import config
 from his.orm import Service
 
-__all__ = ['HIS']
+__all__ = ['HISRequestHandler', 'HIS']
 
 
 logger = getLogger(__file__)
@@ -25,15 +25,8 @@ class HandlerNotAvailable(Error):
         super().__init__('No handler available')
 
 
-class HISMeta(RequestHandler):
-    """Generic HIS service template"""
-
-    BASE_PACKAGE = 'his.mods'
-    CLASS_NAME = 'Handler'
-
-    def __call__(self):
-        """Delegate to actual handler"""
-        return self.handler()
+class HISRequestHandler(RequestHandler):
+    """Abstract, basic request handler with extensions for HIS"""
 
     @property
     def root(self):
@@ -51,6 +44,17 @@ class HISMeta(RequestHandler):
             raise InternalServerError(
                 'Path "{path}" not in root "{root}"'.format(
                     path=self.path_info, root=self.root))
+
+
+class HISMeta(HISRequestHandler):
+    """Generic HIS service template"""
+
+    BASE_PACKAGE = 'his.mods'
+    CLASS_NAME = 'Handler'
+
+    def __call__(self):
+        """Delegate to actual handler"""
+        return self.handler()
 
     @property
     def handler(self):

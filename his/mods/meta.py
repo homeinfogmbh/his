@@ -1,5 +1,7 @@
 """HIS meta services"""
 
+from logging import getLogger
+
 from peewee import DoesNotExist
 from argon2 import PasswordHasher
 from argon2.exceptions import VerifyMismatchError
@@ -21,6 +23,7 @@ __all__ = [
     'install']
 
 
+logger = getLogger(__file__)
 password_hasher = PasswordHasher()
 
 

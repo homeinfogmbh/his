@@ -1,13 +1,15 @@
 """Meta-services for HIS"""
 
+from os.path import relpath
+
 from peewee import DoesNotExist
 
 from homeinfo.lib.wsgi import RequestHandler
 
 from his.orm import Service, CustomerService, Session
-
 from his.api.errors import NoSessionSpecified, NoSuchSession, SessionExpired, \
     ServiceNotRegistered, NotAuthorized
+from his.core import HISRequestHandler
 
 __all__ = [
     'IncompleteImplementationError',
@@ -23,13 +25,18 @@ class IncompleteImplementationError(NotImplementedError):
     pass
 
 
-class HISService(RequestHandler):
+class HISService(HISRequestHandler):
     """A generic HIS service"""
 
     PATH = None
     NAME = None
     DESCRIPTION = None
     PROMOTE = None
+
+    @property
+    def resource(self):
+        """Returns the resource path"""
+        return relpath(self.relpath, self.PATH)
 
     @classmethod
     def install(cls):

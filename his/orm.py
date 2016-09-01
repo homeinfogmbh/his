@@ -281,7 +281,7 @@ class Account(HISModel):
             raise InvalidCredentials()
         else:
             if match:
-                return Session.open(account)
+                return Session.open(self)
             else:
                 raise InvalidCredentials()
 

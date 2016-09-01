@@ -1,5 +1,6 @@
 """Group and user definitions"""
 
+from os.path import dirname
 from datetime import datetime, timedelta
 from uuid import uuid4
 
@@ -139,6 +140,19 @@ class Service(HISModel):
     def __str__(self):
         """Returns the service's name"""
         return self.name
+
+    @classmethod
+    def by_relpath(cls, relpath):
+        """Returns the best matching service
+        for the relative URL path
+        """
+        while relpath:
+            try:
+                return cls.get(cls.path == relpath)
+            except DoesNotExist:
+                relpath = dirname(relpath)
+
+        raise DoesNotExist('No handler found for path {}'.format(relpath))
 
 
 class CustomerService(HISModel):

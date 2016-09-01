@@ -122,31 +122,10 @@ class SessionManager(HISService):
         try:
             session = Session.get(Session.token == self.resource)
         except DoesNotExist:
-            logger.debug('Could not close session by token "{}"'.format(
-                self.resource))
+            raise NoSuchSession()
         else:
             session.close()
             return JSON({'closed': [session.token]})
-
-        # Attempt to close all sessions by account name
-        try:
-            account = Account.get(Account.name == self.resource)
-        except DoesNotExist:
-            logger.debug('Could not close session by account name "{}"'.format(
-                self.resource))
-        else:
-            sessions_closed = []
-
-            for session in Session.select().where(
-                    Session.account == account):
-                session.close()
-                sessions_closed.append(session.token)
-
-            if sessions_closed:
-                return JSON({'closed': sessions_closed})
-
-        # Finally raise error
-        raise NoSuchSession()
 
 
 class ServicePermissions(HISService):

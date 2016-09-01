@@ -122,15 +122,23 @@ class SessionExpired(SessionError):
         Language.EN_US: 'Session expired.'}
 
 
-class ServiceNotRegistered(HISServerError):
+class ServiceError(HISAPIError):
+    """General service error"""
+
+    pass
+
+
+class ServiceNotRegistered(ServiceError):
     """Indicates that the service is not registered"""
+
+    STATUS = 500
 
     LOCALE = {
         Language.DE_DE: 'Dienst ist nicht registriert.',
         Language.EN_US: 'Service is not registered.'}
 
 
-class NoServiceSpecified(HISAPIError):
+class NoServiceSpecified(ServiceError):
     """Indicates that no service was specified"""
 
     LOCALE = {

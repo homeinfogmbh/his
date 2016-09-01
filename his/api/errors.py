@@ -31,7 +31,7 @@ __all__ = [
     'NotAuthorized']
 
 
-class HISAPIError(JSON):
+class HISMessage(JSON):
     """Indicates errors for the WebAPI"""
 
     def __init__(self, charset='utf-8', cors=None):
@@ -40,6 +40,18 @@ class HISAPIError(JSON):
             charset=charset,
             status=self.STATUS,
             cors=cors)
+
+
+class HISServerError(HISAPIMessage):
+    """Indicates errors for the WebAPI"""
+
+    STATUS = 500
+
+
+class HISAPIError(HISAPIMessage):
+    """Indicates errors for the WebAPI"""
+
+    STATUS = 400
 
 
 class LoginError(HISAPIError):
@@ -51,8 +63,6 @@ class LoginError(HISAPIError):
 class MissingCredentials(LoginError):
     """Indicates missing credentials"""
 
-    STATUS = 400
-
     LOCALE = {
         Language.DE_DE: 'Benutzername und / oder Passwort nicht angegeben.',
         Language.EN_US: 'Missing credentials.'}
@@ -60,8 +70,6 @@ class MissingCredentials(LoginError):
 
 class NoSuchAccount(LoginError):
     """Indicates that an account with the specified name does not exist"""
-
-    STATUS = 400
 
     LOCALE = {
         Language.DE_DE: 'Benutzerkonto nicht gefunden.',
@@ -71,8 +79,6 @@ class NoSuchAccount(LoginError):
 class InvalidCredentials(LoginError):
     """Indicates invalid credentials"""
 
-    STATUS = 400
-
     LOCALE = {
         Language.DE_DE: 'Ungültiger Benutzername und / oder Passwort.',
         Language.EN_US: 'Invalid credentials.'}
@@ -80,8 +86,6 @@ class InvalidCredentials(LoginError):
 
 class AlreadyLoggedIn(LoginError):
     """Indicates that the account is already running a session"""
-
-    STATUS = 400
 
     LOCALE = {
         Language.DE_DE: 'Bereits angemeldet.',
@@ -97,8 +101,6 @@ class SessionError(HISAPIError):
 class NoSessionSpecified(SessionError):
     """Indicates a missing session"""
 
-    STATUS = 400
-
     LOCALE = {
         Language.DE_DE: 'Keine Sitzung angegeben.',
         Language.EN_US: 'No session specified.'}
@@ -106,8 +108,6 @@ class NoSessionSpecified(SessionError):
 
 class NoSuchSession(SessionError):
     """Indicates that the specified session does not exist"""
-
-    STATUS = 400
 
     LOCALE = {
         Language.DE_DE: 'Keine solche Sitzung.',
@@ -117,23 +117,13 @@ class NoSuchSession(SessionError):
 class SessionExpired(SessionError):
     """Indicates that the specified session has expired"""
 
-    STATUS = 400
-
     LOCALE = {
         Language.DE_DE: 'Sitzung abgelaufen.',
         Language.EN_US: 'Session expired.'}
 
 
-class ServiceError(HISAPIError):
-    """Indicates errors with services"""
-
-    pass
-
-
-class ServiceNotRegistered(ServiceError):
+class ServiceNotRegistered(HISServerError):
     """Indicates that the service is not registered"""
-
-    STATUS = 500
 
     LOCALE = {
         Language.DE_DE: 'Dienst ist nicht registriert.',
@@ -143,8 +133,6 @@ class ServiceNotRegistered(ServiceError):
 class NoServiceSpecified(ServiceError):
     """Indicates that no service was specified"""
 
-    STATUS = 400
-
     LOCALE = {
         Language.DE_DE: 'Kein Dienst angegeben.',
         Language.EN_US: 'No service specified.'}
@@ -152,8 +140,6 @@ class NoServiceSpecified(ServiceError):
 
 class NoSuchService(ServiceError):
     """Indicates that the service does not exist"""
-
-    STATUS = 400
 
     LOCALE = {
         Language.DE_DE: 'Kein solcher Dienst.',
@@ -169,8 +155,6 @@ class CustomerError(HISAPIError):
 class NoCustomerSpecified(ServiceError):
     """Indicates that no customer was specified"""
 
-    STATUS = 400
-
     LOCALE = {
         Language.DE_DE: 'Keine Kundennummer angegeben.',
         Language.EN_US: 'No customer specified.'}
@@ -179,8 +163,6 @@ class NoCustomerSpecified(ServiceError):
 class InvalidCustomerID(ServiceError):
     """Indicates that an invalid customer ID was specified"""
 
-    STATUS = 400
-
     LOCALE = {
         Language.DE_DE: 'Ungültige Kundennummer angegeben.',
         Language.EN_US: 'Invalid customer ID specified.'}
@@ -188,8 +170,6 @@ class InvalidCustomerID(ServiceError):
 
 class NoSuchCustomer(CustomerError):
     """Indicates that the customer does not exist"""
-
-    STATUS = 400
 
     LOCALE = {
         Language.DE_DE: 'Kein solcher Kunde.',
@@ -200,8 +180,6 @@ class NotAuthorized(HISAPIError):
     """Indicates that the respective entity
     is not authorized to use the service
     """
-
-    STATUS = 400
 
     LOCALE = {
         Language.DE_DE: 'Zugriff verweigert.',

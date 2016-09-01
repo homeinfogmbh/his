@@ -1,8 +1,8 @@
 """Core services"""
 
 from importlib import import_module
-from logging import INFO, getLogger, basicConfig
-from os.path import relpath
+from logging import getLogger
+from os.path import relpath, normpath, commonprefix
 
 from peewee import DoesNotExist
 
@@ -14,6 +14,9 @@ from his.config import config
 from his.orm import Service
 
 __all__ = ['HIS']
+
+
+logger = getLogger(__file__)
 
 
 class HandlerNotAvailable(Error):
@@ -29,12 +32,6 @@ class HISMeta(RequestHandler):
     BASE_PACKAGE = 'his.mods'
     CLASS_NAME = 'Handler'
 
-    def __init__(self, environ, cors, date_format, debug):
-        """Sets a logger"""
-        basicConfig(level=INFO)
-        self.logger = getLogger('HIS')
-        super().__init__(environ, cors, date_format, debug)
-
     def __call__(self):
         """Delegate to actual handler"""
         return self.handler()
@@ -42,14 +39,14 @@ class HISMeta(RequestHandler):
     @property
     def root(self):
         """Returns the WSGI root path"""
-        return config.wsgi['ROOT']
+        return normpath(config.wsgi['ROOT'])
 
     @property
     def relpath(self):
         """Returns the path info with the
         root prefix stripped from it
         """
-        if self.path_info.startswith(self.root):
+        if commonprefix(self.path_info, self.root) == self.root:
             return relpath(self.path_info, self.root)
         else:
             raise InternalServerError(
@@ -59,19 +56,10 @@ class HISMeta(RequestHandler):
     @property
     def handler(self):
         """Returns the appropriate request handler class"""
-        no_handler = Error('No handler registered for path: {path}'.format(
-            path=self.relpath))
-        service_paths = (service.path for service in Service)
-        best_match = maxcommonpath(self.relpath, *service_paths)
-        self.logger.info('Found handler: {}'.format(best_match))
-
-        if not best_match:
-            raise no_handler
-        else:
-            try:
-                service = Service.get(Service.path == best_match)
-            except DoesNotExist:
-                raise no_handler
+        try:
+            service = Service.by_relpath(self.relpath)
+        except DoesNotExist:
+            raise Error('No handler for path: "{}"'.format(self.relpath))
 
         module_path = service.module
         class_name = service.handler
@@ -81,12 +69,12 @@ class HISMeta(RequestHandler):
             handler = getattr(module, class_name)
         except ImportError:
             msg = 'Module "{}" is not installed.'.format(module_path)
-            self.logger.critical(msg)
+            logger.critical(msg)
             raise Error(msg)
         except AttributeError:
             msg = 'Module "{module}" has no handler "{handler}".'.format(
                 module=module_path, handler=class_name)
-            self.logger.critical(msg)
+            logger.critical(msg)
             raise Error(msg)
         else:
             return handler(

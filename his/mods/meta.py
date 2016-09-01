@@ -3,8 +3,6 @@
 from logging import getLogger
 
 from peewee import DoesNotExist
-from argon2 import PasswordHasher
-from argon2.exceptions import VerifyMismatchError
 
 from homeinfo.crm import Customer
 from homeinfo.lib.wsgi import Error, OK, JSON
@@ -24,7 +22,6 @@ __all__ = [
 
 
 logger = getLogger(__file__)
-password_hasher = PasswordHasher()
 
 
 class SessionManager(HISService):
@@ -35,10 +32,52 @@ class SessionManager(HISService):
     DESCRIPTION = 'Manages account sessions'
     PROMOTE = False
     PARAMETER_ERROR = Error(
-        'Must specify either account name or session token', status=400)
+        'Must specify either account name or session token',
+        status=400)
+
+    def get(self):
+        """Lists session information"""
+        if not self.resource:
+            # List all sessions iff specified session is root
+            try:
+                session = self.query_dict['session']
+            except KeyError:
+                raise NoSessionSpecified()
+            else:
+                try:
+                    session = Session.get(Session.token == self.resource)
+                except DoesNotExist:
+                    raise NoSuchSession()
+                else:
+                    if session.active:
+                        if session.account.root:
+                            sessions = {}
+
+                            for session in Session:
+                                sessions[session.token] = session.todict()
+
+                            return JSON(sessions)
+                        else:
+                            raise NotAuthorized()
+                    else:
+                        raise SessionExpired()
+        else:
+            # List specific session information
+            try:
+                session = Session.get(Session.token == self.resource)
+            except DoesNotExist:
+                raise NoSuchSession()
+            else:
+                if session.active:
+                    return JSON(session.todict())
+                else:
+                    raise SessionExpired()
 
     def post(self):
-        """Logs in the user"""
+        """Handles account login requests"""
+        if self.resource is not None:
+            raise Error('Sub-sessions are not supported')
+
         # XXX: Currently ignores posted data
         try:
             account = self.query_dict['account']
@@ -51,78 +90,63 @@ class SessionManager(HISService):
             except DoesNotExist:
                 raise NoSuchAccount()
             else:
-                # Verify password with Argon2
-                try:
-                    match = password_hasher.verify(account.pwhash, passwd)
-                except VerifyMismatchError:
-                    raise InvalidCredentials()
-                else:
-                    if match:
-                        try:
-                            session = Session.open(account)
-                        except AlreadyLoggedIn:
-                            raise AlreadyLoggedIn_()
-                        else:
-                            return JSON(session.todict())
-                    else:
-                        raise InvalidCredentials()
+                session = account.login(passwd)
+                return JSON(session.todict())
 
     def put(self):
         """Tries to keep a session alive"""
-        try:
-            session = self.query_dict['session']
-        except KeyError:
+        if not self.resource:
             raise NoSessionSpecified()
+
+        try:
+            session = Session.get(Session.token == self.resource)
+        except DoesNotExist:
+            raise NoSuchSession()
         else:
-            try:
-                session = Session.get(Session.token == session)
-            except DoesNotExist:
-                raise NoSuchSession()
-            else:
-                if session.active:
-                    if session.renew():
-                        return JSON(session.todict())
-                    else:
-                        raise SessionExpired()
+            if session.active:
+                if session.renew():
+                    return JSON(session.todict())
                 else:
                     raise SessionExpired()
+            else:
+                raise SessionExpired()
 
-    def get(self):
+    def delete(self):
         """Tries to close a specific session identified by its token or
         all sessions for a certain account specified by its name
         """
-        session = self.query_dict.get('session')
-        account = self.query_dict.get('account')
+        if not self.resource:
+            raise NoSessionSpecified()
 
-        if session is not None and account is not None:
-            return self.PARAMETER_ERROR
-        elif session is not None:
-            try:
-                session = Session.get(Session.token == session)
-            except DoesNotExist:
-                raise NoSuchSession()
-            else:
-                session.close()
-                return JSON({'closed': [session.token]})
-        elif account is not None:
-            try:
-                account = Account.get(Account.name == account)
-            except DoesNotExist:
-                raise NoSuchAccount()
-            else:
-                sessions_closed = []
-
-                for session in Session.select().where(
-                        Session.account == account):
-                    session.close()
-                    sessions_closed.append(session.token)
-
-                if sessions_closed:
-                    return JSON({'closed': sessions_closed})
-                else:
-                    raise NoSuchSession()
+        # Attempt to close session by session ID first
+        try:
+            session = Session.get(Session.token == self.resource)
+        except DoesNotExist:
+            logger.debug('Could not close session by token "{}"'.format(
+                self.resource))
         else:
-            return self.PARAMETER_ERROR
+            session.close()
+            return JSON({'closed': [session.token]})
+
+        # Attempt to close all sessions by account name
+        try:
+            account = Account.get(Account.name == self.resource)
+        except DoesNotExist:
+            logger.debug('Could not close session by account name "{}"'.format(
+                self.resource))
+        else:
+            sessions_closed = []
+
+            for session in Session.select().where(
+                    Session.account == account):
+                session.close()
+                sessions_closed.append(session.token)
+
+            if sessions_closed:
+                return JSON({'closed': sessions_closed})
+
+        # Finally raise error
+        raise NoSuchSession()
 
 
 class ServicePermissions(HISService):

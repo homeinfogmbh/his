@@ -4,6 +4,8 @@ from os.path import dirname
 from datetime import datetime, timedelta
 from uuid import uuid4
 
+from argon2 import PasswordHasher
+from argon2.exceptions import VerifyMismatchError
 from peewee import Model, PrimaryKeyField, ForeignKeyField,\
     CharField, BooleanField, DateTimeField, IntegerField, DoesNotExist
 
@@ -11,6 +13,7 @@ from homeinfo.lib.misc import classproperty
 from homeinfo.peewee import MySQLDatabase
 from homeinfo.crm import Customer, Employee
 
+from his.api.errors import InvalidCredentials, AlreadyLoggedIn
 from his.config import config
 
 __all__ = [
@@ -40,12 +43,6 @@ class InconsistencyError(Exception):
     def __init__(self, msg):
         super().__init__(msg)
         self.msg = msg
-
-
-class AlreadyLoggedIn(Exception):
-    """Indicates that a session is already open for the respective account"""
-
-    pass
 
 
 def check_service_consistency(customer=None):
@@ -201,6 +198,8 @@ class CustomerService(HISModel):
 class Account(HISModel):
     """A HIS login account"""
 
+    _PASSWORD_HASHER = PasswordHasher()
+
     customer = ForeignKeyField(
         Customer, db_column='customer',
         related_name='accounts')
@@ -273,6 +272,18 @@ class Account(HISModel):
     def services(self):
         """Yields appropriate services"""
         return AccountServicesWrapper(self)
+
+    def login(self, passwd):
+        """Performs a login"""
+        try:
+            match = self._PASSWORD_HASHER.verify(self.pwhash, passwd)
+        except VerifyMismatchError:
+            raise InvalidCredentials()
+        else:
+            if match:
+                return Session.open(account)
+            else:
+                raise InvalidCredentials()
 
 
 class AccountService(HISModel):

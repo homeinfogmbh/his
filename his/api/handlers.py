@@ -36,7 +36,12 @@ class HISService(HISRequestHandler):
     @property
     def resource(self):
         """Returns the resource path"""
-        return relpath(self.relpath, self.PATH)
+        resource = relpath(self.relpath, self.PATH)
+
+        if resource == '.':
+            return None
+        else:
+            return resource
 
     @classmethod
     def install(cls):

@@ -3,6 +3,7 @@
 from os.path import dirname
 from datetime import datetime, timedelta
 from uuid import uuid4
+from importlib import import_module
 
 from argon2 import PasswordHasher
 from argon2.exceptions import VerifyMismatchError
@@ -122,9 +123,9 @@ class HISModel(Model):
 class Service(HISModel):
     """Registers services of HIS"""
 
-    path = CharField(255)
+    node = CharField(255)
     module = CharField(255)
-    handler = CharField(32)
+    class_ = CharField(32, null=True, default=None)
     name = CharField(32, null=True, default=None)
     description = CharField(255, null=True, default=None)
     # Flag whether the service shall be promoted
@@ -138,18 +139,12 @@ class Service(HISModel):
         """Returns the service's name"""
         return self.name
 
-    @classmethod
-    def by_relpath(cls, relpath):
-        """Returns the best matching service
-        for the relative URL path
-        """
-        while relpath:
-            try:
-                return cls.get(cls.path == relpath)
-            except DoesNotExist:
-                relpath = dirname(relpath)
-
-        raise DoesNotExist('No handler found for path {}'.format(relpath))
+    @property
+    def handler(self):
+        """Loads the appropriate handler"""
+        module = import_module(self.module)
+        class_ = self.class_ or 'App'
+        return getattr(module, class_)
 
 
 class CustomerService(HISModel):

@@ -16,7 +16,7 @@ from his.orm import InconsistencyError, AlreadyLoggedIn, Service, \
     CustomerService, Account, Session
 
 
-class Immobit(AuthorizedService):
+class ImmoBit(AuthorizedService):
     """Handles requests for ImmoBit"""
 
     PATH = 'immobit'
@@ -61,22 +61,17 @@ class Immobit(AuthorizedService):
 
     def post(self):
         """Posts real estate data"""
-        path = self.path
+        dom = self.dom
 
-        if path[-1] == 'openimmo':
-            for immobilie in self.dom.new:
-                # Remove attachments from real estate DOM
-                immobilie.anhaenge = None
-                ident = Immobilie.add(self.customer, immobilie)
+        # TODO: implement DOM validation
+        if self.validate(dom, openimmo.immobilie):
+            ident = Immobilie.add(self.customer, immobilie)
 
-                if ident:
-                    return OK(ident)
-                else:
-                    # TODO: handle
-                    pass
-        elif path[-1] == 'attachment':
-            # TODO: implement
-            pass
+            if ident:
+                return OK(ident)
+            else:
+                # TODO: handle
+                pass
         else:
-            # TODO: handle
+            # TODO: Raise InvalidDOM()
             pass

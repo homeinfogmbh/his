@@ -4,7 +4,7 @@ from os.path import relpath
 
 from peewee import DoesNotExist
 
-from homeinfo.lib.wsgi import RequestHandler
+from homeinfo.lib.rest import ResourceHandler
 
 from his.orm import Service, CustomerService, Session
 from his.api.errors import NoSessionSpecified, NoSuchSession, SessionExpired, \
@@ -25,30 +25,34 @@ class IncompleteImplementationError(NotImplementedError):
     pass
 
 
-class HISService(HISRequestHandler):
+class HISService(ResourceHandler):
     """A generic HIS service"""
 
-    PATH = None
+    NODE = None
     NAME = None
     DESCRIPTION = None
     PROMOTE = None
 
-    @property
-    def resource(self):
-        """Returns the resource path"""
-        resource = relpath(self.relpath, self.PATH)
-
-        if resource == '.':
-            return None
+    @classmethod
+    def register(cls):
+        """Registers a service in the core handler"""
+        try:
+            handler = HIS.HANDLERS[cls.NODE]
+        except KeyError:
+            HIS.HANDLERS[cls.NODE] = cls.NODE
+            return True
         else:
-            return resource
+            if handler is cls:
+                return True
+            else:
+                return False
 
     @classmethod
     def install(cls):
         """Installs the service into
         the registered database
         """
-        if cls.PATH is None or cls.NAME is None:
+        if cls.NODE is None or cls.NAME is None:
             raise IncompleteImplementationError()
         else:
             module = cls.__module__
@@ -59,7 +63,7 @@ class HISService(HISRequestHandler):
             except DoesNotExist:
                 service = Service()
                 service.name = cls.NAME
-                service.path = cls.PATH
+                service.node = cls.NODE
                 service.module = module
                 service.handler = classname
                 service.description = cls.DESCRIPTION
@@ -120,15 +124,15 @@ class AuthorizedService(AccountService):
         is allowed to use this service
         """
         try:
-            path = self.__class__.PATH
+            node = self.__class__.NODE
         except AttributeError:
             raise IncompleteImplementationError()
         else:
-            if not path:
+            if not node:
                 raise IncompleteImplementationError()
             else:
                 try:
-                    service = Service.get(Service.path == path)
+                    service = Service.get(Service.node == node)
                 except DoesNotExist:
                     raise ServiceNotRegistered()
                 else:

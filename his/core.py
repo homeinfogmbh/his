@@ -25,82 +25,15 @@ class HandlerNotAvailable(Error):
         super().__init__('No handler available')
 
 
-class HISRequestHandler(RequestHandler):
-    """Abstract, basic request handler with extensions for HIS"""
+class _ServiceProxy():
 
-    @property
-    def root(self):
-        """Returns the WSGI root path"""
-        return normpath(config.wsgi['ROOT'])
-
-    @property
-    def relpath(self):
-        """Returns the path info with the
-        root prefix stripped from it
-        """
-        if commonprefix([self.path_info, self.root]) == self.root:
-            return relpath(self.path_info, self.root)
-        else:
-            raise InternalServerError(
-                'Path "{path}" not in root "{root}"'.format(
-                    path=self.path_info, root=self.root))
-
-
-class HISMeta(HISRequestHandler):
-    """Generic HIS service template"""
-
-    BASE_PACKAGE = 'his.mods'
-    CLASS_NAME = 'Handler'
-
-    def __call__(self):
-        """Delegate to actual handler"""
-        return self.handler()
-
-    @property
-    def handler(self):
-        """Returns the appropriate request handler class"""
+    def __getitem__(self, node):
         try:
-            service = Service.by_relpath(self.relpath)
+            service = Service.get(Service.node == node)
         except DoesNotExist:
-            raise Error('No handler for path: "{}"'.format(self.relpath))
-
-        module_path = service.module
-        class_name = service.handler
-
-        try:
-            module = import_module(module_path)
-            handler = getattr(module, class_name)
-        except ImportError:
-            msg = 'Module "{}" is not installed.'.format(module_path)
-            logger.critical(msg)
-            raise Error(msg)
-        except AttributeError:
-            msg = 'Module "{module}" has no handler "{handler}".'.format(
-                module=module_path, handler=class_name)
-            logger.critical(msg)
-            raise Error(msg)
+            raise KeyError()
         else:
-            return handler(
-                self.environ,
-                self.cors,
-                self.date_format,
-                self.debug)
-
-    def get(self):
-        """Processes GET requests"""
-        return self.handler.get()
-
-    def post(self):
-        """Processes POST requests"""
-        return self.handler.post()
-
-    def put(self):
-        """Processes PUT requests"""
-        return self.handler.put()
-
-    def delete(self):
-        """Processes DELETE requests"""
-        return self.handler.delete()
+            return service.handler
 
 
 class HIS(WsgiApp):
@@ -108,6 +41,7 @@ class HIS(WsgiApp):
 
     REQUEST_HANDLER = HISMeta
     DEBUG = True
+    HANDLERS = _ServiceProxy()
 
     def __init__(self):
         """Use library defaults, but always enable CORS"""

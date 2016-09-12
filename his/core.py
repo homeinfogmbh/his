@@ -4,7 +4,8 @@ from logging import getLogger
 
 from peewee import DoesNotExist
 
-from homeinfo.lib.wsgi import Error, WsgiApp
+from homeinfo.lib.rest import RestApp
+from homeinfo.lib.wsgi import Error
 
 from his.orm import Service
 
@@ -32,7 +33,7 @@ class _ServiceProxy():
             return service.handler
 
 
-class HIS(WsgiApp):
+class HIS(RestApp):
     """HIS meta service"""
 
     DEBUG = True

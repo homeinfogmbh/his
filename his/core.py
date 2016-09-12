@@ -9,6 +9,7 @@ from homeinfo.lib.rest import RestApp
 from homeinfo.lib.wsgi import Error
 
 from his.orm import Service
+from his.config import config
 
 __all__ = ['HIS']
 
@@ -31,13 +32,16 @@ class _ServiceProxy():
 
     def __getitem__(self, node):
         """Returns the appropriate service for the node"""
-        try:
-            service = Service.get(Service.node == node)
-        except DoesNotExist:
-            self.logger.warning('No service for node "{}"'.format(node))
-            raise KeyError()
+        if node == config.wsgi['root']:
+            return self
         else:
-            return service.handler
+            try:
+                service = Service.get(Service.node == node)
+            except DoesNotExist:
+                self.logger.warning('No service for node "{}"'.format(node))
+                raise KeyError()
+            else:
+                return service.handler
 
 
 class HIS(RestApp):

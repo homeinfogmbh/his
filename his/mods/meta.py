@@ -27,7 +27,7 @@ logger = getLogger(__file__)
 class SessionManager(HISService):
     """Session handling service"""
 
-    PATH = 'session'
+    NODE = 'session'
     NAME = 'sessions manager'
     DESCRIPTION = 'Manages account sessions'
     PROMOTE = False
@@ -131,7 +131,7 @@ class SessionManager(HISService):
 class ServicePermissions(HISService):
     """Handles service permissions"""
 
-    PATH = 'services'
+    NODE = 'services'
     NAME = 'services manager'
     DESCRIPTION = 'Manages services permissions'
     PROMOTE = False

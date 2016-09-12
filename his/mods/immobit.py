@@ -19,7 +19,7 @@ from his.orm import InconsistencyError, AlreadyLoggedIn, Service, \
 class ImmoBit(AuthorizedService):
     """Handles requests for ImmoBit"""
 
-    PATH = 'immobit'
+    NODE = 'immobit'
     NAME = 'ImmoBit'
     DESCRIPTION = 'Immobiliendatenverwaltung'
     PROMOTE = True

@@ -21,15 +21,16 @@ class HandlerNotAvailable(Error):
 
 class _ServiceProxy():
 
-    def __init__(self):
+    def __init__(self, root):
         """Sets the logger"""
+        self.root = root
         self.logger = Logger('ServiceProxy', level=LogLevel.SUCCESS)
 
     def __getitem__(self, node):
         """Returns the appropriate service for the node"""
         if node == config.wsgi['root']:
             self.logger.info('Proxying root')
-            return self
+            return self.root
         else:
             try:
                 service = Service.get(Service.node == node)
@@ -47,8 +48,8 @@ class HIS(RestApp):
     """HIS meta service"""
 
     DEBUG = True
-    HANDLERS = _ServiceProxy()
 
     def __init__(self):
         """Use library defaults, but always enable CORS"""
         super().__init__(cors=True)
+        self.HANDLERS = _ServiceProxy(self)

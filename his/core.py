@@ -33,6 +33,7 @@ class _ServiceProxy():
     def __getitem__(self, node):
         """Returns the appropriate service for the node"""
         if node == config.wsgi['root']:
+            self.logger.info('Proxying root')
             return self
         else:
             try:
@@ -41,7 +42,10 @@ class _ServiceProxy():
                 self.logger.warning('No service for node "{}"'.format(node))
                 raise KeyError()
             else:
-                return service.handler
+                handler = service.handler
+                self.logger.info('Proxying "{node}" to "{handler}"'.format(
+                    node=node, handler=handler))
+                return handler
 
 
 class HIS(RestApp):

@@ -125,7 +125,7 @@ class Service(HISModel):
 
     node = CharField(255)
     module = CharField(255)
-    class_ = CharField(32, null=True, default=None)
+    class_ = CharField(32, db_column='class', null=True, default=None)
     name = CharField(32, null=True, default=None)
     description = CharField(255, null=True, default=None)
     # Flag whether the service shall be promoted

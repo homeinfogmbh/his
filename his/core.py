@@ -1,18 +1,14 @@
 """Core services"""
 
-from importlib import import_module
 from logging import getLogger
-from os.path import relpath, normpath, commonprefix
 
 from peewee import DoesNotExist
 
-from homeinfo.lib.wsgi import Error, InternalServerError, RequestHandler, \
-    WsgiApp
+from homeinfo.lib.wsgi import Error, WsgiApp
 
-from his.config import config
 from his.orm import Service
 
-__all__ = ['HISRequestHandler', 'HIS']
+__all__ = ['HIS']
 
 
 logger = getLogger(__file__)
@@ -39,7 +35,6 @@ class _ServiceProxy():
 class HIS(WsgiApp):
     """HIS meta service"""
 
-    REQUEST_HANDLER = HISMeta
     DEBUG = True
     HANDLERS = _ServiceProxy()
 

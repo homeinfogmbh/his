@@ -1,10 +1,8 @@
 """Core services"""
 
-from logging import getLogger
-
 from peewee import DoesNotExist
 
-from homeinfo.lib.log import Logger
+from homeinfo.lib.log import Logger, LogLevel
 from homeinfo.lib.rest import RestApp
 from homeinfo.lib.wsgi import Error
 
@@ -12,9 +10,6 @@ from his.orm import Service
 from his.config import config
 
 __all__ = ['HIS']
-
-
-logger = getLogger(__file__)
 
 
 class HandlerNotAvailable(Error):
@@ -28,7 +23,7 @@ class _ServiceProxy():
 
     def __init__(self):
         """Sets the logger"""
-        self.logger = Logger('ServiceProxy')
+        self.logger = Logger('ServiceProxy', level=LogLevel.SUCCESS)
 
     def __getitem__(self, node):
         """Returns the appropriate service for the node"""

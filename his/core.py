@@ -4,6 +4,7 @@ from logging import getLogger
 
 from peewee import DoesNotExist
 
+from homeinfo.lib.log import Logger
 from homeinfo.lib.rest import RestApp
 from homeinfo.lib.wsgi import Error
 
@@ -24,10 +25,16 @@ class HandlerNotAvailable(Error):
 
 class _ServiceProxy():
 
+    def __init__(self):
+        """Sets the logger"""
+        self.logger = Logger('ServiceProxy')
+
     def __getitem__(self, node):
+        """Returns the appropriate service for the node"""
         try:
             service = Service.get(Service.node == node)
         except DoesNotExist:
+            self.logger.warning('No service for node "{}"'.format(node))
             raise KeyError()
         else:
             return service.handler

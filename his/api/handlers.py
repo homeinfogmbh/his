@@ -58,7 +58,7 @@ class HISService(ResourceHandler):
             classname = cls.__name__
 
             try:
-                service = Service.get(Service.path == cls.PATH)
+                service = Service.get(Service.node == cls.NODE)
             except DoesNotExist:
                 service = Service()
                 service.name = cls.NAME

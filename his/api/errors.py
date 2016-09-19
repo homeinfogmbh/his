@@ -34,11 +34,22 @@ __all__ = [
 class HISMessage(JSON):
     """Indicates errors for the WebAPI"""
 
-    def __init__(self, charset='utf-8', cors=None):
+    def __init__(self, charset='utf-8', cors=None, status=None, data=None):
+        """Initializes the message"""
+        status = self.STATUS if status is None else status
+        dictionary = {}
+
+        for key in self.LOCALE:
+            dictionary[key] = self.LOCALE[key]
+
+        if data is not None:
+            for key in data:
+                dictionary[key] = data[key]
+
         super().__init__(
-            self.LOCALE,
+            dictionary,
             charset=charset,
-            status=self.STATUS,
+            status=status,
             cors=cors)
 
 

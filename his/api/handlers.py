@@ -48,9 +48,7 @@ class HISService(ResourceHandler):
 
     @classmethod
     def install(cls):
-        """Installs the service into
-        the registered database
-        """
+        """Installs the service into the database index"""
         if cls.NODE is None or cls.NAME is None:
             raise IncompleteImplementationError()
         else:
@@ -72,7 +70,7 @@ class HISService(ResourceHandler):
                 if service.name == cls.NAME:
                     if service.module == module:
                         if service.handler == classname:
-                            return True
+                            return service
 
                 return False
 

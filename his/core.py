@@ -19,12 +19,12 @@ class HandlerNotAvailable(Error):
         super().__init__('No handler available')
 
 
-class _ServiceProxy():
+class RootProxy():
 
     def __init__(self, root):
         """Sets the logger"""
         self.root = root
-        self.logger = Logger('ServiceProxy', level=LogLevel.SUCCESS)
+        self.logger = Logger(self.__class__.__name__, level=LogLevel.SUCCESS)
 
     def __getitem__(self, node):
         """Returns the appropriate service for the node"""
@@ -52,4 +52,4 @@ class HIS(RestApp):
     def __init__(self):
         """Use library defaults, but always enable CORS"""
         super().__init__(cors=True)
-        self.HANDLERS = _ServiceProxy(self)
+        self.HANDLERS = RootProxy(self)

@@ -11,9 +11,24 @@ from openimmo.openimmo import Umfang
 
 from openimmodb3.db import Immobilie
 
+from his.locale import Language
+from his.api.errors import HISMessage
 from his.api.handlers import AuthorizedService
 from his.orm import InconsistencyError, AlreadyLoggedIn, Service, \
     CustomerService, Account, Session
+
+
+class InvalidOpenimmoData(HISMessage):
+    """Indicates invalid OpenImmo XML data"""
+
+    STATUS = 400
+    LOCALE = {
+        Language.DE_DE: 'Ungültige OpenImmo Daten.',
+        Language.EN_US: 'Invalid OpenImmo data.'}
+
+    def __init__(self, stacktrace, charset='utf-8', cors=None):
+        data = {'stacktrace': stacktrace}
+        super().__init__(charset=charset, cors=cors, data=data)
 
 
 class ImmoBit(AuthorizedService):
@@ -46,8 +61,8 @@ class ImmoBit(AuthorizedService):
             try:
                 return openimmo.CreateFromDocument(data)
             except PyXBException:
-                # TODO: Handle
-                pass
+                stacktrace = format_exc()
+                raise InvalidOpenimmoData(stacktrace)
 
     def get(self):
         """Handles GET requests"""

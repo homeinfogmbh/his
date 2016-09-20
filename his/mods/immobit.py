@@ -122,7 +122,7 @@ class RealEstateDeleted(HISMessage):
         Language.EN_US: 'Real estate deleted.'}
 
 
-class ImmoBit(AuthorizedService):
+class Immobit(AuthorizedService):
     """Handles requests for ImmoBit"""
 
     NODE = 'immobit'

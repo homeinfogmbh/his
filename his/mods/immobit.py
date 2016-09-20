@@ -5,8 +5,6 @@ from pyxb.exceptions_ import PyXBException
 from homeinfo.crm import Customer
 from homeinfo.lib.wsgi import XML
 
-from filedb.http import FileError, File
-
 from openimmo import openimmo, factories
 from openimmo.openimmo import Umfang
 
@@ -15,8 +13,6 @@ from openimmodb3.db import Immobilie
 from his.locale import Language
 from his.api.errors import HISMessage
 from his.api.handlers import AuthorizedService
-
-file_manager = File(KEY)
 
 
 class FileTooLarge(HISMessage):
@@ -169,24 +165,12 @@ class ImmoBit(AuthorizedService):
 
     def _update(self, immobilie, dom):
         """Updates the respective real estate"""
-        xml_data = dom.toxml(encoding='utf-8')
-
-        try:
-            file_id = file_manager.add(xml_data)
-        except FileError:
-            raise CannotAddRealEstate() from None
-        else:
-            try:
-                file_manager.delete(immobilie.file)
-            except FileError:
-                self.logger.error('Could not delete file: {}'.format(file_id))
-
-            immobilie.openimmo_obid = dom.openimmo_obid
-            immobilie.objektnr_intern = dom.immobilie.objektnr_intern
-            immobilie.objektnr_extern = dom.immobilie.objektnr_extern
-            immobilie.file = file_id
-            immobilie.save()
-            return RealEstateUpdated()
+        immobilie.openimmo_obid = dom.openimmo_obid
+        immobilie.objektnr_intern = dom.immobilie.objektnr_intern
+        immobilie.objektnr_extern = dom.immobilie.objektnr_extern
+        immobilie.data = dom.toxml(encoding='utf-8')  # New!
+        immobilie.save()
+        return RealEstateUpdated()
 
     def _delete(self, objektnr_extern):
         """Deletes the respective real estate"""

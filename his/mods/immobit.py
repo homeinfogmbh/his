@@ -5,6 +5,8 @@ from pyxb.exceptions_ import PyXBException
 from homeinfo.crm import Customer
 from homeinfo.lib.wsgi import Error, InternalServerError, OK, XML, JSON
 
+from filedb.http import FileError, File
+
 from openimmo import openimmo, factories
 from openimmo.openimmo import Umfang
 
@@ -15,6 +17,8 @@ from his.api.errors import HISMessage
 from his.api.handlers import AuthorizedService
 from his.orm import InconsistencyError, AlreadyLoggedIn, Service, \
     CustomerService, Account, Session
+
+file_manager = File(KEY)
 
 
 class InvalidOpenimmoData(HISMessage):
@@ -52,6 +56,15 @@ class NoSuchRealEstate(HISMessage):
         super().__init__(charset=charset, cors=cors, data=data)
 
 
+class RealEstatedAdded(HISMessage):
+    """Indicates that a file was successfully added"""
+
+    STATUS = 200
+    LOCALE = {
+        Language.DE_DE: 'Immobilie erstellt.',
+        Language.EN_US: 'Real estate added.'}
+
+
 class CannotAddRealEstate(HISMessage):
     """Indicates that the respective real estate could not be added"""
 
@@ -77,6 +90,15 @@ class CannotDeleteRealEstate(HISMessage):
     LOCALE = {
         Language.DE_DE: 'Immobilie konnte nicht gelöscht werden.',
         Language.EN_US: 'Could not delete real estate.'}
+
+
+class RealEstateUpdated(HISMessage):
+    """Indicates that the real estate has been updated"""
+
+    STATUS = 200
+    LOCALE = {
+        Language.DE_DE: 'Immobilie aktualisiert.',
+        Language.EN_US: 'Real estate updated.'}
 
 
 class RealEstateDeleted(HISMessage):
@@ -123,6 +145,21 @@ class ImmoBit(AuthorizedService):
             except PyXBException:
                 raise InvalidOpenimmoData(format_exc()) from None
 
+    def post(self):
+        """Posts real estate data"""
+        dom = self.dom
+
+        # Verify DOM as openimmo.immobilie
+        if isinstance(dom, openimmo.immobilie().__class__):
+            ident = Immobilie.add(self.customer, dom)
+
+            if ident:
+                return RealEstatedAdded()
+            else:
+                raise CannotAddRealEstate()
+        else:
+            raise InvalidDOM()
+
     def get(self):
         """Handles GET requests"""
         if self.resource is None:
@@ -143,20 +180,35 @@ class ImmoBit(AuthorizedService):
             else:
                 return XML(immobilie)
 
-    def post(self):
-        """Posts real estate data"""
-        dom = self.dom
-
-        # Verify DOM as openimmo.immobilie
-        if isinstance(dom, openimmo.immobilie().__class__):
-            ident = Immobilie.add(self.customer, dom)
-
-            if ident:
-                return OK(ident)
-            else:
-                raise CannotAddRealEstate()
+    def put(self):
+        """Updates real estates"""
+        if self.resource is None:
+            raise NoRealEstateSpecified()
         else:
-            raise InvalidDOM()
+            dom = self.dom
+
+            try:
+                immobilie = Immobilie.get(
+                    (Immobilie.customer == self.customer) &
+                    (Immobilie.objektnr_extern == self.resource))
+            except DoesNotExist:
+                raise NoSuchRealEstate(self.resource) from None
+            else:
+                xml_data = immobilie.toxml(encoding='utf-8')
+
+                try:
+                    file_id = file_manager.add(xml_data)
+                except FileError:
+                    raise CannotAddRealEstate() from None
+                else:
+                    try:
+                        file_manager.delete(immobilie.file)
+                    except FileError:
+                        raise CannotDeleteRealEstate() from None
+                    else:
+                        immobilie.file= file_id
+                        immobilie.save()
+                        return RealEstateUpdated()
 
     def delete(self):
         """Removes real estates"""

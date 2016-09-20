@@ -30,7 +30,7 @@ class RootProxy():
     def __getitem__(self, node):
         """Returns the appropriate service for the node"""
         if node == config.wsgi['root']:
-            self.logger.info('Proxying root: {}'.format(node))
+            self.logger.info('Proxying root')
             return self.root
         else:
             try:
@@ -39,9 +39,9 @@ class RootProxy():
                 self.logger.warning('No service for node "{}"'.format(node))
                 raise KeyError()
             else:
-                handler = service.handler
                 self.logger.info('Proxying "{node}" to "{handler}"'.format(
                     node=node, handler=handler))
+                handler = service.handler
                 return handler
 
 

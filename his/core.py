@@ -39,9 +39,9 @@ class RootProxy():
                 self.logger.warning('No service for node "{}"'.format(node))
                 raise KeyError()
             else:
-                self.logger.info('Proxying "{node}" to "{handler}"'.format(
-                    node=node, handler=handler))
+                self.logger.info('Proxying "{}"'.format(node))
                 handler = service.handler
+                self.logger.info('Loading handler "{}"'.format(handler))
                 return handler
 
 

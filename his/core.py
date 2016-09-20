@@ -20,6 +20,7 @@ class HandlerNotAvailable(Error):
 
 
 class RootProxy():
+    """Proxies root queries"""
 
     def __init__(self, root):
         """Sets the logger"""
@@ -29,7 +30,7 @@ class RootProxy():
     def __getitem__(self, node):
         """Returns the appropriate service for the node"""
         if node == config.wsgi['root']:
-            self.logger.info('Proxying root')
+            self.logger.info('Proxying root: {}'.format(node))
             return self.root
         else:
             try:

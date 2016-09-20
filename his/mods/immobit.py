@@ -3,7 +3,7 @@ from peewee import DoesNotExist
 from pyxb.exceptions_ import PyXBException
 
 from homeinfo.crm import Customer
-from homeinfo.lib.wsgi import Error, InternalServerError, OK, XML, JSON
+from homeinfo.lib.wsgi import XML
 
 from filedb.http import FileError, File
 
@@ -15,10 +15,17 @@ from openimmodb3.db import Immobilie
 from his.locale import Language
 from his.api.errors import HISMessage
 from his.api.handlers import AuthorizedService
-from his.orm import InconsistencyError, AlreadyLoggedIn, Service, \
-    CustomerService, Account, Session
 
 file_manager = File(KEY)
+
+
+class FileTooLarge(HISMessage):
+    """Indicates that the posted file was too lange to process"""
+
+    STATUS = 500
+    LOCALE = {
+        Language.DE_DE: 'Datei zu groß.',
+        Language.EN_US: 'File is too large.'}
 
 
 class InvalidOpenimmoData(HISMessage):
@@ -74,6 +81,15 @@ class CannotAddRealEstate(HISMessage):
         Language.EN_US: 'Could not add real estate.'}
 
 
+class RealEstateExists(HISMessage):
+    """Indicates that the respective real estate already exists"""
+
+    STATUS = 400
+    LOCALE = {
+        Language.DE_DE: 'Immobilie existiert bereits.',
+        Language.EN_US: 'Real estate already exists.'}
+
+
 class NoRealEstateSpecified(HISMessage):
     """Indicates that no real estate was specified"""
 
@@ -118,9 +134,78 @@ class ImmoBit(AuthorizedService):
     DESCRIPTION = 'Immobiliendatenverwaltung'
     PROMOTE = True
 
-    def _validate(self, dom, reference):
-        """Validates a DOM against a reference"""
-        return isinstance(dom, reference().__class__)
+    def _add(self, dom):
+        """Adds a new real estate"""
+        try:
+            ident = Immobilie.add(self.customer, dom)
+        except Exception:
+            self.logger.error(format_exc())
+            raise CannotAddRealEstate() from None
+        else:
+            if ident:
+                return RealEstatedAdded()
+            else:
+                raise CannotAddRealEstate() from None
+
+    def _anbieter(self):
+        """Returns all real estates for the respective customer"""
+        anbieter = factories.anbieter(repr(self.customer), str(self.customer))
+
+        for immobilie in Immobilie.by_cid(self.customer):
+            anbieter.immobilie.append(immobilie.dom)
+
+        return XML(anbieter)
+
+    def _immobilie(self, objektnr_extern):
+        """Returns the respective real estate of the respective customer"""
+        try:
+            immobilie = Immobilie.get(
+                (Immobilie.customer == self.customer) &
+                (Immobilie.objektnr_extern == objektnr_extern))
+        except DoesNotExist:
+            raise NoSuchRealEstate(objektnr_extern) from None
+        else:
+            return XML(immobilie)
+
+    def _update(self, immobilie, dom):
+        """Updates the respective real estate"""
+        xml_data = dom.toxml(encoding='utf-8')
+
+        try:
+            file_id = file_manager.add(xml_data)
+        except FileError:
+            raise CannotAddRealEstate() from None
+        else:
+            try:
+                file_manager.delete(immobilie.file)
+            except FileError:
+                self.logger.error('Could not delete file: {}'.format(file_id))
+
+            immobilie.openimmo_obid = dom.openimmo_obid
+            immobilie.objektnr_intern = dom.immobilie.objektnr_intern
+            immobilie.objektnr_extern = dom.immobilie.objektnr_extern
+            immobilie.file = file_id
+            immobilie.save()
+            return RealEstateUpdated()
+
+    def _delete(self, objektnr_extern):
+        """Deletes the respective real estate"""
+        try:
+            immobilie = Immobilie.get(
+                (Immobilie.customer == self.customer) &
+                (Immobilie.objektnr_extern == self.resource))
+        except DoesNotExist:
+            raise NoSuchRealEstate(self.resource) from None
+        else:
+            try:
+                result = immobilie.remove(portals=True)
+            except Exception:
+                result = False
+
+            if result:
+                return RealEstateDeleted()
+            else:
+                raise CannotDeleteRealEstate() from None
 
     @property
     def filters(self):
@@ -138,7 +223,7 @@ class ImmoBit(AuthorizedService):
         try:
             data = self.file.read()
         except MemoryError:
-            raise InternalServerError() from None
+            raise FileTooLarge() from None
         else:
             try:
                 return openimmo.CreateFromDocument(data)
@@ -151,42 +236,27 @@ class ImmoBit(AuthorizedService):
 
         # Verify DOM as openimmo.immobilie
         if isinstance(dom, openimmo.immobilie().__class__):
-            ident = Immobilie.add(self.customer, dom)
-
-            if ident:
-                return RealEstatedAdded()
+            try:
+                Immobilie.get(Immobilie.objektnr_extern == dom.objektnr_extern)
+            except DoesNotExist:
+                return self._add(dom)
             else:
-                raise CannotAddRealEstate()
+                raise RealEstateExists()
         else:
             raise InvalidDOM()
 
     def get(self):
         """Handles GET requests"""
         if self.resource is None:
-            anbieter = factories.anbieter(
-                repr(self.customer), str(self.customer))
-
-            for immobilie in Immobilie.by_cid(self.customer):
-                anbieter.immobilie.append(immobilie.dom)
-
-            return XML(anbieter)
+            return self._anbieter()
         else:
-            try:
-                immobilie = Immobilie.get(
-                    (Immobilie.customer == self.customer) &
-                    (Immobilie.objektnr_extern == self.resource))
-            except DoesNotExist:
-                raise NoSuchRealEstate(self.resource) from None
-            else:
-                return XML(immobilie)
+            return self._immobilie(self.resource)
 
     def put(self):
         """Updates real estates"""
         if self.resource is None:
             raise NoRealEstateSpecified()
         else:
-            dom = self.dom
-
             try:
                 immobilie = Immobilie.get(
                     (Immobilie.customer == self.customer) &
@@ -194,40 +264,16 @@ class ImmoBit(AuthorizedService):
             except DoesNotExist:
                 raise NoSuchRealEstate(self.resource) from None
             else:
-                xml_data = immobilie.toxml(encoding='utf-8')
+                dom = self.dom
 
-                try:
-                    file_id = file_manager.add(xml_data)
-                except FileError:
-                    raise CannotAddRealEstate() from None
+                if isinstance(dom, openimmo.immobilie().__class__):
+                    return self._update(immobilie, dom)
                 else:
-                    try:
-                        file_manager.delete(immobilie.file)
-                    except FileError:
-                        raise CannotDeleteRealEstate() from None
-                    else:
-                        immobilie.file= file_id
-                        immobilie.save()
-                        return RealEstateUpdated()
+                    raise InvalidDOM()
 
     def delete(self):
         """Removes real estates"""
         if self.resource is None:
             raise NoRealEstateSpecified()
         else:
-            try:
-                immobilie = Immobilie.get(
-                    (Immobilie.customer == self.customer) &
-                    (Immobilie.objektnr_extern == self.resource))
-            except DoesNotExist:
-                raise NoSuchRealEstate(self.resource) from None
-            else:
-                try:
-                    result = immobilie.remove(portals=True)
-                except Exception:
-                    result = False
-
-                if result:
-                    return RealEstateDeleted()
-                else:
-                    raise CannotDeleteRealEstate() from None
+            return self._delete(self.resource)

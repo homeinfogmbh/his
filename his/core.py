@@ -31,7 +31,7 @@ class RootProxy():
         """Returns the appropriate service for the node"""
         if node == config.wsgi['root']:
             self.logger.info('Proxying root: {}'.format(node))
-            return self
+            return self.root
         else:
             try:
                 service = Service.get(Service.node == node)

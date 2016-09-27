@@ -49,7 +49,7 @@ class SessionManager(HISService):
                 except DoesNotExist:
                     raise NoSuchSession()
                 else:
-                    if session.active:
+                    if session.alive:
                         if session.account.root:
                             sessions = {}
 
@@ -68,7 +68,7 @@ class SessionManager(HISService):
             except DoesNotExist:
                 raise NoSuchSession()
             else:
-                if session.active:
+                if session.alive:
                     return JSON(session.todict())
                 else:
                     raise SessionExpired()
@@ -103,7 +103,7 @@ class SessionManager(HISService):
         except DoesNotExist:
             raise NoSuchSession()
         else:
-            if session.active:
+            if session.alive:
                 if session.renew():
                     return JSON(session.todict())
                 else:
@@ -118,7 +118,6 @@ class SessionManager(HISService):
         if not self.resource:
             raise NoSessionSpecified()
 
-        # Attempt to close session by session ID first
         try:
             session = Session.get(Session.token == self.resource)
         except DoesNotExist:
@@ -154,7 +153,7 @@ class ServicePermissions(HISService):
         except DoesNotExist:
             raise NoSuchService()
         else:
-            if session.active:
+            if session.alive:
                 account = session.account
                 customer_id = self.query_dict.get('customer')
                 account_name = self.query_dict.get('account')

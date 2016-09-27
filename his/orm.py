@@ -330,7 +330,7 @@ class Session(HISModel):
         except DoesNotExist:
             return cls._open(account, duration=duration)
         else:
-            if session.active:
+            if session.alive:
                 raise AlreadyLoggedIn()
             else:
                 session.close()

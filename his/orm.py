@@ -18,10 +18,7 @@ from his.api.errors import InvalidCredentials, AlreadyLoggedIn
 from his.config import config
 
 __all__ = [
-    'his_db',
     'AlreadyLoggedIn',
-    'HISServiceDatabase',
-    'HISModel',
     'Service',
     'CustomerService',
     'Account',
@@ -73,10 +70,11 @@ class AccountServicesWrapper():
                 return account_service.save()
             else:
                 raise InconsistencyError(
-                    'Cannot enable service {0} for account {1}, '
-                    'because the respective customer {2} is not '
+                    'Cannot enable service {service} for account {account}, '
+                    'because the respective customer {customer} is not '
                     'enabled for it'.format(
-                        service, self.account, self.account.customer))
+                        service=service, account=self.account,
+                        customer=self.account.customer))
 
     def remove(self, service):
         """Removes a service from the mapping"""
@@ -84,30 +82,6 @@ class AccountServicesWrapper():
                 (AccountService.account == self.account) &
                 (AccountService.service == service)):
             account_service.delete_instance()
-
-
-class HISServiceDatabase(MySQLDatabase):
-    """A HIS service database
-    Gets the name of the service, prefixed by the master database
-    """
-
-    def __init__(self, service, host=None, user=None, passwd=None, **kwargs):
-        """Initializes the database with the respective service's
-        name and optional diverging database configuration
-        """
-        if host is None:
-            host = config.db['host']
-
-        if user is None:
-            user = config.db['user']
-
-        if passwd is None:
-            passwd = config.db['passwd']
-
-        # Change the name to create a '_'-separated namespace
-        super().__init__(
-            '_'.join((config.db['db'], str(service).lower())),
-            host=host, user=user, passwd=passwd, closing=True, **kwargs)
 
 
 class HISModel(Model):
@@ -153,21 +127,10 @@ class CustomerService(HISModel):
     class Meta:
         db_table = 'customer_service'
 
-    customer = ForeignKeyField(
-        Customer, db_column='account',
-        related_name='customer_services')
-    service = ForeignKeyField(
-        Service, db_column='service',
-        related_name='service_customers')
+    customer = ForeignKeyField(Customer, db_column='account')
+    service = ForeignKeyField(Service, db_column='service')
     begin = DateTimeField(null=True, default=None)
     end = DateTimeField(null=True, default=None)
-
-    def remove(self):
-        """Safely removes a customer service and its dependencies"""
-        for account_service in AccountService.select().where(
-                (AccountService.account.customer == self.customer) &
-                (AccountService.service == self.service)):
-            account_service.delete_instance()
 
     @classmethod
     def services(cls, customer):
@@ -188,6 +151,15 @@ class CustomerService(HISModel):
                 return datetime.now() >= self.begin
             else:
                 return self.begin <= datetime.now() < self.end
+
+    def remove(self):
+        """Safely removes a customer service and its dependencies"""
+        for account_service in AccountService.select().where(
+                (AccountService.account.customer == self.customer) &
+                (AccountService.service == self.service)):
+            account_service.delete_instance()
+
+        self.delete_instance()
 
 
 class Account(HISModel):
@@ -231,7 +203,7 @@ class Account(HISModel):
 
     def __bool__(self):
         """Returns whether the user is not locked"""
-        return not self.locked
+        return self.valid and not self.locked
 
     @classproperty
     @classmethod
@@ -250,18 +222,29 @@ class Account(HISModel):
                 (cls.admin == 1))
 
     @property
+    def valid(self):
+        """Determines whether the account is valid"""
+        return self.passwd and not self.deleted and not self.disabled
+
+    @property
     def locked(self):
         """Determines whether the user is locked"""
-        if not self.passwd:
-            return True
-        elif self.deleted:
-            return True
-        elif self.disabled:
-            return True
-        elif self.locked_until > datetime.now():
-            return True
-        else:
+        return self.locked_until >= datetime.now()
+
+    @property
+    def usable(self):
+        """Determines whether the account may log in"""
+        return self.valid and not self.locked
+
+    @property
+    def active(self):
+        """Determines whether the account has an open session"""
+        try:
+            session = Session.get(Session.account == self)
+        except DoesNotExist:
             return False
+        else:
+            return session.alive
 
     @property
     def services(self):
@@ -273,12 +256,12 @@ class Account(HISModel):
         try:
             match = self._PASSWORD_HASHER.verify(self.pwhash, passwd)
         except VerifyMismatchError:
-            raise InvalidCredentials()
+            raise InvalidCredentials() from None
         else:
             if match:
                 return Session.open(self)
             else:
-                raise InvalidCredentials()
+                raise InvalidCredentials() from None
 
 
 class AccountService(HISModel):
@@ -292,7 +275,7 @@ class AccountService(HISModel):
 
 
 class Session(HISModel):
-    """A session related to a login"""
+    """A session related to an account"""
 
     DEFAULT_DURATION_MINUTES = 5
 
@@ -308,9 +291,8 @@ class Session(HISModel):
 
     def __str__(self):
         """Returns a human-readable representation"""
-        return ' '.join([': '.join(
-            [' - '.join([str(self.start), str(self.end)]), repr(self)]),
-            ''.join(['(', str(self.login), ')'])])
+        return '{start} - {end}: {token} ({login})'.format(
+            start=self.start, end=self.end, token=self.token, login=self.login)
 
     @classmethod
     def exists(cls, account):
@@ -355,7 +337,7 @@ class Session(HISModel):
                 return cls._open(account, duration=duration)
 
     @property
-    def active(self):
+    def alive(self):
         """Determines whether the session is active"""
         return self.start <= datetime.now() < self.end
 
@@ -375,7 +357,7 @@ class Session(HISModel):
 
     def renew(self, duration=None):
         """Renews the session"""
-        if self.active:
+        if self.alive:
             duration = duration or timedelta(
                 minutes=self.DEFAULT_DURATION_MINUTES)
             self.end = datetime.now() + duration
@@ -387,13 +369,12 @@ class Session(HISModel):
 
     def todict(self):
         """Converts the session to a dictionary"""
-        result = {}
-        result['account'] = self.account.name
-        result['token'] = self.token
-        result['start'] = str(self.start)
-        result['end'] = str(self.end)
-        result['login'] = True if self.login else False
-        return result
+        return {
+            'account': self.account.name,
+            'token': self.token,
+            'start': str(self.start),
+            'end': str(self.end),
+            'login': True if self.login else False}
 
 
 tables = [Service, CustomerService, Account, AccountService, Session]

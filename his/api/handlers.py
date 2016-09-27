@@ -91,7 +91,7 @@ class AuthenticatedService(HISService):
             except DoesNotExist:
                 raise NoSuchSession()
             else:
-                if session.active:
+                if session.alive:
                     return session
                 else:
                     raise SessionExpired()

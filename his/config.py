@@ -19,4 +19,4 @@ class HISConfig(Configuration):
         return self['wsgi']
 
 
-config = Configuration('/etc/his.conf')
+config = HISConfig('/etc/his.conf')

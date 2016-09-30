@@ -8,7 +8,7 @@ from homeinfo.lib.wsgi import XML
 from openimmo import openimmo, factories
 from openimmo.openimmo import Umfang
 
-from openimmodb3.db import Immobilie
+from openimmodb3.orm import Immobilie
 
 from his.locale import Language
 from his.api.errors import HISMessage

@@ -2,7 +2,7 @@
 
 from homeinfo.lib.wsgi import JSON
 
-from his.locale import Language
+from his.api.locale import Language
 
 __all__ = [
     'HISAPIError',

@@ -10,7 +10,7 @@ from openimmo.openimmo import Umfang
 
 from openimmodb3.orm import Immobilie
 
-from his.locale import Language
+from his.api.locale import Language
 from his.api.errors import HISMessage
 from his.api.handlers import AuthorizedService
 

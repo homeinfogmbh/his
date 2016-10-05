@@ -221,6 +221,16 @@ class Account(HISModel):
                 (cls.customer == customer) &
                 (cls.admin == 1))
 
+    @classmethod
+    def find(cls, id_or_name):
+        """Find account by primary key or login name"""
+        try:
+            ident = int(id_or_name)
+        except ValueError:
+            return cls.get(cls.name == id_or_name)
+        else:
+            return cls.get(cls.id == ident)
+
     @property
     def valid(self):
         """Determines whether the account is valid"""

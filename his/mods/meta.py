@@ -8,11 +8,10 @@ from homeinfo.crm import Customer
 from homeinfo.lib.wsgi import Error, OK, JSON
 
 from his.api.errors import MissingCredentials, NoSuchAccount, \
-    InvalidCredentials, AlreadyLoggedIn as AlreadyLoggedIn_, \
     NoSessionSpecified, NoSuchSession, SessionExpired, NoServiceSpecified, \
     NoSuchService, InvalidCustomerID, NoSuchCustomer, NotAuthorized
 from his.api.handlers import HISService
-from his.orm import InconsistencyError, AlreadyLoggedIn, Service, \
+from his.orm import InconsistencyError, Service, \
     CustomerService, Account, Session
 
 __all__ = [

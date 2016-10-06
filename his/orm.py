@@ -1,6 +1,5 @@
 """Group and user definitions"""
 
-from os.path import dirname
 from datetime import datetime, timedelta
 from uuid import uuid4
 from importlib import import_module

@@ -1,14 +1,13 @@
 """Meta-services for HIS"""
 
-from os.path import relpath
-
 from peewee import DoesNotExist
 
 from homeinfo.lib.rest import ResourceHandler
 
-from his.orm import Service, CustomerService, Session
 from his.api.errors import NoSessionSpecified, NoSuchSession, SessionExpired, \
     ServiceNotRegistered, NotAuthorized
+from his.core import HIS
+from his.orm import Service, CustomerService, Session
 
 __all__ = [
     'IncompleteImplementationError',

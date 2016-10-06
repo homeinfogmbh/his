@@ -42,6 +42,10 @@ class HISMessage(JSON):
         for key in self.LOCALE:
             dictionary[key] = self.LOCALE[key]
 
+        for attr in dir(self):
+            if not attr.startswith('_') and attr.upper() != attr:
+                dictionary[attr] = getattr(self, attr)
+
         if data is not None:
             for key in data:
                 dictionary[key] = data[key]

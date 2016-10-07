@@ -101,13 +101,35 @@ class AccountService(AuthenticatedService):
 
     @property
     def account(self):
-        """Returns the respective account"""
-        return self.session.account
+        """Gets the verified targeted account"""
+        if self.session.account.root:
+            try:
+                return Account.find(self.query_dict['account'])
+            except (KeyError, DoesNotExist):
+                return self.session.account
+        elif self.session.account.admin:
+            try:
+                target_account = Account.find(self.query_dict['account'])
+            except (KeyError, DoesNotExist):
+                return self.session.account
+            else:
+                if target_account.customer == self.session.account.customer:
+                    return target_account
+                else:
+                    raise NotAuthorized()
+        else:
+            return self.session.account
 
     @property
     def customer(self):
-        """Returns the respective customer"""
-        return self.session.account.customer
+        """Gets the verified targeted customer"""
+        if self.session.account.root:
+            try:
+                return Customer.find(self.query_dict['customer'])
+            except (KeyError, DoesNotExist):
+                return self.session.account.customer
+        else:
+            return self.session.account.customer
 
 
 class AuthorizedService(AccountService):
@@ -138,12 +160,13 @@ class AuthorizedService(AccountService):
                     #       2a) account is admin or
                     #       2b) account is enabled for the service
                     #
-                    if self.account.root:
+                    if self.session.account.root:
                         return super().__call__()
-                    elif service in CustomerService.services(self.customer):
-                        if self.account.admin:
+                    elif service in CustomerService.services(
+                            self.session.account.customer):
+                        if self.session.account.admin:
                             return super().__call__()
-                        elif service in self.account.services:
+                        elif service in self.session.account.services:
                             return super().__call__()
                         else:
                             raise NotAuthorized()

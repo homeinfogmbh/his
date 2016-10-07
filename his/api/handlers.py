@@ -14,7 +14,6 @@ __all__ = [
     'IncompleteImplementationError',
     'HISService',
     'AuthenticatedService',
-    'AccountService',
     'AuthorizedService']
 
 
@@ -96,44 +95,44 @@ class AuthenticatedService(HISService):
                 else:
                     raise SessionExpired()
 
-
-class AccountService(AuthenticatedService):
-    """A HIS service that is account- and customer-aware"""
-
     @property
     def account(self):
         """Gets the verified targeted account"""
-        if self.session.account.root:
+        account = self.session.account
+
+        if account.root:
             try:
                 return Account.find(self.query_dict['account'])
             except (KeyError, DoesNotExist):
-                return self.session.account
-        elif self.session.account.admin:
+                return account
+        elif account.admin:
             try:
                 target_account = Account.find(self.query_dict['account'])
             except (KeyError, DoesNotExist):
-                return self.session.account
+                return account
             else:
-                if target_account.customer == self.session.account.customer:
+                if target_account.customer == account.customer:
                     return target_account
                 else:
                     raise NotAuthorized()
         else:
-            return self.session.account
+            return account
 
     @property
     def customer(self):
         """Gets the verified targeted customer"""
-        if self.session.account.root:
+        account = self.session.account
+
+        if account.root:
             try:
                 return Customer.find(self.query_dict['customer'])
             except (KeyError, DoesNotExist):
-                return self.session.account.customer
+                return account.customer
         else:
-            return self.session.account.customer
+            return account.customer
 
 
-class AuthorizedService(AccountService):
+class AuthorizedService(AuthenticatedService):
     """A HIS service that checks whether
     the account is enabled for it
     """
@@ -161,13 +160,14 @@ class AuthorizedService(AccountService):
                     #       2a) account is admin or
                     #       2b) account is enabled for the service
                     #
-                    if self.session.account.root:
+                    account = self.session.account
+
+                    if account.root:
                         return super().__call__()
-                    elif service in CustomerService.services(
-                            self.session.account.customer):
-                        if self.session.account.admin:
+                    elif service in CustomerService.services(account.customer):
+                        if account.admin:
                             return super().__call__()
-                        elif service in self.session.account.services:
+                        elif service in account.services:
                             return super().__call__()
                         else:
                             raise NotAuthorized()

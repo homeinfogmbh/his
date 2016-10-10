@@ -49,7 +49,7 @@ class HISService(ResourceHandler):
     def install(cls):
         """Installs the service into the database index"""
         if cls.NODE is None or cls.NAME is None:
-            raise IncompleteImplementationError()
+            raise IncompleteImplementationError() from None
         else:
             module = cls.__module__
             classname = cls.__name__
@@ -83,17 +83,17 @@ class AuthenticatedService(HISService):
         try:
             session_token = self.query_dict['session']
         except KeyError:
-            raise NoSessionSpecified()
+            raise NoSessionSpecified() from None
         else:
             try:
                 session = Session.get(Session.token == session_token)
             except DoesNotExist:
-                raise NoSuchSession()
+                raise NoSuchSession() from None
             else:
                 if session.alive:
                     return session
                 else:
-                    raise SessionExpired()
+                    raise SessionExpired() from None
 
     @property
     def account(self):
@@ -114,7 +114,7 @@ class AuthenticatedService(HISService):
                 if target_account.customer == account.customer:
                     return target_account
                 else:
-                    raise NotAuthorized()
+                    raise NotAuthorized() from None
         else:
             return account
 
@@ -144,15 +144,15 @@ class AuthorizedService(AuthenticatedService):
         try:
             node = self.__class__.NODE
         except AttributeError:
-            raise IncompleteImplementationError()
+            raise IncompleteImplementationError() from None
         else:
             if not node:
-                raise IncompleteImplementationError()
+                raise IncompleteImplementationError() from None
             else:
                 try:
                     service = Service.get(Service.node == node)
                 except DoesNotExist:
-                    raise ServiceNotRegistered()
+                    raise ServiceNotRegistered() from None
                 else:
                     # Allow call iff
                     #   1) account is root or
@@ -170,6 +170,6 @@ class AuthorizedService(AuthenticatedService):
                         elif service in account.services:
                             return super().__call__()
                         else:
-                            raise NotAuthorized()
+                            raise NotAuthorized() from None
                     else:
-                        raise NotAuthorized()
+                        raise NotAuthorized() from None

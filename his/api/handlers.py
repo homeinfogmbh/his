@@ -81,7 +81,7 @@ class AuthenticatedService(HISService):
     def session(self):
         """Returns the session or raises an error"""
         try:
-            session_token = self.query_dict['session']
+            session_token = self.params['session']
         except KeyError:
             raise NoSessionSpecified() from None
         else:
@@ -102,12 +102,12 @@ class AuthenticatedService(HISService):
 
         if account.root:
             try:
-                return Account.find(self.query_dict['account'])
+                return Account.find(self.params['account'])
             except (KeyError, DoesNotExist):
                 return account
         elif account.admin:
             try:
-                target_account = Account.find(self.query_dict['account'])
+                target_account = Account.find(self.params['account'])
             except (KeyError, DoesNotExist):
                 return account
             else:
@@ -125,7 +125,7 @@ class AuthenticatedService(HISService):
 
         if account.root:
             try:
-                return Customer.find(self.query_dict['customer'])
+                return Customer.find(self.params['customer'])
             except (KeyError, DoesNotExist):
                 return account.customer
         else:

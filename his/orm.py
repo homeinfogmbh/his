@@ -17,6 +17,7 @@ from his.api.errors import InvalidCredentials, AlreadyLoggedIn
 from his.config import config
 
 __all__ = [
+    'histable',
     'AlreadyLoggedIn',
     'Service',
     'CustomerService',
@@ -25,8 +26,7 @@ __all__ = [
     'Session',
     'tables']
 
-
-his_db = MySQLDatabase(
+database = MySQLDatabase(
     config.db['db'],
     host=config.db['HOST'],
     user=config.db['USER'],
@@ -46,6 +46,25 @@ def check_service_consistency(customer=None):
     """Check service assignment consistency"""
 
     pass  # TODO: Implement
+
+
+def histable(model_or_name):
+    """Makes a model definition a HIS database table"""
+
+    prefix = 'his'
+    sep = '_'
+
+    def wrap(model):
+        model._meta.db_table = name
+        return model
+
+    if isinstance(model_or_name, str):
+        name = sep.join((prefix, model_or_name))
+        return wrap
+    else:
+        model = model_or_name
+        name = sep.join((prefix, model.__name__.lower()))
+        return wrap(model)
 
 
 class AccountServicesWrapper():
@@ -87,7 +106,7 @@ class HISModel(Model):
     """Generic HOMEINFO Integrated Service database model"""
 
     class Meta:
-        database = his_db
+        database = database
         schema = database.database
 
     id = PrimaryKeyField()

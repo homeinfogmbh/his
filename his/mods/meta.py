@@ -39,7 +39,7 @@ class SessionManager(HISService):
         if not self.resource:
             # List all sessions iff specified session is root
             try:
-                session = self.query_dict['session']
+                session = self.params['session']
             except KeyError:
                 raise NoSessionSpecified()
             else:
@@ -79,8 +79,8 @@ class SessionManager(HISService):
 
         # XXX: Currently ignores posted data
         try:
-            account = self.query_dict['account']
-            passwd = self.query_dict['passwd']
+            account = self.params['account']
+            passwd = self.params['passwd']
         except KeyError:
             raise MissingCredentials()
         else:
@@ -137,7 +137,7 @@ class ServicePermissions(HISService):
     def post(self):
         """Allows services"""
         try:
-            session_token = self.query_dict['session']
+            session_token = self.params['session']
             session = Session.get(Session.token == session_token)
         except KeyError:
             raise NoSessionSpecified()
@@ -145,7 +145,7 @@ class ServicePermissions(HISService):
             raise NoSuchSession()
 
         try:
-            service_name = self.query_dict['service']
+            service_name = self.params['service']
             service = Service.get(Service.name == service_name)
         except KeyError:
             raise NoServiceSpecified()
@@ -154,8 +154,8 @@ class ServicePermissions(HISService):
         else:
             if session.alive:
                 account = session.account
-                customer_id = self.query_dict.get('customer')
-                account_name = self.query_dict.get('account')
+                customer_id = self.params.get('customer')
+                account_name = self.params.get('account')
 
                 if customer_id is not None and account_name is not None:
                     return Error('Must specify either customer or accout.',

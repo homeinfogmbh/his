@@ -17,7 +17,7 @@ from his.api.errors import InvalidCredentials, AlreadyLoggedIn
 from his.config import config
 
 __all__ = [
-    'histable',
+    'service_table',
     'AlreadyLoggedIn',
     'Service',
     'CustomerService',
@@ -48,8 +48,8 @@ def check_service_consistency(customer=None):
     pass  # TODO: Implement
 
 
-def histable(model_or_name):
-    """Makes a model definition a HIS database table"""
+def service_table(model_or_name):
+    """Makes a model definition a HIS service database table"""
 
     prefix = 'his'
     sep = '_'
@@ -201,7 +201,7 @@ class Account(HISModel):
     locked_until = DateTimeField(null=True, default=None)
     disabled = BooleanField(default=True)
     # Flag, whether the account is an
-    # administrator of the respective customer
+    # administrator of its company
     admin = BooleanField(default=False)
     # Flag, whether the user is a super-admin of the system
     # XXX: Such accounts can do ANYTHING!
@@ -278,6 +278,23 @@ class Account(HISModel):
     def services(self):
         """Yields appropriate services"""
         return AccountServicesWrapper(self)
+
+    @property
+    def subjects(self):
+        """Yields accounts this account can manage"""
+        # All accounts can manage theirselves
+        yield self
+
+        # Admins can manage accounts of their
+        # company, i.e. the same customer
+        if self.admin:
+            yield from Account.select().where(
+                Account.customer == self.customer)
+
+            # If the company is a reseller, they can
+            # manage all accounts of the resold companies
+            for customer in self.customer.resales:
+                yield from Account.select().where(Account.customer == customer)
 
     def login(self, passwd):
         """Performs a login"""

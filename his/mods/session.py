@@ -2,7 +2,7 @@
 
 from peewee import DoesNotExist
 
-from homeinfo.lib.wsgi import Error, JSON
+from homeinfo.lib.wsgi import HeaderResponse, Error, JSON
 
 from his.api.errors import MissingCredentials, NoSuchAccount, \
     NoSessionSpecified, NoSuchSession, SessionExpired, \
@@ -116,6 +116,11 @@ class SessionManager(HISService):
         else:
             session.close()
             return JSON({'closed': [session.token]})
+
+    def head(self):
+        """Returns the headers"""
+        # XXX: testing
+        return HeaderResponse()
 
 
 install = [SessionManager]

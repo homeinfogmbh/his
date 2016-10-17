@@ -304,6 +304,8 @@ class Account(HISModel):
             raise InvalidCredentials() from None
         else:
             if match:
+                self.last_login = datetime.now()
+                self.save()
                 return Session.open(self)
             else:
                 raise InvalidCredentials() from None

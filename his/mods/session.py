@@ -117,10 +117,9 @@ class SessionManager(HISService):
             session.close()
             return JSON({'closed': [session.token]})
 
-    def head(self):
-        """Returns the headers"""
-        # XXX: testing
-        return HeaderResponse()
+    def options(self):
+        """Returns the options"""
+        return OK('')
 
 
 install = [SessionManager]

@@ -22,15 +22,3 @@ setup(
         ('/usr/share/his',
          ['files/usr/share/his/his.wsgi'])],
     description='HOMEINFO Integrated Services')
-
-
-from his.orm import tables
-
-for table in tables:
-    table.create_table(fail_silently=True)
-
-
-from his.mods.meta import install
-
-for handler in install:
-    handler.install()

@@ -119,7 +119,7 @@ class SessionManager(HISService):
 
     def options(self):
         """Returns the options"""
-        return OK('')
+        return OK('Hey ho die Hex ist tot.')
 
 
 install = [SessionManager]

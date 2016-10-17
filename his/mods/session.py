@@ -121,7 +121,7 @@ class SessionManager(HISService):
         """Returns the options"""
         msg = 'Hey ho die Hex ist tot.'
         self.logger.debug(msg)
-        return OK(msg)
+        return JSON({'msg': msg})
 
 
 install = [SessionManager]

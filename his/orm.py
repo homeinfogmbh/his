@@ -247,7 +247,7 @@ class Account(HISModel):
     @property
     def valid(self):
         """Determines whether the account is valid"""
-        return self.passwd and not self.deleted and not self.disabled
+        return self.pwhash and not self.deleted and not self.disabled
 
     @property
     def locked(self):

@@ -2,7 +2,7 @@
 
 from peewee import DoesNotExist
 
-from homeinfo.lib.wsgi import HeaderResponse, Error, JSON
+from homeinfo.lib.wsgi import Error, OK, JSON
 
 from his.api.errors import MissingCredentials, NoSuchAccount, \
     NoSessionSpecified, NoSuchSession, SessionExpired, \
@@ -119,9 +119,7 @@ class SessionManager(HISService):
 
     def options(self):
         """Returns the options"""
-        msg = 'Hey ho die Hex ist tot.'
-        self.logger.debug(msg)
-        return JSON({'msg': msg})
+        return OK()
 
 
 install = [SessionManager]

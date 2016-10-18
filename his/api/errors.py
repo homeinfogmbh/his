@@ -9,14 +9,15 @@ __all__ = [
 
     'LoginError',
     'MissingCredentials',
-    'NoSuchAccount',
     'InvalidCredentials',
+    'AccountLocked',
     'AlreadyLoggedIn',
 
     'SessionError',
     'NoSessionSpecified',
     'NoSuchSession',
     'SessionExpired',
+    'NoSuchAccount',
 
     'ServiceError',
     'ServiceNotRegistered',
@@ -68,7 +69,7 @@ class HISAPIError(HISMessage):
 class LoginError(HISAPIError):
     """Indicates login errors"""
 
-    pass
+    STATUS = 401
 
 
 class MissingCredentials(LoginError):
@@ -79,20 +80,30 @@ class MissingCredentials(LoginError):
         Language.EN_US: 'Missing credentials.'}
 
 
-class NoSuchAccount(LoginError):
-    """Indicates that an account with the specified name does not exist"""
-
-    LOCALE = {
-        Language.DE_DE: 'Benutzerkonto nicht gefunden.',
-        Language.EN_US: 'No such account.'}
-
-
 class InvalidCredentials(LoginError):
     """Indicates invalid credentials"""
 
     LOCALE = {
         Language.DE_DE: 'Ungültiger Benutzername und / oder Passwort.',
         Language.EN_US: 'Invalid credentials.'}
+
+
+class AccountLocked(LoginError):
+    """Indicates invalid credentials"""
+
+    LOCALE = {
+        Language.DE_DE: 'Account gesperrt.',
+        Language.EN_US: 'Account locked.'}
+
+    def __init__(self, locked_until, charset='utf-8',
+                 status=None, cors=None, data=None):
+        """Sets locked-until date"""
+        data_ = {'locked_until': locked_until}
+
+        if data is not None:
+            data_.update(data)
+
+        super().__init__(charset=charset, status=status, cors=cors, data=data_)
 
 
 class AlreadyLoggedIn(LoginError):
@@ -133,6 +144,14 @@ class SessionExpired(SessionError):
         Language.EN_US: 'Session expired.'}
 
 
+class NoSuchAccount(SessionError):
+    """Indicates that an account with the specified name does not exist"""
+
+    LOCALE = {
+        Language.DE_DE: 'Benutzerkonto nicht gefunden.',
+        Language.EN_US: 'No such account.'}
+
+
 class ServiceError(HISAPIError):
     """General service error"""
 
@@ -143,7 +162,6 @@ class ServiceNotRegistered(ServiceError):
     """Indicates that the service is not registered"""
 
     STATUS = 500
-
     LOCALE = {
         Language.DE_DE: 'Dienst ist nicht registriert.',
         Language.EN_US: 'Service is not registered.'}

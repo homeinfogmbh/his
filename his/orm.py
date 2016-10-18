@@ -13,12 +13,11 @@ from homeinfo.lib.misc import classproperty
 from homeinfo.peewee import MySQLDatabase
 from homeinfo.crm import Customer, Employee
 
-from his.api.errors import InvalidCredentials, AlreadyLoggedIn
+from his.api.errors import InvalidCredentials, AccountLocked
 from his.config import config
 
 __all__ = [
     'service_table',
-    'AlreadyLoggedIn',
     'Service',
     'CustomerService',
     'Account',
@@ -219,10 +218,6 @@ class Account(HISModel):
         """Returns the login name and appropriate customer"""
         return '{0}@{1}'.format(repr(self), repr(self.customer))
 
-    def __bool__(self):
-        """Returns whether the user is not locked"""
-        return self.valid and not self.locked
-
     @classproperty
     @classmethod
     def superadmins(cls):
@@ -260,19 +255,13 @@ class Account(HISModel):
         return self.locked_until >= datetime.now()
 
     @property
-    def usable(self):
-        """Determines whether the account may log in"""
-        return self.valid and not self.locked
-
-    @property
     def active(self):
         """Determines whether the account has an open session"""
-        try:
-            session = Session.get(Session.account == self)
-        except DoesNotExist:
-            return False
-        else:
-            return session.alive
+        for session in Session.select().where(Session.account == self):
+            if session.alive:
+                return True
+
+        return False
 
     @property
     def services(self):
@@ -304,9 +293,16 @@ class Account(HISModel):
             raise InvalidCredentials() from None
         else:
             if match:
-                self.last_login = datetime.now()
-                self.save()
-                return Session.open(self)
+                # Credentials varification successful
+                if self.valid:
+                    if not self.locked:
+                        self.last_login = datetime.now()
+                        self.save()
+                        return Session.open(self)
+                    else:
+                        raise AccountLocked(self.locked_until) from None
+                else:
+                    raise InvalidCredentials() from None
             else:
                 raise InvalidCredentials() from None
 

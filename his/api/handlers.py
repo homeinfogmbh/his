@@ -93,6 +93,7 @@ class AuthenticatedService(HISService):
                 if session.alive:
                     return session
                 else:
+                    session.delete_instance()
                     raise SessionExpired() from None
 
     @property

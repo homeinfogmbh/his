@@ -137,7 +137,8 @@ class AuthorizedService(AuthenticatedService):
     the account is enabled for it
     """
 
-    def __call__(self):
+    @property
+    def method(self):
         """Determines whether the account
         is allowed to use this service
         """
@@ -163,12 +164,12 @@ class AuthorizedService(AuthenticatedService):
                     account = self.session.account
 
                     if account.root:
-                        return super().__call__()
+                        return super().method
                     elif service in CustomerService.services(account.customer):
                         if account.admin:
-                            return super().__call__()
+                            return super().method
                         elif service in account.services:
-                            return super().__call__()
+                            return super().method
                         else:
                             raise NotAuthorized() from None
                     else:

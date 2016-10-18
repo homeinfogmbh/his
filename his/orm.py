@@ -252,7 +252,10 @@ class Account(HISModel):
     @property
     def locked(self):
         """Determines whether the user is locked"""
-        return self.locked_until >= datetime.now()
+        if self.locked_until is None:
+            return False
+        else:
+            return self.locked_until >= datetime.now()
 
     @property
     def active(self):

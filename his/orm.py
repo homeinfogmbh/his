@@ -354,7 +354,7 @@ class Session(HISModel):
             return True
 
     @classmethod
-    def _open(cls, account, duration=None):
+    def open(cls, account, duration=None):
         """Actually opens a new login session"""
         now = datetime.now()
         duration = duration or timedelta(minutes=cls.DEFAULT_DURATION_MINUTES)
@@ -366,22 +366,6 @@ class Session(HISModel):
         session.login = True
         session.save()
         return session
-
-    @classmethod
-    def open(cls, account, duration=None):
-        """Opens a login session for the specified account
-        XXX: This must only be done after successful login
-        """
-        try:
-            session = cls.get(cls.account == account)
-        except DoesNotExist:
-            return cls._open(account, duration=duration)
-        else:
-            if session.alive:
-                raise AlreadyLoggedIn()
-            else:
-                session.close()
-                return cls._open(account, duration=duration)
 
     @property
     def alive(self):

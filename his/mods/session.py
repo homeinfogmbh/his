@@ -4,7 +4,7 @@ from peewee import DoesNotExist
 
 from homeinfo.lib.wsgi import Error, OK, JSON
 
-from his.api.errors import MissingCredentials, NoSuchAccount, \
+from his.api.errors import MissingCredentials, InvalidCredentials, \
     NoSessionSpecified, NoSuchSession, SessionExpired, \
     NotAuthorized
 from his.api.handlers import HISService
@@ -79,7 +79,7 @@ class SessionManager(HISService):
             try:
                 account = Account.get(Account.name == account)
             except DoesNotExist:
-                raise NoSuchAccount()
+                raise InvalidCredentials()
             else:
                 session = account.login(passwd)
                 return JSON(session.todict())
@@ -115,7 +115,7 @@ class SessionManager(HISService):
             raise NoSuchSession()
         else:
             session.close()
-            return JSON({'closed': [session.token]})
+            return JSON({'closed': session.token})
 
     def options(self):
         """Returns the options"""

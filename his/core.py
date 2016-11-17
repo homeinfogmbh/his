@@ -56,13 +56,6 @@ class SessionCleaner():
         self._running = False
         self._thread = None
 
-    def __enter__(self):
-        self.start()
-        return self
-
-    def __exit__(self, *_):
-        self.stop()
-
     def _run(self):
         """The actual cleanup loop"""
         while self._running:

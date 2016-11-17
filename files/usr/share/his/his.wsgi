@@ -4,5 +4,6 @@
 from homeinfo.lib.rest import RestApp
 from his.core import HISProxy, SessionCleaner
 
-with SessionCleaner():
-    application = RestApp(HISProxy('his'), cors=True, debug=True)
+session_cleaner = SessionCleaner()
+session_cleaner.start()
+application = RestApp(HISProxy('his'), cors=True, debug=True)

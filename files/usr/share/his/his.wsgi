@@ -3,4 +3,4 @@
 
 from his.core import HIS
 
-application = HIS()
+application = HIS(cors=True, debug=True)

@@ -54,8 +54,7 @@ def service_table(module, name=None):
 
     def wrap(model):
         if name is None:
-            model._meta.db_table = '_'.join(
-                (module, cc2jl(model.__name__.lower())))
+            model._meta.db_table = '_'.join((module, cc2jl(model.__name__)))
         else:
             model._meta.db_table = '_'.join((module, name))
 

@@ -2,6 +2,7 @@
 """HIS core handler"""
 
 from homeinfo.lib.rest import RestApp
-from his.core import HISProxy
+from his.core import HISProxy, SessionCleaner
 
-application = RestApp(HISProxy('his'), cors=True, debug=True)
+with SessionCleaner():
+    application = RestApp(HISProxy('his'), cors=True, debug=True)

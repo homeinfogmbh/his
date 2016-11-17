@@ -359,6 +359,15 @@ class Session(HISModel):
         session.save()
         return session
 
+    @classmethod
+    def cleanup(cls):
+        """Cleans up orphaned sessions"""
+        now = datetime.now()
+
+        for session in cls:
+            if session.end < now:
+                session.close()
+
     @property
     def alive(self):
         """Determines whether the session is active"""

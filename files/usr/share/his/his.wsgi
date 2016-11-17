@@ -4,4 +4,4 @@
 from homeinfo.lib.rest import RestApp
 from his.core import HISProxy
 
-application = RestApp(HISProxy, cors=True, debug=True)
+application = RestApp(HISProxy('his'), cors=True, debug=True)

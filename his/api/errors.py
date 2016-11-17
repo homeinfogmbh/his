@@ -94,6 +94,7 @@ class AccountLocked(LoginError):
     LOCALE = {
         Language.DE_DE: 'Account gesperrt.',
         Language.EN_US: 'Account locked.'}
+    STATUS = 423
 
     def __init__(self, locked_until, charset='utf-8',
                  status=None, cors=None, data=None):
@@ -112,6 +113,7 @@ class AlreadyLoggedIn(LoginError):
     LOCALE = {
         Language.DE_DE: 'Bereits angemeldet.',
         Language.EN_US: 'Already logged in.'}
+    STATUS = 409
 
 
 class SessionError(HISAPIError):
@@ -126,6 +128,7 @@ class NoSessionSpecified(SessionError):
     LOCALE = {
         Language.DE_DE: 'Keine Sitzung angegeben.',
         Language.EN_US: 'No session specified.'}
+    STATUS = 420
 
 
 class NoSuchSession(SessionError):
@@ -134,6 +137,7 @@ class NoSuchSession(SessionError):
     LOCALE = {
         Language.DE_DE: 'Keine solche Sitzung.',
         Language.EN_US: 'No such session.'}
+    STATUS = 404
 
 
 class SessionExpired(SessionError):
@@ -142,6 +146,7 @@ class SessionExpired(SessionError):
     LOCALE = {
         Language.DE_DE: 'Sitzung abgelaufen.',
         Language.EN_US: 'Session expired.'}
+    STATUS = 410
 
 
 class NoSuchAccount(SessionError):
@@ -150,6 +155,7 @@ class NoSuchAccount(SessionError):
     LOCALE = {
         Language.DE_DE: 'Benutzerkonto nicht gefunden.',
         Language.EN_US: 'No such account.'}
+    STATUS = 404
 
 
 class ServiceError(HISAPIError):
@@ -173,6 +179,7 @@ class NoServiceSpecified(ServiceError):
     LOCALE = {
         Language.DE_DE: 'Kein Dienst angegeben.',
         Language.EN_US: 'No service specified.'}
+    STATUS = 420
 
 
 class NoSuchService(ServiceError):
@@ -181,6 +188,7 @@ class NoSuchService(ServiceError):
     LOCALE = {
         Language.DE_DE: 'Kein solcher Dienst.',
         Language.EN_US: 'No such service.'}
+    STATUS = 404
 
 
 class CustomerError(HISAPIError):
@@ -195,6 +203,7 @@ class NoCustomerSpecified(ServiceError):
     LOCALE = {
         Language.DE_DE: 'Keine Kundennummer angegeben.',
         Language.EN_US: 'No customer specified.'}
+    STATUS = 420
 
 
 class InvalidCustomerID(ServiceError):
@@ -203,6 +212,7 @@ class InvalidCustomerID(ServiceError):
     LOCALE = {
         Language.DE_DE: 'Ungültige Kundennummer angegeben.',
         Language.EN_US: 'Invalid customer ID specified.'}
+    STATUS = 406
 
 
 class NoSuchCustomer(CustomerError):
@@ -211,6 +221,7 @@ class NoSuchCustomer(CustomerError):
     LOCALE = {
         Language.DE_DE: 'Kein solcher Kunde.',
         Language.EN_US: 'No such customer.'}
+    STATUS = 404
 
 
 class NotAuthorized(HISAPIError):
@@ -221,3 +232,4 @@ class NotAuthorized(HISAPIError):
     LOCALE = {
         Language.DE_DE: 'Zugriff verweigert.',
         Language.EN_US: 'Not authorized.'}
+    STATUS = 403

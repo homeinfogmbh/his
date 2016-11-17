@@ -7,7 +7,6 @@ from homeinfo.lib.rest import ResourceHandler
 
 from his.api.errors import NoSessionSpecified, NoSuchSession, SessionExpired, \
     ServiceNotRegistered, NotAuthorized
-from his.core import HIS
 from his.orm import Service, CustomerService, Account, Session
 
 __all__ = [
@@ -30,20 +29,6 @@ class HISService(ResourceHandler):
     NAME = None
     DESCRIPTION = None
     PROMOTE = None
-
-    @classmethod
-    def register(cls):
-        """Registers a service in the core handler"""
-        try:
-            handler = HIS.HANDLERS[cls.NODE]
-        except KeyError:
-            HIS.HANDLERS[cls.NODE] = cls.NODE
-            return True
-        else:
-            if handler is cls:
-                return True
-            else:
-                return False
 
     @classmethod
     def install(cls):

@@ -10,6 +10,7 @@ from peewee import Model, PrimaryKeyField, ForeignKeyField,\
     CharField, BooleanField, DateTimeField, IntegerField, DoesNotExist
 
 from homeinfo.lib.misc import classproperty
+from homeinfo.lib.strf import cc2jl
 from homeinfo.peewee import MySQLDatabase
 from homeinfo.crm import Customer, Employee
 
@@ -51,7 +52,7 @@ def service_table(module, name=None):
     """Makes a model definition a HIS service database table"""
 
     if name is None:
-        name = '_'.join((module, model.__name__.lower()))
+        name = '_'.join((module, cc2jl(model.__name__.lower())))
     else:
         name = '_'.join((module, name))
 

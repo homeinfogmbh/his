@@ -47,23 +47,19 @@ def check_service_consistency(customer=None):
     pass  # TODO: Implement
 
 
-def service_table(model_or_name):
+def service_table(module, name=None):
     """Makes a model definition a HIS service database table"""
 
-    prefix = 'his'
-    sep = '_'
+    if name is None:
+        name = '_'.join((module, model.__name__.lower()))
+    else:
+        name = '_'.join((module, name))
 
     def wrap(model):
         model._meta.db_table = name
         return model
 
-    if isinstance(model_or_name, str):
-        name = sep.join((prefix, model_or_name))
-        return wrap
-    else:
-        model = model_or_name
-        name = sep.join((prefix, model.__name__.lower()))
-        return wrap(model)
+    return wrap
 
 
 class AccountServicesWrapper():

@@ -31,7 +31,7 @@ class SessionManager(HISService):
         if not self.resource:
             # List all sessions iff specified session is root
             try:
-                session = self.params['session']
+                session = self.query['session']
             except KeyError:
                 raise NoSessionSpecified()
             else:
@@ -71,8 +71,8 @@ class SessionManager(HISService):
 
         # XXX: Currently ignores posted data
         try:
-            account = self.params['account']
-            passwd = self.params['passwd']
+            account = self.query['account']
+            passwd = self.query['passwd']
         except KeyError:
             raise MissingCredentials()
         else:

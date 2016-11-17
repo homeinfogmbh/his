@@ -39,15 +39,15 @@ class ServicePermissions(AuthenticatedService):
         session = self.session
 
         try:
-            service = Service.get(Service.name == self.params['service'])
+            service = Service.get(Service.name == self.query['service'])
         except KeyError:
             raise NoServiceSpecified() from None
         except DoesNotExist:
             raise NoSuchService() from None
         else:
             account = session.account
-            customer_id = self.params.get('customer')
-            account_name = self.params.get('account')
+            customer_id = self.query.get('customer')
+            account_name = self.query.get('account')
 
             if customer_id is not None and account_name is not None:
                 raise AmbiguousTarget() from None

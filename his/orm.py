@@ -18,6 +18,7 @@ from his.api.errors import InvalidCredentials, AccountLocked
 from his.config import config
 
 __all__ = [
+    'database',
     'service_table',
     'Service',
     'CustomerService',
@@ -51,13 +52,13 @@ def check_service_consistency(customer=None):
 def service_table(module, name=None):
     """Makes a model definition a HIS service database table"""
 
-    if name is None:
-        name = '_'.join((module, cc2jl(model.__name__.lower())))
-    else:
-        name = '_'.join((module, name))
-
     def wrap(model):
-        model._meta.db_table = name
+        if name is None:
+            model._meta.db_table = '_'.join(
+                (module, cc2jl(model.__name__.lower())))
+        else:
+            model._meta.db_table = '_'.join((module, name))
+
         return model
 
     return wrap

@@ -2,14 +2,12 @@
 
 from peewee import DoesNotExist
 
-from homeinfo.lib.log import Logger, LogLevel
-from homeinfo.lib.rest import RestApp
+from homeinfo.lib.log import LoggingClass
 from homeinfo.lib.wsgi import Error
 
 from his.orm import Service
-from his.config import config
 
-__all__ = ['HIS']
+__all__ = ['HISProxy']
 
 
 class HandlerNotAvailable(Error):
@@ -19,7 +17,7 @@ class HandlerNotAvailable(Error):
         super().__init__('No handler available')
 
 
-class HandlerProxy(LoggingClass):
+class HISProxy(LoggingClass):
     """Proxies handler requests"""
 
     def __init__(self, root):
@@ -43,11 +41,3 @@ class HandlerProxy(LoggingClass):
                 handler = service.handler
                 self.logger.info('Loading handler "{}"'.format(handler))
                 return handler
-
-
-class HIS(RestApp):
-    """HIS meta service"""
-
-    def __init__(self, root, debug=False):
-        """Use library defaults, but always enable CORS"""
-        super().__init__(HandlerProxy(root), cors=True, debug=debug)

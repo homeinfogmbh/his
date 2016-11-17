@@ -1,6 +1,7 @@
 #! /usr/bin/env python3
 """HIS core handler"""
 
-from his.core import HIS
+from homeinfo.lib.rest import RestApp
+from his.core import HISProxy
 
-application = HIS(debug=True)
+application = RestApp(HISProxy, cors=True, debug=True)

@@ -13,10 +13,5 @@ class HISConfig(Configuration):
         self.load()
         return self['db']
 
-    @property
-    def wsgi(self):
-        self.load()
-        return self['wsgi']
-
 
 config = HISConfig('/etc/his.conf')

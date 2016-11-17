@@ -4,8 +4,6 @@ from datetime import datetime, timedelta
 from uuid import uuid4
 from importlib import import_module
 
-from argon2 import PasswordHasher
-from argon2.exceptions import VerifyMismatchError
 from peewee import Model, PrimaryKeyField, ForeignKeyField,\
     CharField, BooleanField, DateTimeField, IntegerField, DoesNotExist
 
@@ -16,6 +14,7 @@ from homeinfo.crm import Customer, Employee
 
 from his.api.errors import InvalidCredentials, AccountLocked
 from his.config import config
+from his.crypto import verify_password
 
 __all__ = [
     'service_table',
@@ -179,16 +178,14 @@ class CustomerService(HISModel):
 class Account(HISModel):
     """A HIS login account"""
 
-    _PASSWORD_HASHER = PasswordHasher()
-
     customer = ForeignKeyField(
         Customer, db_column='customer',
         related_name='accounts')
     user = ForeignKeyField(
         Employee, db_column='user', null=True,
         related_name='accounts')
-    name = CharField(64)  # Login name
-    pwhash = CharField(73)  # Argon2 hash
+    name = CharField(64)
+    pwhash = CharField(255)
     email = CharField(64)
     created = DateTimeField()
     deleted = DateTimeField(null=True, default=None)
@@ -287,24 +284,15 @@ class Account(HISModel):
 
     def login(self, passwd):
         """Performs a login"""
-        try:
-            match = self._PASSWORD_HASHER.verify(self.pwhash, passwd)
-        except VerifyMismatchError:
-            raise InvalidCredentials() from None
-        else:
-            if match:
-                # Credentials varification successful
-                if self.valid:
-                    if not self.locked:
-                        self.last_login = datetime.now()
-                        self.save()
-                        return Session.open(self)
-                    else:
-                        raise AccountLocked(self.locked_until) from None
-                else:
-                    raise InvalidCredentials() from None
+        if self.valid and verify_password(self.pwhash, passwd):
+            if not self.locked:
+                self.last_login = datetime.now()
+                self.save()
+                return Session.open(self)
             else:
-                raise InvalidCredentials() from None
+                raise AccountLocked(self.locked_until) from None
+        else:
+            raise InvalidCredentials() from None
 
 
 class AccountService(HISModel):
@@ -394,7 +382,7 @@ class Session(HISModel):
         else:
             return False
 
-    def todict(self):
+    def to_dict(self):
         """Converts the session to a dictionary"""
         return {
             'account': self.account.name,

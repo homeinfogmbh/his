@@ -45,7 +45,7 @@ class SessionManager(HISService):
                             sessions = {}
 
                             for session in Session:
-                                sessions[session.token] = session.todict()
+                                sessions[session.token] = session.to_dict()
 
                             return JSON(sessions)
                         else:
@@ -60,7 +60,7 @@ class SessionManager(HISService):
                 raise NoSuchSession()
             else:
                 if session.alive:
-                    return JSON(session.todict())
+                    return JSON(session.to_dict())
                 else:
                     raise SessionExpired()
 
@@ -82,7 +82,7 @@ class SessionManager(HISService):
                 raise InvalidCredentials()
             else:
                 session = account.login(passwd)
-                return JSON(session.todict())
+                return JSON(session.to_dict())
 
     def put(self):
         """Tries to keep a session alive"""
@@ -96,7 +96,7 @@ class SessionManager(HISService):
         else:
             if session.alive:
                 if session.renew():
-                    return JSON(session.todict())
+                    return JSON(session.to_dict())
                 else:
                     raise SessionExpired()
             else:

@@ -3,7 +3,7 @@
 from argon2 import PasswordHasher
 from argon2.exceptions import VerifyMismatchError
 
-__all__[
+__all__ = [
     'passwd_hasher',
     'verify_password']
 

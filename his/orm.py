@@ -8,7 +8,6 @@ from peewee import Model, PrimaryKeyField, ForeignKeyField,\
     CharField, BooleanField, DateTimeField, IntegerField, DoesNotExist
 
 from homeinfo.lib.misc import classproperty
-from homeinfo.lib.strf import cc2jl
 from homeinfo.peewee import MySQLDatabase
 from homeinfo.crm import Customer, Employee
 
@@ -17,7 +16,8 @@ from his.config import config
 from his.crypto import verify_password
 
 __all__ = [
-    'service_table',
+    'module_db',
+    'module_model',
     'HISModel',
     'Service',
     'CustomerService',
@@ -48,18 +48,26 @@ def check_service_consistency(customer=None):
     pass  # TODO: Implement
 
 
-def service_table(module, name=None):
-    """Makes a model definition a HIS service database table"""
+def module_db(module):
+    """Returns a database for the respective sub-module"""
 
-    def wrap(model):
-        if name is None:
-            model._meta.db_table = '_'.join((module, cc2jl(model.__name__)))
-        else:
-            model._meta.db_table = '_'.join((module, name))
+    return MySQLDatabase(
+        '_'.join((config.db['db'], module)),
+        host=config.db['HOST'],
+        user=config.db['USER'],
+        passwd=config.db['PASSWD'],
+        closing=True)
 
-        return model
 
-    return wrap
+def module_model(module):
+    """Returns a base module for the respective module"""
+
+    class ModuleModel(HISModel):
+        class Meta:
+            database = module_db(module)
+            schema = database.database
+
+    return ModuleModel
 
 
 class AccountServicesWrapper():

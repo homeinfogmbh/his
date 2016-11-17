@@ -19,19 +19,19 @@ class HandlerNotAvailable(Error):
         super().__init__('No handler available')
 
 
-class RootProxy():
-    """Proxies root queries"""
+class HandlerProxy(LoggingClass):
+    """Proxies handler requests"""
 
     def __init__(self, root):
         """Sets the logger"""
+        super().__init__()
         self.root = root
-        self.logger = Logger(self.__class__.__name__, level=LogLevel.SUCCESS)
 
     def __getitem__(self, node):
         """Returns the appropriate service for the node"""
-        if node == config.wsgi['root']:
-            self.logger.info('Proxying root')
-            return self.root
+        if node == self.root:
+            self.logger.info('Proxying root: {}'.format(self.root))
+            return self
         else:
             try:
                 service = Service.get(Service.node == node)
@@ -48,9 +48,6 @@ class RootProxy():
 class HIS(RestApp):
     """HIS meta service"""
 
-    DEBUG = True
-
-    def __init__(self):
+    def __init__(self, root, debug=False):
         """Use library defaults, but always enable CORS"""
-        super().__init__(cors=True)
-        self.HANDLERS = RootProxy(self)
+        super().__init__(HandlerProxy(root), cors=True, debug=debug)

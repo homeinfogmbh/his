@@ -18,8 +18,8 @@ from his.api.errors import InvalidCredentials, AccountLocked
 from his.config import config
 
 __all__ = [
-    'database',
     'service_table',
+    'HISModel',
     'Service',
     'CustomerService',
     'Account',

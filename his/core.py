@@ -7,19 +7,11 @@ from threading import Thread
 from peewee import DoesNotExist
 
 from homeinfo.lib.log import LoggingClass
-from homeinfo.lib.wsgi import Error
 
 from his.orm import Service, Session
 from his.api.errors import NoSuchService
 
 __all__ = ['HISProxy', 'SessionCleaner']
-
-
-class HandlerNotAvailable(Error):
-    """Indicates that a given handler is not available"""
-
-    def __init__(self):
-        super().__init__('No handler available')
 
 
 class HISProxy(LoggingClass):

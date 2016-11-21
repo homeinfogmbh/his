@@ -42,9 +42,18 @@ class HISProxy(LoggingClass):
                 raise KeyError()
             else:
                 self.logger.info('Proxying "{}"'.format(node))
-                handler = service.handler
-                self.logger.info('Loading handler "{}"'.format(handler))
-                return handler
+
+                try:
+                    handler = service.handler
+                except ImportError:
+                    self.logger.critical('No such module: {}'.format(
+                        service.module))
+                except AttributeError:
+                    self.logger.critical('No such class: {}'.format(
+                        service.class_))
+                else:
+                    self.logger.info('Loaded handler: {}'.format(handler.name))
+                    return handler
 
 
 class SessionCleaner():

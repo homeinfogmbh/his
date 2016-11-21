@@ -39,7 +39,7 @@ class HISProxy(LoggingClass):
                 service = Service.get(Service.node == node)
             except DoesNotExist:
                 self.logger.warning('No service for node "{}"'.format(node))
-                raise KeyError() from None
+                raise NoSuchService() from None
             else:
                 self.logger.info('Proxying "{}"'.format(node))
 
@@ -48,11 +48,11 @@ class HISProxy(LoggingClass):
                 except ImportError:
                     self.logger.critical('No such module: {}'.format(
                         service.module))
-                    raise KeyError() from None
+                    raise NoSuchService() from None
                 except AttributeError:
                     self.logger.critical('No such class: {}'.format(
                         service.class_))
-                    raise KeyError() from None
+                    raise NoSuchService() from None
                 else:
                     self.logger.info('Loaded handler: {}'.format(handler.name))
                     return handler

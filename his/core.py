@@ -10,6 +10,7 @@ from homeinfo.lib.log import LoggingClass
 from homeinfo.lib.wsgi import Error
 
 from his.orm import Service, Session
+from his.api.errors import NoSuchService
 
 __all__ = ['HISProxy', 'SessionCleaner']
 

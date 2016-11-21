@@ -55,7 +55,7 @@ class HISProxy(LoggingClass):
                         service.class_))
                     raise NoSuchService() from None
                 else:
-                    self.logger.info('Loaded handler: {}'.format(handler.name))
+                    self.logger.info('Loaded handler: {}'.format(handler))
                     return handler
 
 

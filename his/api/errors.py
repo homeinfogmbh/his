@@ -6,6 +6,7 @@ from his.api.locale import Language
 
 __all__ = [
     'HISAPIError',
+    'NotAnInteger',
 
     'LoginError',
     'MissingCredentials',
@@ -18,6 +19,7 @@ __all__ = [
     'NoSuchSession',
     'SessionExpired',
     'NoSuchAccount',
+    'DurationOutOfBounds',
 
     'ServiceError',
     'ServiceNotRegistered',
@@ -70,6 +72,20 @@ class LoginError(HISAPIError):
     """Indicates login errors"""
 
     STATUS = 401
+
+
+class NotAnInteger(HISMessage):
+    """Indicates missing credentials"""
+
+    LOCALE = {
+        Language.DE_DE: 'Keine Ganzzahl.',
+        Language.EN_US: 'Not an integer.'}
+    STATUS = 422
+
+    def __init__(self, key, value, charset='utf-8', cors=None, status=None):
+        """Initializes the message"""
+        super().__init__(charset=charset, cors=cors, status=status,
+                         data={'key': key, 'value': value})
 
 
 class MissingCredentials(LoginError):
@@ -156,6 +172,17 @@ class NoSuchAccount(SessionError):
         Language.DE_DE: 'Benutzerkonto nicht gefunden.',
         Language.EN_US: 'No such account.'}
     STATUS = 404
+
+
+class DurationOutOfBounds(SessionError):
+    """Indicates that an out of bounds duration
+    was secified on session creation or renewal
+    """
+
+    LOCALE = {
+        Language.DE_DE: 'Sitzungsdauer außerhalb des zulässigen Bereichs.',
+        Language.EN_US: 'Session duration out of bounds.'}
+    STATUS = 422
 
 
 class ServiceError(HISAPIError):

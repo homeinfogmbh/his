@@ -11,7 +11,8 @@ from homeinfo.lib.misc import classproperty
 from homeinfo.peewee import MySQLDatabase
 from homeinfo.crm import Customer, Employee
 
-from his.api.errors import InvalidCredentials, AccountLocked
+from his.api.errors import InvalidCredentials, AccountLocked, \
+    DurationOutOfBounds
 from his.config import config
 from his.crypto import verify_password
 
@@ -296,7 +297,7 @@ class Account(HISModel):
             if not self.locked:
                 self.last_login = datetime.now()
                 self.save()
-                return Session.open(self)
+                return True
             else:
                 raise AccountLocked(self.locked_until) from None
         else:
@@ -316,7 +317,7 @@ class AccountService(HISModel):
 class Session(HISModel):
     """A session related to an account"""
 
-    DEFAULT_DURATION_MINUTES = 5
+    ALLOWED_DURATIONS = range(5, 21)
 
     account = ForeignKeyField(Account, db_column='account')
     token = CharField(64)   # A uuid4
@@ -346,18 +347,22 @@ class Session(HISModel):
             return True
 
     @classmethod
-    def open(cls, account, duration=None):
+    def open(cls, account, duration=15):
         """Actually opens a new login session"""
         now = datetime.now()
-        duration = duration or timedelta(minutes=cls.DEFAULT_DURATION_MINUTES)
-        session = cls()
-        session.account = account
-        session.token = str(uuid4())
-        session.start = now
-        session.end = now + duration
-        session.login = True
-        session.save()
-        return session
+
+        if duration in cls.ALLOWED_DURATIONS:
+            duration = timedelta(minutes=duration)
+            session = cls()
+            session.account = account
+            session.token = str(uuid4())
+            session.start = now
+            session.end = now + duration
+            session.login = True
+            session.save()
+            return session
+        else:
+            raise DurationOutOfBounds()
 
     @classmethod
     def cleanup(cls):
@@ -387,17 +392,17 @@ class Session(HISModel):
         """Closes the session"""
         return self.delete_instance()
 
-    def renew(self, duration=None):
+    def renew(self, duration=15):
         """Renews the session"""
-        if self.alive:
-            duration = duration or timedelta(
-                minutes=self.DEFAULT_DURATION_MINUTES)
-            self.end = datetime.now() + duration
-            self.token = str(uuid4())
-            self.login = False
-            return self.save()
+        if duration in self.ALLOWED_DURATIONS:
+            if self.alive:
+                self.end = datetime.now() + timedelta(minutes=duration)
+                self.login = False
+                return self.save()
+            else:
+                return False
         else:
-            return False
+            raise DurationOutOfBounds()
 
     def to_dict(self):
         """Converts the session to a dictionary"""

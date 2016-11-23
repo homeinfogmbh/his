@@ -5,8 +5,8 @@ from peewee import DoesNotExist
 from homeinfo.lib.wsgi import Error, OK, JSON
 
 from his.api.errors import MissingCredentials, InvalidCredentials, \
-    NoSessionSpecified, NoSuchSession, SessionExpired, \
-    NotAuthorized
+    NoSessionSpecified, NoSuchSession, SessionExpired, NotAuthorized, \
+    NotAnInteger
 from his.api.handlers import HISService
 from his.orm import Account, Session
 
@@ -25,6 +25,19 @@ class SessionManager(HISService):
     PARAMETER_ERROR = Error(
         'Must specify either account name or session token',
         status=400)
+
+    @property
+    def duration(self):
+        """Returns the repsective session duration"""
+        try:
+            duration = int(self.query['duration'])
+        except KeyError:
+            # Default duration for refreshed sessions is 15 minutes
+            return 15
+        except (ValueError, TypeError):
+            raise NotAnInteger('duration', duration) from None
+        else:
+            return duration
 
     def get(self):
         """Lists session information"""
@@ -81,8 +94,11 @@ class SessionManager(HISService):
             except DoesNotExist:
                 raise InvalidCredentials()
             else:
-                session = account.login(passwd)
-                return JSON(session.to_dict())
+                if account.login(passwd):
+                    session = Session.open(account, duration=self.duration)
+                    return JSON(session.to_dict())
+                else:
+                    raise InvalidCredentials()
 
     def put(self):
         """Tries to keep a session alive"""
@@ -95,7 +111,7 @@ class SessionManager(HISService):
             raise NoSuchSession()
         else:
             if session.alive:
-                if session.renew():
+                if session.renew(duration=self.duration):
                     return JSON(session.to_dict())
                 else:
                     raise SessionExpired()

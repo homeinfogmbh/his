@@ -7,3 +7,4 @@ from his.core import HISProxy, SessionCleaner
 session_cleaner = SessionCleaner()
 session_cleaner.start()
 application = RestApp(HISProxy('his'), cors=True, debug=True)
+print('Application logging level:', application.logger.level)

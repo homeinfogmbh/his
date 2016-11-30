@@ -332,7 +332,8 @@ class Session(HISModel):
     def __str__(self):
         """Returns a human-readable representation"""
         return '{start} - {end}: {token} ({login})'.format(
-            start=self.start, end=self.end, token=self.token, login=self.login)
+            start=self.start.isoformat(), end=self.end.isoformat(),
+            token=self.token, login=self.login)
 
     @classmethod
     def exists(cls, account):
@@ -409,8 +410,8 @@ class Session(HISModel):
         return {
             'account': self.account.name,
             'token': self.token,
-            'start': str(self.start),
-            'end': str(self.end),
+            'start': self.start.isoformat(),
+            'end': self.end.isoformat(),
             'login': True if self.login else False}
 
 

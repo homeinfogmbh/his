@@ -255,10 +255,12 @@ class Account(HISModel):
     @property
     def locked(self):
         """Determines whether the user is locked"""
-        if self.locked_until is None:
-            return False
-        else:
+        if self.failed_logins >= 3:
+            return True
+        elif self.locked_until is not None:
             return self.locked_until >= datetime.now()
+        else:
+            return False
 
     @property
     def active(self):
@@ -293,15 +295,21 @@ class Account(HISModel):
 
     def login(self, passwd):
         """Performs a login"""
-        if self.valid and verify_password(self.pwhash, passwd):
-            if not self.locked:
-                self.last_login = datetime.now()
-                self.save()
-                return True
+        if self.valid
+            if verify_password(self.pwhash, passwd):
+                if not self.locked:
+                    self.failed_logins = 0
+                    self.last_login = datetime.now()
+                    self.save()
+                    return True
+                else:
+                    raise AccountLocked(self.locked_until) from None
             else:
-                raise AccountLocked(self.locked_until) from None
+                self.failed_logins += 1
+                self.save()
+                raise InvalidCredentials() from None
         else:
-            raise InvalidCredentials() from None
+            raise AccountLocked(self.locked_until) from None
 
 
 class AccountService(HISModel):

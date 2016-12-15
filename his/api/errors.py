@@ -12,6 +12,7 @@ __all__ = [
     'MissingCredentials',
     'InvalidCredentials',
     'AccountLocked',
+    'AccountBlocked',
     'AlreadyLoggedIn',
 
     'SessionError',
@@ -105,7 +106,7 @@ class InvalidCredentials(LoginError):
 
 
 class AccountLocked(LoginError):
-    """Indicates invalid credentials"""
+    """Indicates that the account is locked due to configuration"""
 
     LOCALE = {
         Language.DE_DE: 'Account gesperrt.',
@@ -121,6 +122,17 @@ class AccountLocked(LoginError):
             data_.update(data)
 
         super().__init__(charset=charset, status=status, cors=cors, data=data_)
+
+
+class AccountBlocked(LoginError):
+    """Indicates that the account is blocked
+    due to missing password or failed logins
+    """
+
+    LOCALE = {
+        Language.DE_DE: 'Account blockiert.',
+        Language.EN_US: 'Account blocked.'}
+    STATUS = 423
 
 
 class AlreadyLoggedIn(LoginError):

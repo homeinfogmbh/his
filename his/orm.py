@@ -11,7 +11,7 @@ from homeinfo.lib.misc import classproperty
 from homeinfo.peewee import MySQLDatabase
 from homeinfo.crm import Customer, Employee
 
-from his.api.errors import InvalidCredentials, AccountLocked, AccountBlocked, \
+from his.api.errors import InvalidCredentials, AccountLocked, \
     DurationOutOfBounds
 from his.config import config
 from his.crypto import verify_password
@@ -295,21 +295,18 @@ class Account(HISModel):
 
     def login(self, passwd):
         """Performs a login"""
-        if self.valid:
+        if self.valid and not self.locked:
             if verify_password(self.pwhash, passwd):
-                if not self.locked:
-                    self.failed_logins = 0
-                    self.last_login = datetime.now()
-                    self.save()
-                    return True
-                else:
-                    raise AccountLocked(self.locked_until) from None
+                self.failed_logins = 0
+                self.last_login = datetime.now()
+                self.save()
+                return True
             else:
                 self.failed_logins += 1
                 self.save()
                 raise InvalidCredentials() from None
         else:
-            raise AccountBlocked() from None
+            raise AccountLocked() from None
 
 
 class AccountService(HISModel):

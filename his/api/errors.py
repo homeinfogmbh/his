@@ -12,7 +12,6 @@ __all__ = [
     'MissingCredentials',
     'InvalidCredentials',
     'AccountLocked',
-    'AccountBlocked',
     'AlreadyLoggedIn',
 
     'SessionError',
@@ -106,32 +105,11 @@ class InvalidCredentials(LoginError):
 
 
 class AccountLocked(LoginError):
-    """Indicates that the account is locked due to configuration"""
+    """Indicates that the account is locked"""
 
     LOCALE = {
         Language.DE_DE: 'Account gesperrt.',
         Language.EN_US: 'Account locked.'}
-    STATUS = 423
-
-    def __init__(self, locked_until, charset='utf-8',
-                 status=None, cors=None, data=None):
-        """Sets locked-until date"""
-        data_ = {'locked_until': locked_until}
-
-        if data is not None:
-            data_.update(data)
-
-        super().__init__(charset=charset, status=status, cors=cors, data=data_)
-
-
-class AccountBlocked(LoginError):
-    """Indicates that the account is blocked
-    due to missing password or failed logins
-    """
-
-    LOCALE = {
-        Language.DE_DE: 'Account blockiert.',
-        Language.EN_US: 'Account blocked.'}
     STATUS = 423
 
 

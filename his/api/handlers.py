@@ -5,21 +5,14 @@ from peewee import DoesNotExist
 from homeinfo.crm import Customer
 from homeinfo.lib.rest import ResourceHandler
 
-from his.api.errors import NoSessionSpecified, NoSuchSession, SessionExpired, \
-    ServiceNotRegistered, NotAuthorized
+from his.api.errors import IncompleteImplementationError, NoSessionSpecified, \
+    NoSuchSession, SessionExpired, ServiceNotRegistered, NotAuthorized
 from his.orm import Service, CustomerService, Account, Session
 
 __all__ = [
-    'IncompleteImplementationError',
     'HISService',
     'AuthenticatedService',
     'AuthorizedService']
-
-
-class IncompleteImplementationError(NotImplementedError):
-    """Indicates an incomplete implementation of the service"""
-
-    pass
 
 
 class HISService(ResourceHandler):

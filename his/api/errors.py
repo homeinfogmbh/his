@@ -6,6 +6,7 @@ from his.api.locale import Language
 
 __all__ = [
     'HISAPIError',
+    'IncompleteImplementationError',
     'NotAnInteger',
 
     'LoginError',
@@ -66,6 +67,15 @@ class HISAPIError(HISMessage):
     """Indicates errors for the WebAPI"""
 
     STATUS = 400
+
+
+class IncompleteImplementationError(HISAPIError):
+    """Indicates an incomplete implementation of the service"""
+
+    STATUS = 400
+    LOCALE = {
+        Language.DE_DE: 'Dieser Dienst wurde noch nicht implementiert.',
+        Language.EN_US: 'This service has not yet been implemented.'}
 
 
 class LoginError(HISAPIError):

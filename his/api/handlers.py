@@ -1,9 +1,11 @@
 """Meta-services for HIS"""
 
+from contextlib import suppress
 from peewee import DoesNotExist
 
 from homeinfo.crm import Customer
 from homeinfo.lib.rest import ResourceHandler
+from homeinfo.lib.wsgi import InternalServerError
 
 from his.api.errors import IncompleteImplementationError, NoSessionSpecified, \
     NoSuchSession, SessionExpired, ServiceNotRegistered, NotAuthorized, \
@@ -16,6 +18,12 @@ __all__ = [
     'AuthorizedService']
 
 
+class CheckPassed(Exception):
+    """Indicates that a service check passed"""
+
+    pass
+
+
 class HISService(ResourceHandler):
     """A generic HIS service"""
 
@@ -26,8 +34,12 @@ class HISService(ResourceHandler):
 
     def __call__(self):
         """Check service and run it"""
-        self._check()
-        return super().__call__()
+        try:
+            self._check()
+        except CheckPassed:
+            return super().__call__()
+        else:
+            raise InternalServerError('Service check failed.') from None
 
     @classmethod
     def install(cls):
@@ -57,13 +69,18 @@ class HISService(ResourceHandler):
 
                 return False
 
+    def _check(self):
+        raise CheckPassed()
+
 
 class AuthenticatedService(HISService):
     """A HIS service that is session-aware"""
 
     def _check(self):
         """Checks whether the account is logged in"""
-        if not self.session.alive:
+        if self.session.alive:
+            raise CheckPassed() from None
+        else:
             raise SessionExpired() from None
 
     @property
@@ -128,7 +145,8 @@ class AuthorizedService(AuthenticatedService):
         """Determines whether the account
         is allowed to use this service
         """
-        super()._check()
+        with suppress(CheckPassed):
+            super()._check()
 
         try:
             node = self.__class__.NODE
@@ -152,12 +170,12 @@ class AuthorizedService(AuthenticatedService):
                     account = self.account
 
                     if account.root:
-                        pass
+                        raise CheckPassed() from None
                     elif service in CustomerService.services(account.customer):
                         if account.admin:
-                            pass
+                            raise CheckPassed() from None
                         elif service in account.services:
-                            pass
+                            raise CheckPassed() from None
                         else:
                             raise NotAuthorized() from None
                     else:

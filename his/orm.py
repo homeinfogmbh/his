@@ -34,6 +34,10 @@ database = MySQLDatabase(
     passwd=config.db['PASSWD'],
     closing=True)
 
+DATE_FORMAT = '%Y-%m-%d'
+TIME_FORMAT = '%H:%M:%S'
+DATETIME_FORMAT = '{0}T{1}.%f'.format(DATE_FORMAT, TIME_FORMAT)
+
 
 class InconsistencyError(Exception):
     """Indicates inconsistencies in database configuration"""
@@ -307,6 +311,32 @@ class Account(HISModel):
                 raise InvalidCredentials() from None
         else:
             raise AccountLocked() from None
+
+    def to_dict(self):
+        """Returns the account as a JSON-like dictionary"""
+        dictionary = {
+            'customer': self.customer.id,
+            'name': self.name,
+            'email': self.email,
+            'created': self.created.isoformat(),
+            'failed_logins': self.failed_logins,
+            'disabled': self.disabled,
+            'admin': self.admin,
+            'root': self.root}
+
+        if self.user is not None:
+            dictionary['user'] = self.user.id
+
+        if self.deleted is not None:
+            dictionary['deleted'] = self.deleted.isoformat()
+
+        if self.last_login is not None:
+            dictionary['last_login'] = self.last_login.isoformat()
+
+        if self.locked_until is not None:
+            dictionary['locked_until'] = self.locked_until.isoformat()
+
+        return dictionary
 
 
 class AccountService(HISModel):

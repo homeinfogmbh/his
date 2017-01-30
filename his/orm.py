@@ -14,9 +14,10 @@ from homeinfo.crm import Customer, Employee
 from his.api.errors import InvalidCredentials, AccountLocked, \
     DurationOutOfBounds
 from his.config import config
-from his.crypto import verify_password
+from his.crypto import passwd_hasher, verify_password
 
 __all__ = [
+    'AccountExists',
     'module_db',
     'module_model',
     'HISModel',
@@ -34,10 +35,6 @@ database = MySQLDatabase(
     passwd=config.db['PASSWD'],
     closing=True)
 
-DATE_FORMAT = '%Y-%m-%d'
-TIME_FORMAT = '%H:%M:%S'
-DATETIME_FORMAT = '{0}T{1}.%f'.format(DATE_FORMAT, TIME_FORMAT)
-
 
 class InconsistencyError(Exception):
     """Indicates inconsistencies in database configuration"""
@@ -45,6 +42,14 @@ class InconsistencyError(Exception):
     def __init__(self, msg):
         super().__init__(msg)
         self.msg = msg
+
+
+class AccountExists(Exception):
+    """Indicates that the respective account already exists"""
+
+    def __init__(self, field):
+        super().__init__(field)
+        self.field = field
 
 
 def check_service_consistency(customer=None):
@@ -232,6 +237,48 @@ class Account(HISModel):
         return cls.select().where(cls.root == 1)
 
     @classmethod
+    def add(cls, customer, name, email, passwd=None, pwhash=None, user=None,
+            locked_until=None, disabled=None, admin=None, root=None):
+        """Adds a new account"""
+        try:
+            cls.get(cls.email == email)
+        except DoesNotExist:
+            try:
+                cls.get(cls.name == name)
+            except DoesNotExist:
+                account = cls()
+                account.customer = customer
+                account.name = name
+                account.email = email
+
+                if passwd is not None and pwhash is not None:
+                    raise ValueError('Must specify either passwd or pwhash')
+                elif passwd is not None:
+                    account.passwd = passwd
+                elif pwhash is not None:
+                    account.pwhash = pwhash
+                else:
+                    raise ValueError('Must specify either passwd or pwhash')
+
+                account.user = user
+                account.locked_until = locked_until
+
+                if disabled is not None:
+                    account.disabled = disabled
+
+                if admin is not None:
+                    account.admin = admin
+
+                if root is not None:
+                    account.root = root
+
+                return account
+            else:
+                raise AccountExists('name')
+        else:
+            raise AccountExists('email')
+
+    @classmethod
     def admins(cls, customer=None):
         """Yields administrators"""
         if customer is None:
@@ -250,6 +297,12 @@ class Account(HISModel):
             return cls.get(cls.name == id_or_name)
         else:
             return cls.get(cls.id == ident)
+
+    def passwd(self, passwd):
+        """Sets the password"""
+        self.pwhash = passwd_hasher.hash(passwd)
+
+    passwd = property(None, passwd)
 
     @property
     def valid(self):

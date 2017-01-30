@@ -79,27 +79,24 @@ class AuthenticatedService(HISService):
     def account(self):
         """Gets the verified targeted account"""
         account = self.session.account
-        su_account = self.query.get('account')
 
-        if account.root:
-            if su_account is not None:
-                try:
-                    return Account.find(su_account)
-                except DoesNotExist:
-                    raise NoSuchAccount() from None
-        elif account.admin:
+        if account.root or account.admin:
+            su_account = self.query.get('account')
+
             if su_account is not None:
                 try:
                     su_account = Account.find(su_account)
                 except DoesNotExist:
                     raise NoSuchAccount() from None
                 else:
-                    if su_account.customer == account.customer:
+                    if account.root:
+                        return su_account
+                    elif su_account.customer == account.customer:
                         return su_account
                     else:
                         raise NotAuthorized() from None
-        else:
-            return account
+
+        return account
 
     @property
     def customer(self):

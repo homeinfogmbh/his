@@ -1,10 +1,14 @@
 """Account management"""
 
+from json import loads
+
 from peewee import DoesNotExist
 
-from homeinfo.lib.wsgi import JSON
+from homeinfo.lib.wsgi import Error, OK, JSON
+from homeinfo.crm import Customer
 
-from his.api.errors import NotAuthorized, NoSuchAccount
+from his.api.errors import NotAuthorized, NoSuchAccount, InvalidJSON, \
+    NoCustomerSpecified, NoSuchCustomer
 from his.api.handlers import AuthenticatedService
 from his.orm import Account
 
@@ -23,6 +27,7 @@ class AccountService(AuthenticatedService):
             raise NoSuchAccount() from None
 
     def get(self):
+        """List one or many accounts"""
         account = self.account
 
         if self.resource is None:
@@ -51,3 +56,38 @@ class AccountService(AuthenticatedService):
                     raise NotAuthorized() from None
             else:
                 raise NotAuthorized() from None
+
+    def post(self):
+        """Create a new account"""
+        account = self.account
+
+        if account.root or account.admin:
+            try:
+                d = loads(self.data)
+            except ValueError:
+                raise InvalidJSON() from None
+            else:
+                try:
+                    customer = Customer.get(Customer.id == d['customer'])
+                except KeyError:
+                    raise NoCustomerSpecified() from None
+                except DoesNotExist:
+                    raise NoSuchCustomer() from None
+
+                try:
+                    name = d['name']
+                except KeyError:
+                    raise Error('No name specified')
+
+                try:
+                    email = d['email']
+                except KeyError:
+                    raise Error('No email specified')
+
+                account_ = Account.add(
+                    customer, name, email,
+                    passwd=d.get('passwd'),
+                    disabled=d.get('disabled'),
+                    admin=d.get('admin'))
+                account_.save()
+                return OK()

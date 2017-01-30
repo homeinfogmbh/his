@@ -4,13 +4,13 @@ from json import loads
 
 from peewee import DoesNotExist
 
-from homeinfo.lib.wsgi import Error, OK, JSON
+from homeinfo.lib.wsgi import Error, OK, JSON, InternalServerError
 from homeinfo.crm import Customer
 
 from his.api.errors import NotAuthorized, NoSuchAccount, InvalidJSON, \
     NoCustomerSpecified, NoSuchCustomer
 from his.api.handlers import AuthenticatedService
-from his.orm import Account
+from his.orm import AccountExists, Account
 
 
 class AccountService(AuthenticatedService):
@@ -84,10 +84,17 @@ class AccountService(AuthenticatedService):
                 except KeyError:
                     raise Error('No email specified')
 
-                account_ = Account.add(
-                    customer, name, email,
-                    passwd=d.get('passwd'),
-                    disabled=d.get('disabled'),
-                    admin=d.get('admin'))
-                account_.save()
-                return OK()
+                try:
+                    account_ = Account.add(
+                        customer, name, email,
+                        passwd=d.get('passwd'),
+                        disabled=d.get('disabled'),
+                        admin=d.get('admin'))
+                except ValueError:
+                    raise InternalServerError('Value error.') from None
+                except AccountExists as e:
+                    raise Error('Account already exists for {}.'.format(
+                        e.field), status=409) from None
+                else:
+                    account_.save()
+                    return OK()

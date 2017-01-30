@@ -338,6 +338,26 @@ class Account(HISModel):
 
         return dictionary
 
+    def patch(self, d):
+        """Patches the record from a JSON-like dictionary"""
+        try:
+            email = d['email']
+        except KeyError:
+            pass
+        else:
+            if email is not None:
+                self.email = email
+
+        try:
+            admin = d['admin']
+        except KeyError:
+            pass
+        else:
+            if admin is not None:
+                self.admin = admin
+
+        return self
+
 
 class AccountService(HISModel):
     """Many-to-many Account <-> Service mapping"""

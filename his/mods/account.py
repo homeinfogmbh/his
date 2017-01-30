@@ -23,7 +23,7 @@ class AccountService(AuthenticatedService):
             raise NoSuchAccount() from None
 
     def get(self):
-        account = self.account.root
+        account = self.account
 
         if self.resource is None:
             if account.root:

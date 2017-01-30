@@ -1,6 +1,5 @@
 """Meta-services for HIS"""
 
-from contextlib import suppress
 from peewee import DoesNotExist
 
 from homeinfo.crm import Customer
@@ -145,38 +144,40 @@ class AuthorizedService(AuthenticatedService):
         """Determines whether the account
         is allowed to use this service
         """
-        with suppress(CheckPassed):
-            super()._check()
-
         try:
-            node = self.__class__.NODE
-        except AttributeError:
-            raise IncompleteImplementationError() from None
-        else:
-            if not node:
+            super()._check()
+        except CheckPassed:
+            try:
+                node = self.__class__.NODE
+            except AttributeError:
                 raise IncompleteImplementationError() from None
             else:
-                try:
-                    service = Service.get(Service.node == node)
-                except DoesNotExist:
-                    raise ServiceNotRegistered() from None
+                if not node:
+                    raise IncompleteImplementationError() from None
                 else:
-                    # Allow call iff
-                    #   1) account is root or
-                    #   2) account's customer is enabled for the service and
-                    #       2a) account is admin or
-                    #       2b) account is enabled for the service
-                    #
-                    account = self.account
+                    try:
+                        service = Service.get(Service.node == node)
+                    except DoesNotExist:
+                        raise ServiceNotRegistered() from None
+                    else:
+                        # Allow call iff
+                        #   1) account is root or
+                        #   2) account's customer is enabled for the service
+                        #      and
+                        #       2a) account is admin or
+                        #       2b) account is enabled for the service
+                        #
+                        account = self.account
 
-                    if account.root:
-                        raise CheckPassed() from None
-                    elif service in CustomerService.services(account.customer):
-                        if account.admin:
+                        if account.root:
                             raise CheckPassed() from None
-                        elif service in account.services:
-                            raise CheckPassed() from None
+                        elif service in CustomerService.services(
+                                account.customer):
+                            if account.admin:
+                                raise CheckPassed() from None
+                            elif service in account.services:
+                                raise CheckPassed() from None
+                            else:
+                                raise NotAuthorized() from None
                         else:
                             raise NotAuthorized() from None
-                    else:
-                        raise NotAuthorized() from None

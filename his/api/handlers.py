@@ -32,7 +32,13 @@ class HISService(ResourceHandler):
     PROMOTE = None
 
     def __call__(self):
-        """Check service and run it"""
+        """Check service and run it.
+
+        Succeeded cheks are determined by a certain exception, so that faulty
+        implementations of SomeService._check() or accidental overrides of
+        those will most likely result in a failed service check as they do
+        not throw this special exception.
+        """
         try:
             self._check()
         except CheckPassed:

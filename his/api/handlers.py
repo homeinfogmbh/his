@@ -6,7 +6,8 @@ from homeinfo.crm import Customer
 from homeinfo.lib.rest import ResourceHandler
 
 from his.api.errors import IncompleteImplementationError, NoSessionSpecified, \
-    NoSuchSession, SessionExpired, ServiceNotRegistered, NotAuthorized
+    NoSuchSession, SessionExpired, ServiceNotRegistered, NotAuthorized, \
+    NoSuchCustomer, NoSuchAccount
 from his.orm import Service, CustomerService, Account, Session
 
 __all__ = [
@@ -78,22 +79,25 @@ class AuthenticatedService(HISService):
     def account(self):
         """Gets the verified targeted account"""
         account = self.session.account
+        su_account = self.query.get('account')
 
         if account.root:
-            try:
-                return Account.find(self.query['account'])
-            except (KeyError, DoesNotExist):
-                return account
+            if su_account is not None:
+                try:
+                    return Account.find(su_account)
+                except DoesNotExist:
+                    raise NoSuchAccount() from None
         elif account.admin:
-            try:
-                target_account = Account.find(self.query['account'])
-            except (KeyError, DoesNotExist):
-                return account
-            else:
-                if target_account.customer == account.customer:
-                    return target_account
+            if su_account is not None:
+                try:
+                    su_account = Account.find(su_account)
+                except DoesNotExist:
+                    raise NoSuchAccount() from None
                 else:
-                    raise NotAuthorized() from None
+                    if su_account.customer == account.customer:
+                        return su_account
+                    else:
+                        raise NotAuthorized() from None
         else:
             return account
 
@@ -103,12 +107,15 @@ class AuthenticatedService(HISService):
         account = self.session.account
 
         if account.root:
-            try:
-                return Customer.find(self.query['customer'])
-            except (KeyError, DoesNotExist):
-                return account.customer
-        else:
-            return account.customer
+            su_customer = self.query.get('customer')
+
+            if su_customer is not None:
+                try:
+                    return Customer.find(su_customer)
+                except DoesNotExist:
+                    raise NoSuchCustomer() from None
+
+        return account.customer
 
 
 class AuthorizedService(AuthenticatedService):

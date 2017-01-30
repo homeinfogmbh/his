@@ -24,6 +24,11 @@ class HISService(ResourceHandler):
     DESCRIPTION = None
     PROMOTE = None
 
+    def __call__(self):
+        """Check service and run it"""
+        self._check()
+        return super().__call__()
+
     @classmethod
     def install(cls):
         """Installs the service into the database index"""
@@ -56,6 +61,11 @@ class HISService(ResourceHandler):
 class AuthenticatedService(HISService):
     """A HIS service that is session-aware"""
 
+    def _check(self):
+        """Checks whether the account is logged in"""
+        if not self.session.alive:
+            raise SessionExpired() from None
+
     @property
     def session(self):
         """Returns the session or raises an error"""
@@ -65,15 +75,9 @@ class AuthenticatedService(HISService):
             raise NoSessionSpecified() from None
         else:
             try:
-                session = Session.get(Session.token == session_token)
+                return Session.get(Session.token == session_token)
             except DoesNotExist:
                 raise NoSuchSession() from None
-            else:
-                if session.alive:
-                    return session
-                else:
-                    session.delete_instance()
-                    raise SessionExpired() from None
 
     @property
     def account(self):
@@ -120,11 +124,12 @@ class AuthorizedService(AuthenticatedService):
     the account is enabled for it
     """
 
-    @property
-    def method(self):
+    def _check(self):
         """Determines whether the account
         is allowed to use this service
         """
+        super()._check()
+
         try:
             node = self.__class__.NODE
         except AttributeError:
@@ -144,15 +149,15 @@ class AuthorizedService(AuthenticatedService):
                     #       2a) account is admin or
                     #       2b) account is enabled for the service
                     #
-                    account = self.session.account
+                    account = self.account
 
                     if account.root:
-                        return super().method
+                        pass
                     elif service in CustomerService.services(account.customer):
                         if account.admin:
-                            return super().method
+                            pass
                         elif service in account.services:
-                            return super().method
+                            pass
                         else:
                             raise NotAuthorized() from None
                     else:

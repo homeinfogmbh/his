@@ -194,7 +194,7 @@ class AuthorizedService(AuthenticatedService):
 class AdminService(AuthenticatedService):
     """Base class for admin-only services"""
 
-    def _check():
+    def _check(self):
         """Check whether we are an admin"""
         try:
             super()._check()
@@ -208,7 +208,7 @@ class AdminService(AuthenticatedService):
 class RootService(AuthenticatedService):
     """Base class for root-only services"""
 
-    def _check():
+    def _check(self):
         """Check whether we are root"""
         try:
             super()._check()

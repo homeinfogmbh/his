@@ -14,7 +14,9 @@ from his.orm import Service, CustomerService, Account, Session
 __all__ = [
     'HISService',
     'AuthenticatedService',
-    'AuthorizedService']
+    'AuthorizedService',
+    'AdminService',
+    'RootService']
 
 
 class CheckPassed(Exception):
@@ -187,3 +189,31 @@ class AuthorizedService(AuthenticatedService):
                                 raise NotAuthorized() from None
                         else:
                             raise NotAuthorized() from None
+
+
+class AdminService(AuthenticatedService):
+    """Base class for admin-only services"""
+
+    def _check():
+        """Check whether we are an admin"""
+        try:
+            super()._check()
+        except CheckPassed:
+            if self.account.admin:
+                raise CheckPassed()
+            else:
+                raise NotAuthorized() from None
+
+
+class RootService(AuthenticatedService):
+    """Base class for root-only services"""
+
+    def _check():
+        """Check whether we are root"""
+        try:
+            super()._check()
+        except CheckPassed:
+            if self.account.root:
+                raise CheckPassed()
+            else:
+                raise NotAuthorized() from None

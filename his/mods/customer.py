@@ -5,9 +5,19 @@ from his.api.handlers import AdminService
 __all__ = ['Logo']
 
 
-class Logo(AdminService):
+class CustomerService(AdminService):
     """Handles service permissions"""
 
-    def post(self):
+    def get(self):
         """Allows services"""
-        pass
+        if self.resource is not None:
+            if self.resource == 'logo':
+                # TODO: Get logo
+                pass
+            else:
+                raise InvalidOperation() from None
+        else:
+            customer = self.customer
+            return JSON({
+                'cid': customer.cid,
+                'name': customer.name})

@@ -54,6 +54,8 @@ class AccountService(AuthenticatedService):
                     return JSON(account_.to_dict())
                 else:
                     raise NotAuthorized() from None
+            elif account == account_:
+                return JSON(account_.to_dict())
             else:
                 raise NotAuthorized() from None
 

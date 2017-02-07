@@ -8,6 +8,7 @@ __all__ = [
     'HISAPIError',
     'IncompleteImplementationError',
     'NotAnInteger',
+    'InvalidJSON',
 
     'LoginError',
     'MissingCredentials',
@@ -96,6 +97,15 @@ class NotAnInteger(HISMessage):
         """Initializes the message"""
         super().__init__(charset=charset, cors=cors, status=status,
                          data={'key': key, 'value': value})
+
+
+class InvalidJSON(HISMessage):
+    """Indicates that the JSON data is invalid"""
+
+    LOCALE = {
+        Language.DE_DE: 'Fehlerhaftes JSON Objekt.',
+        Language.EN_US: 'Invalid JSON object.'}
+    STATUS = 422
 
 
 class MissingCredentials(LoginError):

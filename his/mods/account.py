@@ -44,7 +44,7 @@ class AccountService(AuthenticatedService):
                 return JSON([a.to_dict() for a in accounts])
             else:
                 raise NotAuthorized() from None
-        elif resource == 'me':
+        elif self.resource == 'me':
             return JSON(account.to_dict())
         else:
             account_ = self.account_

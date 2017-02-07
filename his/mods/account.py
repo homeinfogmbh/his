@@ -102,3 +102,8 @@ class AccountService(AuthenticatedService):
                 else:
                     account_.save()
                     return OK()
+
+    def patch(self):
+        """Modifies an account"""
+        # TODO: implement similarly to get() but with restricted fields
+        pass

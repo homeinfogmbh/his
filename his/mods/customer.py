@@ -1,8 +1,16 @@
 """Customer-level meta services"""
 
+from homeinfo.lib.wsgi import JSON
+
+from his.api.errors import HISAPIError
 from his.api.handlers import AdminService
 
-__all__ = ['Logo']
+__all__ = ['CustomerService']
+
+
+class InvalidOperation(HISAPIError):
+
+    ID = 600
 
 
 class CustomerService(AdminService):

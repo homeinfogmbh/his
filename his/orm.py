@@ -8,6 +8,7 @@ from peewee import Model, PrimaryKeyField, ForeignKeyField,\
     CharField, BooleanField, DateTimeField, IntegerField, DoesNotExist
 
 from homeinfo.lib.misc import classproperty
+from homeinfo.lib.time import strpdatetime
 from homeinfo.peewee import MySQLDatabase
 from homeinfo.crm import Customer, Employee
 
@@ -26,6 +27,7 @@ __all__ = [
     'Account',
     'AccountService',
     'Session',
+    'CustomerSettings',
     'tables']
 
 database = MySQLDatabase(
@@ -50,6 +52,20 @@ class AccountExists(Exception):
     def __init__(self, field):
         super().__init__(field)
         self.field = field
+
+
+class PasswordMismatch(Exception):
+    """Indicates that two passwords do not match"""
+
+    def __init__(self, pw1, pw2):
+        self.pw1 = pw1
+        self.pw2 = pw2
+
+
+class MissingCurrentPassword(Exception):
+    """Indicates that the current password was not provided"""
+
+    pass
 
 
 def check_service_consistency(customer=None):
@@ -210,9 +226,9 @@ class Account(HISModel):
     last_login = DateTimeField(null=True, default=None)
     failed_logins = IntegerField(default=0)
     locked_until = DateTimeField(null=True, default=None)
-    disabled = BooleanField(default=True)
+    disabled = BooleanField(default=False)
     # Flag, whether the account is an
-    # administrator of its company
+    # administrator of its customer (=company)
     admin = BooleanField(default=False)
     # Flag, whether the user is a super-admin of the system
     # XXX: Such accounts can do ANYTHING!
@@ -297,6 +313,11 @@ class Account(HISModel):
             return cls.get(cls.name == id_or_name)
         else:
             return cls.get(cls.id == ident)
+
+    @classmethod
+    def of(cls, customer):
+        """Yields the accounts of the respective customer"""
+        return cls.select().where(cls.customer == customer)
 
     def passwd(self, passwd):
         """Sets the password"""
@@ -391,7 +412,7 @@ class Account(HISModel):
 
         return dictionary
 
-    def patch(self, d):
+    def patch(self, d, passwd=None, root=False, admin=False):
         """Patches the record from a JSON-like dictionary"""
         try:
             email = d['email']
@@ -402,12 +423,82 @@ class Account(HISModel):
                 self.email = email
 
         try:
-            admin = d['admin']
+            passwd = d['passwd']
+            passwd_repeated = d['passwd_repeated']
         except KeyError:
             pass
         else:
-            if admin is not None:
-                self.admin = admin
+            if passwd != passwd_repeated:
+                raise PasswordMismatch() from None
+
+        if root or admin:
+            self.passwd = passwd
+        else:
+            try:
+                old_passwd = d['old_passwd']
+            except KeyError:
+                raise MissingCurrentPassword()
+            else:
+                if verify_password(self.session.account.pwhash, old_passwd):
+                    self.passwd = passwd
+
+        if root or admin:
+            try:
+                admin = d['admin']
+            except KeyError:
+                pass
+            else:
+                if admin is not None:
+                    self.admin = admin
+
+        if root:
+            try:
+                customer = d['customer']
+            except KeyError:
+                pass
+            else:
+                self.customer = Customer.get(Customer.id == int(customer))
+
+            try:
+                user = d['user']
+            except KeyError:
+                pass
+            else:
+                if user is None:
+                    self.user = None
+                else:
+                    self.user = Employee.get(Employee.id == int(user))
+
+            try:
+                name = d['name']
+            except KeyError:
+                pass
+            else:
+                if name is not None:
+                    self.name = name
+                else:
+                    raise ValueError('No name specified')
+
+            try:
+                failed_logins = d['failed_logins']
+            except KeyError:
+                pass
+            else:
+                self.failed_logins = int(failed_logins)
+
+            try:
+                locked_until = d['locked_until']
+            except KeyError:
+                pass
+            else:
+                self.locked_until = strpdatetime(locked_until)
+
+            try:
+                disabled = d['disabled']
+            except KeyError:
+                pass
+            else:
+                self.disabled = bool(disabled)
 
         return self
 
@@ -521,6 +612,21 @@ class Session(HISModel):
             'start': self.start.isoformat(),
             'end': self.end.isoformat(),
             'login': True if self.login else False}
+
+
+class CustomerSettings(HISModel):
+    """Settings for a certain customer"""
+
+    class Meta:
+        db_table = 'customer_settings'
+
+    customer = ForeignKeyField(Customer, db_column='customer')
+    max_accounts = IntegerField(null=True, default=10)
+
+    @classmethod
+    def of(cls, customer):
+        """Returns the settings of a respective customer"""
+        return cls.get(cls.customer == customer)
 
 
 tables = [Service, CustomerService, Account, AccountService, Session]

@@ -12,13 +12,14 @@ from homeinfo.lib.time import strpdatetime
 from homeinfo.peewee import MySQLDatabase
 from homeinfo.crm import Customer, Employee
 
-from his.api.errors import InvalidCredentials, AccountLocked, \
+from his.api.messages import InvalidCredentials, AccountLocked, \
     DurationOutOfBounds
 from his.config import config
 from his.crypto import passwd_hasher, verify_password
 
 __all__ = [
     'AccountExists',
+    'AmbiguousDataError',
     'module_db',
     'module_model',
     'HISModel',
@@ -54,18 +55,14 @@ class AccountExists(Exception):
         self.field = field
 
 
-class PasswordMismatch(Exception):
+class AmbiguousDataError(Exception):
     """Indicates that two passwords do not match"""
 
-    def __init__(self, pw1, pw2):
-        self.pw1 = pw1
-        self.pw2 = pw2
+    def __init__(self, field):
+        self.field = field
 
-
-class MissingCurrentPassword(Exception):
-    """Indicates that the current password was not provided"""
-
-    pass
+    def __str__(self):
+        return self.field
 
 
 def check_service_consistency(customer=None):
@@ -412,93 +409,52 @@ class Account(HISModel):
 
         return dictionary
 
-    def patch(self, d, passwd=None, root=False, admin=False):
+    def patch(self, d):
         """Patches the record from a JSON-like dictionary"""
         try:
             email = d['email']
         except KeyError:
             pass
         else:
-            if email is not None:
+            try:
+                self.__class__.get(self.__class__.email == email)
+            except DoesNotExist:
                 self.email = email
+            else:
+                raise AmbiguousDataError('email')
+
+        with suppress(KeyError):
+            self.passwd = d['passwd']
+
+        with suppress(KeyError):
+            self.admin = d['admin']
+
+        with suppress(KeyError):
+            self.customer = Customer.get(Customer.id == int(d['customer']))
+
+        with suppress(KeyError):
+            self.user = Employee.get(Employee.id == int(d['user']))
 
         try:
-            passwd = d['passwd']
-            passwd_repeated = d['passwd_repeated']
+            name = d['name']
         except KeyError:
             pass
         else:
-            if passwd != passwd_repeated:
-                raise PasswordMismatch() from None
-
-        if root or admin:
-            self.passwd = passwd
-        else:
             try:
-                old_passwd = d['old_passwd']
-            except KeyError:
-                raise MissingCurrentPassword()
+                self.__class__.get(self.__class__.name == name)
+            except DoesNotExist:
+                self.name = name
             else:
-                if verify_password(self.session.account.pwhash, old_passwd):
-                    self.passwd = passwd
+                raise AmbiguousDataError('name')
 
-        if root or admin:
-            try:
-                admin = d['admin']
-            except KeyError:
-                pass
-            else:
-                if admin is not None:
-                    self.admin = admin
+        with suppress(KeyError):
+            self.failed_logins = d['failed_logins']
 
-        if root:
-            try:
-                customer = d['customer']
-            except KeyError:
-                pass
-            else:
-                self.customer = Customer.get(Customer.id == int(customer))
+        with suppress(KeyError):
+            self.locked_until = strpdatetime(locked_until = d['locked_until'])
 
-            try:
-                user = d['user']
-            except KeyError:
-                pass
-            else:
-                if user is None:
-                    self.user = None
-                else:
-                    self.user = Employee.get(Employee.id == int(user))
-
-            try:
-                name = d['name']
-            except KeyError:
-                pass
-            else:
-                if name is not None:
-                    self.name = name
-                else:
-                    raise ValueError('No name specified')
-
-            try:
-                failed_logins = d['failed_logins']
-            except KeyError:
-                pass
-            else:
-                self.failed_logins = int(failed_logins)
-
-            try:
-                locked_until = d['locked_until']
-            except KeyError:
-                pass
-            else:
-                self.locked_until = strpdatetime(locked_until)
-
-            try:
-                disabled = d['disabled']
-            except KeyError:
-                pass
-            else:
-                self.disabled = bool(disabled)
+        with suppress(KeyError):
+            self.disabled = d['disabled']
 
         return self
 

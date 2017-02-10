@@ -2,7 +2,7 @@
 
 from homeinfo.lib.wsgi import JSON
 
-from his.api.errors import HISAPIError
+from his.api.messages import HISAPIError
 from his.api.handlers import AdminService
 
 __all__ = ['CustomerService']

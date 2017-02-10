@@ -6,9 +6,9 @@ from homeinfo.crm import Customer
 from homeinfo.lib.rest import ResourceHandler
 from homeinfo.lib.wsgi import InternalServerError
 
-from his.api.errors import IncompleteImplementationError, NoSessionSpecified, \
-    NoSuchSession, SessionExpired, ServiceNotRegistered, NotAuthorized, \
-    NoSuchCustomer, NoSuchAccount
+from his.api.messages import IncompleteImplementationError, \
+    NoSessionSpecified, NoSuchSession, SessionExpired, ServiceNotRegistered, \
+    NotAuthorized, NoSuchCustomer, NoSuchAccount
 from his.orm import Service, CustomerService, Account, Session
 
 __all__ = [

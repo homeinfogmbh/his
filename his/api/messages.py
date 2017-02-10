@@ -42,6 +42,7 @@ __all__ = [
     'AccountError',
     'NoAccountSpecified',
     'NoSuchAccount',
+    'AccountPatched',
 
     'BoundaryError',
     'DurationOutOfBounds']
@@ -77,6 +78,7 @@ class HISMessage(JSON, metaclass=UniquelyIdentifiedMessage):
     """Indicates errors for the WebAPI"""
 
     ID = None   # Base message
+    STATUS = 200
 
     def __init__(self, *msgs, cors=None, lang=None, **data):
         """Initializes the message"""
@@ -323,7 +325,7 @@ class AccountError(HISAPIError):
     STATUS = 404
 
 
-class NoAccountSpecified(SessionError):
+class NoAccountSpecified(AccountError):
     """Indicates that no account has been specified"""
 
     ID = 441
@@ -333,7 +335,7 @@ class NoAccountSpecified(SessionError):
         Language.EN_US: 'No such account.'}
 
 
-class NoSuchAccount(SessionError):
+class NoSuchAccount(AccountError):
     """Indicates that an account with the specified name does not exist"""
 
     ID = 442
@@ -341,6 +343,13 @@ class NoSuchAccount(SessionError):
     LOCALE = {
         Language.DE_DE: 'Benutzerkonto nicht gefunden.',
         Language.EN_US: 'No such account.'}
+
+
+class AccountPatched(AccountError):
+    """Indicates that the account has been patched successfully"""
+
+    ID = 443
+    STATUS = 200
 
 
 class BoundaryError(HISAPIError):

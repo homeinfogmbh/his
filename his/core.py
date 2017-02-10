@@ -9,7 +9,7 @@ from peewee import DoesNotExist
 from homeinfo.lib.log import LoggingClass
 
 from his.orm import Service, Session
-from his.api.errors import NoSuchService
+from his.api.messages import NoSuchService
 
 __all__ = ['HISProxy', 'SessionCleaner']
 

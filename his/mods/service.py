@@ -5,8 +5,8 @@ from peewee import DoesNotExist
 from homeinfo.crm import Customer
 from homeinfo.lib.wsgi import Error, OK, JSON
 
-from his.api.errors import NoServiceSpecified, \
-    NoSuchService, InvalidCustomerID, NoSuchCustomer, NotAuthorized
+from his.api.messages import NoServiceSpecified, NoSuchService, \
+    InvalidCustomerID, NoSuchCustomer, NotAuthorized
 from his.api.handlers import AuthenticatedService
 from his.api.locale import Language
 from his.orm import InconsistencyError, Service, CustomerService, Account

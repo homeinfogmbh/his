@@ -4,7 +4,7 @@ from peewee import DoesNotExist
 
 from homeinfo.lib.wsgi import Error, OK, JSON
 
-from his.api.errors import MissingCredentials, InvalidCredentials, \
+from his.api.messages import MissingCredentials, InvalidCredentials, \
     NoSessionSpecified, NoSuchSession, SessionExpired, NotAuthorized, \
     NotAnInteger
 from his.api.handlers import HISService

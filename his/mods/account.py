@@ -6,10 +6,11 @@ from peewee import DoesNotExist
 
 from homeinfo.lib.wsgi import Error, OK, JSON, InternalServerError
 
-from his.api.errors import NoDataProvided, InvalidJSON, NoAccountSpecified, \
+from his.api.messages import NoDataProvided, InvalidJSON, NoAccountSpecified, \
     NoSuchAccount, InvalidUTF8Data, NotAuthorized
 from his.api.handlers import AuthenticatedService
-from his.orm import AccountExists, Account, CustomerSettings
+from his.orm import AccountExists, AmbiguousDataError, Account, \
+    CustomerSettings
 
 
 CURRENT_ACCOUNT_SELECTOR = '!'
@@ -81,14 +82,38 @@ class AccountService(AuthenticatedService):
         json = self._json
 
         if self.account.root:
-            target_account.patch(json, root=True)
-            target_account.save()
-            return OK()
+            try:
+                target_account.patch(json, root=True)
+                target_account.save()
+            except (TypeError, ValueError) as e:
+                raise InvalidData() from None
+            except AmbiguousDataError as e:
+                raise HISDataError(field=str(e)) from None
+            else:
+                return AccountPatched()
         elif self.account.admin:
             if self.account.customer == target_account.customer:
-                target_account.patch(json, admin=True)
-                target_account.save()
-                return OK()
+                patch_dict = {}
+                invalid_keys = []
+
+                for k in json:
+                    if k in ('name', 'passwd', 'email', 'admin'):
+                        patch_dict[k] = json[k]
+                    else:
+                        invalid_keys.append(k)
+
+                try:
+                    target_account.patch(patch_dict, admin=True)
+                    target_account.save()
+                except (TypeError, ValueError) as e:
+                    raise InvalidData() from None
+                except AmbiguousDataError as e:
+                    raise HISDataError(field=str(e)) from None
+                else:
+                    if invalid_keys:
+                        return AccountPatched(invalid_keys=invalid_keys)
+                    else:
+                        return AccountPatched()
             else:
                 raise NotAuthorized()
         else:

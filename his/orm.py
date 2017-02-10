@@ -583,7 +583,7 @@ class CustomerSettings(HISModel):
     customer = ForeignKeyField(Customer, db_column='customer')
     max_accounts = IntegerField(null=True, default=10)
     _logo = IntegerField(db_column='logo', null=True)
-    logo = FileProperty(file_client, _logo)
+    logo = FileProperty(_logo, file_client)
 
     @classmethod
     def of(cls, customer):

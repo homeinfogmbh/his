@@ -6,8 +6,9 @@ from peewee import DoesNotExist
 
 from homeinfo.lib.wsgi import Error, OK, JSON, InternalServerError
 
-from his.api.messages import NoDataProvided, InvalidJSON, NoAccountSpecified, \
-    NoSuchAccount, InvalidUTF8Data, NotAuthorized
+from his.api.messages import HISDataError, NoDataProvided, InvalidData, \
+    InvalidJSON, NoAccountSpecified, NoSuchAccount, InvalidUTF8Data, \
+    NotAuthorized, AccountPatched
 from his.api.handlers import AuthenticatedService
 from his.orm import AccountExists, AmbiguousDataError, Account, \
     CustomerSettings
@@ -96,6 +97,7 @@ class AccountService(AuthenticatedService):
                 patch_dict = {}
                 invalid_keys = []
 
+                # Filter valid options for admins
                 for k in json:
                     if k in ('name', 'passwd', 'email', 'admin'):
                         patch_dict[k] = json[k]
@@ -115,14 +117,33 @@ class AccountService(AuthenticatedService):
                     else:
                         return AccountPatched()
             else:
-                raise NotAuthorized()
+                raise NotAuthorized() from None
         else:
-            if self.account == target_account:
-                target_account.patch(self._json)
-                target_account.save()
-                return OK()
+            if self.session.account == target_account:
+                patch_dict = {}
+                invalid_keys = []
+
+                # Filter valid options for admins
+                for k in json:
+                    if k in ('passwd', 'email'):
+                        patch_dict[k] = json[k]
+                    else:
+                        invalid_keys.append(k)
+
+                try:
+                    target_account.patch(patch_dict, admin=True)
+                    target_account.save()
+                except (TypeError, ValueError) as e:
+                    raise InvalidData() from None
+                except AmbiguousDataError as e:
+                    raise HISDataError(field=str(e)) from None
+                else:
+                    if invalid_keys:
+                        return AccountPatched(invalid_keys=invalid_keys)
+                    else:
+                        return AccountPatched()
             else:
-                raise NotAuthorized()
+                raise NotAuthorized() from None
 
     def get(self):
         """List one or many accounts"""

@@ -2,6 +2,7 @@
 
 from datetime import datetime, timedelta
 from uuid import uuid4
+from contextlib import suppress
 from importlib import import_module
 
 from peewee import Model, PrimaryKeyField, ForeignKeyField,\
@@ -451,7 +452,7 @@ class Account(HISModel):
             self.failed_logins = d['failed_logins']
 
         with suppress(KeyError):
-            self.locked_until = strpdatetime(locked_until = d['locked_until'])
+            self.locked_until = strpdatetime(locked_until=d['locked_until'])
 
         with suppress(KeyError):
             self.disabled = d['disabled']

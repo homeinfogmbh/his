@@ -13,8 +13,11 @@ from homeinfo.lib.time import strpdatetime
 from homeinfo.peewee import MySQLDatabase
 from homeinfo.crm import Customer, Employee
 
+from filedb import FileProperty
+
 from his.api.messages import InvalidCredentials, AccountLocked, \
     DurationOutOfBounds
+from his.api.share import file_client
 from his.config import config
 from his.crypto import passwd_hasher, verify_password
 
@@ -579,6 +582,8 @@ class CustomerSettings(HISModel):
 
     customer = ForeignKeyField(Customer, db_column='customer')
     max_accounts = IntegerField(null=True, default=10)
+    _logo = IntegerField(db_column='logo', null=True)
+    logo = FileProperty(file_client, _logo)
 
     @classmethod
     def of(cls, customer):

@@ -9,8 +9,9 @@ __all__ = ['CustomerService']
 
 
 class InvalidOperation(HISAPIError):
+    """Indicates an invalid operation"""
 
-    ID = 600
+    pass
 
 
 class CustomerService(AdminService):

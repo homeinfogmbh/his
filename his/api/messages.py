@@ -15,6 +15,7 @@ __all__ = [
     'NoSuchService',
 
     'HISDataError',
+    'NoDataProvided',
     'NotAnInteger',
     'InvalidUTF8Data',
     'InvalidJSON',
@@ -108,6 +109,12 @@ class HISDataError(HISMessage):
     """Indicates errors in sent data"""
 
     STATUS = 422
+
+
+class NoDataProvided(HISDataError):
+    """Indicates missing data"""
+
+    pass
 
 
 class NotAnInteger(HISDataError):

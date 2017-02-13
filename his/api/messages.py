@@ -17,6 +17,7 @@ __all__ = [
     'HISDataError',
     'NoDataProvided',
     'NotAnInteger',
+    'InvalidData',
     'InvalidUTF8Data',
     'InvalidJSON',
     'InvalidCustomerID',
@@ -123,19 +124,25 @@ class NotAnInteger(HISDataError):
     pass
 
 
-class InvalidUTF8Data(HISDataError):
+class InvalidData(HISDataError):
+    """Indicates missing data"""
+
+    pass
+
+
+class InvalidUTF8Data(InvalidData):
     """Indicates that the data provided was not UTF-8 text"""
 
     pass
 
 
-class InvalidJSON(HISDataError):
+class InvalidJSON(InvalidData):
     """Indicates that the JSON data is invalid"""
 
     pass
 
 
-class InvalidCustomerID(HISDataError):
+class InvalidCustomerID(InvalidData):
     """Indicates that an invalid customer ID was specified"""
 
     pass

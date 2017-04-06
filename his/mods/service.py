@@ -3,7 +3,7 @@
 from peewee import DoesNotExist
 
 from homeinfo.crm import Customer
-from homeinfo.lib.wsgi import Error, OK, JSON
+from wsgilib import Error, OK, JSON
 
 from his.api.messages import NoServiceSpecified, NoSuchService, \
     InvalidCustomerID, NoSuchCustomer, NotAuthorized

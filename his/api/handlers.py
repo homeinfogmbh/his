@@ -3,8 +3,7 @@
 from peewee import DoesNotExist
 
 from homeinfo.crm import Customer
-from homeinfo.lib.rest import ResourceHandler
-from homeinfo.lib.wsgi import InternalServerError
+from wsgilib import InternalServerError, ResourceHandler
 
 from his.api.messages import IncompleteImplementationError, \
     NoSessionSpecified, NoSuchSession, SessionExpired, ServiceNotRegistered, \

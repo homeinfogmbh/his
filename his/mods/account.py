@@ -4,7 +4,7 @@ from json import loads
 
 from peewee import DoesNotExist
 
-from homeinfo.lib.wsgi import Error, OK, JSON, InternalServerError
+from wsgilib import Error, OK, JSON, InternalServerError
 
 from his.api.messages import HISDataError, NoDataProvided, InvalidData, \
     InvalidJSON, NoAccountSpecified, NoSuchAccount, InvalidUTF8Data, \

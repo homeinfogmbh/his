@@ -1,11 +1,11 @@
 """HIS configuration"""
 
-from homeinfo.lib.config import Configuration
+from configparserplus import ConfigParserPlus
 
 __all__ = ['config']
 
 
-class HISConfig(Configuration):
+class HISConfig(ConfigParserPlus):
     """HIS's main configuration"""
 
     @property

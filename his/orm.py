@@ -8,12 +8,12 @@ from importlib import import_module
 from peewee import Model, PrimaryKeyField, ForeignKeyField,\
     CharField, BooleanField, DateTimeField, IntegerField, DoesNotExist
 
-from homeinfo.lib.misc import classproperty
-from homeinfo.lib.time import strpdatetime
-from homeinfo.peewee import MySQLDatabase
-from homeinfo.crm import Customer, Employee
-
+from peeweeplus import MySQLDatabase
+from timelib import strpdatetime
 from filedb import FileProperty
+
+from homeinfo.misc import classproperty
+from homeinfo.crm import Customer, Employee
 
 from his.api.messages import InvalidCredentials, AccountLocked, \
     DurationOutOfBounds

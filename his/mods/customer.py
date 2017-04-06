@@ -1,6 +1,6 @@
 """Customer-level meta services"""
 
-from homeinfo.lib.wsgi import JSON
+from wsgilib import JSON
 
 from his.api.messages import HISAPIError
 from his.api.handlers import AdminService

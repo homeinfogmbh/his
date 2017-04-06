@@ -6,7 +6,7 @@ from threading import Thread
 
 from peewee import DoesNotExist
 
-from homeinfo.lib.log import LoggingClass
+from fancylog import LoggingClass
 
 from his.orm import Service, Session
 from his.api.messages import NoSuchService

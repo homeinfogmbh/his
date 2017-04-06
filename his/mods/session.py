@@ -2,7 +2,7 @@
 
 from peewee import DoesNotExist
 
-from homeinfo.lib.wsgi import Error, OK, JSON
+from wsgilib import Error, OK, JSON
 
 from his.api.messages import MissingCredentials, InvalidCredentials, \
     NoSessionSpecified, NoSuchSession, SessionExpired, NotAuthorized, \

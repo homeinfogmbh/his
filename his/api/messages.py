@@ -2,7 +2,7 @@
 
 from contextlib import suppress
 from configparser import ConfigParser
-from homeinfo.lib.wsgi import JSON
+from wsgilib import JSON
 
 __all__ = [
     'HISMessage',

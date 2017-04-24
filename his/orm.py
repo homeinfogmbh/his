@@ -89,10 +89,17 @@ def module_db(module):
 def module_model(module):
     """Returns a base module for the respective module"""
 
-    class ModuleModel(HISModel):
+    class ModuleModel(HISModel, LoggingClass):
+        """Module model wrapper class"""
+
         class Meta:
             database = module_db(module)
             schema = database.database
+
+        def __init__(self, *args, logger=None, **kwargs):
+            """initializes the super classes"""
+            HISModel.__init__(self, *args, **kwargs)
+            LoggingClass.__init__(self, logger=logger)
 
     return ModuleModel
 

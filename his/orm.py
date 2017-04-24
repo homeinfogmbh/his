@@ -11,6 +11,7 @@ from peewee import Model, PrimaryKeyField, ForeignKeyField,\
 from peeweeplus import MySQLDatabase
 from timelib import strpdatetime
 from filedb import FileProperty
+from fancylog import LoggingClass
 
 from homeinfo.misc import classproperty
 from homeinfo.crm import Customer, Employee

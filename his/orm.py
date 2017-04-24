@@ -77,7 +77,7 @@ def check_service_consistency(customer=None):
 
 
 def module_db(module):
-    """Returns a database for the respective sub-module"""
+    """Returns a database for the respective module"""
 
     return MySQLDatabase(
         '_'.join((config.db['db'], module)),
@@ -88,7 +88,7 @@ def module_db(module):
 
 
 def module_model(module):
-    """Returns a base module for the respective module"""
+    """Returns a base model for the respective module"""
 
     class ModuleModel(HISModel, LoggingClass):
         """Module model wrapper class"""

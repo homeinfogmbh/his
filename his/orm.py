@@ -546,7 +546,12 @@ class Session(HISModel):
     @property
     def alive(self):
         """Determines whether the session is active"""
-        return self.start <= datetime.now() < self.end
+        if self.start <= datetime.now() < self.end:
+            print('SESSION OK:', self.start, self.end)
+            return True
+        else:
+            print('SESSION NOT OK:', self.start, self.end)
+            return False
 
     def reload(self):
         """Re-loads the session information from the database"""

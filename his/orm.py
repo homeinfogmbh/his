@@ -486,7 +486,7 @@ class Session(HISModel):
 
     # Changed to max. 12 hours according to request
     # by Patrick Gunkel from 2017-07-11
-    ALLOWED_DURATIONS = range(5, 12 * 60)
+    ALLOWED_DURATIONS = range(5, 12 * 60 + 1)
 
     account = ForeignKeyField(Account, db_column='account')
     token = CharField(64)   # A uuid4

@@ -33,8 +33,7 @@ class SessionManager(HISService):
             duration = int(self.query['duration'])
         except KeyError:
             # Default duration for refreshed sessions is 15 minutes
-            # Changed to 12 hours as requested by Patrick Gunkel on 2017-07-11
-            return 12 * 60
+            return 15
         except (ValueError, TypeError):
             raise NotAnInteger('duration', duration) from None
         else:

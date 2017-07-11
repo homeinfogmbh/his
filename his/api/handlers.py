@@ -66,7 +66,8 @@ class HISService(ResourceHandler):
                 service.handler = classname
                 service.description = cls.DESCRIPTION
                 service.promote = cls.PROMOTE
-                return service.save()
+                service.save()
+                return True
             else:
                 if service.name == cls.NAME:
                     if service.module == module:

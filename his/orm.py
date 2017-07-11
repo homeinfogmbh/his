@@ -123,7 +123,8 @@ class AccountServicesWrapper():
                 account_service = AccountService()
                 account_service.account = self.account
                 account_service.service = service
-                return account_service.save()
+                account_service.save()
+                return True
             else:
                 raise InconsistencyError(
                     'Cannot enable service {service} for account {account}, '

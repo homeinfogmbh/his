@@ -71,12 +71,8 @@ class ServicePermissions(AuthenticatedService):
                         customer_service = CustomerService()
                         customer_service.customer = customer
                         customer_service.service = service
-
-                        if customer_service.save():
-                            return OK('Service added for customer.')
-                        else:
-                            raise Error('Could not add service.',
-                                        status=500)
+                        customer_service.save()
+                        return OK('Service added for customer.')
                     else:
                         return OK('Service already enabled.')
                 else:

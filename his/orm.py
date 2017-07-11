@@ -573,7 +573,8 @@ class Session(HISModel):
             if self.alive:
                 self.end = datetime.now() + timedelta(minutes=duration)
                 self.login = False
-                return self.save()
+                self.save()
+                return True
             else:
                 return False
         else:

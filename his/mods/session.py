@@ -33,7 +33,8 @@ class SessionManager(HISService):
             duration = int(self.query['duration'])
         except KeyError:
             # Default duration for refreshed sessions is 15 minutes
-            return 15
+            # Changed to 12 hours as requested by Patrick Gunkel on 2017-07-11
+            return 12 * 60
         except (ValueError, TypeError):
             raise NotAnInteger('duration', duration) from None
         else:
@@ -110,11 +111,8 @@ class SessionManager(HISService):
         except DoesNotExist:
             raise NoSuchSession()
         else:
-            if session.alive:
-                if session.renew(duration=self.duration):
-                    return JSON(session.to_dict())
-                else:
-                    raise SessionExpired()
+            if session.renew(duration=self.duration):
+                return JSON(session.to_dict())
             else:
                 raise SessionExpired()
 

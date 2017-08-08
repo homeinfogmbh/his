@@ -5,6 +5,8 @@ from configparser import ConfigParser
 from wsgilib import JSON
 
 __all__ = [
+    'locales',
+
     'HISMessage',
     'HISServerError',
     'IncompleteImplementationError',
@@ -48,18 +50,30 @@ __all__ = [
     'DurationOutOfBounds']
 
 
+def locales(locales_file):
+    """Sets the locales file"""
+
+    parser = ConfigParser()
+    parser.read(locales_file)
+
+    def wrap(cls):
+        cls.LOCALES = parser
+        return cls
+
+    return wrap
+
+
+@locales('/etc/his.d/locale/core.ini')
 class HISMessage(JSON):
     """Indicates errors for the WebAPI"""
 
     STATUS = 200
-    LOCALE = ConfigParser()
-    LOCALE.read('/etc/his.d/locale/core.ini')
 
     def __init__(self, *data, cors=None, lang='de_DE', **fields):
         """Initializes the message"""
 
         with suppress(KeyError):
-            locale = self.LOCALE[self.__class__.__name__][lang]
+            locale = self.LOCALES[self.__class__.__name__][lang]
 
         if data:
             locale.format(*data)

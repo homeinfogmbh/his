@@ -276,6 +276,7 @@ class Account(HISModel):
                 account.customer = customer
                 account.name = name
                 account.email = email
+                account.created = datetime.now()
 
                 if passwd is not None and pwhash is not None:
                     raise ValueError('Must specify either passwd or pwhash')

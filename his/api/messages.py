@@ -80,7 +80,6 @@ class HISMessage(JSON):
 
         dictionary = {'message': locale}
         dictionary.update(fields)
-
         super().__init__(dictionary, status=self.STATUS, cors=cors)
 
 

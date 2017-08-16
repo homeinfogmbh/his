@@ -57,7 +57,7 @@ def locales(locales_file):
     parser.read(locales_file)
 
     def wrap(cls):
-        cls.LOCALES = parser
+        cls.LOCALES = parser[cls.__name__]
         return cls
 
     return wrap
@@ -72,13 +72,15 @@ class HISMessage(JSON):
     def __init__(self, *data, cors=None, lang='de_DE', **fields):
         """Initializes the message"""
 
-        with suppress(KeyError):
-            locale = self.LOCALES[self.__class__.__name__][lang]
+        try:
+            localized_message = self.LOCALES[lang]
+        except KeyError:
+            localized_message = self.LOCALES['en_US']
 
         if data:
-            locale.format(*data)
+            localized_message.format(*data)
 
-        dictionary = {'message': locale}
+        dictionary = {'message': localized_message}
         dictionary.update(fields)
         super().__init__(dictionary, status=self.STATUS, cors=cors)
 

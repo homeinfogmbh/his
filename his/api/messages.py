@@ -57,6 +57,8 @@ def locales(locales_file):
     parser.read(locales_file)
 
     def wrap(cls):
+        print('Loading file', locales_file)
+
         try:
             cls.LOCALES = parser[cls.__name__]
         except KeyError:

@@ -57,7 +57,7 @@ def locales(locales_file):
     parser.read(locales_file)
 
     def wrap(cls):
-        cls.LOCALES = parser
+        cls._parser = parser
         return cls
 
     return wrap
@@ -80,7 +80,7 @@ class HISMessage(JSON):
     def locales(cls):
         """Returns the classes locales"""
         try:
-            return cls.LOCALES[cls.__name__]
+            return cls._parser[cls.__name__]
         except KeyError:
             return {}
 

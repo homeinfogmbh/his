@@ -190,6 +190,16 @@ class CustomerService(HISModel):
     end = DateTimeField(null=True, default=None)
 
     @classmethod
+    def add(cls, customer, service, begin, end):
+        """Adds a new customer service"""
+        customer_service = cls()
+        customer_service.customer = customer
+        customer_service.service = service
+        customer_service.begin = begin
+        customer_service.end = end
+        return customer_service
+
+    @classmethod
     def services(cls, customer):
         """Yields services for the respective customer"""
         for customer_service in cls.select().where(cls.customer == customer):

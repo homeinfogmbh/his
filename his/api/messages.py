@@ -57,7 +57,7 @@ def locales(locales_file):
     parser.read(locales_file)
 
     def wrap(cls):
-        print('Loading file', locales_file)
+        print('Loading file', locales_file, 'on class', cls)
 
         try:
             cls.LOCALES = parser[cls.__name__]

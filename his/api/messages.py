@@ -1,8 +1,8 @@
 """Web API errors"""
 
-from contextlib import suppress
 from configparser import ConfigParser
 from wsgilib import JSON
+from homeinfo.misc import classproperty
 
 __all__ = [
     'locales',
@@ -57,16 +57,7 @@ def locales(locales_file):
     parser.read(locales_file)
 
     def wrap(cls):
-        print('Loading file', locales_file, 'on class', cls)
-
-        try:
-            cls.LOCALES = parser[cls.__name__]
-        except KeyError:
-            cls.LOCALES = {}
-            print('Could not load', cls.__name__, 'from', dict(parser))
-        else:
-            print('Loaded', cls.__name__, 'from', parser)
-
+        cls.LOCALES = parser
         return cls
 
     return wrap
@@ -80,18 +71,27 @@ class HISMessage(JSON):
 
     def __init__(self, *data, cors=None, lang='de_DE', **fields):
         """Initializes the message"""
-
-        try:
-            localized_message = self.LOCALES[lang]
-        except KeyError:
-            localized_message = self.LOCALES['en_US']
-
-        if data:
-            localized_message.format(*data)
-
-        dictionary = {'message': localized_message}
+        dictionary = {'message': self.message(lang, data=data)}
         dictionary.update(fields)
         super().__init__(dictionary, status=self.STATUS, cors=cors)
+
+    @classproperty
+    @classmethod
+    def locales(cls):
+        """Returns the classes locales"""
+        try:
+            return cls.LOCALES[cls.__name__]
+        except KeyError:
+            return {}
+
+    def message(self, lang, data=None):
+        """Returns the respective message"""
+        message = self.__class__.locales[lang]
+
+        if data:
+            message.format(*data)
+
+        return message
 
 
 class HISServerError(HISMessage):

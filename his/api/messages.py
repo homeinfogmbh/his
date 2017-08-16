@@ -63,6 +63,9 @@ def locales(locales_file):
             cls.LOCALES = parser[cls.__name__]
         except KeyError:
             cls.LOCALES = {}
+            print('Could not load', cls.__name__, 'from', parser)
+        else:
+            print('Loaded', cls.__name__, 'from', parser)
 
         return cls
 

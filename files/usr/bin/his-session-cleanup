@@ -4,18 +4,26 @@ from datetime import datetime
 from his.orm import Session
 
 
-def cleanup_sessions(before=None, quiet=False):
+def cleanup_sessions(before=None, verbose=False):
     """Cleans up orphaned sessions"""
 
     if before is None:
         before = datetime.now()
 
     for session in Session.select().where(Session.end < before):
-        if not quiet:
+        if verbose:
             print('Clearing session: {}.'.format(session))
 
         session.delete_instance()
 
+    if verbose:
+        try:
+            session
+        except UnboundLocalError:
+            print('Nothing to do.')
+        else:
+            print('Done.')
+
 
 if __name__ == '__main__':
-    cleanup_sessions()
+    cleanup_sessions(verbose=True)

@@ -19,15 +19,16 @@ service validity.
 specified date and time [default: %Y-%m-%dT%H:%M:%S].
     --help                              Print this page.
 """
-from itertools import chain
+from datetime import datetime
 from random import choice
 from string import digits, ascii_letters
 from sys import stderr
 
 from peewee import DoesNotExist
 
-from homeinfo.crm import Customer, Employee
-from his.orm import Account, Service, CustomerService, AccountService
+from homeinfo.crm import Customer
+from his.orm import AccountExists, Account, Service, CustomerService, \
+    AccountService
 
 
 def randchars(count, pool=None):
@@ -164,4 +165,3 @@ if __name__ == '__main__':
             account = options['<account>']
             service = options['<service>']
             add_account_service(options['<account>'], options['<service>'])
-

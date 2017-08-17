@@ -4,17 +4,12 @@
 Manage HIS settings.
 
 Usage:
-    hisutil -Aa <name> <email> <customer> [--passwd=<passwd>]
-    hisutil -CSa <customer> <service> [--begin=<begin>] \
+    hisutil account add <name> <email> <customer> [--passwd=<passwd>]
+    hisutil customer-service add <customer> <service> [--begin=<begin>] \
 [--end=<end>] [--date-format=<date_format>]
-    hisutil -ASa <account> <service>
+    hisutil account-service add <account> <service>
 
 Options:
-    --account, -A                       Operate on accounts.
-    --service, -S                       Operate on services.
-    --customer, -C                      Operate on customers.
-    --add, -a                           Perform adding.
-    --delete, -d                        Perform deletion.
     --passwd=<passwd>                   Sets the desired password.
     --begin=<begin>                     Sets the begin date and time for \
 service validity.
@@ -150,28 +145,23 @@ def add_account_service(account, service):
 if __name__ == '__main__':
     from docopt import docopt
     options = docopt(__doc__)
-    customer = options['--customer']
-    account = options['--account']
-    service = options['--service']
-    add = options['--add']
-    delete = options['--delete']
 
-    if account:
-        if service:
-            if add:
-                account = options['<account>']
-                service = options['<service>']
-                add_account_service(options['<account>'], options['<service>'])
-        elif add:
+    if options['account']:
+        if options['add']:
             add_account(
                 options['<customer>'], options['<name>'], options['<email>'],
                 options['<passwd>'])
-    elif customer:
-        if service:
-            if add:
-                customer = options['<customer>']
-                service = options['<service>']
-                add_customer_service(
-                    options['<customer>'], options['<service>'],
-                    options['--begin'], options['--end'],
-                    options['--date-format'])
+    elif options['customer-service']:
+        if options['add']:
+            customer = options['<customer>']
+            service = options['<service>']
+            add_customer_service(
+                options['<customer>'], options['<service>'],
+                options['--begin'], options['--end'],
+                options['--date-format'])
+    elif options['account-service']:
+        if options['add']:
+            account = options['<account>']
+            service = options['<service>']
+            add_account_service(options['<account>'], options['<service>'])
+

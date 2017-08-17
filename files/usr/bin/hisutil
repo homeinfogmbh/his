@@ -150,7 +150,7 @@ if __name__ == '__main__':
         if options['add']:
             add_account(
                 options['<customer>'], options['<name>'], options['<email>'],
-                options['<passwd>'])
+                options['--passwd'])
     elif options['customer-service']:
         if options['add']:
             customer = options['<customer>']

@@ -17,5 +17,6 @@ setup(
         ('/etc/uwsgi/apps-available',
          ['files/etc/uwsgi/apps-available/his.ini']),
         ('/etc/his.d/locale', ['files/etc/his.d/locale/core.ini']),
-        ('/usr/share/his', ['files/usr/share/his/his.wsgi'])],
+        ('/usr/share/his', ['files/usr/share/his/his.wsgi']),
+        ('/usr/local/bin', ['files/usr/bin/hisutil'])],
     description='HOMEINFO Integrated Services')

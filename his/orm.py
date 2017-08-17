@@ -492,6 +492,14 @@ class AccountService(HISModel):
     account = ForeignKeyField(Account, db_column='account')
     service = ForeignKeyField(Service, db_column='service')
 
+    @classmethod
+    def add(cls, account, service):
+        """Adds a new account service"""
+        account_service = cls()
+        account_service.account = account
+        account_service.service = service
+        return account_service
+
 
 class Session(HISModel):
     """A session related to an account"""

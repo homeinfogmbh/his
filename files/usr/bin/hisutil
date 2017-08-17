@@ -47,6 +47,16 @@ def genpw(length=16, pool=None):
     return ''.join(randchars(length, pool=pool))
 
 
+def get_account(name):
+    """Gets an account by its name"""
+
+    try:
+        return Account.get(Account.name == name)
+    except DoesNotExist:
+        print('No such account: {}.'.format(name))
+        exit(2)
+
+
 def get_customer(customer):
     """Gets the customer from the customer's id as a string"""
 
@@ -63,14 +73,14 @@ def get_customer(customer):
             exit(2)
 
 
-def get_account(name):
-    """Gets an account by its name"""
+def get_service(name):
+    """Returns the respective service"""
 
     try:
-        return Account.get(Account.name == name)
+        return Service.get(Service.name == name)
     except DoesNotExist:
-        print('No such account: {}.'.format(name))
-        exit(2)
+        print('No such service: "{}".'.format(name), file=stderr)
+        exit(4)
 
 
 def add_account(customer, name, email, passwd):
@@ -90,16 +100,6 @@ def add_account(customer, name, email, passwd):
     else:
         account.save()  # Account.add() does not perform save()
         print(account)
-
-
-def get_service(name):
-    """Returns the respective service"""
-
-    try:
-        return Service.get(Service.name == name)
-    except DoesNotExist:
-        print('No such service: "{}".'.format(name), file=stderr)
-        exit(4)
 
 
 def add_customer_service(customer, service, begin, end, date_format):

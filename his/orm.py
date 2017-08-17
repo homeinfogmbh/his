@@ -189,6 +189,9 @@ class CustomerService(HISModel):
     begin = DateTimeField(null=True, default=None)
     end = DateTimeField(null=True, default=None)
 
+    def __str__(self):
+        return '{}@{}'.format(repr(self.customer), str(self.service))
+
     @classmethod
     def add(cls, customer, service, begin, end):
         """Adds a new customer service"""
@@ -264,7 +267,7 @@ class Account(HISModel):
 
     def __str__(self):
         """Returns the login name and appropriate customer"""
-        return '{0}@{1}'.format(repr(self), repr(self.customer))
+        return '{}@{}'.format(repr(self), repr(self.customer))
 
     @classproperty
     @classmethod
@@ -491,6 +494,9 @@ class AccountService(HISModel):
 
     account = ForeignKeyField(Account, db_column='account')
     service = ForeignKeyField(Service, db_column='service')
+
+    def __str__(self):
+        return '{}@{}'.format(str(self.account), str(self.service))
 
     @classmethod
     def add(cls, account, service):

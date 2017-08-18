@@ -13,7 +13,6 @@ setup(
         'his.api',
         'his.mods'],
     data_files=[
-        ('/etc', ['files/etc/his.conf']),
         ('/etc/uwsgi/apps-available',
          ['files/etc/uwsgi/apps-available/his.ini']),
         ('/etc/his.d/locale', ['files/etc/his.d/locale/core.ini']),

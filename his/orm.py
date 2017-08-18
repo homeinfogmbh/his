@@ -34,10 +34,10 @@ __all__ = [
     'tables']
 
 database = MySQLDatabase(
-    config.db['db'],
-    host=config.db['HOST'],
-    user=config.db['USER'],
-    passwd=config.db['PASSWD'],
+    config['db']['db'],
+    host=config['db']['HOST'],
+    user=config['db']['USER'],
+    passwd=config['db']['PASSWD'],
     closing=True)
 
 

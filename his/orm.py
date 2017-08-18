@@ -24,6 +24,7 @@ from his.crypto import passwd_hasher, verify_password
 __all__ = [
     'AccountExists',
     'AmbiguousDataError',
+    'his_db',
     'HISModel',
     'Service',
     'CustomerService',
@@ -65,6 +66,17 @@ class AmbiguousDataError(Exception):
 
     def __str__(self):
         return self.field
+
+
+def his_db(service_name):
+    """Returns a database for the respective service"""
+
+    return MySQLDatabase(
+        'his_{}'.format(service_name),
+        host=config['db']['HOST'],
+        user=config['db']['USER'],
+        passwd=config['db']['PASSWD'],
+        closing=True)
 
 
 def check_service_consistency(customer=None):

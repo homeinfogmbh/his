@@ -11,7 +11,6 @@ from peewee import Model, PrimaryKeyField, ForeignKeyField,\
 from peeweeplus import MySQLDatabase
 from timelib import strpdatetime
 from filedb import FileProperty
-from fancylog import LoggingClass
 
 from homeinfo.misc import classproperty
 from homeinfo.crm import Customer, Employee
@@ -25,8 +24,6 @@ from his.crypto import passwd_hasher, verify_password
 __all__ = [
     'AccountExists',
     'AmbiguousDataError',
-    'module_db',
-    'module_model',
     'HISModel',
     'Service',
     'CustomerService',
@@ -74,35 +71,6 @@ def check_service_consistency(customer=None):
     """Check service assignment consistency"""
 
     pass  # TODO: Implement
-
-
-def module_db(module):
-    """Returns a database for the respective module"""
-
-    return MySQLDatabase(
-        '_'.join((config.db['db'], module)),
-        host=config.db['HOST'],
-        user=config.db['USER'],
-        passwd=config.db['PASSWD'],
-        closing=True)
-
-
-def module_model(module):
-    """Returns a base model for the respective module"""
-
-    class ModuleModel(HISModel, LoggingClass):
-        """Module model wrapper class"""
-
-        class Meta:
-            database = module_db(module)
-            schema = database.database
-
-        def __init__(self, *args, logger=None, **kwargs):
-            """initializes the super classes"""
-            HISModel.__init__(self, *args, **kwargs)
-            LoggingClass.__init__(self, logger=logger)
-
-    return ModuleModel
 
 
 class AccountServicesWrapper():

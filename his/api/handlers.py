@@ -19,7 +19,13 @@ __all__ = [
 
 
 class CheckPassed(Exception):
-    """Indicates that a service check passed"""
+    """Indicates that a service check passed.
+
+    Successful service checks are indicated by
+    this exception to make the check robust and
+    fail-safe to e.g. unintentional check method
+    overrides.
+    """
 
     pass
 

@@ -502,16 +502,6 @@ class Session(HISModel):
             self.login)
 
     @classmethod
-    def exists(cls, account):
-        """Determines whether a session
-        exists for the specified account
-        """
-        try:
-            return cls.get(cls.account == account)
-        except DoesNotExist:
-            return False
-
-    @classmethod
     def open(cls, account, duration=15):
         """Actually opens a new login session"""
         now = datetime.now()

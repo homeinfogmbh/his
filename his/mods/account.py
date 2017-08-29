@@ -186,12 +186,15 @@ class AccountService(AuthenticatedService):
         if account.root:
             return self._add_account(self.customer)
         elif account.admin:
-            settings = CustomerSettings.of(account.customer)
+            settings = CustomerSettings.get(
+                CustomerSettings.customer == account.customer)
 
             if settings.max_accounts is None:
                 return self._add_account(self.customer)
             else:
-                accounts = len(list(Account.of(account.customer)))
+                accounts = Account.select().where(
+                    Account.customer == account.customer)
+                accounts = len(tuple(accounts))
 
                 if accounts < settings.max_accounts:
                     return self._add_account(self.customer)

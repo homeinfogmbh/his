@@ -32,9 +32,9 @@ __all__ = [
     'AccountService',
     'Session',
     'CustomerSettings',
-    'tables']
+    'MODELS']
 
-database = MySQLDatabase(
+DATABASE = MySQLDatabase(
     config['db']['db'],
     host=config['db']['HOST'],
     user=config['db']['USER'],
@@ -105,13 +105,11 @@ class AccountServicesWrapper():
                 account_service.service = service
                 account_service.save()
                 return True
-            else:
-                raise InconsistencyError(
-                    'Cannot enable service {service} for account {account}, '
-                    'because the respective customer {customer} is not '
-                    'enabled for it'.format(
-                        service=service, account=self.account,
-                        customer=self.account.customer))
+
+            raise InconsistencyError(
+                'Cannot enable service {} for account {}, because the '
+                'respective customer {} is not enabled for it.'.format(
+                    service, self.account, self.account.customer))
 
     def remove(self, service):
         """Removes a service from the mapping"""
@@ -125,7 +123,7 @@ class HISModel(Model):
     """Generic HOMEINFO Integrated Service database model"""
 
     class Meta:
-        database = database
+        database = DATABASE
         schema = database.database
 
     id = PrimaryKeyField()
@@ -194,13 +192,13 @@ class CustomerService(HISModel):
         if self.begin is None:
             if self.end is None:
                 return True
-            else:
-                return datetime.now() < self.end
-        else:
-            if self.end is None:
-                return datetime.now() >= self.begin
-            else:
-                return self.begin <= datetime.now() < self.end
+
+            return datetime.now() < self.end
+
+        if self.end is None:
+            return datetime.now() >= self.begin
+
+        return self.begin <= datetime.now() < self.end
 
     def remove(self):
         """Safely removes a customer service and its dependencies"""
@@ -234,7 +232,7 @@ class Account(HISModel):
     # administrator of its customer (=company)
     admin = BooleanField(default=False)
     # Flag, whether the user is a super-admin of the system
-    # XXX: Such accounts can do ANYTHING!
+    # Such accounts can do ANYTHING!
     root = BooleanField(default=False)
 
     def __int__(self):
@@ -293,20 +291,19 @@ class Account(HISModel):
                     account.root = root
 
                 return account
-            else:
-                raise AccountExists('name')
-        else:
-            raise AccountExists('email')
+
+            raise AccountExists('name')
+
+        raise AccountExists('email')
 
     @classmethod
     def admins(cls, customer=None):
         """Yields administrators"""
         if customer is None:
             return cls.select().where(cls.admin == 1)
-        else:
-            return cls.select().where(
-                (cls.customer == customer) &
-                (cls.admin == 1))
+
+        return cls.select().where(
+            (cls.customer == customer) & (cls.admin == 1))
 
     @classmethod
     def find(cls, id_or_name):
@@ -317,11 +314,6 @@ class Account(HISModel):
             return cls.get(cls.name == id_or_name)
         else:
             return cls.get(cls.id == ident)
-
-    @classmethod
-    def of(cls, customer):
-        """Yields the accounts of the respective customer"""
-        return cls.select().where(cls.customer == customer)
 
     def passwd(self, passwd):
         """Sets the password"""
@@ -341,8 +333,8 @@ class Account(HISModel):
             return True
         elif self.locked_until is not None:
             return self.locked_until >= datetime.now()
-        else:
-            return False
+
+        return False
 
     @property
     def active(self):
@@ -361,7 +353,7 @@ class Account(HISModel):
     @property
     def subjects(self):
         """Yields accounts this account can manage"""
-        # All accounts can manage theirselves
+        # All accounts can manage themselves
         yield self
 
         # Admins can manage accounts of their
@@ -383,12 +375,12 @@ class Account(HISModel):
                 self.last_login = datetime.now()
                 self.save()
                 return True
-            else:
-                self.failed_logins += 1
-                self.save()
-                raise InvalidCredentials() from None
-        else:
-            raise AccountLocked() from None
+
+            self.failed_logins += 1
+            self.save()
+            raise InvalidCredentials() from None
+
+        raise AccountLocked() from None
 
     def to_dict(self):
         """Returns the account as a JSON-like dictionary"""
@@ -416,10 +408,10 @@ class Account(HISModel):
 
         return dictionary
 
-    def patch(self, d):
+    def patch(self, dictionary):
         """Patches the record from a JSON-like dictionary"""
         try:
-            email = d['email']
+            email = dictionary['email']
         except KeyError:
             pass
         else:
@@ -428,22 +420,23 @@ class Account(HISModel):
             except DoesNotExist:
                 self.email = email
             else:
-                raise AmbiguousDataError('email')
+                raise AmbiguousDataError('email') from None
 
         with suppress(KeyError):
-            self.passwd = d['passwd']
+            self.passwd = dictionary['passwd']
 
         with suppress(KeyError):
-            self.admin = d['admin']
+            self.admin = dictionary['admin']
 
         with suppress(KeyError):
-            self.customer = Customer.get(Customer.id == int(d['customer']))
+            self.customer = Customer.get(
+                Customer.id == dictionary['customer'])
 
         with suppress(KeyError):
-            self.user = Employee.get(Employee.id == int(d['user']))
+            self.user = Employee.get(Employee.id == dictionary['user'])
 
         try:
-            name = d['name']
+            name = dictionary['name']
         except KeyError:
             pass
         else:
@@ -452,16 +445,16 @@ class Account(HISModel):
             except DoesNotExist:
                 self.name = name
             else:
-                raise AmbiguousDataError('name')
+                raise AmbiguousDataError('name') from None
 
         with suppress(KeyError):
-            self.failed_logins = d['failed_logins']
+            self.failed_logins = dictionary['failed_logins']
 
         with suppress(KeyError):
-            self.locked_until = strpdatetime(locked_until=d['locked_until'])
+            self.locked_until = strpdatetime(dictionary['locked_until'])
 
         with suppress(KeyError):
-            self.disabled = d['disabled']
+            self.disabled = dictionary['disabled']
 
         return self
 
@@ -514,11 +507,9 @@ class Session(HISModel):
         exists for the specified account
         """
         try:
-            cls.get(cls.account == account)
+            return cls.get(cls.account == account)
         except DoesNotExist:
             return False
-        else:
-            return True
 
     @classmethod
     def open(cls, account, duration=15):
@@ -535,8 +526,8 @@ class Session(HISModel):
             session.login = True
             session.save()
             return session
-        else:
-            raise DurationOutOfBounds()
+
+        raise DurationOutOfBounds()
 
     @classmethod
     def cleanup(cls):
@@ -554,13 +545,12 @@ class Session(HISModel):
 
     def reload(self):
         """Re-loads the session information from the database"""
-        cls = self.__class__
-        return cls.get(
-            (cls.account == self.account) &
-            (cls.token == self.token) &
-            (cls.start == self.start) &
-            (cls.end == self.end) &
-            (cls.login == self.login))
+        return self.__class__.get(
+            (self.__class__.account == self.account) &
+            (self.__class__.token == self.token) &
+            (self.__class__.start == self.start) &
+            (self.__class__.end == self.end) &
+            (self.__class__.login == self.login))
 
     def close(self):
         """Closes the session"""
@@ -574,10 +564,10 @@ class Session(HISModel):
                 self.login = False
                 self.save()
                 return True
-            else:
-                return False
-        else:
-            raise DurationOutOfBounds()
+
+            return False
+
+        raise DurationOutOfBounds()
 
     def to_dict(self):
         """Converts the session to a dictionary"""
@@ -586,7 +576,7 @@ class Session(HISModel):
             'token': self.token,
             'start': self.start.isoformat(),
             'end': self.end.isoformat(),
-            'login': True if self.login else False}
+            'login': bool(self.login)}
 
 
 class CustomerSettings(HISModel):
@@ -600,10 +590,5 @@ class CustomerSettings(HISModel):
     _logo = IntegerField(db_column='logo', null=True)
     logo = FileProperty(_logo, file_client)
 
-    @classmethod
-    def of(cls, customer):
-        """Returns the settings of a respective customer"""
-        return cls.get(cls.customer == customer)
 
-
-tables = [Service, CustomerService, Account, AccountService, Session]
+MODELS = [Service, CustomerService, Account, AccountService, Session]

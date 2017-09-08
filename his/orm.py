@@ -248,7 +248,7 @@ class Account(HISModel):
 
     def __str__(self):
         """Returns the login name and appropriate customer."""
-        return '{}@{}'.format(repr(self), self.customer.cid)
+        return '{}@{}'.format(repr(self), self.customer.id)
 
     @classproperty
     @classmethod

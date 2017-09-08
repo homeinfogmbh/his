@@ -26,7 +26,4 @@ class CustomerService(AdminService):
             else:
                 raise InvalidOperation() from None
         else:
-            customer = self.customer
-            return JSON({
-                'cid': customer.cid,
-                'name': customer.name})
+            return JSON(self.customer.to_dict())

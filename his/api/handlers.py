@@ -142,9 +142,14 @@ class AuthenticatedService(HISService):
 
             if su_customer is not None:
                 try:
-                    return Customer.find(su_customer)
-                except DoesNotExist:
-                    raise NoSuchCustomer() from None
+                    cid = int(su_customer)
+                except ValueError:
+                    raise NotAnInteger() from None
+                else:
+                    try:
+                        return Customer.get(Customer.id == cid)
+                    except DoesNotExist:
+                        raise NoSuchCustomer() from None
 
         return account.customer
 

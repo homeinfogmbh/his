@@ -43,7 +43,7 @@ DATABASE = MySQLDatabase(
 
 
 class InconsistencyError(Exception):
-    """Indicates inconsistencies in database configuration"""
+    """Indicates inconsistencies in database configuration."""
 
     def __init__(self, msg):
         super().__init__(msg)
@@ -51,7 +51,7 @@ class InconsistencyError(Exception):
 
 
 class AccountExists(Exception):
-    """Indicates that the respective account already exists"""
+    """Indicates that the respective account already exists."""
 
     def __init__(self, field):
         super().__init__(field)
@@ -59,7 +59,7 @@ class AccountExists(Exception):
 
 
 class AmbiguousDataError(Exception):
-    """Indicates that two passwords do not match"""
+    """Indicates that the provided data is ambiguous."""
 
     def __init__(self, field):
         self.field = field
@@ -69,7 +69,7 @@ class AmbiguousDataError(Exception):
 
 
 def his_db(service_name):
-    """Returns a database for the respective service"""
+    """Returns a database for the respective service."""
 
     return MySQLDatabase(
         'his_{}'.format(service_name),
@@ -80,24 +80,28 @@ def his_db(service_name):
 
 
 def check_service_consistency(customer=None):
-    """Check service assignment consistency"""
+    """Checks whether services assigned to the
+    customer and its accounts are consistent.
+    """
 
     pass  # TODO: Implement
 
 
-class AccountServicesWrapper():
-    """Wraps service mappings with manipulation options"""
+class AccountServicesProxy():
+    """Proxy to transparently handle an account's services."""
 
     def __init__(self, account):
+        """Sets the respective account."""
         self.account = account
 
     def __iter__(self):
+        """Yields appropriate services."""
         for account_service in AccountService.select().where(
                 AccountService.account == self.account):
             yield account_service.service
 
     def add(self, service):
-        """Adds a service to the mapping"""
+        """Maps a service to this account."""
         if service not in self:
             if service in CustomerService.services(self.account.customer):
                 account_service = AccountService()
@@ -112,7 +116,7 @@ class AccountServicesWrapper():
                     service, self.account, self.account.customer))
 
     def remove(self, service):
-        """Removes a service from the mapping"""
+        """Removes a service from the account's mapping."""
         for account_service in AccountService.select().where(
                 (AccountService.account == self.account) &
                 (AccountService.service == service)):
@@ -211,14 +215,13 @@ class CustomerService(HISModel):
 
 
 class Account(HISModel):
-    """A HIS login account"""
+    """A HIS account."""
 
     customer = ForeignKeyField(
-        Customer, db_column='customer',
-        related_name='accounts')
+        Customer, db_column='customer', related_name='accounts')
     user = ForeignKeyField(
-        Employee, db_column='user', null=True,
-        related_name='accounts')
+        Employee, db_column='user', null=True, related_name='accounts')
+    role = EnumField((''))
     name = CharField(64)
     pwhash = CharField(255)
     email = CharField(64)
@@ -236,27 +239,26 @@ class Account(HISModel):
     root = BooleanField(default=False)
 
     def __int__(self):
-        """Returns the login's ID"""
+        """Returns the account's ID."""
         return self.id
 
     def __repr__(self):
-        """Returns the login name"""
+        """Returns the account's login name."""
         return self.name
 
     def __str__(self):
-        """Returns the login name and appropriate customer"""
-        return '{}@{}'.format(repr(self), repr(self.customer))
+        """Returns the login name and appropriate customer."""
+        return '{}@{}'.format(repr(self), self.customer.cid)
 
     @classproperty
     @classmethod
     def superadmins(cls):
-        """Returns all super-administrators"""
+        """Yields all root users aka. super-admins."""
         return cls.select().where(cls.root == 1)
 
     @classmethod
-    def add(cls, customer, name, email, passwd=None, pwhash=None, user=None,
-            locked_until=None, disabled=None, admin=None, root=None):
-        """Adds a new account"""
+    def add(cls, customer, name, email, passwd=None, pwhash=None, user=None):
+        """Adds a new account."""
         try:
             cls.get(cls.email == email)
         except DoesNotExist:
@@ -279,22 +281,11 @@ class Account(HISModel):
                     raise ValueError('Must specify either passwd or pwhash')
 
                 account.user = user
-                account.locked_until = locked_until
-
-                if disabled is not None:
-                    account.disabled = disabled
-
-                if admin is not None:
-                    account.admin = admin
-
-                if root is not None:
-                    account.root = root
-
                 return account
 
-            raise AccountExists('name')
+            raise AccountExists('name') from None
 
-        raise AccountExists('email')
+        raise AccountExists('email') from None
 
     @classmethod
     def admins(cls, customer=None):
@@ -347,8 +338,8 @@ class Account(HISModel):
 
     @property
     def services(self):
-        """Yields appropriate services"""
-        return AccountServicesWrapper(self)
+        """Returns an account <> service mapping proxy."""
+        return AccountServicesProxy(self)
 
     @property
     def subjects(self):

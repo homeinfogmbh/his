@@ -221,7 +221,6 @@ class Account(HISModel):
         Customer, db_column='customer', related_name='accounts')
     user = ForeignKeyField(
         Employee, db_column='user', null=True, related_name='accounts')
-    role = EnumField((''))
     name = CharField(64)
     pwhash = CharField(255)
     email = CharField(64)

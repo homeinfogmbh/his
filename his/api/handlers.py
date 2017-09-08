@@ -5,7 +5,7 @@ from peewee import DoesNotExist
 from homeinfo.crm import Customer
 from wsgilib import InternalServerError, ResourceHandler
 
-from his.api.messages import IncompleteImplementationError, \
+from his.api.messages import IncompleteImplementationError, NotAnInteger, \
     NoSessionSpecified, NoSuchSession, SessionExpired, ServiceNotRegistered, \
     NotAuthorized, NoSuchCustomer, NoSuchAccount
 from his.orm import Service, CustomerService, Account, Session

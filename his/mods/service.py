@@ -8,7 +8,6 @@ from wsgilib import Error, OK, JSON
 from his.api.messages import NoServiceSpecified, NoSuchService, \
     InvalidCustomerID, NoSuchCustomer, NotAuthorized
 from his.api.handlers import AuthenticatedService
-from his.api.locale import Language
 from his.orm import InconsistencyError, Service, CustomerService, Account
 
 __all__ = [
@@ -22,8 +21,8 @@ class AmbiguousTarget(JSON):
 
     STATUS = 400
     LOCALE = {
-        Language.DE_DE: 'Mehrdeutiges Ziel angegeben.',
-        Language.EN_US: 'Ambiguous target selected.'}
+        'de_DE': 'Mehrdeutiges Ziel angegeben.',
+        'en_US': 'Ambiguous target selected.'}
 
 
 class ServicePermissions(AuthenticatedService):

@@ -1,7 +1,7 @@
 """HIS configuration"""
 
-from configparserplus import ConfigParserPlus
+from configlib import INIParser
 
 __all__ = ['config']
 
-config = ConfigParserPlus('/etc/his.d/his.conf')
+config = INIParser('/etc/his.d/his.conf')

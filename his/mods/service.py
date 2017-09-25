@@ -13,7 +13,7 @@ from his.orm import InconsistencyError, Service, CustomerService, Account
 __all__ = [
     'AmbiguousTarget',
     'ServicePermissions',
-    'install']
+    'INSTALL']
 
 
 class AmbiguousTarget(JSON):
@@ -86,8 +86,8 @@ class ServicePermissions(AuthenticatedService):
 
                     try:
                         account.services.add(service)
-                    except InconsistencyError as e:
-                        return Error(e.msg, status=400)
+                    except InconsistencyError as error:
+                        return Error(error.msg, status=400)
                     else:
                         return OK('Service added for account.')
                 else:
@@ -97,4 +97,4 @@ class ServicePermissions(AuthenticatedService):
                              status=400)
 
 
-install = [ServicePermissions]
+INSTALL = [ServicePermissions]

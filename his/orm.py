@@ -61,6 +61,7 @@ class AmbiguousDataError(Exception):
     """Indicates that the provided data is ambiguous."""
 
     def __init__(self, field):
+        super().__init__(field)
         self.field = field
 
     def __str__(self):
@@ -76,14 +77,6 @@ def his_db(service_name):
         user=CONFIG['db']['USER'],
         passwd=CONFIG['db']['PASSWD'],
         closing=True)
-
-
-def check_service_consistency(customer=None):
-    """Checks whether services assigned to the
-    customer and its accounts are consistent.
-    """
-
-    pass  # TODO: Implement
 
 
 class AccountServicesProxy():

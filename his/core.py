@@ -78,8 +78,8 @@ class SessionCleaner():
             self._thread = Thread(target=self._run)
             self._thread.start()
             return True
-        else:
-            return False
+
+        return False
 
     def stop(self):
         """Stops the cleanup thread"""

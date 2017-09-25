@@ -46,14 +46,11 @@ class AccountService(AuthenticatedService):
 
         try:
             account = Account.add(
-                customer, name, email,
-                passwd=json.get('passwd'),
-                disabled=json.get('disabled'),
-                admin=json.get('admin'))
+                customer, name, email, passwd=json.get('passwd'))
         except ValueError:
             raise InternalServerError('Value error.') from None
-        except AccountExists as e:
-            raise Error('Account already exists for {}.'.format(e.field),
+        except AccountExists as error:
+            raise Error('Account already exists for {}.'.format(error.field),
                         status=409) from None
         else:
             account.save()
@@ -67,10 +64,10 @@ class AccountService(AuthenticatedService):
             try:
                 target_account.patch(json, root=True)
                 target_account.save()
-            except (TypeError, ValueError) as e:
+            except (TypeError, ValueError):
                 raise InvalidData() from None
-            except AmbiguousDataError as e:
-                raise HISDataError(field=str(e)) from None
+            except AmbiguousDataError as error:
+                raise HISDataError(field=str(error)) from None
             else:
                 return AccountPatched()
         elif self.account.admin:
@@ -88,15 +85,15 @@ class AccountService(AuthenticatedService):
                 try:
                     target_account.patch(patch_dict, admin=True)
                     target_account.save()
-                except (TypeError, ValueError) as e:
+                except (TypeError, ValueError):
                     raise InvalidData() from None
-                except AmbiguousDataError as e:
-                    raise HISDataError(field=str(e)) from None
+                except AmbiguousDataError as error:
+                    raise HISDataError(field=str(error)) from None
                 else:
                     if invalid_keys:
                         return AccountPatched(invalid_keys=invalid_keys)
-                    else:
-                        return AccountPatched()
+
+                    return AccountPatched()
             else:
                 raise NotAuthorized() from None
         else:
@@ -114,15 +111,15 @@ class AccountService(AuthenticatedService):
                 try:
                     target_account.patch(patch_dict, admin=True)
                     target_account.save()
-                except (TypeError, ValueError) as e:
+                except (TypeError, ValueError):
                     raise InvalidData() from None
-                except AmbiguousDataError as e:
-                    raise HISDataError(field=str(e)) from None
+                except AmbiguousDataError as error:
+                    raise HISDataError(field=str(error)) from None
                 else:
                     if invalid_keys:
                         return AccountPatched(invalid_keys=invalid_keys)
-                    else:
-                        return AccountPatched()
+
+                    return AccountPatched()
             else:
                 raise NotAuthorized() from None
 
@@ -134,14 +131,14 @@ class AccountService(AuthenticatedService):
             if account.root:
                 if self.query.get('customer') is None:
                     return JSON([a.to_dict() for a in Account])
-                else:
-                    return JSON([a.to_dict() for a in Account.select().where(
-                        Account.customer == self.customer)])
+
+                return JSON([a.to_dict() for a in Account.select().where(
+                    Account.customer == self.customer)])
             elif account.admin:
                 return JSON([a.to_dict() for a in Account.select().where(
                     Account.customer == self.customer)])
-            else:
-                raise NotAuthorized() from None
+
+            raise NotAuthorized() from None
         elif self.resource == CURRENT_ACCOUNT_SELECTOR:
             # Account of used session
             return JSON(account.to_dict())

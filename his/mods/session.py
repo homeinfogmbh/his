@@ -12,7 +12,7 @@ from his.orm import Account, Session
 
 __all__ = [
     'Session',
-    'install']
+    'INSTALL']
 
 
 class SessionManager(HISService):
@@ -82,7 +82,6 @@ class SessionManager(HISService):
         if self.resource is not None:
             raise Error('Sub-sessions are not supported')
 
-        # XXX: Currently ignores posted data
         try:
             account = self.query['account']
             passwd = self.query['passwd']
@@ -135,4 +134,4 @@ class SessionManager(HISService):
         return OK()
 
 
-install = [SessionManager]
+INSTALL = [SessionManager]

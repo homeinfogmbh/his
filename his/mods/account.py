@@ -36,11 +36,11 @@ class AccountService(AuthenticatedService):
     @property
     def _json(self):
         """Returns provided JSON data"""
-        if self.data is None:
+        if self.data.bytes is None:
             raise NoDataProvided() from None
         else:
             try:
-                text = self.data.decode()
+                text = self.data.bytes.decode()
             except ValueError:
                 raise InvalidUTF8Data() from None
             else:

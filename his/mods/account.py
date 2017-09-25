@@ -1,14 +1,11 @@
 """Account management"""
 
-from json import loads
-
 from peewee import DoesNotExist
 
 from wsgilib import Error, OK, JSON, InternalServerError
 
-from his.api.messages import HISDataError, NoDataProvided, InvalidData, \
-    InvalidJSON, NoAccountSpecified, NoSuchAccount, InvalidUTF8Data, \
-    NotAuthorized, AccountPatched
+from his.api.messages import HISDataError, InvalidData, NoAccountSpecified, \
+    NoSuchAccount, NotAuthorized, AccountPatched
 from his.api.handlers import AuthenticatedService
 from his.orm import AccountExists, AmbiguousDataError, Account, \
     CustomerSettings
@@ -33,25 +30,9 @@ class AccountService(AuthenticatedService):
             except DoesNotExist:
                 raise NoSuchAccount() from None
 
-    @property
-    def _json(self):
-        """Returns provided JSON data"""
-        if self.data.bytes is None:
-            raise NoDataProvided() from None
-        else:
-            try:
-                text = self.data.bytes.decode()
-            except ValueError:
-                raise InvalidUTF8Data() from None
-            else:
-                try:
-                    return loads(text)
-                except AttributeError:
-                    raise InvalidJSON() from None
-
     def _add_account(self, customer):
         """Adds an account for the respective customer"""
-        json = self._json
+        json = self.data.json
 
         try:
             name = json['name']
@@ -80,7 +61,7 @@ class AccountService(AuthenticatedService):
 
     def _change_account(self, target_account):
         """Change account data"""
-        json = self._json
+        json = self.data.json
 
         if self.account.root:
             try:

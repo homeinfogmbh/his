@@ -7,7 +7,8 @@ from wsgilib import InternalServerError, ResourceHandler
 
 from his.api.messages import IncompleteImplementationError, NotAnInteger, \
     NoSessionSpecified, NoSuchSession, SessionExpired, ServiceNotRegistered, \
-    NotAuthorized, NoSuchCustomer, NoSuchAccount
+    NotAuthorized, NoSuchCustomer, NoSuchAccount, NoDataProvided, \
+    InvalidUTF8Data, InvalidJSON
 from his.orm import Service, CustomerService, Account, Session
 
 __all__ = [
@@ -37,6 +38,11 @@ class HISService(ResourceHandler):
     NAME = None
     DESCRIPTION = None
     PROMOTE = None
+
+    ERRORS = {
+        'NO_DATA_PROVIDED': NoDataProvided(),
+        'NON_UTF8_DATA': InvalidUTF8Data(),
+        'NON_JSON_DATA': InvalidJSON()}
 
     def __call__(self):
         """Check service and run it.

@@ -86,12 +86,15 @@ class HISMessage(JSON):
 
     def message(self, lang, data=None):
         """Returns the respective message"""
-        message = self.__class__.locales[lang]
+        try:
+            message = self.__class__.locales[lang]
+        except KeyError:
+            return 'Could not get locale: {}.'.format(lang)
+        else:
+            if data:
+                message.format(*data)
 
-        if data:
-            message.format(*data)
-
-        return message
+            return message
 
 
 class HISServerError(HISMessage):

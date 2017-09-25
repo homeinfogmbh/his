@@ -17,9 +17,8 @@ from homeinfo.crm import Customer, Employee
 
 from his.api.messages import InvalidCredentials, AccountLocked, \
     DurationOutOfBounds
-from his.api.share import file_client
-from his.config import config
-from his.crypto import passwd_hasher, verify_password
+from his.config import CONFIG, FILE_CLIENT
+from his.crypto import PASSWORD_HASHER, verify_password
 
 __all__ = [
     'AccountExists',
@@ -35,10 +34,10 @@ __all__ = [
     'MODELS']
 
 DATABASE = MySQLDatabase(
-    config['db']['db'],
-    host=config['db']['HOST'],
-    user=config['db']['USER'],
-    passwd=config['db']['PASSWD'],
+    CONFIG['db']['db'],
+    host=CONFIG['db']['HOST'],
+    user=CONFIG['db']['USER'],
+    passwd=CONFIG['db']['PASSWD'],
     closing=True)
 
 
@@ -73,9 +72,9 @@ def his_db(service_name):
 
     return MySQLDatabase(
         'his_{}'.format(service_name),
-        host=config['db']['HOST'],
-        user=config['db']['USER'],
-        passwd=config['db']['PASSWD'],
+        host=CONFIG['db']['HOST'],
+        user=CONFIG['db']['USER'],
+        passwd=CONFIG['db']['PASSWD'],
         closing=True)
 
 
@@ -307,7 +306,7 @@ class Account(HISModel):
 
     def passwd(self, passwd):
         """Sets the password"""
-        self.pwhash = passwd_hasher.hash(passwd)
+        self.pwhash = PASSWORD_HASHER.hash(passwd)
 
     passwd = property(None, passwd)
 
@@ -568,7 +567,7 @@ class CustomerSettings(HISModel):
     customer = ForeignKeyField(Customer, db_column='customer')
     max_accounts = IntegerField(null=True, default=10)
     _logo = IntegerField(db_column='logo', null=True)
-    logo = FileProperty(_logo, file_client)
+    logo = FileProperty(_logo, FILE_CLIENT)
 
 
 MODELS = [Service, CustomerService, Account, AccountService, Session]

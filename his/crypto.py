@@ -4,11 +4,11 @@ from argon2 import PasswordHasher
 from argon2.exceptions import VerifyMismatchError
 
 __all__ = [
-    'passwd_hasher',
+    'PASSWORD_HASHER',
     'verify_password']
 
 
-passwd_hasher = PasswordHasher()
+PASSWORD_HASHER = PasswordHasher()
 
 
 def verify_password(pwhash, passwd):
@@ -17,6 +17,6 @@ def verify_password(pwhash, passwd):
     """
 
     try:
-        return passwd_hasher.verify(pwhash, passwd)
+        return PASSWORD_HASHER.verify(pwhash, passwd)
     except VerifyMismatchError:
         return False

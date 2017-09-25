@@ -46,6 +46,8 @@ class HISProxy(LoggingClass):
                     self.logger.critical('No such class: {}'.format(
                         service.class_))
                     raise NoSuchService() from None
+                except Exception as error:
+                    print('Got error:', type(error), error)
                 else:
                     self.logger.info('Loaded handler: {}'.format(handler))
                     return handler

@@ -10,6 +10,8 @@ def cleanup_sessions(before=None, verbose=False):
     if before is None:
         before = datetime.now()
 
+    session = None
+
     for session in Session.select().where(Session.end < before):
         if verbose:
             print('Clearing session: {}.'.format(session))
@@ -17,9 +19,7 @@ def cleanup_sessions(before=None, verbose=False):
         session.delete_instance()
 
     if verbose:
-        try:
-            session
-        except UnboundLocalError:
+        if session is None:
             print('Nothing to do.')
         else:
             print('Done.')

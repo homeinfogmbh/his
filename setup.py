@@ -12,12 +12,9 @@ setup(
         'his',
         'his.api',
         'his.mods'],
+    scripts=['files/hisutil', 'files/his-session-cleanup'],
     data_files=[
-        ('/etc/uwsgi/apps-available',
-         ['files/etc/uwsgi/apps-available/his.ini']),
-        ('/etc/his.d/locale', ['files/etc/his.d/locale/core.ini']),
-        ('/usr/share/his', ['files/usr/share/his/his.wsgi']),
-        ('/usr/local/bin', [
-            'files/usr/bin/hisutil',
-            'files/usr/bin/his-session-cleanup'])],
-    description='HOMEINFO Integrated Services')
+        ('/etc/uwsgi/apps-available', ['files/his.ini']),
+        ('/etc/his.d/locale', ['files/core.ini']),
+        ('/usr/share/his', ['files/his.wsgi'])],
+    description='HOMEINFO Integrated Services.')

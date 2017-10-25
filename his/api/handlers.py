@@ -98,7 +98,7 @@ class AuthenticatedService(HISService):
 
     @check_hook
     def check(self):
-        """Checks whether the account is logged in"""
+        """Checks whether the account is logged in."""
         if self.session.alive:
             return True
 
@@ -106,7 +106,7 @@ class AuthenticatedService(HISService):
 
     @property
     def session(self):
-        """Returns the session or raises an error"""
+        """Returns the session or raises an error."""
         try:
             session_token = self.query['session']
         except KeyError:
@@ -119,7 +119,7 @@ class AuthenticatedService(HISService):
 
     @property
     def account(self):
-        """Gets the verified targeted account"""
+        """Gets the verified targeted account."""
         account = self.session.account
 
         if account.root or account.admin:

@@ -1,4 +1,4 @@
-"""Group and user definitions"""
+"""Group and user definitions."""
 
 from datetime import datetime, timedelta
 from uuid import uuid4
@@ -116,7 +116,7 @@ class AccountServicesProxy():
 
 
 class HISModel(Model):
-    """Generic HOMEINFO Integrated Service database model"""
+    """Generic HOMEINFO Integrated Service database model."""
 
     class Meta:
         database = DATABASE
@@ -126,7 +126,7 @@ class HISModel(Model):
 
 
 class Service(HISModel):
-    """Registers services of HIS"""
+    """Registers services of HIS."""
 
     node = CharField(255)
     module = CharField(255)
@@ -136,24 +136,20 @@ class Service(HISModel):
     # Flag whether the service shall be promoted
     promote = BooleanField(default=True)
 
-    def __repr__(self):
-        """Returns the service's ID as a string"""
-        return '.'.join(self.module, self.handler)
-
     def __str__(self):
-        """Returns the service's name"""
+        """Returns the service's name."""
         return self.name
 
     @property
     def handler(self):
-        """Loads the appropriate handler"""
+        """Loads the appropriate handler."""
         module = import_module(self.module)
         class_ = self.class_ or 'App'
         return getattr(module, class_)
 
 
 class CustomerService(HISModel):
-    """Many-to-many Account <-> Services mapping"""
+    """Many-to-many Account <-> Services mapping."""
 
     class Meta:
         db_table = 'customer_service'
@@ -168,7 +164,7 @@ class CustomerService(HISModel):
 
     @classmethod
     def add(cls, customer, service, begin, end):
-        """Adds a new customer service"""
+        """Adds a new customer service."""
         customer_service = cls()
         customer_service.customer = customer
         customer_service.service = service
@@ -178,13 +174,13 @@ class CustomerService(HISModel):
 
     @classmethod
     def services(cls, customer):
-        """Yields services for the respective customer"""
+        """Yields services for the respective customer."""
         for customer_service in cls.select().where(cls.customer == customer):
             yield customer_service.service
 
     @property
     def active(self):
-        """Determines whether the service mapping is active"""
+        """Determines whether the service mapping is active."""
         if self.begin is None:
             if self.end is None:
                 return True
@@ -197,7 +193,7 @@ class CustomerService(HISModel):
         return self.begin <= datetime.now() < self.end
 
     def remove(self):
-        """Safely removes a customer service and its dependencies"""
+        """Safely removes a customer service and its dependencies."""
         for account_service in AccountService.select().where(
                 (AccountService.account.customer == self.customer) &
                 (AccountService.service == self.service)):
@@ -263,13 +259,13 @@ class Account(HISModel):
                 account.created = datetime.now()
 
                 if passwd is not None and pwhash is not None:
-                    raise ValueError('Must specify either passwd or pwhash')
+                    raise ValueError('Must specify either passwd or pwhash.')
                 elif passwd is not None:
                     account.passwd = passwd
                 elif pwhash is not None:
                     account.pwhash = pwhash
                 else:
-                    raise ValueError('Must specify either passwd or pwhash')
+                    raise ValueError('Must specify either passwd or pwhash.')
 
                 account.user = user
                 return account
@@ -280,7 +276,7 @@ class Account(HISModel):
 
     @classmethod
     def admins(cls, customer=None):
-        """Yields administrators"""
+        """Yields administrators."""
         if customer is None:
             return cls.select().where(cls.admin == 1)
 
@@ -289,7 +285,7 @@ class Account(HISModel):
 
     @classmethod
     def find(cls, id_or_name):
-        """Find account by primary key or login name"""
+        """Find account by primary key or login name."""
         try:
             ident = int(id_or_name)
         except ValueError:
@@ -298,19 +294,19 @@ class Account(HISModel):
             return cls.get(cls.id == ident)
 
     def passwd(self, passwd):
-        """Sets the password"""
+        """Sets the password."""
         self.pwhash = PASSWORD_HASHER.hash(passwd)
 
     passwd = property(None, passwd)
 
     @property
     def valid(self):
-        """Determines whether the account is valid"""
+        """Determines whether the account is valid."""
         return self.pwhash and not self.deleted and not self.disabled
 
     @property
     def locked(self):
-        """Determines whether the user is locked"""
+        """Determines whether the user is locked."""
         if self.failed_logins > 5:
             return True
         elif self.locked_until is not None:
@@ -320,7 +316,7 @@ class Account(HISModel):
 
     @property
     def active(self):
-        """Determines whether the account has an open session"""
+        """Determines whether the account has an open session."""
         for session in Session.select().where(Session.account == self):
             if session.alive:
                 return True
@@ -334,23 +330,22 @@ class Account(HISModel):
 
     @property
     def subjects(self):
-        """Yields accounts this account can manage"""
-        # All accounts can manage themselves
+        """Yields accounts this account can manage."""
+        # All accounts can manage themselves.
         yield self
 
         # Admins can manage accounts of their
-        # company, i.e. the same customer
+        # company, i.e. the same customer.
         if self.admin:
-            yield from Account.select().where(
-                Account.customer == self.customer)
+            cls = self.__class__
 
-            # If the company is a reseller, they can
-            # manage all accounts of the resold companies
-            for customer in self.customer.resales:
-                yield from Account.select().where(Account.customer == customer)
+            for account in cls.select().where(cls.customer == self.customer):
+                # We already yielded this very account.
+                if account != self:
+                    yield account
 
     def login(self, passwd):
-        """Performs a login"""
+        """Performs a login."""
         if self.valid and not self.locked:
             if verify_password(self.pwhash, passwd):
                 self.failed_logins = 0
@@ -365,7 +360,7 @@ class Account(HISModel):
         raise AccountLocked() from None
 
     def to_dict(self):
-        """Returns the account as a JSON-like dictionary"""
+        """Returns the account as a JSON-like dictionary."""
         dictionary = {
             'customer': self.customer.id,
             'name': self.name,
@@ -391,7 +386,7 @@ class Account(HISModel):
         return dictionary
 
     def patch(self, dictionary):
-        """Patches the record from a JSON-like dictionary"""
+        """Patches the record from a JSON-like dictionary."""
         try:
             email = dictionary['email']
         except KeyError:
@@ -442,7 +437,7 @@ class Account(HISModel):
 
 
 class AccountService(HISModel):
-    """Many-to-many Account <-> Service mapping"""
+    """Many-to-many Account <-> Service mapping."""
 
     class Meta:
         db_table = 'account_service'
@@ -455,7 +450,7 @@ class AccountService(HISModel):
 
     @classmethod
     def add(cls, account, service):
-        """Adds a new account service"""
+        """Adds a new account service."""
         account_service = cls()
         account_service.account = account
         account_service.service = service
@@ -463,7 +458,7 @@ class AccountService(HISModel):
 
 
 class Session(HISModel):
-    """A session related to an account"""
+    """A session related to an account."""
 
     ALLOWED_DURATIONS = range(5, 31)
 
@@ -474,18 +469,18 @@ class Session(HISModel):
     login = BooleanField()  # Login session or keep-alive?
 
     def __repr__(self):
-        """Returns a unique string representation"""
+        """Returns a unique string representation."""
         return self.token
 
     def __str__(self):
-        """Returns a human-readable representation"""
+        """Returns a human-readable representation."""
         return '{} - {}: {} ({})'.format(
             self.start.isoformat(), self.end.isoformat(), self.token,
             self.login)
 
     @classmethod
     def open(cls, account, duration=15):
-        """Actually opens a new login session"""
+        """Actually opens a new login session."""
         now = datetime.now()
 
         if duration in cls.ALLOWED_DURATIONS:
@@ -502,21 +497,26 @@ class Session(HISModel):
         raise DurationOutOfBounds()
 
     @classmethod
-    def cleanup(cls):
-        """Cleans up orphaned sessions"""
-        now = datetime.now()
+    def cleanup(cls, before=None):
+        """Cleans up orphaned sessions."""
+        cleaned_up = []
 
-        for session in cls:
-            if session.end < now:
-                session.close()
+        if before is None:
+            before = datetime.now()
+
+        for session in cls.select().where(cls.end < before):
+            cleaned_up.append(session)
+            session.close()
+
+        return cleaned_up
 
     @property
     def alive(self):
-        """Determines whether the session is active"""
+        """Determines whether the session is active."""
         return self.start <= datetime.now() < self.end
 
     def reload(self):
-        """Re-loads the session information from the database"""
+        """Re-loads the session information from the database."""
         return self.__class__.get(
             (self.__class__.account == self.account) &
             (self.__class__.token == self.token) &
@@ -525,11 +525,11 @@ class Session(HISModel):
             (self.__class__.login == self.login))
 
     def close(self):
-        """Closes the session"""
+        """Closes the session."""
         return self.delete_instance()
 
     def renew(self, duration=15):
-        """Renews the session"""
+        """Renews the session."""
         if duration in self.ALLOWED_DURATIONS:
             if self.alive:
                 self.end = datetime.now() + timedelta(minutes=duration)
@@ -542,7 +542,7 @@ class Session(HISModel):
         raise DurationOutOfBounds()
 
     def to_dict(self):
-        """Converts the session to a dictionary"""
+        """Converts the session to a dictionary."""
         return {
             'account': self.account.name,
             'token': self.token,
@@ -552,7 +552,7 @@ class Session(HISModel):
 
 
 class CustomerSettings(HISModel):
-    """Settings for a certain customer"""
+    """Settings for a certain customer."""
 
     class Meta:
         db_table = 'customer_settings'

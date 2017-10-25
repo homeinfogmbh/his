@@ -68,29 +68,26 @@ class HISService(ResourceHandler):
         """Installs the service into the database index."""
         if cls.NODE is None or cls.NAME is None:
             raise IncompleteImplementationError() from None
-        else:
-            module = cls.__module__
-            classname = cls.__name__
 
-            try:
-                service = Service.get(Service.node == cls.NODE)
-            except DoesNotExist:
-                service = Service()
-                service.name = cls.NAME
-                service.node = cls.NODE
-                service.module = module
-                service.handler = classname
-                service.description = cls.DESCRIPTION
-                service.promote = cls.PROMOTE
-                service.save()
-                return True
-            else:
-                if service.name == cls.NAME:
-                    if service.module == module:
-                        if service.handler == classname:
-                            return service
+        try:
+            service = Service.get(Service.node == cls.NODE)
+        except DoesNotExist:
+            service = Service()
+            service.name = cls.NAME
+            service.node = cls.NODE
+            service.module = cls.__module__
+            service.handler = cls.__name__
+            service.description = cls.DESCRIPTION
+            service.promote = cls.PROMOTE
+            service.save()
+            return service
 
-                return False
+        if service.name == cls.NAME:
+            if service.module == cls.__module__:
+                if service.handler == cls.__name__:
+                    return service
+
+        return False
 
 
 class AuthenticatedService(HISService):

@@ -22,7 +22,7 @@ __all__ = [
 
 
 def check_hook(method):
-    """Marks a method as a check hook."""
+    """Decorator to mark a method as a check hook."""
 
     method.check_hook = True
     return method

@@ -52,8 +52,8 @@ class HISService(ResourceHandler):
 
     @property
     def __check_hooks(self):
-        """Yields all check hooks of the respective class in reversed
-        __mro__ order ensuring a top-down test of the respective hooks.
+        """Yields all check hooks of the superclasses and this class
+        in reversed __mro__ order ensuring a top-down test.
         """
         for superclass in reversed(self.__class__.__mro__):
             for name in dir(superclass):

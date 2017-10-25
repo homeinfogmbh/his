@@ -1,29 +1,22 @@
 #! /usr/bin/env python3
-"""Cleans up orphaned HIS sessions"""
-from datetime import datetime
+"""Cleans up orphaned HIS sessions."""
+
 from his.orm import Session
 
 
-def cleanup_sessions(before=None, verbose=False):
-    """Cleans up orphaned sessions"""
+def cleanup_sessions():
+    """Cleans up orphaned sessions."""
 
-    if before is None:
-        before = datetime.now()
+    count = 0
 
-    session = None
+    for count, session in enumerate(Session.cleanup(), start=1):
+        print('Clearing session: {}.'.format(session))
 
-    for session in Session.select().where(Session.end < before):
-        if verbose:
-            print('Clearing session: {}.'.format(session))
-
-        session.delete_instance()
-
-    if verbose:
-        if session is None:
-            print('Nothing to do.')
-        else:
-            print('Done.')
+    if count:
+        print('Deleted {} orphaned sessions.'.format(count))
+    else:
+        print('Nothing to do.')
 
 
 if __name__ == '__main__':
-    cleanup_sessions(verbose=True)
+    cleanup_sessions()

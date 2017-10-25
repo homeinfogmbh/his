@@ -131,7 +131,9 @@ class AuthenticatedService(HISService):
                 except DoesNotExist:
                     raise NoSuchAccount() from None
 
-                if account.root or su_account.customer == account.customer:
+                if account.root:
+                    return su_account
+                elif su_account.customer == account.customer:
                     return su_account
 
                 raise NotAuthorized() from None
@@ -195,7 +197,9 @@ class AuthorizedService(AuthenticatedService):
         if account.root:
             return True
         elif service in CustomerService.services(account.customer):
-            if account.admin or service in account.services:
+            if account.admin:
+                return True
+            elif service in account.services:
                 return True
 
         raise NotAuthorized() from None

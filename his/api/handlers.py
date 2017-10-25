@@ -1,4 +1,6 @@
-"""Meta-services for HIS"""
+"""Meta-services for HIS."""
+
+from contextlib import suppress
 
 from peewee import DoesNotExist
 
@@ -19,20 +21,15 @@ __all__ = [
     'RootService']
 
 
-class CheckPassed(Exception):
-    """Indicates that a service check passed.
+def check_hook(method):
+    """Marks a method as a check hook."""
 
-    Successful service checks are indicated by
-    this exception to make the check robust and
-    fail-safe to e.g. unintentional check method
-    overrides.
-    """
-
-    pass
+    method.check_hook = True
+    return method
 
 
 class HISService(ResourceHandler):
-    """A generic HIS service"""
+    """A generic HIS service."""
 
     NODE = None
     NAME = None
@@ -45,23 +42,30 @@ class HISService(ResourceHandler):
         'NON_JSON_DATA': InvalidJSON()}
 
     def __call__(self):
-        """Check service and run it.
-
-        Succeeded cheks are determined by a certain exception, so that faulty
-        implementations of SomeService._check() or accidental overrides of
-        those will most likely result in a failed service check as they do
-        not throw this special exception.
+        """Checks all check hooks of superclasses and this class in
+        order to determine whether the service should be run.
         """
-        try:
-            self._check()
-        except CheckPassed:
+        if all(check_hook(self) for check_hook in self.__check_hooks):
             return super().__call__()
-        else:
-            raise InternalServerError('Service check failed.') from None
+
+        raise InternalServerError('Service check failed.') from None
+
+    @property
+    def __check_hooks(self):
+        """Yields all check hooks of the respective class in reversed
+        __mro__ order ensuring a top-down test of the respective hooks.
+        """
+        for superclass in reversed(self.__class__.__mro__):
+            for name in dir(superclass):
+                attribute = getattr(superclass, name)
+
+                with suppress(AttributeError):
+                    if attribute.check_hook:
+                        yield attribute
 
     @classmethod
     def install(cls):
-        """Installs the service into the database index"""
+        """Installs the service into the database index."""
         if cls.NODE is None or cls.NAME is None:
             raise IncompleteImplementationError() from None
         else:
@@ -88,19 +92,17 @@ class HISService(ResourceHandler):
 
                 return False
 
-    def _check(self):
-        raise CheckPassed()
-
 
 class AuthenticatedService(HISService):
-    """A HIS service that is session-aware"""
+    """A HIS service that is session-aware."""
 
-    def _check(self):
+    @check_hook
+    def check(self):
         """Checks whether the account is logged in"""
         if self.session.alive:
-            raise CheckPassed() from None
-        else:
-            raise SessionExpired() from None
+            return True
+
+        raise SessionExpired() from None
 
     @property
     def session(self):
@@ -109,11 +111,11 @@ class AuthenticatedService(HISService):
             session_token = self.query['session']
         except KeyError:
             raise NoSessionSpecified() from None
-        else:
-            try:
-                return Session.get(Session.token == session_token)
-            except DoesNotExist:
-                raise NoSuchSession() from None
+
+        try:
+            return Session.get(Session.token == session_token)
+        except DoesNotExist:
+            raise NoSuchSession() from None
 
     @property
     def account(self):
@@ -128,19 +130,17 @@ class AuthenticatedService(HISService):
                     su_account = Account.find(su_account)
                 except DoesNotExist:
                     raise NoSuchAccount() from None
-                else:
-                    if account.root:
-                        return su_account
-                    elif su_account.customer == account.customer:
-                        return su_account
-                    else:
-                        raise NotAuthorized() from None
+
+                if account.root or su_account.customer == account.customer:
+                    return su_account
+
+                raise NotAuthorized() from None
 
         return account
 
     @property
     def customer(self):
-        """Gets the verified targeted customer"""
+        """Gets the verified targeted customer."""
         account = self.session.account
 
         if account.root:
@@ -151,86 +151,75 @@ class AuthenticatedService(HISService):
                     cid = int(su_customer)
                 except ValueError:
                     raise NotAnInteger() from None
-                else:
-                    try:
-                        return Customer.get(Customer.id == cid)
-                    except DoesNotExist:
-                        raise NoSuchCustomer() from None
+
+                try:
+                    return Customer.get(Customer.id == cid)
+                except DoesNotExist:
+                    raise NoSuchCustomer() from None
 
         return account.customer
 
 
 class AuthorizedService(AuthenticatedService):
     """A HIS service that checks whether
-    the account is enabled for it
+    the account is enabled for it.
     """
 
-    def _check(self):
+    @check_hook
+    def check(self):
         """Determines whether the account
-        is allowed to use this service
+        is allowed to use this service.
         """
         try:
-            super()._check()
-        except CheckPassed:
-            try:
-                node = self.__class__.NODE
-            except AttributeError:
-                raise IncompleteImplementationError() from None
-            else:
-                if not node:
-                    raise IncompleteImplementationError() from None
-                else:
-                    try:
-                        service = Service.get(Service.node == node)
-                    except DoesNotExist:
-                        raise ServiceNotRegistered() from None
-                    else:
-                        # Allow call iff
-                        #   1) account is root or
-                        #   2) account's customer is enabled for the service
-                        #      and
-                        #       2a) account is admin or
-                        #       2b) account is enabled for the service
-                        #
-                        account = self.account
+            node = self.__class__.NODE
+        except AttributeError:
+            raise IncompleteImplementationError() from None
 
-                        if account.root:
-                            raise CheckPassed() from None
-                        elif service in CustomerService.services(
-                                account.customer):
-                            if account.admin:
-                                raise CheckPassed() from None
-                            elif service in account.services:
-                                raise CheckPassed() from None
-                            else:
-                                raise NotAuthorized() from None
-                        else:
-                            raise NotAuthorized() from None
+        if not node:
+            raise IncompleteImplementationError() from None
+
+        try:
+            service = Service.get(Service.node == node)
+        except DoesNotExist:
+            raise ServiceNotRegistered() from None
+
+        # Allow call iff
+        #   1) account is root or
+        #   2) account's customer is enabled for the service
+        #      and
+        #       2a) account is admin or
+        #       2b) account is enabled for the service
+        #
+        account = self.account
+
+        if account.root:
+            return True
+        elif service in CustomerService.services(account.customer):
+            if account.admin or service in account.services:
+                return True
+
+        raise NotAuthorized() from None
 
 
 class AdminService(AuthenticatedService):
-    """Base class for admin-only services"""
+    """Base class for admin-only services."""
 
-    def _check(self):
-        """Check whether we are an admin"""
-        try:
-            super()._check()
-        except CheckPassed:
-            if self.account.admin:
-                raise CheckPassed()
-            else:
-                raise NotAuthorized() from None
+    @check_hook
+    def check(self):
+        """Check whether we are an admin."""
+        if self.account.admin:
+            return True
+
+        raise NotAuthorized() from None
 
 
 class RootService(AuthenticatedService):
-    """Base class for root-only services"""
+    """Base class for root-only services."""
 
-    def _check(self):
-        """Check whether we are root"""
-        try:
-            super()._check()
-        except CheckPassed:
-            if self.account.root:
-                raise CheckPassed()
-            else:
-                raise NotAuthorized() from None
+    @check_hook
+    def check(self):
+        """Check whether we are root."""
+        if self.account.root:
+            return True
+
+        raise NotAuthorized() from None

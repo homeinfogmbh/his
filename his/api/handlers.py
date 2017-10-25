@@ -50,19 +50,6 @@ class HISService(ResourceHandler):
 
         raise InternalServerError('Service check failed.') from None
 
-    @property
-    def __check_hooks(self):
-        """Yields all check hooks of the superclasses and this class
-        in reversed __mro__ order ensuring a top-down test.
-        """
-        for superclass in reversed(self.__class__.__mro__):
-            for name in dir(superclass):
-                attribute = getattr(superclass, name)
-
-                with suppress(AttributeError):
-                    if attribute.check_hook:
-                        yield attribute
-
     @classmethod
     def install(cls):
         """Installs the service into the database index."""
@@ -88,6 +75,19 @@ class HISService(ResourceHandler):
                     return service
 
         return False
+
+    @property
+    def __check_hooks(self):
+        """Yields all check hooks of the superclasses and this class
+        in reversed __mro__ order ensuring a top-down test.
+        """
+        for superclass in reversed(self.__class__.__mro__):
+            for name in dir(superclass):
+                attribute = getattr(superclass, name)
+
+                with suppress(AttributeError):
+                    if attribute.check_hook:
+                        yield attribute
 
 
 class AuthenticatedService(HISService):

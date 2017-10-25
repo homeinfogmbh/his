@@ -1,17 +1,13 @@
 """Core services"""
 
-from itertools import repeat
-from time import sleep
-from threading import Thread
-
 from peewee import DoesNotExist
 
 from fancylog import LoggingClass
 
-from his.orm import Service, Session
+from his.orm import Service
 from his.api.messages import NoSuchService
 
-__all__ = ['HISProxy', 'SessionCleaner']
+__all__ = ['HISProxy']
 
 
 class HISProxy(LoggingClass):
@@ -49,44 +45,3 @@ class HISProxy(LoggingClass):
                 else:
                     self.logger.info('Loaded handler: {}'.format(handler))
                     return handler
-
-
-class SessionCleaner():
-    """Periodically cleans up the sessions"""
-
-    def __init__(self, interval=60):
-        """Sets the cleanup interval"""
-        self.interval = interval
-        self._running = False
-        self._thread = None
-
-    def _run(self):
-        """The actual cleanup loop"""
-        while self._running:
-            Session.cleanup()
-
-            for _ in repeat(None, self.interval):
-                if self._running:
-                    sleep(1)
-                else:
-                    break
-
-    def start(self):
-        """Starts the cleanup thread"""
-        if self._thread is None:
-            self._running = True
-            self._thread = Thread(target=self._run)
-            self._thread.start()
-            return True
-
-        return False
-
-    def stop(self):
-        """Stops the cleanup thread"""
-        self._running = False
-
-        if self._thread is not None:
-            self._thread.join()
-            self._thread = None
-
-        return True

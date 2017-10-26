@@ -90,7 +90,6 @@ class HISService(ResourceHandler):
                 with suppress(AttributeError):
                     if attribute.check_hook:
                         if attribute not in processed:
-                            print('Yielding check hook', attribute, 'on', self)
                             processed.add(attribute)
                             yield attribute
 

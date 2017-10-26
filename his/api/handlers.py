@@ -81,14 +81,18 @@ class HISService(ResourceHandler):
         """Yields all check hooks of the superclasses and this class
         in reversed __mro__ order ensuring a top-down test.
         """
+        processed = set()
+
         for superclass in reversed(self.__class__.__mro__):
             for name in dir(superclass):
                 attribute = getattr(superclass, name)
 
                 with suppress(AttributeError):
                     if attribute.check_hook:
-                        print('Yielding check hook', attribute, 'on', self)
-                        yield attribute
+                        if attribute not in processed:
+                            print('Yielding check hook', attribute, 'on', self)
+                            processed.add(attribute)
+                            yield attribute
 
 
 class AuthenticatedService(HISService):

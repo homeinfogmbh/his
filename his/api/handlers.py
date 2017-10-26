@@ -87,7 +87,7 @@ class HISService(ResourceHandler):
 
                 with suppress(AttributeError):
                     if attribute.check_hook:
-                        print('Check hook:', attribute)
+                        print('Yielding check hook', attribute, 'on', self)
                         yield attribute
 
 

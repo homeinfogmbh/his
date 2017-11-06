@@ -17,7 +17,7 @@ from homeinfo.crm import Customer, Employee
 
 from his.api.messages import InvalidCredentials, AccountLocked, \
     DurationOutOfBounds
-from his.config import CONFIG, FILE_CLIENT
+from his.config import CONFIG
 from his.crypto import PASSWORD_HASHER, verify_password
 
 __all__ = [
@@ -560,7 +560,7 @@ class CustomerSettings(HISModel):
     customer = ForeignKeyField(Customer, db_column='customer')
     max_accounts = IntegerField(null=True, default=10)
     _logo = IntegerField(db_column='logo', null=True)
-    logo = FileProperty(_logo, FILE_CLIENT)
+    logo = FileProperty(_logo)
 
 
 MODELS = [Service, CustomerService, Account, AccountService, Session]

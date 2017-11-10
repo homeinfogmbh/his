@@ -5,7 +5,7 @@ from contextlib import suppress
 from peewee import DoesNotExist
 
 from homeinfo.crm import Customer
-from wsgilib import InternalServerError, ResourceHandler
+from wsgilib import InternalServerError, PostData, ResourceHandler
 
 from his.api.messages import IncompleteImplementationError, NotAnInteger, \
     NoSessionSpecified, NoSuchSession, SessionExpired, ServiceNotRegistered, \
@@ -28,6 +28,14 @@ def check_hook(method):
     return method
 
 
+class HISData(PostData):
+    """HIS post data handler."""
+
+    no_data_provided = NoDataProvided()
+    non_utf8_data = InvalidUTF8Data()
+    non_json_data = InvalidJSON()
+
+
 class HISService(ResourceHandler):
     """A generic HIS service."""
 
@@ -35,11 +43,7 @@ class HISService(ResourceHandler):
     NAME = None
     DESCRIPTION = None
     PROMOTE = None
-
-    ERRORS = {
-        'NO_DATA_PROVIDED': NoDataProvided(),
-        'NON_UTF8_DATA': InvalidUTF8Data(),
-        'NON_JSON_DATA': InvalidJSON()}
+    DATA_HANDLER = HISData
 
     def __call__(self):
         """Checks all check hooks of superclasses and this class in

@@ -24,3 +24,8 @@ class HISRouter(Router):
 
 
 ROUTER = HISRouter(ROOT)
+
+from . import account
+from . import customer
+from . import service
+from . import session

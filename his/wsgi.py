@@ -23,4 +23,4 @@ class HISRouter(Router):
         return super().route(self.root + '/' + path)
 
 
-ROUTER = Router(ROOT)
+ROUTER = HISRouter(ROOT)

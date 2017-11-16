@@ -5,7 +5,7 @@ from contextlib import suppress
 from peewee import DoesNotExist
 
 from homeinfo.crm import Customer
-from wsgilib import InternalServerError, PostData, ResourceHandler
+from wsgilib import InternalServerError, PostData, RestHandler
 
 from his.api.messages import IncompleteImplementationError, NotAnInteger, \
     NoSessionSpecified, NoSuchSession, SessionExpired, ServiceNotRegistered, \
@@ -36,7 +36,7 @@ class HISData(PostData):
     non_json_data = InvalidJSON()
 
 
-class HISService(ResourceHandler):
+class HISService(RestHandler):
     """A generic HIS service."""
 
     NODE = None

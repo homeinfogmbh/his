@@ -9,14 +9,10 @@ from his.api.messages import MissingCredentials, InvalidCredentials, \
     NotAnInteger
 from his.api.handlers import HISService
 from his.orm import Account, Session
-from his.wsgi import ROUTER
 
-__all__ = [
-    'Session',
-    'INSTALL']
+__all__ = ['Session', 'INSTALL']
 
 
-@ROUTER.route('/session/[token]')
 class SessionManager(HISService):
     """Session handling service"""
 

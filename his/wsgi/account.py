@@ -9,13 +9,11 @@ from his.api.messages import HISDataError, InvalidData, NoAccountSpecified, \
 from his.api.handlers import AuthenticatedService
 from his.orm import AccountExists, AmbiguousDataError, Account, \
     CustomerSettings
-from his.wsgi import ROUTER
 
 
 CURRENT_ACCOUNT_SELECTOR = '!'
 
 
-@ROUTER.route('/account/[id:int]')
 class AccountService(AuthenticatedService):
     """Service that handles accounts"""
 

@@ -9,7 +9,6 @@ from his.api.messages import NoServiceSpecified, NoSuchService, \
     InvalidCustomerID, NoSuchCustomer, NotAuthorized
 from his.api.handlers import AuthenticatedService
 from his.orm import InconsistencyError, Service, CustomerService, Account
-from his.wsgi import ROUTER
 
 __all__ = [
     'AmbiguousTarget',
@@ -27,7 +26,6 @@ class AmbiguousTarget(JSON):
         'en_US': 'Ambiguous target selected.'}
 
 
-@ROUTER.route('/service/[id:int]')
 class ServicePermissions(AuthenticatedService):
     """Handles service permissions."""
 

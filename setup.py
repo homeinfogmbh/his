@@ -11,7 +11,7 @@ setup(
     packages=[
         'his',
         'his.api',
-        'his.mods'],
+        'his.wsgi'],
     scripts=['files/hisutil', 'files/his-session-cleanup'],
     data_files=[
         ('/etc/uwsgi/apps-available', ['files/his.ini']),

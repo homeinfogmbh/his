@@ -1,4 +1,4 @@
-"""HIS WSGI core router."""
+"""HIS WSGI core services."""
 
 from wsgilib import Router
 

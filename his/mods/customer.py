@@ -4,6 +4,7 @@ from wsgilib import JSON
 
 from his.api.messages import HISAPIError
 from his.api.handlers import AdminService
+from his.wsgi import ROUTER
 
 __all__ = ['CustomerService']
 
@@ -14,6 +15,7 @@ class InvalidOperation(HISAPIError):
     pass
 
 
+@ROUTER.route('/customer/[cid:int]')
 class CustomerService(AdminService):
     """Handles service permissions"""
 

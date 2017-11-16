@@ -2,6 +2,6 @@
 """HIS core handler"""
 
 from wsgilib import RestApp
-from his.core import mk_router
+from his.wsgi import ROUTER
 
-application = RestApp(mk_router('his'), cors=True, debug=True)
+application = RestApp(ROUTER, cors=True, debug=True)

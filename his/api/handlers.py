@@ -172,7 +172,11 @@ class AuthorizedService(AuthenticatedService):
         try:
             service = Service.get(Service.name == service_name)
         except DoesNotExist:
+            print('### DEBUG No such service: {} ###'.format(service_name))
             raise ServiceNotRegistered() from None
+        else:
+            print('### DEBUG Found service: {} ({}) ###'.format(
+                service, servic_name))
 
         # Allow call iff
         #   1) account is root or

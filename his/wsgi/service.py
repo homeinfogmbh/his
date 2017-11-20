@@ -7,7 +7,7 @@ from wsgilib import Error, OK, JSON
 
 from his.api.messages import NoServiceSpecified, NoSuchService, \
     InvalidCustomerID, NoSuchCustomer, NotAuthorized
-from his.api.handlers import AuthenticatedService
+from his.api.handlers import service, AuthenticatedService
 from his.orm import InconsistencyError, Service, CustomerService, Account
 
 __all__ = [
@@ -26,13 +26,9 @@ class AmbiguousTarget(JSON):
         'en_US': 'Ambiguous target selected.'}
 
 
+@service('services')
 class ServicePermissions(AuthenticatedService):
     """Handles service permissions."""
-
-    NODE = 'services'
-    NAME = 'services manager'
-    DESCRIPTION = 'Manages services permissions'
-    PROMOTE = False
 
     def add_customer_service(self, customer_id, service):
         """Allows the respective customer to use the given service."""

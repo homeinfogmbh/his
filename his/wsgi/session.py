@@ -7,19 +7,16 @@ from wsgilib import Error, OK, JSON
 from his.api.messages import MissingCredentials, InvalidCredentials, \
     NoSessionSpecified, NoSuchSession, SessionExpired, NotAuthorized, \
     NotAnInteger
-from his.api.handlers import HISService
+from his.api.handlers import service, HISService
 from his.orm import Account, Session
 
 __all__ = ['Session', 'INSTALL']
 
 
+@service('session')
 class SessionManager(HISService):
     """Session handling service"""
 
-    NODE = 'session'
-    NAME = 'sessions manager'
-    DESCRIPTION = 'Manages account sessions'
-    PROMOTE = False
     PARAMETER_ERROR = Error(
         'Must specify either account name or session token',
         status=400)

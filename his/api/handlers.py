@@ -166,7 +166,7 @@ class AuthorizedService(AuthenticatedService):
         except AttributeError:
             raise IncompleteImplementationError() from None
 
-        if not node:
+        if not service_name:
             raise IncompleteImplementationError() from None
 
         try:

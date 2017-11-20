@@ -14,6 +14,7 @@ from his.api.messages import IncompleteImplementationError, NotAnInteger, \
 from his.orm import Service, CustomerService, Account, Session
 
 __all__ = [
+    'service',
     'HISService',
     'AuthenticatedService',
     'AuthorizedService',
@@ -28,6 +29,19 @@ def check_hook(method):
     return method
 
 
+def service(name):
+    """Decorator to specify which service
+    the respective handler belongs to.
+    """
+
+    def wrap(handler):
+        """Wraps the respective handler."""
+        handler.SERVICE = name
+        return handler
+
+    return wrap
+
+
 class HISData(PostData):
     """HIS post data handler."""
 
@@ -39,10 +53,6 @@ class HISData(PostData):
 class HISService(RestHandler):
     """A generic HIS service."""
 
-    NODE = None
-    NAME = None
-    DESCRIPTION = None
-    PROMOTE = None
     DATA_HANDLER = HISData
 
     def __call__(self):
@@ -53,32 +63,6 @@ class HISService(RestHandler):
             return super().__call__()
 
         raise InternalServerError('Service check failed.') from None
-
-    @classmethod
-    def install(cls):
-        """Installs the service into the database index."""
-        if cls.NODE is None or cls.NAME is None:
-            raise IncompleteImplementationError() from None
-
-        try:
-            service = Service.get(Service.node == cls.NODE)
-        except DoesNotExist:
-            service = Service()
-            service.name = cls.NAME
-            service.node = cls.NODE
-            service.module = cls.__module__
-            service.handler = cls.__name__
-            service.description = cls.DESCRIPTION
-            service.promote = cls.PROMOTE
-            service.save()
-            return service
-
-        if service.name == cls.NAME:
-            if service.module == cls.__module__:
-                if service.handler == cls.__name__:
-                    return service
-
-        return False
 
     @property
     def __check_hooks(self):
@@ -178,7 +162,7 @@ class AuthorizedService(AuthenticatedService):
         is allowed to use this service.
         """
         try:
-            node = self.__class__.NODE
+            service_name = self.__class__.SERVICE
         except AttributeError:
             raise IncompleteImplementationError() from None
 
@@ -186,7 +170,7 @@ class AuthorizedService(AuthenticatedService):
             raise IncompleteImplementationError() from None
 
         try:
-            service = Service.get(Service.node == node)
+            service = Service.get(Service.name == service_name)
         except DoesNotExist:
             raise ServiceNotRegistered() from None
 

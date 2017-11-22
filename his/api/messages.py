@@ -92,7 +92,7 @@ class HISMessage(JSON):
             return 'Could not get locale: {}.'.format(lang)
 
         if data:
-            message.format(*data)
+            return message.format(*data)
 
         return message
 

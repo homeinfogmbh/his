@@ -128,7 +128,7 @@ class AuthenticatedService(HISService):
             if session_account.root:
                 return su_account
             elif session_account.admin:
-                if su_account.customer == account.customer:
+                if session_account.customer == su_account.customer:
                     return su_account
 
         raise NotAuthorized() from None

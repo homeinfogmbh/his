@@ -94,6 +94,7 @@ class AuthenticatedService(HISService):
         raise SessionExpired() from None
 
     @property
+    @lru_cache(maxsize=1)
     def session(self):
         """Returns the session or raises an error."""
         try:
@@ -107,48 +108,50 @@ class AuthenticatedService(HISService):
             raise NoSuchSession() from None
 
     @property
+    @lru_cache(maxsize=1)
     def account(self):
         """Gets the verified targeted account."""
-        account = self.session.account
+        session_account = self.session.account
 
-        if account.root or account.admin:
-            su_account = self.query.get('account')
+        try:
+            su_account = self.query['account']
+        except KeyError:
+            return session_account
 
-            if su_account is not None:
-                try:
-                    su_account = Account.find(su_account)
-                except DoesNotExist:
-                    raise NoSuchAccount() from None
+        if session_account.root or session_account.admin:
+            try:
+                su_account = Account.find(su_account)
+            except DoesNotExist:
+                raise NoSuchAccount() from None
 
-                if account.root:
+            if session_account.root:
+                return su_account
+            elif session_account.admin:
+                if su_account.customer == account.customer:
                     return su_account
-                elif su_account.customer == account.customer:
-                    return su_account
 
-                raise NotAuthorized() from None
-
-        return account
+        raise NotAuthorized() from None
 
     @property
+    @lru_cache(maxsize=1)
     def customer(self):
         """Gets the verified targeted customer."""
-        account = self.session.account
+        session_account = self.session.account
 
-        if account.root:
-            su_customer = self.query.get('customer')
+        try:
+            cid = int(self.query['customer'])
+        except KeyError:
+            return session_account.customer
+        except (TypeError, ValueError):
+            raise NotAnInteger() from None
 
-            if su_customer is not None:
-                try:
-                    cid = int(su_customer)
-                except ValueError:
-                    raise NotAnInteger() from None
+        if session_account.root:
+            try:
+                return Customer.get(Customer.id == cid)
+            except DoesNotExist:
+                raise NoSuchCustomer() from None
 
-                try:
-                    return Customer.get(Customer.id == cid)
-                except DoesNotExist:
-                    raise NoSuchCustomer() from None
-
-        return account.customer
+        raise NotAuthorized() from None
 
 
 class AuthorizedService(AuthenticatedService):

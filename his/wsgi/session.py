@@ -1,4 +1,4 @@
-"""HIS meta services"""
+"""HIS session service."""
 
 from peewee import DoesNotExist
 
@@ -15,87 +15,95 @@ __all__ = ['Session', 'INSTALL']
 
 @service('session')
 class SessionManager(HISService):
-    """Session handling service"""
+    """Session handling service."""
 
     PARAMETER_ERROR = Error(
-        'Must specify either account name or session token',
+        'Must specify either account name or session token.',
         status=400)
 
     @property
     def duration(self):
-        """Returns the repsective session duration"""
+        """Returns the repsective session duration in minutes."""
+        duration = self.query.get('duration', 15)
+
         try:
-            duration = int(self.query['duration'])
-        except KeyError:
-            # Default duration for refreshed sessions is 15 minutes
-            return 15
+            return int(duration)
         except (ValueError, TypeError):
             raise NotAnInteger('duration', duration) from None
-        else:
-            return duration
 
-    def get(self):
-        """Lists session information"""
-        if not self.resource:
-            # List all sessions iff specified session is root
-            try:
-                session = self.query['session']
-            except KeyError:
-                raise NoSessionSpecified()
-            else:
-                try:
-                    session = Session.get(Session.token == session)
-                except DoesNotExist:
-                    raise NoSuchSession()
-                else:
-                    if session.alive:
-                        if session.account.root:
-                            sessions = {}
-
-                            for session in Session:
-                                sessions[session.token] = session.to_dict()
-
-                            return JSON(sessions)
-                        else:
-                            raise NotAuthorized()
-                    else:
-                        raise SessionExpired()
-        else:
-            # List specific session information
-            try:
-                session = Session.get(Session.token == self.resource)
-            except DoesNotExist:
-                raise NoSuchSession()
-            else:
-                if session.alive:
-                    return JSON(session.to_dict())
-                else:
-                    raise SessionExpired()
-
-    def post(self):
-        """Handles account login requests"""
-        if self.resource is not None:
-            raise Error('Sub-sessions are not supported')
+    def list_sessions(self):
+        """Lists all sessions iff specified session is root."""
+        try:
+            session = self.query['session']
+        except KeyError:
+            raise NoSessionSpecified()
 
         try:
-            account = self.query['account']
-            passwd = self.query['passwd']
-        except KeyError:
+            session = Session.get(Session.token == session)
+        except DoesNotExist:
+            raise NoSuchSession()
+
+        if session.alive:
+            if session.account.root:
+                sessions = {}
+
+                for session in Session:
+                    sessions[session.token] = session.to_dict()
+
+                return JSON(sessions)
+
+            raise NotAuthorized()
+
+        raise SessionExpired()
+
+    def list_session(self):
+        """Lists the respective session."""
+        try:
+            session = Session.get(Session.token == self.resource)
+        except DoesNotExist:
+            raise NoSuchSession()
+
+        if session.alive:
+            return JSON(session.to_dict())
+
+        raise SessionExpired()
+
+    def get(self):
+        """Lists session information."""
+        if not self.resource:
+            return self.list_sessions()
+
+        return self.list_session()
+
+    def post(self):
+        """Handles account login requests."""
+        if self.resource is not None:
+            raise Error('Sub-sessions are not supported.')
+
+        try:
+            credentials = self.data.json
+        except Error:
             raise MissingCredentials()
-        else:
-            try:
-                account = Account.get(Account.name == account)
-            except DoesNotExist:
-                raise InvalidCredentials()
-            else:
-                if account.login(passwd):
-                    session = Session.open(account, duration=self.duration)
-                    return JSON(session.to_dict())
-                else:
-                    raise InvalidCredentials()
+
+        account = credentials.get('account')
+        passwd = credentials.get('passwd')
+
+        if not account or not passwd:
+            raise MissingCredentials()
+
+        try:
+            account = Account.get(Account.name == account)
+        except DoesNotExist:
+            raise InvalidCredentials()
+
+        if account.login(passwd):
+            session = Session.open(account, duration=self.duration)
+            return JSON(session.to_dict())
+
+        raise InvalidCredentials()
 
     def put(self):
-        """Tries to keep a session alive"""
+        """Tries to keep a session alive."""
         if not self.resource:
             raise NoSessionSpecified()
 
@@ -103,15 +111,15 @@ class SessionManager(HISService):
             session = Session.get(Session.token == self.resource)
         except DoesNotExist:
             raise NoSuchSession()
-        else:
-            if session.renew(duration=self.duration):
-                return JSON(session.to_dict())
-            else:
-                raise SessionExpired()
+
+        if session.renew(duration=self.duration):
+            return JSON(session.to_dict())
+
+        raise SessionExpired()
 
     def delete(self):
         """Tries to close a specific session identified by its token or
-        all sessions for a certain account specified by its name
+        all sessions for a certain account specified by its name.
         """
         if not self.resource:
             raise NoSessionSpecified()
@@ -120,12 +128,12 @@ class SessionManager(HISService):
             session = Session.get(Session.token == self.resource)
         except DoesNotExist:
             raise NoSuchSession()
-        else:
-            session.close()
-            return JSON({'closed': session.token})
+
+        session.close()
+        return JSON({'closed': session.token})
 
     def options(self):
-        """Returns the options"""
+        """Returns the options."""
         return OK()
 
 

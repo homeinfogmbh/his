@@ -80,13 +80,8 @@ class SessionManager(HISService):
         if self.resource is not None:
             raise Error('Sub-sessions are not supported.')
 
-        try:
-            credentials = self.data.json
-        except Error:
-            raise MissingCredentials()
-
-        account = credentials.get('account')
-        passwd = credentials.get('passwd')
+        account = self.data.json.get('account')
+        passwd = self.data.json.get('passwd')
 
         if not account or not passwd:
             raise MissingCredentials()

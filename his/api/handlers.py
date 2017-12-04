@@ -184,7 +184,7 @@ class AuthorizedService(AuthenticatedService):
         #       2a) account is admin or
         #       2b) account is enabled for the service
         #
-        account = self.account
+        account = self.session.account
 
         if account.root:
             return True
@@ -203,7 +203,7 @@ class AdminService(AuthenticatedService):
     @check_hook
     def check(self):
         """Check whether we are an admin."""
-        if self.account.admin:
+        if self.session.account.admin:
             return True
 
         raise NotAuthorized() from None
@@ -215,7 +215,7 @@ class RootService(AuthenticatedService):
     @check_hook
     def check(self):
         """Check whether we are root."""
-        if self.account.root:
+        if self.session.account.root:
             return True
 
         raise NotAuthorized() from None

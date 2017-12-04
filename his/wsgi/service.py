@@ -6,24 +6,11 @@ from homeinfo.crm import Customer
 from wsgilib import Error, OK, JSON
 
 from his.api.messages import NoServiceSpecified, NoSuchService, \
-    InvalidCustomerID, NoSuchCustomer, NotAuthorized
+    InvalidCustomerID, NoSuchCustomer, NotAuthorized, AmbiguousTarget
 from his.api.handlers import service, AuthenticatedService
 from his.orm import InconsistencyError, Service, CustomerService, Account
 
-__all__ = [
-    'AmbiguousTarget',
-    'ServicePermissions',
-    'INSTALL']
-
-
-# TODO: Outsource to his.api.messages.
-class AmbiguousTarget(JSON):
-    """Indicates that the selected target is ambiguous."""
-
-    STATUS = 400
-    LOCALE = {
-        'de_DE': 'Mehrdeutiges Ziel angegeben.',
-        'en_US': 'Ambiguous target selected.'}
+__all__ = ['ServicePermissions']
 
 
 @service('services')
@@ -55,8 +42,8 @@ class ServicePermissions(AuthenticatedService):
             customer_service.service = service
             customer_service.save()
             return OK('Service added for customer.')
-        else:
-            return OK('Service already enabled.')
+
+        return OK('Service already enabled.')
 
     def add_account_service(self, account_name, service):
         """Allows the respective account to use the given service."""
@@ -73,8 +60,8 @@ class ServicePermissions(AuthenticatedService):
             account.services.add(service)
         except InconsistencyError as error:
             return Error(error.msg, status=400)
-        else:
-            return OK('Service added for account.')
+
+        return OK('Service added for account.')
 
     def add_service(self, service):
         """Sets permissions for the respective account."""
@@ -100,6 +87,3 @@ class ServicePermissions(AuthenticatedService):
             raise NoSuchService() from None
 
         return self.add_service(service)
-
-
-INSTALL = [ServicePermissions]

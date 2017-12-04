@@ -10,7 +10,7 @@ from his.api.messages import MissingCredentials, InvalidCredentials, \
 from his.api.handlers import service, HISService
 from his.orm import Account, Session
 
-__all__ = ['Session', 'INSTALL']
+__all__ = ['Session']
 
 
 @service('session')
@@ -130,6 +130,3 @@ class SessionManager(HISService):
     def options(self):
         """Returns the options."""
         return OK()
-
-
-INSTALL = [SessionManager]

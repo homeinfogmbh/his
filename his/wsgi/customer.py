@@ -2,28 +2,30 @@
 
 from wsgilib import JSON
 
-from his.api.messages import HISAPIError
+from his.api.messages import InvalidOperation, CustomerUnconfigured
 from his.api.handlers import AdminService
+from his.orm import CustomerSettings
 
 __all__ = ['CustomerService']
-
-
-class InvalidOperation(HISAPIError):
-    """Indicates an invalid operation"""
-
-    pass
 
 
 class CustomerService(AdminService):
     """Handles service permissions"""
 
+    @property
+    def settings(self):
+        """Returns the respective customer settings."""
+        try:
+            CustomerSettings.get(CustomerSettings.customer == self.customer)
+        except DoesNotExist:
+            raise CustomerUnconfigured() from None
+
     def get(self):
         """Allows services"""
         if self.resource is not None:
             if self.resource == 'logo':
-                # TODO: Get logo
-                pass
-            else:
-                raise InvalidOperation() from None
-        else:
-            return JSON(self.customer.to_dict())
+                return Binary(self.settings.logo)
+
+            raise InvalidOperation() from None
+
+        return JSON(self.customer.to_dict())

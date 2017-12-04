@@ -47,7 +47,12 @@ __all__ = [
     'AccountPatched',
 
     'BoundaryError',
-    'DurationOutOfBounds']
+    'DurationOutOfBounds',
+
+    'AmbiguousTarget',
+
+    'CustomerUnconfigured',
+    'InvalidOperation']
 
 
 def locales(locales_file):
@@ -297,3 +302,21 @@ class BoundaryError(HISAPIError):
     """Base for boundry violation errors."""
 
     STATUS = 403
+
+
+class AmbiguousTarget(HISAPIError):
+    """Indicates that the selected target is ambiguous."""
+
+    STATUS = 400
+
+class CustomerUnconfigured(HISAPIError):
+    """Indicates that the respective customer
+    has no customer configuration.
+    """
+
+    STATUS = 404
+
+class InvalidOperation(HISAPIError):
+    """Indicates that the an invalid operation has been requested """
+
+    STATUS = 400

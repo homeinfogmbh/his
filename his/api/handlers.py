@@ -1,7 +1,7 @@
 """Meta-services for HIS."""
 
 from contextlib import suppress
-from functoorls import lru_cache
+from functools import lru_cache
 
 from peewee import DoesNotExist
 

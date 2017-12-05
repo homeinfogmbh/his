@@ -1,132 +1,112 @@
 """HIS session service."""
 
+from json import load
+
+from flask import request, jsonify, Flask
 from peewee import DoesNotExist
 
-from wsgilib import Error, OK, JSON
-
-from his.api.messages import MissingCredentials, InvalidCredentials, \
-    NoSessionSpecified, NoSuchSession, SessionExpired, NotAuthorized, \
-    NotAnInteger
-from his.api.handlers import service, HISService
 from his.orm import Account, Session
 
-__all__ = ['Session']
+__all__ = ['APPLICATION']
 
 
-@service('session')
-class SessionManager(HISService):
-    """Session handling service."""
+APPLICATION = Flask('session')
 
-    PARAMETER_ERROR = Error(
-        'Must specify either account name or session token.',
-        status=400)
 
-    @property
-    def duration(self):
-        """Returns the repsective session duration in minutes."""
-        duration = self.query.get('duration', 15)
+def get_duration(default=15):
+    """Returns the repsective session duration in minutes."""
 
-        try:
-            return int(duration)
-        except (ValueError, TypeError):
-            raise NotAnInteger('duration', duration) from None
+    return int(request.args.get('duration', default))
 
-    def list_sessions(self):
-        """Lists all sessions iff specified session is root."""
-        try:
-            session = self.query['session']
-        except KeyError:
-            raise NoSessionSpecified()
 
-        try:
-            session = Session.get(Session.token == session)
-        except DoesNotExist:
-            raise NoSuchSession()
+@APPLICATION.route('/session', methods=['POST'])
+def open_session():
+    """Opens a new session for the respective account."""
 
-        if session.alive:
-            if session.account.root:
-                sessions = {}
+    json = load(request.get_data())
+    account = json.get('account')
+    passwd = json.get('passwd')
 
-                for session in Session:
-                    sessions[session.token] = session.to_dict()
+    if not account or not passwd:
+        return ('Missing user name and / or password.', 400)
 
-                return JSON(sessions)
-
-            raise NotAuthorized()
-
-        raise SessionExpired()
-
-    def list_session(self):
-        """Lists the respective session."""
-        try:
-            session = Session.get(Session.token == self.resource)
-        except DoesNotExist:
-            raise NoSuchSession()
-
-        if session.alive:
-            return JSON(session.to_dict())
-
-        raise SessionExpired()
-
-    def get(self):
-        """Lists session information."""
-        if not self.resource:
-            return self.list_sessions()
-
-        return self.list_session()
-
-    def post(self):
-        """Handles account login requests."""
-        if self.resource is not None:
-            raise Error('Sub-sessions are not supported.')
-
-        account = self.data.json.get('account')
-        passwd = self.data.json.get('passwd')
-
-        if not account or not passwd:
-            raise MissingCredentials()
-
-        try:
-            account = Account.get(Account.name == account)
-        except DoesNotExist:
-            raise InvalidCredentials()
-
+    try:
+        account = Account.get(Account.name == account)
+    except DoesNotExist:
+        pass
+    else:
         if account.login(passwd):
-            session = Session.open(account, duration=self.duration)
-            return JSON(session.to_dict())
+            session = Session.open(account, duration=get_duration())
+            return jsonify(session.to_dict())
 
-        raise InvalidCredentials()
+    return ('Invalid user name and / or password.', 401)
 
-    def put(self):
-        """Tries to keep a session alive."""
-        if not self.resource:
-            raise NoSessionSpecified()
 
-        try:
-            session = Session.get(Session.token == self.resource)
-        except DoesNotExist:
-            raise NoSuchSession()
+@APPLICATION.route('/session', methods=['GET'])
+def list_sessions():
+    """Lists all sessions iff specified session is root."""
 
-        if session.renew(duration=self.duration):
-            return JSON(session.to_dict())
+    try:
+        session = request.args['session']
+    except KeyError:
+        return ('No session specified.', 400)
 
-        raise SessionExpired()
+    try:
+        session = Session.get(Session.token == session)
+    except DoesNotExist:
+        return ('No such session.', 404)
 
-    def delete(self):
-        """Tries to close a specific session identified by its token or
-        all sessions for a certain account specified by its name.
-        """
-        if not self.resource:
-            raise NoSessionSpecified()
+    if session.alive:
+        if session.account.root:
+            sessions = {
+                session.token: session.to_dict() for session in Session}
+            return jsonify(sessions)
 
-        try:
-            session = Session.get(Session.token == self.resource)
-        except DoesNotExist:
-            raise NoSuchSession()
+        return ('Not authorized.', 403)
 
-        session.close()
-        return JSON({'closed': session.token})
+    return ('Session expired.', 410)
 
-    def options(self):
-        """Returns the options."""
-        return OK()
+
+@APPLICATION.route('/session/<session_token>', methods=['GET'])
+def list_session(session_token):
+    """Lists the respective session."""
+
+    try:
+        session = Session.get(Session.token == session_token)
+    except DoesNotExist:
+        return ('No such session.', 404)
+
+    if session.alive:
+        return jsonify(session.to_dict())
+
+    return ('Session expired.', 410)
+
+
+@APPLICATION.route('/session/<session_token>', methods=['PUT'])
+def refresh_session(session_token):
+    """Refreshes an existing session."""
+
+    try:
+        session = Session.get(Session.token == session_token)
+    except DoesNotExist:
+        return ('No such session.', 404)
+
+    if session.renew(duration=get_duration()):
+        return jsonify(session.to_dict())
+
+    return ('Session expired.', 410)
+
+
+@APPLICATION.route('/session/<session_token>', methods=['DELETE'])
+def delete(session_token):
+    """Tries to close a specific session identified by its token or
+    all sessions for a certain account specified by its name.
+    """
+
+    try:
+        session = Session.get(Session.token == session_token)
+    except DoesNotExist:
+        return ('No such session.', 404)
+
+    session.close()
+    return jsonify({'closed': session.token})

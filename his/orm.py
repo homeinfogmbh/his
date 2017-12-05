@@ -18,7 +18,7 @@ from homeinfo.crm import Customer, Employee
 from his.api.messages import InvalidCredentials, AccountLocked, \
     DurationOutOfBounds
 from his.config import CONFIG
-from his.crypto import PASSWORD_HASHER, verify_password
+from his.crypto import hash_password, verify_password
 
 __all__ = [
     'AccountExists',
@@ -280,12 +280,12 @@ class Account(HISModel):
             ident = int(id_or_name)
         except ValueError:
             return cls.get(cls.name == id_or_name)
-        else:
-            return cls.get(cls.id == ident)
+
+        return cls.get(cls.id == ident)
 
     def passwd(self, passwd):
         """Sets the password."""
-        self.pwhash = PASSWORD_HASHER.hash(passwd)
+        self.pwhash = hash_password(passwd)
 
     passwd = property(None, passwd)
 
@@ -327,9 +327,8 @@ class Account(HISModel):
         # Admins can manage accounts of their
         # company, i.e. the same customer.
         if self.admin:
-            cls = self.__class__
-
-            for account in cls.select().where(cls.customer == self.customer):
+            for account in self.__class__.select().where(
+                    self.__class__.customer == self.customer):
                 # We already yielded this very account.
                 if account != self:
                     yield account
@@ -538,7 +537,7 @@ class Session(HISModel):
             'token': self.token,
             'start': self.start.isoformat(),
             'end': self.end.isoformat(),
-            'login': bool(self.login)}
+            'login': self.login}
 
 
 class CustomerSettings(HISModel):

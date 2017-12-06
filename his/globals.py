@@ -6,8 +6,9 @@ from werkzeug.local import LocalProxy
 
 from homeinfo.crm import Customer
 
-from his.api.messages import  NotAnInteger, NoSessionSpecified, NoSuchSession,\
-    NotAuthorized, NoSuchCustomer, NoSuchAccount
+from his.messages.account import NoSuchAccount, NotAuthorized
+from his.messages.customer import InvalidCustomerID, NoSuchCustomer
+from his.messages.session import NoSessionSpecified, NoSuchSession
 from his.orm import Session, Account
 
 
@@ -63,7 +64,7 @@ def get_customer():
     except KeyError:
         return session_account.customer
     except (TypeError, ValueError):
-        raise NotAnInteger() from None
+        raise InvalidCustomerID() from None
 
     if session_account.root:
         try:

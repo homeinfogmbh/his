@@ -1,34 +1,13 @@
 """HIS WSGI core services."""
 
-from wsgilib import Router
+from flask import Flask
 
-from his.config import ROOT
-from his.wsgi.account import AccountService
-from his.wsgi.customer import CustomerService
-from his.wsgi.service import ServicePermissions
-from his.wsgi.session import SessionManager
+from his.wsgi.account import *
+from his.wsgi.customer import *
+from his.wsgi.service import *
+from his.wsgi.session import *
 
-__all__ = ['ROUTER']
-
-
-class HISRouter(Router):
-    """HIS router with variable root."""
-
-    def __init__(self, root):
-        """Sets root."""
-        super().__init__()
-        self.root = root
-
-    def route(self, path):
-        """Routes relative to root."""
-        if path.startswith('/'):
-            return super().route(self.root + path)
-
-        return super().route(self.root + '/' + path)
+__all__ = ['APPLICATION']
 
 
-ROUTER = HISRouter(ROOT)
-ROUTER.route('/account/[id:int]')(AccountService)
-ROUTER.route('/customer/[cid:int]')(CustomerService)
-ROUTER.route('/service/[id:int]')(ServicePermissions)
-ROUTER.route('/session/[token]')(SessionManager)
+APPLICATION = Flask('his')

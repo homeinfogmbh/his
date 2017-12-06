@@ -2,15 +2,21 @@
 
 from json import load
 
-from flask import request, jsonify, Flask
+from flask import request, jsonify
 from peewee import DoesNotExist
 
+from his.messages.account import NotAuthorized
+from his.messages.session import NoSessionSpecified, NoSuchSession, \
+    SessionExpired, MissingCredentials, InvalidCredentials
 from his.orm import Account, Session
+from his.wsgi import APPLICATION
 
-__all__ = ['APPLICATION']
-
-
-APPLICATION = Flask('session')
+__all__ = [
+    'open_session',
+    'list_sessions',
+    'list_session',
+    'refresh_session',
+    'close_session']
 
 
 def get_duration(default=15):
@@ -28,7 +34,7 @@ def open_session():
     passwd = json.get('passwd')
 
     if not account or not passwd:
-        return ('Missing user name and / or password.', 400)
+        raise MissingCredentials()
 
     try:
         account = Account.get(Account.name == account)
@@ -39,7 +45,7 @@ def open_session():
             session = Session.open(account, duration=get_duration())
             return jsonify(session.to_dict())
 
-    return ('Invalid user name and / or password.', 401)
+    raise InvalidCredentials()
 
 
 @APPLICATION.route('/session', methods=['GET'])
@@ -49,12 +55,12 @@ def list_sessions():
     try:
         session = request.args['session']
     except KeyError:
-        return ('No session specified.', 400)
+        raise NoSessionSpecified()
 
     try:
         session = Session.get(Session.token == session)
     except DoesNotExist:
-        return ('No such session.', 404)
+        raise NoSuchSession()
 
     if session.alive:
         if session.account.root:
@@ -62,9 +68,9 @@ def list_sessions():
                 session.token: session.to_dict() for session in Session}
             return jsonify(sessions)
 
-        return ('Not authorized.', 403)
+        raise NotAuthorized()
 
-    return ('Session expired.', 410)
+    raise SessionExpired()
 
 
 @APPLICATION.route('/session/<session_token>', methods=['GET'])
@@ -74,12 +80,12 @@ def list_session(session_token):
     try:
         session = Session.get(Session.token == session_token)
     except DoesNotExist:
-        return ('No such session.', 404)
+        raise NoSuchSession()
 
     if session.alive:
         return jsonify(session.to_dict())
 
-    return ('Session expired.', 410)
+    raise SessionExpired()
 
 
 @APPLICATION.route('/session/<session_token>', methods=['PUT'])
@@ -89,16 +95,16 @@ def refresh_session(session_token):
     try:
         session = Session.get(Session.token == session_token)
     except DoesNotExist:
-        return ('No such session.', 404)
+        raise NoSuchSession()
 
     if session.renew(duration=get_duration()):
         return jsonify(session.to_dict())
 
-    return ('Session expired.', 410)
+    raise SessionExpired()
 
 
 @APPLICATION.route('/session/<session_token>', methods=['DELETE'])
-def delete(session_token):
+def close_session(session_token):
     """Tries to close a specific session identified by its token or
     all sessions for a certain account specified by its name.
     """
@@ -106,7 +112,7 @@ def delete(session_token):
     try:
         session = Session.get(Session.token == session_token)
     except DoesNotExist:
-        return ('No such session.', 404)
+        raise NoSuchSession()
 
     session.close()
     return jsonify({'closed': session.token})

@@ -1,31 +1,32 @@
 """Customer-level meta services"""
 
-from wsgilib import JSON
-
-from his.api.messages import InvalidOperation, CustomerUnconfigured
+from his.api.globals import CUSTOMER
 from his.api.handlers import AdminService
+from his.api.messages import InvalidOperation, CustomerUnconfigured
 from his.orm import CustomerSettings
+from his.wsgi import APPLICATION
 
 __all__ = ['CustomerService']
 
 
-class CustomerService(AdminService):
-    """Handles service permissions"""
+def settings(self):
+    """Returns the respective customer settings."""
 
-    @property
-    def settings(self):
-        """Returns the respective customer settings."""
-        try:
-            CustomerSettings.get(CustomerSettings.customer == self.customer)
-        except DoesNotExist:
-            raise CustomerUnconfigured() from None
+    try:
+        CustomerSettings.get(CustomerSettings.customer == CUSTOMER)
+    except DoesNotExist:
+        raise CustomerUnconfigured() from None
 
-    def get(self):
-        """Allows services"""
-        if self.resource is not None:
-            if self.resource == 'logo':
-                return Binary(self.settings.logo)
 
-            raise InvalidOperation() from None
+@APPLICATION.route('/customer', methods=['GET'])
+def get_customer(self):
+    """Allows services"""
 
-        return JSON(self.customer.to_dict())
+    return jsonify(CUSTOMER.to_dict())
+
+
+@APPLICATION.route('/customer/logo', methods=['GET'])
+def get_customer(self):
+    """Allows services"""
+
+    return Binary(settings().logo)

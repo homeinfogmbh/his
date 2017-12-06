@@ -8,7 +8,7 @@ from his.messages.account import NotAuthorized
 from his.messages.data import NoDataProvided, InvalidUTF8Data, InvalidJSON
 from his.messages.service import NoSuchService
 from his.messages.session import SessionExpired
-from his.orm import Service, CustomerService
+from his.orm import Service
 
 __all__ = ['DATA', 'authenticated', 'authorized', 'admin', 'root']
 

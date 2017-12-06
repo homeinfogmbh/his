@@ -313,19 +313,29 @@ class Account(HISModel):
     passwd = property(None, passwd)
 
     @property
-    def valid(self):
-        """Determines whether the account is valid."""
-        return self.pwhash and not self.deleted and not self.disabled
-
-    @property
     def locked(self):
         """Determines whether the user is locked."""
-        if self.failed_logins > 5:
-            return True
-        elif self.locked_until is not None:
-            return self.locked_until >= datetime.now()
+        if self.locked_until is None:
+            return False
 
-        return False
+        return self.locked_until >= datetime.now()
+
+    @property
+    def usable(self):
+        """Determines whether the account is currently usable."""
+        return not self.deleted and not self.disabled and not self.locked
+
+    @property
+    def failed_logins_exceeded(self):
+        """Determines whether the account has exceeded
+        the acceptable amount of failed logins.
+        """
+        return self.failed_logins > 5
+
+    @property
+    def can_login(self):
+        """Determines whether the account can log in."""
+        return self.usable and not self.failed_logins_exceeded
 
     @property
     def active(self):
@@ -358,7 +368,7 @@ class Account(HISModel):
 
     def login(self, passwd):
         """Performs a login."""
-        if self.valid and not self.locked:
+        if self.can_login:
             if verify_password(self.pwhash, passwd):
                 self.failed_logins = 0
                 self.last_login = datetime.now()

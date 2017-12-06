@@ -4,7 +4,7 @@ from peewee import DoesNotExist
 from wsgilib import PostData
 
 from his.globals import SESSION
-from his.messages.account import NotAuthorized
+from his.messages.account import NotAuthorized, AccountLocked
 from his.messages.data import NoDataProvided, InvalidUTF8Data, InvalidJSON
 from his.messages.service import NoSuchService
 from his.messages.session import SessionExpired
@@ -28,10 +28,13 @@ def authenticated(function):
         """Wraps the respective function
         with preceding authentication.
         """
-        if SESSION.active:
-            return function(*args, **kwargs)
+        if SESSION.account.usable:
+            if SESSION.alive:
+                return function(*args, **kwargs)
 
-        raise SessionExpired()
+            raise SessionExpired()
+
+        raise AccountLocked()
 
     return authentication_wrapper
 

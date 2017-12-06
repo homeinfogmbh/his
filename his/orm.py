@@ -48,6 +48,9 @@ class InconsistencyError(Exception):
         super().__init__(msg)
         self.msg = msg
 
+    def __str__(self):
+        return self.msg
+
 
 class AccountExists(Exception):
     """Indicates that the respective account already exists."""
@@ -130,12 +133,32 @@ class Service(HISModel):
 
     name = CharField(32, null=True, default=None)
     description = CharField(255, null=True, default=None)
-    # Flag whether the service shall be promoted
+    # Flag whether the service shall be promoted.
     promote = BooleanField(default=True)
 
     def __str__(self):
         """Returns the service's name."""
         return self.name
+
+    def authorized(self, account):
+        """Determines whether the respective account
+        is authorized to use this service.
+
+        An account is considered authorized if:
+            1) account is root or
+            2) account's customer is enabled for the service and
+                2a) account is admin or
+                2b) account is enabled for the service
+        """
+        if account.root:
+            return True
+        elif self in CustomerService.services(account.customer):
+            if account.admin:
+                return True
+            elif self in account.services:
+                return True
+
+        return False
 
 
 class CustomerService(HISModel):

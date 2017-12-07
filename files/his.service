@@ -1,0 +1,12 @@
+[Unit]
+Description=HOMEINFO Integrated Services
+After=network.target mysql.service
+Requires=mysql.service
+
+[Service]
+User=his
+Group=his
+ExecStart=/usr/local/bin/hisd
+
+[Install]
+WantedBy=multi-user.target

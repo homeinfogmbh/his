@@ -12,9 +12,8 @@ setup(
         'his',
         'his.api',
         'his.wsgi'],
-    scripts=['files/hisutil', 'files/his-session-cleanup'],
+    scripts=['files/hisd', 'files/hisutil', 'files/his-session-cleanup'],
     data_files=[
-        ('/etc/uwsgi/apps-available', ['files/his.ini']),
-        ('/etc/his.d/locale', ['files/core.ini']),
-        ('/usr/share/his', ['files/his.wsgi'])],
+        ('/usr/lib/systemd/system', ['files/his.service'])
+        ('/etc/his.d/locale', ['files/his.ini'])],
     description='HOMEINFO Integrated Services.')

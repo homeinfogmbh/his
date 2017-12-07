@@ -1,32 +1,61 @@
 """Customer-level meta services"""
 
-from his.api.globals import CUSTOMER
-from his.api.handlers import AdminService
-from his.api.messages import InvalidOperation, CustomerUnconfigured
+from flask import jsonify
+from peewee import DoesNotExist
+
+from homeinfo.crm import Customer
+from wsgilib import Binary
+
+from his.globals import ACCOUNT, CUSTOMER, SU_CUSTOMER
+from his.messages.account import NotAuthorized
+from his.messages.customer import InvalidCustomerID, NoSuchCustomer, \
+    CustomerUnconfigured
 from his.orm import CustomerSettings
 from his.wsgi import APPLICATION
 
-__all__ = ['CustomerService']
+__all__ = ['get_customer', 'get_logo']
 
 
-def settings(self):
+def customer_by_cid(cid):
+    """Returns the customer by the respective customer ID."""
+
+    try:
+        cid = int(cid)
+    except ValueError:
+        raise InvalidCustomerID()
+
+    try:
+        return Customer.get(Customer.id == cid)
+    except DoesNotExist:
+        raise NoSuchCustomer()
+
+
+def settings():
     """Returns the respective customer settings."""
 
     try:
-        CustomerSettings.get(CustomerSettings.customer == CUSTOMER)
+        CustomerSettings.get(CustomerSettings.customer == SU_CUSTOMER)
     except DoesNotExist:
         raise CustomerUnconfigured() from None
 
 
-@APPLICATION.route('/customer', methods=['GET'])
-def get_customer(self):
+@APPLICATION.route('/customer/<customer>', methods=['GET'])
+def get_customer(customer):
     """Allows services"""
 
-    return jsonify(CUSTOMER.to_dict())
+    if customer == '!':
+        return jsonify(CUSTOMER.to_dict())
+
+    customer = customer_by_cid(customer)
+
+    if ACCOUNT.root or CUSTOMER == customer:
+        return jsonify(customer.to_dict())
+
+    raise NotAuthorized()
 
 
 @APPLICATION.route('/customer/logo', methods=['GET'])
-def get_customer(self):
+def get_logo():
     """Allows services"""
 
     return Binary(settings().logo)

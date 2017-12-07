@@ -12,7 +12,7 @@ from his.messages.session import NoSessionSpecified, NoSuchSession
 from his.orm import Session, Account
 
 
-__all__ = ['SESSION', 'ACCOUNT', 'CUSTOMER']
+__all__ = ['SESSION', 'ACCOUNT', 'CUSTOMER', 'SU_ACCOUNT', 'SU_CUSTOMER']
 
 
 def get_session():
@@ -21,60 +21,58 @@ def get_session():
     try:
         session_token = request.args['session']
     except KeyError:
-        raise NoSessionSpecified() from None
+        raise NoSessionSpecified()
 
     try:
         return Session.get(Session.token == session_token)
     except DoesNotExist:
-        raise NoSuchSession() from None
+        raise NoSuchSession()
 
 
 def get_account():
     """Gets the verified targeted account."""
 
-    session_account = SESSION.account
-
     try:
         su_account = request.args['account']
     except KeyError:
-        return session_account
+        return ACCOUNT
 
-    if session_account.root or session_account.admin:
+    if ACCOUNT.root or ACCOUNT.admin:
         try:
             su_account = Account.find(su_account)
         except DoesNotExist:
-            raise NoSuchAccount() from None
+            raise NoSuchAccount()
 
-        if session_account.root:
+        if ACCOUNT.root:
             return su_account
-        elif session_account.admin:
-            if session_account.customer == su_account.customer:
+        elif ACCOUNT.admin:
+            if su_account.customer == CUSTOMER:
                 return su_account
 
-    raise NotAuthorized() from None
+    raise NotAuthorized()
 
 
 def get_customer():
     """Gets the verified targeted customer."""
 
-    session_account = SESSION.account
-
     try:
         cid = int(request.args['customer'])
     except KeyError:
-        return session_account.customer
+        return CUSTOMER
     except (TypeError, ValueError):
-        raise InvalidCustomerID() from None
+        raise InvalidCustomerID()
 
-    if session_account.root:
+    if ACCOUNT.root:
         try:
             return Customer.get(Customer.id == cid)
         except DoesNotExist:
-            raise NoSuchCustomer() from None
+            raise NoSuchCustomer()
 
-    raise NotAuthorized() from None
+    raise NotAuthorized()
 
 
 SESSION = LocalProxy(get_session)
-ACCOUNT = LocalProxy(get_account)
-CUSTOMER = LocalProxy(get_customer)
+ACCOUNT = LocalProxy(lambda: SESSION.account)
+CUSTOMER = LocalProxy(lambda: ACCOUNT.customer)
+SU_ACCOUNT = LocalProxy(get_account)
+SU_CUSTOMER = LocalProxy(get_customer)

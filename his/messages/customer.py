@@ -5,7 +5,8 @@ from his.messages.common import Message
 __all__ = [
     'InvalidCustomerID',
     'NoCustomerSpecified',
-    'NoSuchCustomer']
+    'NoSuchCustomer',
+    'CustomerUnconfigured']
 
 
 class InvalidCustomerID(Message):
@@ -22,5 +23,13 @@ class NoCustomerSpecified(Message):
 
 class NoSuchCustomer(Message):
     """Indicates that the customer does not exist."""
+
+    STATUS = 404
+
+
+class CustomerUnconfigured(Message):
+    """Indicates that there is no configuration
+    available for the respective customer.
+    """
 
     STATUS = 404

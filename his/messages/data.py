@@ -3,8 +3,11 @@
 from his.messages.common import Message
 
 __all__ = [
+    'DataError',
     'NoDataProvided',
     'NotAnInteger',
+    'MissingData',
+    'InvalidData',
     'InvalidUTF8Data',
     'InvalidJSON',
     'InvalidCustomerID']
@@ -24,6 +27,12 @@ class NoDataProvided(DataError):
 
 class NotAnInteger(DataError):
     """Indicates missing credentials."""
+
+    pass
+
+
+class MissingData(DataError):
+    """Indicates missing data."""
 
     pass
 

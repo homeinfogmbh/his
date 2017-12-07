@@ -1,191 +1,242 @@
 """Account management."""
 
+from flask import request, jsonify
 from peewee import DoesNotExist
 
-from wsgilib import Error, OK, JSON, InternalServerError
+from wsgilib import JSON
 
-from his.api.messages import HISDataError, InvalidData, NoAccountSpecified, \
-    NoSuchAccount, NotAuthorized, AccountPatched
-from his.api.handlers import AuthenticatedService
-from his.orm import AccountExists, AmbiguousDataError, Account, \
-    CustomerSettings
+from his.api import DATA
+from his.globals import ACCOUNT, CUSTOMER, SU_CUSTOMER
+from his.messages.account import NoSuchAccount, NotAuthorized, AccountExists, \
+    AccountCreated, AccountPatched, AccountsExhausted
+from his.messages.customer import CustomerUnconfigured
+from his.messages.data import DataError, MissingData, InvalidData
+from his.orm import AccountExists as AccountExists_, AmbiguousDataError, \
+    Account, CustomerSettings
+from his.wsgi import APPLICATION
+from his.wsgi.customer import customer_by_cid
+
+__all__ = ['list_accounts', 'get_account', 'add_account', 'patch_account']
 
 
-CURRENT_ACCOUNT_SELECTOR = '!'
+def account_by_name(name_or_id):
+    """Returns the respective account by its name."""
 
-
-class AccountService(AuthenticatedService):
-    """Service that handles accounts."""
-
-    @property
-    def selected_account(self):
-        """Returns the target account."""
-        if self.resource is None:
-            raise NoAccountSpecified() from None
-
+    try:
+        ident = int(name_or_id)
+    except ValueError:
         try:
-            return Account.get(
-                (Account.name == self.resource) &
-                (Account.customer == self.customer))
+            return Account.get(Account.name == name_or_id)
         except DoesNotExist:
-            raise NoSuchAccount() from None
+            raise NoSuchAccount()
 
-    def add_account(self, customer):
-        """Adds an account for the respective customer."""
-        json = self.data.json
+    try:
+        return Account.get(Account.id == ident)
+    except DoesNotExist:
+        raise NoSuchAccount()
 
-        try:
-            name = json['name']
-        except KeyError:
-            raise Error('No name specified.')
 
-        try:
-            email = json['email']
-        except KeyError:
-            raise Error('No email specified.')
+def list_accounts_root():
+    """Lists accounts."""
 
-        try:
-            account = Account.add(
-                customer, name, email, passwd=json.get('passwd'))
-        except ValueError:
-            raise InternalServerError('Value error.') from None
-        except AccountExists as error:
-            raise Error('Account already exists for {}.'.format(error.field),
-                        status=409) from None
+    try:
+        customer = request.args['customer']
+    except KeyError:
+        return Account
+
+    return Account.select().where(
+        Account.customer == customer_by_cid(customer))
+
+
+def _add_account():
+    """Adds an account for the current customer."""
+
+    json = DATA.json
+
+    try:
+        name = json['name']
+    except KeyError:
+        raise MissingData(field='name')
+
+    try:
+        email = json['email']
+    except KeyError:
+        raise MissingData(field='email')
+
+    try:
+        passwd = json['passwd']
+    except KeyError:
+        raise MissingData(field='passwd')
+
+    try:
+        account = Account.add(SU_CUSTOMER, name, email, passwd=passwd)
+    except AccountExists_:
+        raise AccountExists()
+
+    account.save()
+    return AccountCreated()
+
+
+def _patch_account_root(account):
+    """Patches the account from a root user context."""
+
+    try:
+        account.patch(DATA.json)
+        account.save()
+    except (TypeError, ValueError):
+        raise InvalidData()
+    except AmbiguousDataError as error:
+        raise DataError(field=str(error))
+
+    return AccountPatched()
+
+
+def _patch_account_admin(account):
+    """Patches the account from an admin context."""
+
+    patch_dict = {}
+    invalid_keys = []
+
+    # Filter valid options for admins.
+    for key, value in DATA.json.items():
+        if key in ('name', 'passwd', 'email', 'admin'):
+            patch_dict[key] = value
         else:
-            account.save()
-            return OK(status=201)
+            invalid_keys.append(key)
 
-    def change_account(self, target_account):
-        """Change account data."""
-        json = self.data.json
+    try:
+        account.patch(patch_dict)
+        account.save()
+    except (TypeError, ValueError):
+        raise InvalidData()
+    except AmbiguousDataError as error:
+        raise DataError(field=str(error))
 
-        if self.account.root:
-            try:
-                target_account.patch(json, root=True)
-                target_account.save()
-            except (TypeError, ValueError):
-                raise InvalidData() from None
-            except AmbiguousDataError as error:
-                raise HISDataError(field=str(error)) from None
+    if invalid_keys:
+        return AccountPatched(invalid_keys=invalid_keys)
 
-            return AccountPatched()
-        elif self.account.admin:
-            if self.account.customer == target_account.customer:
-                patch_dict = {}
-                invalid_keys = []
+    return AccountPatched()
 
-                # Filter valid options for admins
-                for key, value in json.items():
-                    if key in ('name', 'passwd', 'email', 'admin'):
-                        patch_dict[key] = value
-                    else:
-                        invalid_keys.append(key)
 
-                try:
-                    target_account.patch(patch_dict, admin=True)
-                    target_account.save()
-                except (TypeError, ValueError):
-                    raise InvalidData() from None
-                except AmbiguousDataError as error:
-                    raise HISDataError(field=str(error)) from None
+def _patch_account_user(account):
+    """Patches the accunt from a user context."""
 
-                if invalid_keys:
-                    return AccountPatched(invalid_keys=invalid_keys)
+    patch_dict = {}
+    invalid_keys = []
 
-                return AccountPatched()
-
-            raise NotAuthorized() from None
+    # Filter valid options for normal users.
+    for key, value in DATA.json.items():
+        if key in ('passwd', 'email'):
+            patch_dict[key] = value
         else:
-            if self.session.account == target_account:
-                patch_dict = {}
-                invalid_keys = []
+            invalid_keys.append(key)
 
-                # Filter valid options for admins
-                for key, value in json.items():
-                    if key in ('passwd', 'email'):
-                        patch_dict[key] = value
-                    else:
-                        invalid_keys.append(key)
+    try:
+        account.patch(patch_dict)
+        account.save()
+    except (TypeError, ValueError):
+        raise InvalidData()
+    except AmbiguousDataError as error:
+        raise DataError(field=str(error))
 
-                try:
-                    target_account.patch(patch_dict, admin=True)
-                    target_account.save()
-                except (TypeError, ValueError):
-                    raise InvalidData() from None
-                except AmbiguousDataError as error:
-                    raise HISDataError(field=str(error)) from None
+    if invalid_keys:
+        return AccountPatched(invalid_keys=invalid_keys)
 
-                if invalid_keys:
-                    return AccountPatched(invalid_keys=invalid_keys)
+    return AccountPatched()
 
-                return AccountPatched()
 
-            raise NotAuthorized() from None
+def _patch_account(account):
+    """Change account data."""
 
-    def get(self):
-        """List one or many accounts."""
-        account = self.account
+    if ACCOUNT.root:
+        return _patch_account_root(account)
+    elif ACCOUNT.admin:
+        if account.customer == CUSTOMER:
+            return _patch_account_admin(account)
 
-        if self.resource is None:
-            if account.root:
-                if self.query.get('customer') is None:
-                    return JSON([a.to_dict() for a in Account])
+        raise NotAuthorized()
 
-                return JSON([a.to_dict() for a in Account.select().where(
-                    Account.customer == self.customer)])
-            elif account.admin:
-                return JSON([a.to_dict() for a in Account.select().where(
-                    Account.customer == self.customer)])
+    if account == ACCOUNT:
+        return _patch_account_user(account)
 
-            raise NotAuthorized() from None
-        elif self.resource == CURRENT_ACCOUNT_SELECTOR:
-            # Account of used session
-            return JSON(account.to_dict())
+    raise NotAuthorized()
 
-        selected_account = self.selected_account
 
-        if account.root:
-            return JSON(selected_account.to_dict())
-        elif account.admin:
-            if account.customer == selected_account.customer:
-                return JSON(selected_account.to_dict())
+@APPLICATION.route('/account', methods=['GET'])
+def list_accounts():
+    """List one or many accounts."""
 
-            raise NotAuthorized() from None
-        elif account == selected_account:
-            return JSON(selected_account.to_dict())
+    if ACCOUNT.root:
+        return JSON([account.to_dict() for account in list_accounts_root()])
+    elif ACCOUNT.admin:
+        return JSON([account.to_dict() for account in Account.select().where(
+            Account.customer == CUSTOMER)])
 
-        raise NotAuthorized() from None
+    raise NotAuthorized()
 
-    def post(self):
-        """Create a new account."""
-        account = self.account
 
-        if account.root:
-            return self.add_account(self.customer)
-        elif account.admin:
+@APPLICATION.route('/account/<name>', methods=['GET'])
+def get_account(name):
+    """Gets an account by name."""
+
+    if name == '!':
+        # Return the account of the current session.
+        return jsonify(ACCOUNT.to_dict())
+
+    account = account_by_name(name)
+
+    if ACCOUNT.root:
+        return jsonify(account.to_dict())
+    elif ACCOUNT.admin:
+        if account.customer == CUSTOMER:
+            return jsonify(account.to_dict())
+
+        raise NotAuthorized()
+    elif ACCOUNT == account:
+        return jsonify(account.to_dict())
+
+    raise NotAuthorized()
+
+
+@APPLICATION.route('/account', methods=['POST'])
+def add_account():
+    """Create a new account."""
+
+    if ACCOUNT.root:
+        return _add_account()
+    elif ACCOUNT.admin:
+        try:
             settings = CustomerSettings.get(
-                CustomerSettings.customer == account.customer)
+                CustomerSettings.customer == CUSTOMER)
+        except DoesNotExist:
+            raise CustomerUnconfigured()
 
-            if settings.max_accounts is None:
-                return self.add_account(self.customer)
+        if settings.max_accounts is None:
+            return _add_account()
 
-            accounts = Account.select().where(
-                Account.customer == account.customer)
-            accounts = len(tuple(accounts))
+        accounts = sum(1 for _ in Account.select().where(
+            Account.customer == CUSTOMER))
 
-            if accounts < settings.max_accounts:
-                return self.add_account(self.customer)
+        if accounts < settings.max_accounts:
+            return _add_account()
 
-            raise Error('Accounts exhausted.', status=403)
+        raise AccountsExhausted()
 
-        raise NotAuthorized() from None
+    raise NotAuthorized()
 
-    def patch(self):
-        """Modifies an account."""
-        if self.resource is None:
-            raise NoAccountSpecified() from None
-        elif self.resource == CURRENT_ACCOUNT_SELECTOR:
-            return self.change_account(self.session.account)
 
-        return self.change_account(self.selected_account)
+@APPLICATION.route('/account/<name>', methods=['PATCH'])
+def patch_account(name):
+    """Modifies an account."""
+
+    if name == '!':
+        return _patch_account(ACCOUNT)
+
+    account = account_by_name(name)
+
+    if ACCOUNT.root:
+        return _patch_account(account)
+    elif ACCOUNT.admin and CUSTOMER == account.customer:
+        return _patch_account(account)
+
+    raise NotAuthorized()

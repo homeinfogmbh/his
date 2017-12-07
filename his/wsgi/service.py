@@ -5,7 +5,7 @@ from peewee import DoesNotExist
 
 from homeinfo.crm import Customer
 
-from his.globals import SESSION
+from his.globals import ACCOUNT, CUSTOMER
 from his.messages.account import NotAuthorized, NoSuchAccount
 from his.messages.customer import InvalidCustomerID, NoSuchCustomer
 from his.messages.service import NoServiceSpecified, NoSuchService, \
@@ -20,7 +20,7 @@ __all__ = ['add_service']
 def add_customer_service(customer_id, service):
     """Allows the respective customer to use the given service."""
 
-    if not SESSION.account.root:
+    if not ACCOUNT.root:
         raise NotAuthorized()
 
     try:
@@ -50,7 +50,7 @@ def add_customer_service(customer_id, service):
 def add_account_service(account_name, service):
     """Allows the respective account to use the given service."""
 
-    if not SESSION.account.admin:
+    if not ACCOUNT.admin:
         raise NotAuthorized()
 
     try:
@@ -58,7 +58,7 @@ def add_account_service(account_name, service):
     except DoesNotExist:
         raise NoSuchAccount()
 
-    if SESSION.account.customer != account.customer:
+    if CUSTOMER != account.customer:
         raise NotAuthorized()
 
     try:

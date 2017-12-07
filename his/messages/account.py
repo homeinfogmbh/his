@@ -9,7 +9,9 @@ __all__ = [
     'AccountCreated',
     'AccountDeleted',
     'AccountPatched',
-    'NotAuthorized']
+    'NotAuthorized',
+    'AccountExists',
+    'AccountsExhausted']
 
 
 class NoAccountSpecified(Message):
@@ -54,3 +56,17 @@ class NotAuthorized(Message):
     """
 
     STATUS = 403
+
+
+class AccountExists(Message):
+    """Indicates that the respective account already exists."""
+
+    STATUS = 409
+
+
+class AccountsExhausted(Message):
+    """Indicates that the respective customer has
+    exhauseted their respective account quota.
+    """
+
+    STATUS = 402

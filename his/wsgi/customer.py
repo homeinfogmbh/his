@@ -6,6 +6,7 @@ from peewee import DoesNotExist
 from homeinfo.crm import Customer
 from wsgilib import Binary
 
+from his.api import authenticated
 from his.globals import ACCOUNT, CUSTOMER, SU_CUSTOMER
 from his.messages.account import NotAuthorized
 from his.messages.customer import InvalidCustomerID, NoSuchCustomer, \
@@ -40,6 +41,7 @@ def settings():
 
 
 @APPLICATION.route('/customer/<customer>', methods=['GET'])
+@authenticated
 def get_customer(customer):
     """Allows services"""
 
@@ -55,6 +57,7 @@ def get_customer(customer):
 
 
 @APPLICATION.route('/customer/logo', methods=['GET'])
+@authenticated
 def get_logo():
     """Allows services"""
 

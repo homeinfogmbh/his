@@ -5,6 +5,7 @@ from peewee import DoesNotExist
 
 from homeinfo.crm import Customer
 
+from his.api import authenticated
 from his.globals import ACCOUNT, CUSTOMER
 from his.messages.account import NotAuthorized, NoSuchAccount
 from his.messages.customer import InvalidCustomerID, NoSuchCustomer
@@ -70,6 +71,7 @@ def add_account_service(account_name, service):
 
 
 @APPLICATION.route('/service', methods=['POST'])
+@authenticated
 def add_service():
     """Adds the respective service."""
 

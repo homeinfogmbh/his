@@ -5,7 +5,7 @@ from peewee import DoesNotExist
 
 from wsgilib import JSON
 
-from his.api import DATA
+from his.api import DATA, authenticated
 from his.globals import ACCOUNT, CUSTOMER, SU_CUSTOMER
 from his.messages.account import NoSuchAccount, NotAuthorized, AccountExists, \
     AccountCreated, AccountPatched, AccountsExhausted
@@ -163,6 +163,7 @@ def _patch_account(account):
 
 
 @APPLICATION.route('/account', methods=['GET'])
+@authenticated
 def list_accounts():
     """List one or many accounts."""
 
@@ -176,6 +177,7 @@ def list_accounts():
 
 
 @APPLICATION.route('/account/<name>', methods=['GET'])
+@authenticated
 def get_account(name):
     """Gets an account by name."""
 
@@ -199,6 +201,7 @@ def get_account(name):
 
 
 @APPLICATION.route('/account', methods=['POST'])
+@authenticated
 def add_account():
     """Create a new account."""
 
@@ -226,6 +229,7 @@ def add_account():
 
 
 @APPLICATION.route('/account/<name>', methods=['PATCH'])
+@authenticated
 def patch_account(name):
     """Modifies an account."""
 

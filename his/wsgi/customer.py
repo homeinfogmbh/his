@@ -4,7 +4,7 @@ from flask import jsonify
 from peewee import DoesNotExist
 
 from homeinfo.crm import Customer
-from wsgilib import crossdomain, Binary
+from wsgilib import Binary
 
 from his.api import authenticated
 from his.globals import ACCOUNT, CUSTOMER, SU_CUSTOMER
@@ -39,7 +39,6 @@ def settings():
         raise CustomerUnconfigured() from None
 
 
-@crossdomain(origin='*')
 @authenticated
 def get_customer(customer):
     """Allows services"""
@@ -55,7 +54,6 @@ def get_customer(customer):
     raise NotAuthorized()
 
 
-@crossdomain(origin='*')
 @authenticated
 def get_logo():
     """Allows services"""

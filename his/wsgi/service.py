@@ -4,7 +4,6 @@ from flask import request
 from peewee import DoesNotExist
 
 from homeinfo.crm import Customer
-from wsgilib import crossdomain
 
 from his.api import authenticated
 from his.globals import ACCOUNT, CUSTOMER
@@ -70,7 +69,6 @@ def add_account_service(account_name, service):
     return ServiceAdded()
 
 
-@crossdomain(origin='*')
 @authenticated
 def add_service():
     """Adds the respective service."""

@@ -4,7 +4,7 @@ from configparser import ConfigParser
 
 from wsgilib import JSON
 
-__all__ = ['Message']
+__all__ = ['locales', 'Message']
 
 
 DEFAULT_LANGUAGE = 'de_DE'

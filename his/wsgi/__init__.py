@@ -12,7 +12,7 @@ from his.wsgi.session import open_session, list_sessions, list_session, \
 __all__ = ['APPLICATION']
 
 
-APPLICATION = Application('his', cors=True)
+APPLICATION = Application('his', debug=True, cors=True)
 APPLICATION.route('/account', methods=['GET'])(list_accounts)
 APPLICATION.route('/account/<name>', methods=['GET'])(get_account)
 APPLICATION.route('/account', methods=['POST'])(add_account)

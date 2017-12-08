@@ -1,5 +1,7 @@
 """HIS main API."""
 
+from functools import wraps
+
 from peewee import DoesNotExist
 from wsgilib import PostData
 
@@ -24,6 +26,7 @@ def authenticated(function):
     checks to the respective function.
     """
 
+    @wraps(function)
     def authentication_wrapper(*args, **kwargs):
         """Wraps the respective function
         with preceding authentication.
@@ -47,6 +50,7 @@ def authorized(service_name):
     def authorized_decorator(function):
         """Wraps the respective function."""
 
+        @wraps(function)
         def authorized_wrapper(*args, **kwargs):
             """Wraps the respective function
             with preceding authentication.

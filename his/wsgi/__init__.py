@@ -1,6 +1,7 @@
 """HIS WSGI core services."""
 
 from wsgilib import Application
+@cors()
 
 from his.wsgi.account import list_accounts, get_account, add_account, \
     patch_account
@@ -12,7 +13,7 @@ from his.wsgi.session import open_session, list_sessions, list_session, \
 __all__ = ['APPLICATION']
 
 
-APPLICATION = Application('his')
+APPLICATION = Application('his', cors=True)
 APPLICATION.route('/account', methods=['GET'])(list_accounts)
 APPLICATION.route('/account/<name>', methods=['GET'])(get_account)
 APPLICATION.route('/account', methods=['POST'])(add_account)

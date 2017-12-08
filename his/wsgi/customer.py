@@ -10,7 +10,7 @@ from his.messages.customer import InvalidCustomerID, NoSuchCustomer, \
     CustomerUnconfigured
 from his.orm import CustomerSettings
 from homeinfo.crm import Customer
-from wsgilib import cors, Binary
+from wsgilib import Binary
 
 __all__ = ['get_customer', 'get_logo']
 
@@ -38,7 +38,6 @@ def settings():
         raise CustomerUnconfigured() from None
 
 
-@cors()
 @authenticated
 def get_customer(customer):
     """Allows services"""
@@ -54,7 +53,6 @@ def get_customer(customer):
     raise NotAuthorized()
 
 
-@cors()
 @authenticated
 def get_logo():
     """Allows services"""

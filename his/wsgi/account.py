@@ -12,7 +12,7 @@ from his.messages.data import DataError, MissingData, InvalidData
 from his.orm import AccountExists as AccountExists_, AmbiguousDataError, \
     Account, CustomerSettings
 from his.wsgi.customer import customer_by_cid
-from wsgilib import cors, JSON
+from wsgilib import JSON
 
 __all__ = ['list_accounts', 'get_account', 'add_account', 'patch_account']
 
@@ -160,7 +160,6 @@ def _patch_account(account):
     raise NotAuthorized()
 
 
-@cors()
 @authenticated
 def list_accounts():
     """List one or many accounts."""
@@ -174,7 +173,6 @@ def list_accounts():
     raise NotAuthorized()
 
 
-@cors()
 @authenticated
 def get_account(name):
     """Gets an account by name."""
@@ -198,7 +196,6 @@ def get_account(name):
     raise NotAuthorized()
 
 
-@cors()
 @authenticated
 def add_account():
     """Create a new account."""
@@ -226,7 +223,6 @@ def add_account():
     raise NotAuthorized()
 
 
-@cors()
 @authenticated
 def patch_account(name):
     """Modifies an account."""

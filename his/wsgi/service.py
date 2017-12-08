@@ -12,7 +12,6 @@ from his.messages.service import NoServiceSpecified, NoSuchService, \
     MissingServiceTarget
 from his.orm import InconsistencyError, Service, CustomerService, Account
 from homeinfo.crm import Customer
-from wsgilib import cors
 
 __all__ = ['add_service']
 
@@ -69,7 +68,6 @@ def add_account_service(account_name, service):
     return ServiceAdded()
 
 
-@cors()
 @authenticated
 def add_service():
     """Adds the respective service."""

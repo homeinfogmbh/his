@@ -3,7 +3,7 @@
 from flask import request, jsonify
 from peewee import DoesNotExist
 
-from wsgilib import JSON
+from wsgilib import crossdomain, JSON
 
 from his.api import DATA, authenticated
 from his.globals import ACCOUNT, CUSTOMER, SU_CUSTOMER
@@ -161,6 +161,7 @@ def _patch_account(account):
     raise NotAuthorized()
 
 
+@crossdomain(origin='*')
 @authenticated
 def list_accounts():
     """List one or many accounts."""
@@ -174,6 +175,7 @@ def list_accounts():
     raise NotAuthorized()
 
 
+@crossdomain(origin='*')
 @authenticated
 def get_account(name):
     """Gets an account by name."""
@@ -197,6 +199,7 @@ def get_account(name):
     raise NotAuthorized()
 
 
+@crossdomain(origin='*')
 @authenticated
 def add_account():
     """Create a new account."""
@@ -224,6 +227,7 @@ def add_account():
     raise NotAuthorized()
 
 
+@crossdomain(origin='*')
 @authenticated
 def patch_account(name):
     """Modifies an account."""

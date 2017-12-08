@@ -1,7 +1,6 @@
 """HIS WSGI core services."""
 
 from wsgilib import Application
-@cors()
 
 from his.wsgi.account import list_accounts, get_account, add_account, \
     patch_account

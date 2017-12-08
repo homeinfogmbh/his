@@ -9,7 +9,6 @@ from his.messages.account import NotAuthorized
 from his.messages.session import NoSessionSpecified, NoSuchSession, \
     SessionExpired, MissingCredentials, InvalidCredentials
 from his.orm import Account, Session
-from his.wsgi import APPLICATION
 
 __all__ = [
     'open_session',
@@ -25,7 +24,6 @@ def get_duration(default=15):
     return int(request.args.get('duration', default))
 
 
-@APPLICATION.route('/session', methods=['POST'])
 def open_session():
     """Opens a new session for the respective account."""
 
@@ -48,7 +46,6 @@ def open_session():
     raise InvalidCredentials()
 
 
-@APPLICATION.route('/session', methods=['GET'])
 def list_sessions():
     """Lists all sessions iff specified session is root."""
 
@@ -73,7 +70,6 @@ def list_sessions():
     raise SessionExpired()
 
 
-@APPLICATION.route('/session/<session_token>', methods=['GET'])
 def list_session(session_token):
     """Lists the respective session."""
 
@@ -88,7 +84,6 @@ def list_session(session_token):
     raise SessionExpired()
 
 
-@APPLICATION.route('/session/<session_token>', methods=['PUT'])
 def refresh_session(session_token):
     """Refreshes an existing session."""
 
@@ -103,7 +98,6 @@ def refresh_session(session_token):
     raise SessionExpired()
 
 
-@APPLICATION.route('/session/<session_token>', methods=['DELETE'])
 def close_session(session_token):
     """Tries to close a specific session identified by its token or
     all sessions for a certain account specified by its name.

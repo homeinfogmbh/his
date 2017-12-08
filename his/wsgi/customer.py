@@ -12,7 +12,6 @@ from his.messages.account import NotAuthorized
 from his.messages.customer import InvalidCustomerID, NoSuchCustomer, \
     CustomerUnconfigured
 from his.orm import CustomerSettings
-from his.wsgi import APPLICATION
 
 __all__ = ['get_customer', 'get_logo']
 
@@ -40,7 +39,6 @@ def settings():
         raise CustomerUnconfigured() from None
 
 
-@APPLICATION.route('/customer/<customer>', methods=['GET'])
 @authenticated
 def get_customer(customer):
     """Allows services"""
@@ -56,7 +54,6 @@ def get_customer(customer):
     raise NotAuthorized()
 
 
-@APPLICATION.route('/customer/logo', methods=['GET'])
 @authenticated
 def get_logo():
     """Allows services"""

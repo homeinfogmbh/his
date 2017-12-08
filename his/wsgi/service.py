@@ -13,7 +13,6 @@ from his.messages.service import NoServiceSpecified, NoSuchService, \
     ServiceAdded, ServiceAlreadyEnabled, AmbiguousServiceTarget, \
     MissingServiceTarget
 from his.orm import InconsistencyError, Service, CustomerService, Account
-from his.wsgi import APPLICATION
 
 __all__ = ['add_service']
 
@@ -70,7 +69,6 @@ def add_account_service(account_name, service):
     return ServiceAdded()
 
 
-@APPLICATION.route('/service', methods=['POST'])
 @authenticated
 def add_service():
     """Adds the respective service."""

@@ -1,6 +1,6 @@
 """HIS session service."""
 
-from json import load
+from json import loads
 
 from flask import request, jsonify
 from peewee import DoesNotExist
@@ -27,7 +27,7 @@ def get_duration(default=15):
 def open_session():
     """Opens a new session for the respective account."""
 
-    json = load(request.get_data())
+    json = loads(request.get_data().decode())
     account = json.get('account')
     passwd = json.get('passwd')
 

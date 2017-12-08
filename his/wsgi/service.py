@@ -3,8 +3,6 @@
 from flask import request
 from peewee import DoesNotExist
 
-from homeinfo.crm import Customer
-
 from his.api import authenticated
 from his.globals import ACCOUNT, CUSTOMER
 from his.messages.account import NotAuthorized, NoSuchAccount
@@ -13,6 +11,8 @@ from his.messages.service import NoServiceSpecified, NoSuchService, \
     ServiceAdded, ServiceAlreadyEnabled, AmbiguousServiceTarget, \
     MissingServiceTarget
 from his.orm import InconsistencyError, Service, CustomerService, Account
+from homeinfo.crm import Customer
+from wsgilib import cors
 
 __all__ = ['add_service']
 
@@ -69,6 +69,7 @@ def add_account_service(account_name, service):
     return ServiceAdded()
 
 
+@cors()
 @authenticated
 def add_service():
     """Adds the respective service."""

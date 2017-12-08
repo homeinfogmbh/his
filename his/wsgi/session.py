@@ -10,6 +10,8 @@ from his.messages.session import NoSessionSpecified, NoSuchSession, \
     SessionExpired, MissingCredentials, InvalidCredentials
 from his.orm import Account, Session
 
+from wsgilib import cors
+
 __all__ = [
     'open_session',
     'list_sessions',
@@ -24,6 +26,7 @@ def get_duration(default=15):
     return int(request.args.get('duration', default))
 
 
+@cors()
 def open_session():
     """Opens a new session for the respective account."""
 
@@ -46,6 +49,7 @@ def open_session():
     raise InvalidCredentials()
 
 
+@cors()
 def list_sessions():
     """Lists all sessions iff specified session is root."""
 
@@ -70,6 +74,7 @@ def list_sessions():
     raise SessionExpired()
 
 
+@cors()
 def list_session(session_token):
     """Lists the respective session."""
 
@@ -84,6 +89,7 @@ def list_session(session_token):
     raise SessionExpired()
 
 
+@cors()
 def refresh_session(session_token):
     """Refreshes an existing session."""
 
@@ -98,6 +104,7 @@ def refresh_session(session_token):
     raise SessionExpired()
 
 
+@cors()
 def close_session(session_token):
     """Tries to close a specific session identified by its token or
     all sessions for a certain account specified by its name.

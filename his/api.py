@@ -73,12 +73,13 @@ def authorized(service_name):
 def admin(function):
     """Decorator to check for administrative services."""
 
+    @wraps(function)
     def admin_wrapper(*args, **kwargs):
         """Checks whether the session's account is an administrator."""
         if SESSION.account.admin:
             return function(*args, **kwargs)
 
-        raise NotAuthorized() from None
+        raise NotAuthorized()
 
     return admin_wrapper
 
@@ -86,11 +87,12 @@ def admin(function):
 def root(function):
     """Decorator to check for root services."""
 
+    @wraps(function)
     def root_wrapper(*args, **kwargs):
         """Checks whether the session's account is root."""
         if SESSION.account.root:
             return function(*args, **kwargs)
 
-        raise NotAuthorized() from None
+        raise NotAuthorized()
 
     return root_wrapper

@@ -1,4 +1,4 @@
-"""HIS environment globals."""
+"""HIS environment proxies, faking globals."""
 
 from flask import request
 from peewee import DoesNotExist

@@ -82,7 +82,7 @@ def his_db(service_name):
         closing=True)
 
 
-class AccountServicesProxy():
+class AccountServicesProxy:
     """Proxy to transparently handle an account's services."""
 
     def __init__(self, account):
@@ -228,10 +228,9 @@ class Account(HISModel):
     failed_logins = IntegerField(default=0)
     locked_until = DateTimeField(null=True, default=None)
     disabled = BooleanField(default=False)
-    # Flag, whether the account is an
-    # administrator of its customer (=company)
+    # Flag, whether the account is an administrator of its customer (=company).
     admin = BooleanField(default=False)
-    # Flag, whether the user is a super-admin of the system
+    # Flag, whether the user is a super-admin of the system.
     # Such accounts can do ANYTHING!
     root = BooleanField(default=False)
 
@@ -351,17 +350,14 @@ class Account(HISModel):
     @property
     def subjects(self):
         """Yields accounts this account can manage."""
-        # All accounts can manage themselves.
-        yield self
-
-        # Admins can manage accounts of their
-        # company, i.e. the same customer.
-        if self.admin:
+        if self.root:
+            yield from self.__class__
+        elif self.admin:
             for account in self.__class__.select().where(
                     self.__class__.customer == self.customer):
-                # We already yielded this very account.
-                if account != self:
-                    yield account
+                yield account
+        else:
+            yield self
 
     def login(self, passwd):
         """Performs a login."""

@@ -3,16 +3,9 @@
 from his.messages.common import Message
 
 __all__ = [
-    'InvalidCustomerID',
     'NoCustomerSpecified',
     'NoSuchCustomer',
     'CustomerUnconfigured']
-
-
-class InvalidCustomerID(Message):
-    """Base for errors regarding customers."""
-
-    STATUS = 406
 
 
 class NoCustomerSpecified(Message):

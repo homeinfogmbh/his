@@ -582,4 +582,4 @@ class CustomerSettings(HISModel):
     logo = FileProperty(_logo)
 
 
-MODELS = [Service, CustomerService, Account, AccountService, Session]
+MODELS = (Service, CustomerService, Account, AccountService, Session)

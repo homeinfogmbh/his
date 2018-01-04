@@ -45,9 +45,8 @@ def get_account():
 
         if ACCOUNT.root:
             return su_account
-        elif ACCOUNT.admin:
-            if su_account.customer == CUSTOMER:
-                return su_account
+        elif ACCOUNT.admin and su_account.customer == CUSTOMER.id:
+            return su_account
 
     raise NotAuthorized()
 

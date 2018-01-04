@@ -14,10 +14,10 @@ from his.orm import AccountExists as AccountExists_, AmbiguousDataError, \
 from his.wsgi.customer import customer_by_cid
 from wsgilib import JSON
 
-__all__ = ['list_accounts', 'get_account', 'add_account', 'patch_account']
+__all__ = ['ROUTES']
 
 
-def account_by_name(name_or_id):
+def by_name(name_or_id):
     """Returns the respective account by its name."""
 
     try:
@@ -34,7 +34,7 @@ def account_by_name(name_or_id):
         raise NoSuchAccount()
 
 
-def list_accounts_root():
+def _list_root():
     """Lists accounts."""
 
     try:
@@ -75,7 +75,7 @@ def _add_account():
     return AccountCreated()
 
 
-def _patch_account_root(account):
+def _patch_root(account):
     """Patches the account from a root user context."""
 
     try:
@@ -89,7 +89,7 @@ def _patch_account_root(account):
     return AccountPatched()
 
 
-def _patch_account_admin(account):
+def _patch_admin(account):
     """Patches the account from an admin context."""
 
     patch_dict = {}
@@ -116,7 +116,7 @@ def _patch_account_admin(account):
     return AccountPatched()
 
 
-def _patch_account_user(account):
+def _patch_user(account):
     """Patches the accunt from a user context."""
 
     patch_dict = {}
@@ -143,29 +143,29 @@ def _patch_account_user(account):
     return AccountPatched()
 
 
-def _patch_account(account):
+def _patch(account):
     """Change account data."""
 
     if ACCOUNT.root:
-        return _patch_account_root(account)
+        return _patch_root(account)
     elif ACCOUNT.admin:
         if account.customer == CUSTOMER:
-            return _patch_account_admin(account)
+            return _patch_admin(account)
 
         raise NotAuthorized()
 
     if account == ACCOUNT:
-        return _patch_account_user(account)
+        return _patch_user(account)
 
     raise NotAuthorized()
 
 
 @authenticated
-def list_accounts():
+def lst():
     """List one or many accounts."""
 
     if ACCOUNT.root:
-        return JSON([account.to_dict() for account in list_accounts_root()])
+        return JSON([account.to_dict() for account in _list_root()])
     elif ACCOUNT.admin:
         return JSON([account.to_dict() for account in Account.select().where(
             Account.customer == CUSTOMER)])
@@ -174,14 +174,14 @@ def list_accounts():
 
 
 @authenticated
-def get_account(name):
+def get(name):
     """Gets an account by name."""
 
     if name == '!':
         # Return the account of the current session.
         return jsonify(ACCOUNT.to_dict())
 
-    account = account_by_name(name)
+    account = by_name(name)
 
     if ACCOUNT.root:
         return jsonify(account.to_dict())
@@ -197,7 +197,7 @@ def get_account(name):
 
 
 @authenticated
-def add_account():
+def add():
     """Create a new account."""
 
     if ACCOUNT.root:
@@ -224,17 +224,24 @@ def add_account():
 
 
 @authenticated
-def patch_account(name):
+def patch(name):
     """Modifies an account."""
 
     if name == '!':
-        return _patch_account(ACCOUNT)
+        return _patch(ACCOUNT)
 
-    account = account_by_name(name)
+    account = by_name(name)
 
     if ACCOUNT.root:
-        return _patch_account(account)
+        return _patch(account)
     elif ACCOUNT.admin and CUSTOMER == account.customer:
-        return _patch_account(account)
+        return _patch(account)
 
     raise NotAuthorized()
+
+
+ROUTES = (
+    ('GET', '/account', lst),
+    ('GET', '/account/<name>', get),
+    ('POST', '/account', add),
+    ('PATCH', '/account/<name>', patch))

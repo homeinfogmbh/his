@@ -6,14 +6,15 @@ from peewee import DoesNotExist
 from his.api import authenticated
 from his.globals import ACCOUNT, CUSTOMER
 from his.messages.account import NotAuthorized, NoSuchAccount
-from his.messages.customer import InvalidCustomerID, NoSuchCustomer
+from his.messages.customer import NoSuchCustomer
+from his.messages.data import InvalidCustomerID
 from his.messages.service import NoServiceSpecified, NoSuchService, \
     ServiceAdded, ServiceAlreadyEnabled, AmbiguousServiceTarget, \
     MissingServiceTarget
 from his.orm import InconsistencyError, Service, CustomerService, Account
 from homeinfo.crm import Customer
 
-__all__ = ['add_service']
+__all__ = ['ROUTES']
 
 
 def add_customer_service(customer_id, service):
@@ -69,7 +70,7 @@ def add_account_service(account_name, service):
 
 
 @authenticated
-def add_service():
+def add():
     """Adds the respective service."""
 
     try:
@@ -90,3 +91,6 @@ def add_service():
         return add_account_service(account_name, service)
 
     raise MissingServiceTarget()
+
+
+ROUTES = (('POST', '/service', add),)

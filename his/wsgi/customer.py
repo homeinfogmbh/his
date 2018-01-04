@@ -6,13 +6,13 @@ from peewee import DoesNotExist
 from his.api import authenticated
 from his.globals import ACCOUNT, CUSTOMER, SU_CUSTOMER
 from his.messages.account import NotAuthorized
-from his.messages.customer import InvalidCustomerID, NoSuchCustomer, \
-    CustomerUnconfigured
+from his.messages.customer import NoSuchCustomer, CustomerUnconfigured
+from his.messages.data import InvalidCustomerID
 from his.orm import CustomerSettings
 from homeinfo.crm import Customer
 from wsgilib import Binary
 
-__all__ = ['get_customer', 'get_logo']
+__all__ = ['ROUTES']
 
 
 def customer_by_cid(cid):
@@ -39,7 +39,7 @@ def settings():
 
 
 @authenticated
-def get_customer(customer):
+def get(customer):
     """Allows services"""
 
     if customer == '!':
@@ -58,3 +58,8 @@ def get_logo():
     """Allows services"""
 
     return Binary(settings().logo)
+
+
+ROUTES = (
+    ('GET', '/customer/<customer>', get),
+    ('GET', '/customer/logo', get_logo))

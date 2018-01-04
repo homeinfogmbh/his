@@ -10,21 +10,18 @@ from his.messages.session import NoSessionSpecified, NoSuchSession, \
     SessionExpired, MissingCredentials, InvalidCredentials
 from his.orm import Account, Session
 
-__all__ = [
-    'open_session',
-    'list_sessions',
-    'list_session',
-    'refresh_session',
-    'close_session']
+__all__ = ['ROUTES']
+
+DURATION = 15
 
 
-def get_duration(default=15):
+def get_duration():
     """Returns the repsective session duration in minutes."""
 
-    return int(request.args.get('duration', default))
+    return int(request.args.get('duration', DURATION))
 
 
-def open_session():
+def login():
     """Opens a new session for the respective account."""
 
     json = loads(request.get_data().decode())
@@ -46,7 +43,7 @@ def open_session():
     raise InvalidCredentials()
 
 
-def list_sessions():
+def lst():
     """Lists all sessions iff specified session is root."""
 
     try:
@@ -70,7 +67,7 @@ def list_sessions():
     raise SessionExpired()
 
 
-def list_session(session_token):
+def get(session_token):
     """Lists the respective session."""
 
     try:
@@ -84,7 +81,7 @@ def list_session(session_token):
     raise SessionExpired()
 
 
-def refresh_session(session_token):
+def refresh(session_token):
     """Refreshes an existing session."""
 
     try:
@@ -98,7 +95,7 @@ def refresh_session(session_token):
     raise SessionExpired()
 
 
-def close_session(session_token):
+def close(session_token):
     """Tries to close a specific session identified by its token or
     all sessions for a certain account specified by its name.
     """
@@ -110,3 +107,11 @@ def close_session(session_token):
 
     session.close()
     return jsonify({'closed': session.token})
+
+
+ROUTES = (
+    ('POST', '/session', login),
+    ('GET', '/session', lst),
+    ('GET', '/session/<session_token>', get),
+    ('PUT', '/session/<session_token>', refresh),
+    ('DELETE', '/session/<session_token>', close))

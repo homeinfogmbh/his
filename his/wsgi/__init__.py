@@ -1,7 +1,5 @@
 """HIS WSGI core services."""
 
-from itertools import chain
-
 from wsgilib import Application
 
 from his.wsgi import account, customer, service, session

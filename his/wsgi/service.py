@@ -90,4 +90,4 @@ def add():
     raise MissingServiceTarget()
 
 
-ROUTES = (('POST', '/service', add),)
+ROUTES = (('POST', '/service', add, 'add_service'),)

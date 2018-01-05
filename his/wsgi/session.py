@@ -109,8 +109,8 @@ def close(session_token):
 
 
 ROUTES = (
-    ('POST', '/session', login),
-    ('GET', '/session', lst),
-    ('GET', '/session/<session_token>', get),
-    ('PUT', '/session/<session_token>', refresh),
-    ('DELETE', '/session/<session_token>', close))
+    ('POST', '/session', login, 'login'),
+    ('GET', '/session', lst, 'list_sessions'),
+    ('GET', '/session/<session_token>', get, 'get_session'),
+    ('PUT', '/session/<session_token>', refresh, 'refresh_session'),
+    ('DELETE', '/session/<session_token>', close, 'close_session'))

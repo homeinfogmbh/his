@@ -9,7 +9,7 @@ from his.messages import NotAuthorized, NoSessionSpecified, NoSuchSession, \
     SessionExpired, MissingCredentials, InvalidCredentials
 from his.orm import Account, Session
 
-__all__ = ['ROUTES']
+__all__ = ['ENDPOINTS']
 
 DURATION = 15
 
@@ -108,9 +108,9 @@ def close(session_token):
     return jsonify({'closed': session.token})
 
 
-ROUTES = (
-    ('POST', '/session', login, 'login'),
-    ('GET', '/session', lst, 'list_sessions'),
-    ('GET', '/session/<session_token>', get, 'get_session'),
-    ('PUT', '/session/<session_token>', refresh, 'refresh_session'),
-    ('DELETE', '/session/<session_token>', close, 'close_session'))
+ENDPOINTS = {
+    'login': ('POST', '/session', login),
+    'list_sessions': ('GET', '/session', lst),
+    'get_session': ('GET', '/session/<session_token>', get),
+    'refresh_session': ('PUT', '/session/<session_token>', refresh),
+    'close_session': ('DELETE', '/session/<session_token>', close)}

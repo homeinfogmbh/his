@@ -11,7 +11,7 @@ from his.messages import NotAuthorized, NoSuchAccount, NoSuchCustomer, \
 from his.orm import InconsistencyError, Service, CustomerService, Account
 from homeinfo.crm import Customer
 
-__all__ = ['ROUTES']
+__all__ = ['ENDPOINTS']
 
 
 def add_customer_service(customer_id, service):
@@ -90,4 +90,4 @@ def add():
     raise MissingServiceTarget()
 
 
-ROUTES = (('POST', '/service', add, 'add_service'),)
+ENDPOINTS = {'add_service': ('POST', '/service', add)}

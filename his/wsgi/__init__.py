@@ -10,5 +10,5 @@ __all__ = ['APPLICATION']
 
 
 APPLICATION = Application('his', debug=True, cors=True)
-APPLICATION.routes_table = chain(
+APPLICATION.routes = chain(
     account.ROUTES, customer.ROUTES, service.ROUTES, session.ROUTES)

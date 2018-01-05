@@ -11,7 +11,7 @@ from his.orm import CustomerSettings
 from homeinfo.crm import Customer
 from wsgilib import Binary
 
-__all__ = ['ENDPOINTS']
+__all__ = ['ROUTES']
 
 
 def customer_by_cid(cid):
@@ -59,6 +59,6 @@ def get_logo():
     return Binary(settings().logo)
 
 
-ENDPOINTS = {
-    'get_customer': ('GET', '/customer/<customer>', get),
-    'get_customer_logo': ('GET', '/customer-logo', get_logo)}
+ROUTES = (
+    ('GET', '/customer/<customer>', get, 'get_customer'),
+    ('GET', '/customer-logo', get_logo, 'get_customer_logo'))

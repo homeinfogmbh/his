@@ -13,7 +13,7 @@ from his.orm import AccountExists as AccountExists_, AmbiguousDataError, \
 from his.wsgi.customer import customer_by_cid
 from wsgilib import JSON
 
-__all__ = ['ENDPOINTS']
+__all__ = ['ROUTES']
 
 
 def by_name(name_or_id):
@@ -239,8 +239,8 @@ def patch(name):
     raise NotAuthorized()
 
 
-ENDPOINTS = {
-    'list_accounts': ('GET', '/account', lst),
-    'get_account': ('GET', '/account/<name>', get),
-    'add_account': ('POST', '/account', add),
-    'patch_account': ('PATCH', '/account/<name>', patch)}
+ROUTES = (
+    ('GET', '/account', lst, 'list_accounts'),
+    ('GET', '/account/<name>', get, 'get_account'),
+    ('POST', '/account', add, 'add_account'),
+    ('PATCH', '/account/<name>', patch, 'patch_account'))

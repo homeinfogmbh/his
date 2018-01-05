@@ -5,9 +5,8 @@ from peewee import DoesNotExist
 
 from his.api import authenticated
 from his.globals import ACCOUNT, CUSTOMER, SU_CUSTOMER
-from his.messages.account import NotAuthorized
-from his.messages.customer import NoSuchCustomer, CustomerUnconfigured
-from his.messages.data import InvalidCustomerID
+from his.messages import NotAuthorized, NoSuchCustomer, CustomerUnconfigured, \
+    InvalidCustomerID
 from his.orm import CustomerSettings
 from homeinfo.crm import Customer
 from wsgilib import Binary

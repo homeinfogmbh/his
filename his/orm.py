@@ -15,8 +15,7 @@ from filedb import FileProperty
 from homeinfo.misc import classproperty
 from homeinfo.crm import Customer, Employee
 
-from his.messages.account import AccountLocked
-from his.messages.session import InvalidCredentials, DurationOutOfBounds
+from his.messages import AccountLocked, InvalidCredentials, DurationOutOfBounds
 from his.config import CONFIG
 from his.crypto import hash_password, verify_password
 

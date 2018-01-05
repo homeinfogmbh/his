@@ -6,9 +6,8 @@ from werkzeug.local import LocalProxy
 
 from homeinfo.crm import Customer
 
-from his.messages.account import NoSuchAccount, NotAuthorized
-from his.messages.customer import InvalidCustomerID, NoSuchCustomer
-from his.messages.session import NoSessionSpecified, NoSuchSession
+from his.messages import NoSuchAccount, NotAuthorized, NoSuchCustomer, \
+    InvalidCustomerID, NoSessionSpecified, NoSuchSession
 from his.orm import Session, Account
 
 

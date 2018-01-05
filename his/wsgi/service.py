@@ -5,12 +5,9 @@ from peewee import DoesNotExist
 
 from his.api import authenticated
 from his.globals import ACCOUNT, CUSTOMER
-from his.messages.account import NotAuthorized, NoSuchAccount
-from his.messages.customer import NoSuchCustomer
-from his.messages.data import InvalidCustomerID
-from his.messages.service import NoServiceSpecified, NoSuchService, \
-    ServiceAdded, ServiceAlreadyEnabled, AmbiguousServiceTarget, \
-    MissingServiceTarget
+from his.messages import NotAuthorized, NoSuchAccount, NoSuchCustomer, \
+    InvalidCustomerID, NoServiceSpecified, NoSuchService, ServiceAdded, \
+    ServiceAlreadyEnabled, AmbiguousServiceTarget, MissingServiceTarget
 from his.orm import InconsistencyError, Service, CustomerService, Account
 from homeinfo.crm import Customer
 

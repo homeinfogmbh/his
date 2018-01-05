@@ -6,10 +6,8 @@ from peewee import DoesNotExist
 from wsgilib import PostData
 
 from his.globals import SESSION
-from his.messages.account import NotAuthorized, AccountLocked
-from his.messages.data import NoDataProvided, InvalidUTF8Data, InvalidJSON
-from his.messages.service import NoSuchService
-from his.messages.session import SessionExpired
+from his.messages import NotAuthorized, AccountLocked, NoDataProvided, \
+    InvalidUTF8Data, InvalidJSON, NoSuchService, SessionExpired
 from his.orm import Service
 
 __all__ = ['DATA', 'authenticated', 'authorized', 'admin', 'root']

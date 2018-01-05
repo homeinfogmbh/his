@@ -5,8 +5,7 @@ from json import loads
 from flask import request, jsonify
 from peewee import DoesNotExist
 
-from his.messages.account import NotAuthorized
-from his.messages.session import NoSessionSpecified, NoSuchSession, \
+from his.messages import NotAuthorized, NoSessionSpecified, NoSuchSession, \
     SessionExpired, MissingCredentials, InvalidCredentials
 from his.orm import Account, Session
 

@@ -5,10 +5,9 @@ from peewee import DoesNotExist
 
 from his.api import DATA, authenticated
 from his.globals import ACCOUNT, CUSTOMER, SU_CUSTOMER
-from his.messages.account import NoSuchAccount, NotAuthorized, AccountExists, \
-    AccountCreated, AccountPatched, AccountsExhausted
-from his.messages.customer import CustomerUnconfigured
-from his.messages.data import DataError, MissingData, InvalidData
+from his.messages import NoSuchAccount, NotAuthorized, AccountExists, \
+    AccountCreated, AccountPatched, AccountsExhausted, CustomerUnconfigured, \
+    DataError, MissingData, InvalidData
 from his.orm import AccountExists as AccountExists_, AmbiguousDataError, \
     Account, CustomerSettings
 from his.wsgi.customer import customer_by_cid

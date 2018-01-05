@@ -10,5 +10,7 @@ __all__ = ['APPLICATION']
 
 
 APPLICATION = Application('his', debug=True, cors=True)
-APPLICATION.routes = chain(
-    account.ROUTES, customer.ROUTES, service.ROUTES, session.ROUTES)
+APPLICATION.set_endpoint('account', account.ROUTES)
+APPLICATION.set_endpoint('customer', customer.ROUTES)
+APPLICATION.set_endpoint('service', service.ROUTES)
+APPLICATION.set_endpoint('session', session.ROUTES)

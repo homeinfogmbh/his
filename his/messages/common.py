@@ -22,7 +22,7 @@ class Message(JSON):
     """Indicates errors for the WebAPI."""
 
     STATUS = 200
-    LOCALES = locales('/etc/his.d/locale/core.ini')
+    LOCALES = locales('/etc/his.d/locale/his.ini')
 
     def __init__(self, *data, lang=DEFAULT_LANGUAGE, **fields):
         """Initializes the message."""

@@ -1,5 +1,6 @@
 [Unit]
 Description=HOMEINFO Integrated Services
+PartOf=wsgi-services.target
 
 [Service]
 User=his

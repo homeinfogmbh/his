@@ -4,7 +4,7 @@ from flask import jsonify
 from peewee import DoesNotExist
 
 from his.api import authenticated
-from his.globals import ACCOUNT, CUSTOMER, SU_CUSTOMER
+from his.globals import ACCOUNT, CUSTOMER
 from his.messages import NotAuthorized, NoSuchCustomer, CustomerUnconfigured, \
     InvalidCustomerID
 from his.orm import CustomerSettings
@@ -32,7 +32,7 @@ def settings():
     """Returns the respective customer settings."""
 
     try:
-        CustomerSettings.get(CustomerSettings.customer == SU_CUSTOMER)
+        CustomerSettings.get(CustomerSettings.customer == CUSTOMER)
     except DoesNotExist:
         raise CustomerUnconfigured() from None
 

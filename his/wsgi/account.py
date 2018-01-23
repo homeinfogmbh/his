@@ -4,7 +4,7 @@ from flask import request, jsonify
 from peewee import DoesNotExist
 
 from his.api import DATA, authenticated
-from his.globals import ACCOUNT, CUSTOMER, SU_CUSTOMER
+from his.globals import ACCOUNT, CUSTOMER
 from his.messages import NoSuchAccount, NotAuthorized, AccountExists, \
     AccountCreated, AccountPatched, AccountsExhausted, CustomerUnconfigured, \
     DataError, MissingData, InvalidData
@@ -66,7 +66,7 @@ def _add_account():
         raise MissingData(field='passwd')
 
     try:
-        account = Account.add(SU_CUSTOMER, name, email, passwd=passwd)
+        account = Account.add(CUSTOMER, name, email, passwd=passwd)
     except AccountExists_:
         raise AccountExists()
 

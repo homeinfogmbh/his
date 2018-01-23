@@ -69,8 +69,16 @@ def get_customer():
     raise NotAuthorized()
 
 
-SESSION = LocalProxy(get_session)
-ACCOUNT = LocalProxy(lambda: SESSION.account)
-CUSTOMER = LocalProxy(lambda: ACCOUNT.customer)
-SU_ACCOUNT = LocalProxy(get_account)
-SU_CUSTOMER = LocalProxy(get_customer)
+class ModelProxy(LocalProxy):
+    """Proxies ORM models."""
+
+    def __int__(self):
+        """Returns the primary key value."""
+        return self._get_current_object()._get_pk_value()
+
+
+SESSION = ModelProxy(get_session)
+ACCOUNT = ModelProxy(lambda: SESSION.account)
+CUSTOMER = ModelProxy(lambda: ACCOUNT.customer)
+SU_ACCOUNT = ModelProxy(get_account)
+SU_CUSTOMER = ModelProxy(get_customer)

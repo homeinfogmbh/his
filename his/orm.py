@@ -3,12 +3,11 @@
 from datetime import datetime, timedelta
 from uuid import uuid4
 from contextlib import suppress
-from importlib import import_module
 
-from peewee import Model, PrimaryKeyField, ForeignKeyField,\
-    CharField, BooleanField, DateTimeField, IntegerField, DoesNotExist
+from peewee import PrimaryKeyField, ForeignKeyField, CharField, BooleanField, \
+    DateTimeField, IntegerField, DoesNotExist
 
-from peeweeplus import MySQLDatabase
+from peeweeplus import MySQLDatabase, JSONModel
 from timelib import strpdatetime
 from filedb import FileProperty
 
@@ -108,6 +107,8 @@ class AccountServicesProxy:
                 'Cannot enable service {} for account {}, because the '
                 'respective customer {} is not enabled for it.'.format(
                     service, self.account, self.account.customer))
+
+        return False
 
     def remove(self, service):
         """Removes a service from the account's mapping."""

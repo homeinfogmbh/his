@@ -1,4 +1,4 @@
-"""Group and user definitions."""
+"""ORM models."""
 
 from datetime import datetime, timedelta
 from uuid import uuid4
@@ -15,9 +15,9 @@ from filedb import FileProperty
 from homeinfo.misc import classproperty
 from homeinfo.crm import Customer, Employee
 
-from his.messages import AccountLocked, InvalidCredentials, DurationOutOfBounds
 from his.config import CONFIG
 from his.crypto import hash_password, verify_password
+from his.messages import AccountLocked, InvalidCredentials, DurationOutOfBounds
 
 __all__ = [
     'AccountExists',
@@ -117,7 +117,7 @@ class AccountServicesProxy:
             account_service.delete_instance()
 
 
-class HISModel(Model):
+class HISModel(JSONModel):
     """Generic HOMEINFO Integrated Service database model."""
 
     class Meta:

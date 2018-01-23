@@ -11,7 +11,7 @@ from his.messages import NoSuchAccount, NotAuthorized, NoSuchCustomer, \
 from his.orm import Session, Account
 
 
-__all__ = ['SESSION', 'ACCOUNT', 'CUSTOMER', 'SU_ACCOUNT', 'SU_CUSTOMER']
+__all__ = ['SESSION', 'ACCOUNT', 'CUSTOMER']
 
 
 def get_session():
@@ -32,20 +32,20 @@ def get_account():
     """Gets the verified targeted account."""
 
     try:
-        su_account = request.args['account']
+        account = request.args['account']
     except KeyError:
-        return ACCOUNT
+        return SESSION.account
 
-    if ACCOUNT.root or ACCOUNT.admin:
+    if SESSION.account.root or SESSION.account.admin:
         try:
-            su_account = Account.find(su_account)
+            account = Account.find(account)
         except DoesNotExist:
             raise NoSuchAccount()
 
-        if ACCOUNT.root:
-            return su_account
-        elif ACCOUNT.admin and su_account.customer == CUSTOMER.id:
-            return su_account
+        if SESSION.account.root:
+            return account
+        elif SESSION.account.admin and account.customer == CUSTOMER.id:
+            return account
 
     raise NotAuthorized()
 
@@ -56,11 +56,11 @@ def get_customer():
     try:
         cid = int(request.args['customer'])
     except KeyError:
-        return CUSTOMER
+        return ACCOUNT.customer
     except (TypeError, ValueError):
         raise InvalidCustomerID()
 
-    if ACCOUNT.root:
+    if SESSION.account.root:
         try:
             return Customer.get(Customer.id == cid)
         except DoesNotExist:
@@ -78,7 +78,5 @@ class ModelProxy(LocalProxy):
 
 
 SESSION = ModelProxy(get_session)
-ACCOUNT = ModelProxy(lambda: SESSION.account)
-CUSTOMER = ModelProxy(lambda: ACCOUNT.customer)
-SU_ACCOUNT = ModelProxy(get_account)
-SU_CUSTOMER = ModelProxy(get_customer)
+ACCOUNT = ModelProxy(get_account)
+CUSTOMER = ModelProxy(get_customer)

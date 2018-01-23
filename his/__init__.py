@@ -7,7 +7,7 @@ may be implemented.
 (C) 2017: HOMEINFO - Digitale Informationssysteme GmbH
 """
 from his.api import DATA, authenticated, authorized, admin, root
-from his.globals import SESSION, ACCOUNT, CUSTOMER, SU_ACCOUNT, SU_CUSTOMER
+from his.globals import SESSION, ACCOUNT, CUSTOMER
 from his.messages.common import locales, Message
 from his.orm import his_db, Account
 
@@ -15,8 +15,6 @@ __all__ = [
     'SESSION',
     'ACCOUNT',
     'CUSTOMER',
-    'SU_ACCOUNT',
-    'SU_CUSTOMER',
     'DATA',
     'authenticated',
     'authorized',

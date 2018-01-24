@@ -44,8 +44,9 @@ class MetaMessage(type):
         super().__init__(*args, **kwargs)
 
         # Exclude Message base class and protected (abstract) messages.
-        print('MRO:', cls.__mro__, flush=True)
-        if cls.__mro__[1] is JSON and not cls.__name__.startswith('_'):
+        if cls.__mro__[1] is JSON or cls.__name__.startswith('_'):
+            pass
+        else:
             try:
                 cls.locales = cls.LOCALES[cls.__name__]
             except KeyError:

@@ -43,10 +43,9 @@ class MetaMessage(type):
         """Sets the class's respective locales."""
         super().__init__(*args, **kwargs)
 
-        # Exclude Message base class and protected (abstract) messages.
-        if cls.__mro__[1] is JSON or cls.__name__.startswith('_'):
-            pass
-        else:
+        try:
+            del cls.ABSTRACT
+        except AttributeError:
             try:
                 cls.locales = cls.LOCALES[cls.__name__]
             except KeyError:
@@ -58,6 +57,7 @@ class Message(JSON, metaclass=MetaMessage):
 
     LOCALES = locales('/etc/his.d/locale/his.ini')
     STATUS = 200
+    ABSTRACT = True
 
     def __init__(self, *data, lang=DEFAULT_LANGUAGE, **fields):
         """Initializes the message."""

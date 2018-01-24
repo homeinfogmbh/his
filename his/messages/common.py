@@ -43,10 +43,11 @@ class MetaMessage(type):
         """Sets the class's respective locales."""
         super().__init__(*args, **kwargs)
 
-        try:
-            cls.locales = cls.LOCALES[cls.__name__]
-        except KeyError:
-            raise MessageNotFound(cls.__name__)
+        if cls is not Message and not cls.__name__.startswith('_'):
+            try:
+                cls.locales = cls.LOCALES[cls.__name__]
+            except KeyError:
+                raise MessageNotFound(cls.__name__)
 
 
 class Message(JSON, metaclass=MetaMessage):

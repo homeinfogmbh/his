@@ -43,7 +43,8 @@ class MetaMessage(type):
         """Sets the class's respective locales."""
         super().__init__(*args, **kwargs)
 
-        if cls is not Message and not cls.__name__.startswith('_'):
+        # Exclude Message base class and protected (abstract) messages.
+        if cls.__mro__[1] is JSON and not cls.__name__.startswith('_'):
             try:
                 cls.locales = cls.LOCALES[cls.__name__]
             except KeyError:

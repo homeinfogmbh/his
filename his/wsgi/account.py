@@ -1,7 +1,6 @@
 """Account management."""
 
 from flask import request, jsonify
-from peewee import DoesNotExist
 
 from his.api import DATA, authenticated
 from his.globals import ACCOUNT, CUSTOMER
@@ -24,12 +23,12 @@ def by_name(name_or_id):
     except ValueError:
         try:
             return Account.get(Account.name == name_or_id)
-        except DoesNotExist:
+        except Account.DoesNotExist:
             raise NoSuchAccount()
 
     try:
         return Account.get(Account.id == ident)
-    except DoesNotExist:
+    except Account.DoesNotExist:
         raise NoSuchAccount()
 
 
@@ -205,7 +204,7 @@ def add():
         try:
             settings = CustomerSettings.get(
                 CustomerSettings.customer == CUSTOMER)
-        except DoesNotExist:
+        except CustomerSettings.DoesNotExist:
             raise CustomerUnconfigured()
 
         if settings.max_accounts is None:

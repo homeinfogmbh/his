@@ -1,7 +1,6 @@
 """Customer-level meta services"""
 
 from flask import jsonify
-from peewee import DoesNotExist
 
 from his.api import authenticated
 from his.globals import ACCOUNT, CUSTOMER
@@ -24,7 +23,7 @@ def customer_by_cid(cid):
 
     try:
         return Customer.get(Customer.id == cid)
-    except DoesNotExist:
+    except Customer.DoesNotExist:
         raise NoSuchCustomer()
 
 
@@ -33,7 +32,7 @@ def settings():
 
     try:
         CustomerSettings.get(CustomerSettings.customer == CUSTOMER)
-    except DoesNotExist:
+    except CustomerSettings.DoesNotExist:
         raise CustomerUnconfigured() from None
 
 

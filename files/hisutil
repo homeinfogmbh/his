@@ -25,7 +25,6 @@ from string import digits, ascii_letters
 from sys import stderr
 
 from docopt import docopt
-from peewee import DoesNotExist
 
 from homeinfo.crm import Customer
 from his.orm import AccountExists, Account, Service, CustomerService, \
@@ -53,7 +52,7 @@ def get_account(name):
 
     try:
         return Account.get(Account.name == name)
-    except DoesNotExist:
+    except Account.DoesNotExist:
         print('No such account: {}.'.format(name))
         exit(2)
 
@@ -66,12 +65,12 @@ def get_customer(customer):
     except ValueError:
         print('Invalid customer ID: {}.'.format(customer), file=stderr)
         exit(1)
-    else:
-        try:
-            return Customer.get(Customer.id == customer)
-        except DoesNotExist:
-            print('No such customer: {}.'.format(customer), file=stderr)
-            exit(2)
+
+    try:
+        return Customer.get(Customer.id == customer)
+    except Customer.DoesNotExist:
+        print('No such customer: {}.'.format(customer), file=stderr)
+        exit(2)
 
 
 def get_service(name):
@@ -79,7 +78,7 @@ def get_service(name):
 
     try:
         return Service.get(Service.name == name)
-    except DoesNotExist:
+    except Service.DoesNotExist:
         print('No such service: "{}".'.format(name), file=stderr)
         exit(4)
 
@@ -119,7 +118,7 @@ def add_customer_service(customer, service, begin, end, date_format):
         customer_service = CustomerService.get(
             (CustomerService.customer == customer) &
             (CustomerService.service == service))
-    except DoesNotExist:
+    except CustomerService.DoesNotExist:
         customer_service = CustomerService.add(
             customer, service, begin=begin, end=end)
         customer_service.save()
@@ -137,7 +136,7 @@ def add_account_service(account, service):
         account_service = AccountService.get(
             (AccountService.account == account) &
             (AccountService.service == service))
-    except DoesNotExist:
+    except AccountService.DoesNotExist:
         account_service = AccountService.add(account, service)
         account_service.save()
 

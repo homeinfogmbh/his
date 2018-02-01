@@ -2,7 +2,6 @@
 
 from functools import wraps
 
-from peewee import DoesNotExist
 from wsgilib import PostData
 
 from his.globals import SESSION
@@ -55,7 +54,7 @@ def authorized(service_name):
             """
             try:
                 service = Service.get(Service.name == service_name)
-            except DoesNotExist:
+            except Service.DoesNotExist:
                 raise NoSuchService()
 
             if service.authorized(SESSION.account):

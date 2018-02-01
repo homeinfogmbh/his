@@ -1,7 +1,6 @@
 """HIS meta services."""
 
 from flask import request
-from peewee import DoesNotExist
 
 from his.api import authenticated
 from his.globals import ACCOUNT, CUSTOMER
@@ -27,14 +26,14 @@ def add_customer_service(customer_id, service):
 
     try:
         customer = Customer.get(Customer.id == cid)
-    except DoesNotExist:
+    except Customer.DoesNotExist:
         raise NoSuchCustomer()
 
     try:
         CustomerService.get(
             (CustomerService.customer == customer)
             & (CustomerService.service == service))
-    except DoesNotExist:
+    except CustomerService.DoesNotExist:
         customer_service = CustomerService()
         customer_service.customer = customer
         customer_service.service = service
@@ -52,7 +51,7 @@ def add_account_service(account_name, service):
 
     try:
         account = Account.get(Account.name == account_name)
-    except DoesNotExist:
+    except Account.DoesNotExist:
         raise NoSuchAccount()
 
     if CUSTOMER != account.customer:
@@ -74,7 +73,7 @@ def add():
         service = Service.get(Service.name == request.args['service'])
     except KeyError:
         raise NoServiceSpecified()
-    except DoesNotExist:
+    except Service.DoesNotExist:
         raise NoSuchService()
 
     customer_id = request.args.get('customer')

@@ -3,7 +3,6 @@
 from json import loads
 
 from flask import request, jsonify
-from peewee import DoesNotExist
 
 from his.messages import NotAuthorized, NoSessionSpecified, NoSuchSession, \
     SessionExpired, MissingCredentials, InvalidCredentials
@@ -32,8 +31,8 @@ def login():
 
     try:
         account = Account.get(Account.name == account)
-    except DoesNotExist:
-        pass
+    except Account.DoesNotExist:
+        raise InvalidCredentials()
     else:
         if account.login(passwd):
             session = Session.open(account, duration=get_duration())
@@ -52,7 +51,7 @@ def lst():
 
     try:
         session = Session.get(Session.token == session)
-    except DoesNotExist:
+    except Session.DoesNotExist:
         raise NoSuchSession()
 
     if session.alive:
@@ -71,7 +70,7 @@ def get(session_token):
 
     try:
         session = Session.get(Session.token == session_token)
-    except DoesNotExist:
+    except Session.DoesNotExist:
         raise NoSuchSession()
 
     if session.alive:
@@ -85,7 +84,7 @@ def refresh(session_token):
 
     try:
         session = Session.get(Session.token == session_token)
-    except DoesNotExist:
+    except Session.DoesNotExist:
         raise NoSuchSession()
 
     if session.renew(duration=get_duration()):
@@ -101,7 +100,7 @@ def close(session_token):
 
     try:
         session = Session.get(Session.token == session_token)
-    except DoesNotExist:
+    except Session.DoesNotExist:
         raise NoSuchSession()
 
     session.close()

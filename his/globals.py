@@ -1,7 +1,6 @@
 """HIS environment proxies, faking globals."""
 
 from flask import request
-from peewee import DoesNotExist
 from werkzeug.local import LocalProxy
 
 from homeinfo.crm import Customer
@@ -24,7 +23,7 @@ def get_session():
 
     try:
         return Session.get(Session.token == session_token)
-    except DoesNotExist:
+    except Session.DoesNotExist:
         raise NoSuchSession()
 
 
@@ -39,7 +38,7 @@ def get_account():
     if SESSION.account.root or SESSION.account.admin:
         try:
             account = Account.find(account)
-        except DoesNotExist:
+        except Account.DoesNotExist:
             raise NoSuchAccount()
 
         if SESSION.account.root:
@@ -63,7 +62,7 @@ def get_customer():
     if SESSION.account.root:
         try:
             return Customer.get(Customer.id == cid)
-        except DoesNotExist:
+        except Customer.DoesNotExist:
             raise NoSuchCustomer()
 
     raise NotAuthorized()

@@ -108,10 +108,7 @@ def _patch_admin(account):
     except AmbiguousDataError as error:
         raise DataError(field=str(error))
 
-    if invalid_keys:
-        return AccountPatched(invalid_keys=invalid_keys)
-
-    return AccountPatched()
+    return AccountPatched(invalid_keys=invalid_keys)
 
 
 def _patch_user(account):

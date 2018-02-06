@@ -387,7 +387,7 @@ class Account(HISModel):
             'root': self.root}
 
         if self.user is not None:
-            dictionary['user'] = self.user.id
+            dictionary['user'] = self.user.to_dict()
 
         if self.deleted is not None:
             dictionary['deleted'] = self.deleted.isoformat()

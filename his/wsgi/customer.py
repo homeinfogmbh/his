@@ -4,8 +4,9 @@ from flask import jsonify
 
 from his.api import authenticated
 from his.globals import ACCOUNT, CUSTOMER
-from his.messages import NotAuthorized, NoSuchCustomer, CustomerUnconfigured, \
-    InvalidCustomerID
+from his.messages.account import NotAuthorized
+from his.messages.customer import NoSuchCustomer, CustomerUnconfigured
+from his.messages.data import InvalidCustomerID
 from his.orm import CustomerSettings
 from homeinfo.crm import Customer
 from wsgilib import Binary

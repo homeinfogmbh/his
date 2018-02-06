@@ -4,9 +4,10 @@ from flask import request, jsonify
 
 from his.api import DATA, authenticated
 from his.globals import ACCOUNT, CUSTOMER
-from his.messages import NoSuchAccount, NotAuthorized, AccountExists, \
-    AccountCreated, AccountPatched, AccountsExhausted, CustomerUnconfigured, \
-    DataError, MissingData, InvalidData
+from his.messages.account import NoSuchAccount, NotAuthorized, AccountExists, \
+    AccountCreated, AccountPatched, AccountsExhausted
+from his.messages.customer import CustomerUnconfigured
+from his.messages.data import DataError, MissingData, InvalidData
 from his.orm import AccountExists as AccountExists_, AmbiguousDataError, \
     Account, CustomerSettings
 from his.wsgi.customer import customer_by_cid
@@ -15,7 +16,7 @@ from wsgilib import JSON
 __all__ = ['ROUTES']
 
 
-def by_name(name_or_id):
+def account_by_name(name_or_id):
     """Returns the respective account by its name."""
 
     try:
@@ -176,7 +177,7 @@ def get(name):
         # Return the account of the current session.
         return jsonify(ACCOUNT.to_dict())
 
-    account = by_name(name)
+    account = account_by_name(name)
 
     if ACCOUNT.root:
         return jsonify(account.to_dict())
@@ -225,7 +226,7 @@ def patch(name):
     if name == '!':
         return _patch(ACCOUNT)
 
-    account = by_name(name)
+    account = account_by_name(name)
 
     if ACCOUNT.root:
         return _patch(account)

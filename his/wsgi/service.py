@@ -1,33 +1,46 @@
 """HIS meta services."""
 
-from flask import request
+from wsgilib import JSON
 
-from his.api import authenticated
-from his.globals import ACCOUNT, CUSTOMER
-from his.messages import NotAuthorized, NoSuchAccount, NoSuchCustomer, \
-    InvalidCustomerID, NoServiceSpecified, NoSuchService, ServiceAdded, \
-    ServiceAlreadyEnabled, AmbiguousServiceTarget, MissingServiceTarget
-from his.orm import InconsistencyError, Service, CustomerService, Account
-from homeinfo.crm import Customer
+from his.api import DATA, authenticated, root, admin
+from his.globals import SESSION, ACCOUNT, CUSTOMER
+from his.messages.account import NotAuthorized, NoAccountSpecified
+from his.messages.customer import NoCustomerSpecified
+from his.messages.service import NoServiceSpecified, NoSuchService, \
+    ServiceAdded, ServiceAlreadyEnabled
+from his.orm import InconsistencyError, Service, CustomerService, \
+    AccountService
+from his.wsgi.account import account_by_name
+from his.wsgi.customer import customer_by_cid
 
 __all__ = ['ROUTES']
 
 
-def add_customer_service(customer_id, service):
+def service_by_name(name):
+    """Returns the respective service."""
+
+    try:
+        return Service.get(Service.name == name)
+    except Service.DoesNotExist:
+        raise NoSuchService()
+
+
+@authenticated
+@root
+def add_customer_service():
     """Allows the respective customer to use the given service."""
 
-    if not ACCOUNT.root:
-        raise NotAuthorized()
+    json = DATA.json
 
     try:
-        cid = int(customer_id)
-    except ValueError:
-        raise InvalidCustomerID()
+        customer = customer_by_cid(json['customer'])
+    except KeyError:
+        raise NoCustomerSpecified()
 
     try:
-        customer = Customer.get(Customer.id == cid)
-    except Customer.DoesNotExist:
-        raise NoSuchCustomer()
+        service = service_by_name(json['service'])
+    except KeyError:
+        raise NoServiceSpecified()
 
     try:
         CustomerService.get(
@@ -43,19 +56,25 @@ def add_customer_service(customer_id, service):
     return ServiceAlreadyEnabled()
 
 
-def add_account_service(account_name, service):
+@authenticated
+@admin
+def add_account_service():
     """Allows the respective account to use the given service."""
 
-    if not ACCOUNT.admin:
+    json = DATA.json
+
+    try:
+        account = account_by_name(json['account'])
+    except KeyError:
+        raise NoAccountSpecified()
+
+    if account not in ACCOUNT.subjects:
         raise NotAuthorized()
 
     try:
-        account = Account.get(Account.name == account_name)
-    except Account.DoesNotExist:
-        raise NoSuchAccount()
-
-    if CUSTOMER != account.customer:
-        raise NotAuthorized()
+        service = service_by_name(json['service'])
+    except KeyError:
+        raise NoServiceSpecified()
 
     try:
         account.services.add(service)
@@ -66,27 +85,41 @@ def add_account_service(account_name, service):
 
 
 @authenticated
-def add():
-    """Adds the respective service."""
+def list_services():
+    """Lists promoted services."""
 
-    try:
-        service = Service.get(Service.name == request.args['service'])
-    except KeyError:
-        raise NoServiceSpecified()
-    except Service.DoesNotExist:
-        raise NoSuchService()
+    if SESSION.account.root:
+        return JSON([service.to_dict() for service in Service])
 
-    customer_id = request.args.get('customer')
-    account_name = request.args.get('account')
-
-    if customer_id is not None and account_name is not None:
-        raise AmbiguousServiceTarget()
-    elif customer_id is not None:
-        return add_customer_service(customer_id, service)
-    elif account_name is not None:
-        return add_account_service(account_name, service)
-
-    raise MissingServiceTarget()
+    return JSON([service.to_dict() for service in Service.select().where(
+        Service.promote == 1)])
 
 
-ROUTES = (('POST', '/service', add, 'add_service'),)
+@authenticated
+@admin
+def list_customer_services():
+    """Lists services of the respective customer."""
+
+    return JSON([customer_service.to_dict() for customer_service
+        in CustomerService.select().where(
+            CustomerService.customer == CUSTOMER.id)])
+
+
+@authenticated
+def list_account_services():
+    """Lists services of the respective account."""
+
+    return JSON([account_service.to_dict() for account_service
+        in AccountService.select().where(
+            AccountService.account == ACCOUNT.id)])
+
+
+ROUTES = (
+    ('POST', '/service/customer', add_customer_service,
+     'add_customer_service'),
+    ('POST', '/service/account', add_account_service, 'add_account_service'),
+    ('GET', '/service', list_services, 'list_services'),
+    ('GET', '/service/customer', list_customer_services,
+     'list_customer_services'),
+    ('GET', '/service/account', list_account_services,
+     'list_account_services'))

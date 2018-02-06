@@ -100,7 +100,7 @@ def list_services():
 def list_customer_services():
     """Lists services of the respective customer."""
 
-    return JSON([customer_service.to_dict() for customer_service
+    return JSON([customer_service.service.to_dict() for customer_service
         in CustomerService.select().where(
             CustomerService.customer == CUSTOMER.id)])
 
@@ -109,7 +109,7 @@ def list_customer_services():
 def list_account_services():
     """Lists services of the respective account."""
 
-    return JSON([account_service.to_dict() for account_service
+    return JSON([account_service.service.to_dict() for account_service
         in AccountService.select().where(
             AccountService.account == ACCOUNT.id)])
 

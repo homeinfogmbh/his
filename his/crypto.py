@@ -6,13 +6,13 @@ from string import ascii_letters, digits, punctuation
 from argon2 import PasswordHasher
 from argon2.exceptions import VerifyMismatchError
 
-__all__ = ['PasswordTooShort', 'hash_password', 'verify_password']
+__all__ = ['PasswordTooShortError', 'hash_password', 'verify_password']
 
 
 _PASSWORD_HASHER = PasswordHasher()
 
 
-class PasswordTooShort(ValueError):
+class PasswordTooShortError(ValueError):
     """Indicates that the provided password was too short."""
 
     def __init__(self, minlen, pwlen):
@@ -31,7 +31,7 @@ def hash_password(passwd, minlen=8):
     """Creates a hash of the given password."""
 
     if len(passwd) < minlen:
-        raise PasswordTooShort(minlen, len(passwd))
+        raise PasswordTooShortError(minlen, len(passwd))
 
     return _PASSWORD_HASHER.hash(passwd)
 

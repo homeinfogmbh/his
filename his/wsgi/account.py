@@ -1,13 +1,13 @@
 """Account management."""
 
 from his.api import DATA, authenticated
-from his.crypto import PasswordTooShort as PasswordTooShort_, genpw
+from his.crypto import PasswordTooShortError, genpw
 from his.globals import ACCOUNT, CUSTOMER
 from his.messages.account import NoSuchAccount, NotAuthorized, AccountExists, \
     AccountCreated, AccountPatched, AccountsExhausted, PasswordTooShort
 from his.messages.customer import CustomerUnconfigured
 from his.messages.data import DataError, MissingData, InvalidData
-from his.orm import AccountExists as AccountExists_, AmbiguousDataError, \
+from his.orm import AccountExistsError, AmbiguousDataError, \
     Account, CustomerSettings
 from wsgilib import JSON
 
@@ -59,9 +59,9 @@ def add_account():
 
     try:
         account = Account.add(CUSTOMER, name, email, passwd=passwd)
-    except AccountExists_:
+    except AccountExistsError:
         raise AccountExists()
-    except PasswordTooShort_ as password_too_short:
+    except PasswordTooShortError as password_too_short:
         raise PasswordTooShort(minlen=password_too_short.minlen)
 
     account.save()
@@ -93,7 +93,7 @@ def patch_account(account, only=None):
     try:
         account.patch(patch_dict)
         account.save()
-    except PasswordTooShort_ as password_too_short:
+    except PasswordTooShortError as password_too_short:
         raise PasswordTooShort(minlen=password_too_short.minlen)
     except (TypeError, ValueError):
         raise InvalidData()

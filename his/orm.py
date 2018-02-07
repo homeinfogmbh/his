@@ -7,19 +7,18 @@ from contextlib import suppress
 from peewee import PrimaryKeyField, ForeignKeyField, CharField, BooleanField, \
     DateTimeField, IntegerField, DoesNotExist
 
+from filedb import FileProperty
+from homeinfo.crm import Customer, Employee
+from homeinfo.misc import classproperty
 from peeweeplus import MySQLDatabase, JSONModel
 from timelib import strpdatetime
-from filedb import FileProperty
-
-from homeinfo.misc import classproperty
-from homeinfo.crm import Customer, Employee
 
 from his.config import CONFIG
 from his.crypto import hash_password, verify_password
 from his.messages import AccountLocked, InvalidCredentials, DurationOutOfBounds
 
 __all__ = [
-    'AccountExists',
+    'AccountExistsError',
     'AmbiguousDataError',
     'his_db',
     'HISModel',
@@ -50,7 +49,7 @@ class InconsistencyError(Exception):
         return self.msg
 
 
-class AccountExists(Exception):
+class AccountExistsError(Exception):
     """Indicates that the respective account already exists."""
 
     def __init__(self, field):
@@ -279,9 +278,9 @@ class Account(HISModel):
                 account.user = user
                 return account
 
-            raise AccountExists('name')
+            raise AccountExistsError('name')
 
-        raise AccountExists('email')
+        raise AccountExistsError('email')
 
     @classmethod
     def admins(cls, customer=None):

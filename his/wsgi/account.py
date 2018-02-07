@@ -72,60 +72,24 @@ def add_account():
     return AccountCreated()
 
 
-def patch_root(account):
-    """Patches the account from a root user context."""
-
-    try:
-        account.patch(DATA.json)
-        account.save()
-    except (TypeError, ValueError):
-        raise InvalidData()
-    except AmbiguousDataError as error:
-        raise DataError(field=str(error))
-
-    return AccountPatched()
-
-
-def patch_admin(account):
-    """Patches the account from an admin context."""
+def patch_account(account, only=None):
+    """Patches the respective account with the provided dictionary."""
 
     patch_dict = {}
     invalid_keys = []
 
-    # Filter valid options for admins.
-    for key, value in DATA.json.items():
-        if key in ('name', 'passwd', 'email', 'admin'):
-            patch_dict[key] = value
-        else:
-            invalid_keys.append(key)
+    if only is not None:
+        for key, value in DATA.json.items():
+            if key in only:
+                patch_dict[key] = value
+            else:
+                invalid_keys.append(key)
 
     try:
         account.patch(patch_dict)
         account.save()
-    except (TypeError, ValueError):
-        raise InvalidData()
-    except AmbiguousDataError as error:
-        raise DataError(field=str(error))
-
-    return AccountPatched(invalid_keys=invalid_keys)
-
-
-def patch_user(account):
-    """Patches the accunt from a user context."""
-
-    patch_dict = {}
-    invalid_keys = []
-
-    # Filter valid options for normal users.
-    for key, value in DATA.json.items():
-        if key in ('passwd', 'email'):
-            patch_dict[key] = value
-        else:
-            invalid_keys.append(key)
-
-    try:
-        account.patch(patch_dict)
-        account.save()
+    except PasswordTooShort_ as password_too_short:
+        raise PasswordTooShort(minlen=password_too_short.minlen)
     except (TypeError, ValueError):
         raise InvalidData()
     except AmbiguousDataError as error:
@@ -199,14 +163,15 @@ def patch(name):
     """Modifies an account."""
 
     if name == '!':
-        return patch_user(ACCOUNT)
+        return patch_account(ACCOUNT, only=('passwd', 'email'))
 
     account = account_by_name(name)
 
     if ACCOUNT.root:
-        return patch_root(account)
+        return patch_account(account)
     elif ACCOUNT.admin and CUSTOMER == account.customer:
-        return patch_admin(account)
+        return patch_account(
+            account, only=('name', 'passwd', 'email', 'admin'))
 
     raise NotAuthorized()
 

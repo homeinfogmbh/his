@@ -374,29 +374,15 @@ class Account(HISModel):
 
         raise AccountLocked() from None
 
-    def to_dict(self):
+    def to_dict(self, null=False, **kwargs):
         """Returns the account as a JSON-like dictionary."""
-        dictionary = {
-            'customer': self.customer.id,
-            'name': self.name,
-            'email': self.email,
-            'created': self.created.isoformat(),
-            'failed_logins': self.failed_logins,
-            'disabled': self.disabled,
-            'admin': self.admin,
-            'root': self.root}
+        dictionary = super().to_dict(null=null, **kwargs)
+        dictionary['customer'] = self.customer.id
 
         if self.user is not None:
             dictionary['user'] = self.user.to_dict()
-
-        if self.deleted is not None:
-            dictionary['deleted'] = self.deleted.isoformat()
-
-        if self.last_login is not None:
-            dictionary['last_login'] = self.last_login.isoformat()
-
-        if self.locked_until is not None:
-            dictionary['locked_until'] = self.locked_until.isoformat()
+        elif null:
+            dictionary['user'] = None
 
         return dictionary
 
@@ -556,14 +542,11 @@ class Session(HISModel):
 
         raise DurationOutOfBounds()
 
-    def to_dict(self):
+    def to_dict(self, **kwargs):
         """Converts the session to a dictionary."""
-        return {
-            'account': self.account.name,
-            'token': self.token,
-            'start': self.start.isoformat(),
-            'end': self.end.isoformat(),
-            'login': self.login}
+        dictionary = super().to_dict(**kwargs)
+        dictionary['account'] = self.account.name
+        return dictionary
 
 
 class CustomerSettings(HISModel):

@@ -1,10 +1,10 @@
 """Account management."""
 
 from his.api import DATA, authenticated
-from his.crypto import genpw
+from his.crypto import PasswordTooShort as PasswordTooShort_, genpw
 from his.globals import ACCOUNT, CUSTOMER
 from his.messages.account import NoSuchAccount, NotAuthorized, AccountExists, \
-    AccountCreated, AccountPatched, AccountsExhausted
+    AccountCreated, AccountPatched, AccountsExhausted, PasswordTooShort
 from his.messages.customer import CustomerUnconfigured
 from his.messages.data import DataError, MissingData, InvalidData
 from his.orm import AccountExists as AccountExists_, AmbiguousDataError, \
@@ -61,6 +61,8 @@ def add_account():
         account = Account.add(CUSTOMER, name, email, passwd=passwd)
     except AccountExists_:
         raise AccountExists()
+    except PasswordTooShort_ as password_too_short:
+        raise PasswordTooShort(minlen=password_too_short.minlen)
 
     account.save()
 

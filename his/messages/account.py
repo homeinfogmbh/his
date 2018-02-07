@@ -11,7 +11,8 @@ __all__ = [
     'AccountPatched',
     'NotAuthorized',
     'AccountExists',
-    'AccountsExhausted']
+    'AccountsExhausted',
+    'PasswordTooShort']
 
 
 class NoAccountSpecified(Message):
@@ -70,3 +71,9 @@ class AccountsExhausted(Message):
     """
 
     STATUS = 402
+
+
+class PasswordTooShort(Message):
+    """Indicates that the provided password is too short."""
+
+    STATUS = 400

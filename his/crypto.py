@@ -12,7 +12,7 @@ __all__ = ['PasswordTooShortError', 'hash_password', 'verify_password']
 _PASSWORD_HASHER = PasswordHasher()
 
 
-class PasswordTooShortError(ValueError):
+class PasswordTooShortError(Exception):
     """Indicates that the provided password was too short."""
 
     def __init__(self, minlen, pwlen):

@@ -93,10 +93,10 @@ def patch_account(account, only=None):
     try:
         account.patch(patch_dict)
         account.save()
-    except PasswordTooShortError as password_too_short:
-        raise PasswordTooShort(minlen=password_too_short.minlen)
     except (TypeError, ValueError):
         raise InvalidData()
+    except PasswordTooShortError as password_too_short:
+        raise PasswordTooShort(minlen=password_too_short.minlen)
     except AmbiguousDataError as error:
         raise DataError(field=str(error))
 

@@ -42,7 +42,7 @@ def login():
     raise InvalidCredentials()
 
 
-def lst():
+def list_():
     """Lists all sessions iff specified session is root."""
 
     try:
@@ -110,7 +110,7 @@ def close(session_token):
 
 ROUTES = (
     ('POST', '/session', login, 'login'),
-    ('GET', '/session', lst, 'list_sessions'),
+    ('GET', '/session', list_, 'list_sessions'),
     ('GET', '/session/<session_token>', get, 'get_session'),
     ('PUT', '/session/<session_token>', refresh, 'refresh_session'),
     ('DELETE', '/session/<session_token>', close, 'close_session'))

@@ -279,9 +279,9 @@ class Account(HISModel):
                 account.user = user
                 return account
 
-            raise AccountExists('name') from None
+            raise AccountExists('name')
 
-        raise AccountExists('email') from None
+        raise AccountExists('email')
 
     @classmethod
     def admins(cls, customer=None):
@@ -370,9 +370,9 @@ class Account(HISModel):
 
             self.failed_logins += 1
             self.save()
-            raise InvalidCredentials() from None
+            raise InvalidCredentials()
 
-        raise AccountLocked() from None
+        raise AccountLocked()
 
     def to_dict(self, null=False, **kwargs):
         """Returns the account as a JSON-like dictionary."""
@@ -398,7 +398,7 @@ class Account(HISModel):
             except DoesNotExist:
                 self.email = email
             else:
-                raise AmbiguousDataError('email') from None
+                raise AmbiguousDataError('email')
 
         with suppress(KeyError):
             self.passwd = dictionary['passwd']
@@ -423,7 +423,7 @@ class Account(HISModel):
             except DoesNotExist:
                 self.name = name
             else:
-                raise AmbiguousDataError('name') from None
+                raise AmbiguousDataError('name')
 
         with suppress(KeyError):
             self.failed_logins = dictionary['failed_logins']

@@ -1,5 +1,8 @@
 """HIS cryptography library."""
 
+from random import choice
+from string import ascii_letters, digits, punctuation
+
 from argon2 import PasswordHasher
 from argon2.exceptions import VerifyMismatchError
 
@@ -24,3 +27,11 @@ def verify_password(pwhash, passwd):
         return _PASSWORD_HASHER.verify(pwhash, passwd)
     except VerifyMismatchError:
         return False
+
+
+def genpw(pool=ascii_letters+digits+punctuation, length=8):
+    """Generates a password with the specified
+    length from the character pool.
+    """
+
+    return ''.join(choice(pool) for _ in range(length))

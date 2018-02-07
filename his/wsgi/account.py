@@ -1,8 +1,7 @@
 """Account management."""
 
-from flask import request, jsonify
-
 from his.api import DATA, authenticated
+from his.crypto import genpw
 from his.globals import ACCOUNT, CUSTOMER
 from his.messages.account import NoSuchAccount, NotAuthorized, AccountExists, \
     AccountCreated, AccountPatched, AccountsExhausted
@@ -10,7 +9,6 @@ from his.messages.customer import CustomerUnconfigured
 from his.messages.data import DataError, MissingData, InvalidData
 from his.orm import AccountExists as AccountExists_, AmbiguousDataError, \
     Account, CustomerSettings
-from his.wsgi.customer import customer_by_cid
 from wsgilib import JSON
 
 __all__ = ['ROUTES']
@@ -33,37 +31,31 @@ def account_by_name(name_or_id):
         raise NoSuchAccount()
 
 
-def _list_root():
-    """Lists accounts."""
-
-    try:
-        customer = request.args['customer']
-    except KeyError:
-        return Account
-
-    return Account.select().where(
-        Account.customer == customer_by_cid(customer))
-
-
-def _add_account():
+def add_account():
     """Adds an account for the current customer."""
 
     json = DATA.json
+    missing_fields = []
+    password_generated = False
 
     try:
         name = json['name']
     except KeyError:
-        raise MissingData(field='name')
+        missing_fields.append('name')
 
     try:
         email = json['email']
     except KeyError:
-        raise MissingData(field='email')
+        missing_fields.append('email')
 
     try:
         passwd = json['passwd']
     except KeyError:
-        raise MissingData(field='passwd')
+        passwd = genpw()
+        password_generated = True
+
+    if missing_fields:
+        raise MissingData(missing_fields=missing_fields)
 
     try:
         account = Account.add(CUSTOMER, name, email, passwd=passwd)
@@ -71,10 +63,14 @@ def _add_account():
         raise AccountExists()
 
     account.save()
+
+    if password_generated:
+        return AccountCreated(passwd=passwd)
+
     return AccountCreated()
 
 
-def _patch_root(account):
+def patch_root(account):
     """Patches the account from a root user context."""
 
     try:
@@ -88,7 +84,7 @@ def _patch_root(account):
     return AccountPatched()
 
 
-def _patch_admin(account):
+def patch_admin(account):
     """Patches the account from an admin context."""
 
     patch_dict = {}
@@ -112,7 +108,7 @@ def _patch_admin(account):
     return AccountPatched(invalid_keys=invalid_keys)
 
 
-def _patch_user(account):
+def patch_user(account):
     """Patches the accunt from a user context."""
 
     patch_dict = {}
@@ -139,34 +135,11 @@ def _patch_user(account):
     return AccountPatched()
 
 
-def _patch(account):
-    """Change account data."""
-
-    if ACCOUNT.root:
-        return _patch_root(account)
-    elif ACCOUNT.admin:
-        if account.customer == CUSTOMER:
-            return _patch_admin(account)
-
-        raise NotAuthorized()
-
-    if account == ACCOUNT:
-        return _patch_user(account)
-
-    raise NotAuthorized()
-
-
 @authenticated
-def lst():
+def list_():
     """List one or many accounts."""
 
-    if ACCOUNT.root:
-        return JSON([account.to_dict() for account in _list_root()])
-    elif ACCOUNT.admin:
-        return JSON([account.to_dict() for account in Account.select().where(
-            Account.customer == CUSTOMER)])
-
-    raise NotAuthorized()
+    return JSON([account.to_dict() for account in account.subjects])
 
 
 @authenticated
@@ -175,19 +148,19 @@ def get(name):
 
     if name == '!':
         # Return the account of the current session.
-        return jsonify(ACCOUNT.to_dict())
+        return JSON(ACCOUNT.to_dict())
 
     account = account_by_name(name)
 
     if ACCOUNT.root:
-        return jsonify(account.to_dict())
+        return JSON(account.to_dict())
     elif ACCOUNT.admin:
         if account.customer == CUSTOMER:
-            return jsonify(account.to_dict())
+            return JSON(account.to_dict())
 
         raise NotAuthorized()
     elif ACCOUNT == account:
-        return jsonify(account.to_dict())
+        return JSON(account.to_dict())
 
     raise NotAuthorized()
 
@@ -197,7 +170,7 @@ def add():
     """Create a new account."""
 
     if ACCOUNT.root:
-        return _add_account()
+        return add_account()
     elif ACCOUNT.admin:
         try:
             settings = CustomerSettings.get(
@@ -206,13 +179,13 @@ def add():
             raise CustomerUnconfigured()
 
         if settings.max_accounts is None:
-            return _add_account()
+            return add_account()
 
         accounts = sum(1 for _ in Account.select().where(
             Account.customer == CUSTOMER))
 
         if accounts < settings.max_accounts:
-            return _add_account()
+            return add_account()
 
         raise AccountsExhausted()
 
@@ -224,20 +197,20 @@ def patch(name):
     """Modifies an account."""
 
     if name == '!':
-        return _patch(ACCOUNT)
+        return patch_user(ACCOUNT)
 
     account = account_by_name(name)
 
     if ACCOUNT.root:
-        return _patch(account)
+        return patch_root(account)
     elif ACCOUNT.admin and CUSTOMER == account.customer:
-        return _patch(account)
+        return patch_admin(account)
 
     raise NotAuthorized()
 
 
 ROUTES = (
-    ('GET', '/account', lst, 'list_accounts'),
+    ('GET', '/account', list_, 'list_accounts'),
     ('GET', '/account/<name>', get, 'get_account'),
     ('POST', '/account', add, 'add_account'),
     ('PATCH', '/account/<name>', patch, 'patch_account'))

@@ -73,12 +73,17 @@ def add_account():
 
 
 def patch_account(account, only=None):
-    """Patches the respective account with the provided dictionary."""
+    """Patches the respective account with the provided
+    dictionary and an optional field restriction.
+    """
 
-    patch_dict = {}
     invalid_keys = []
 
-    if only is not None:
+    if only is None:
+        patch_dict = DATA.json
+    else:
+        patch_dict = {}
+
         for key, value in DATA.json.items():
             if key in only:
                 patch_dict[key] = value

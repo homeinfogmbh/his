@@ -110,7 +110,7 @@ def patch_account(account, only=None):
 def list_():
     """List one or many accounts."""
 
-    return JSON([account.to_dict() for account in account.subjects])
+    return JSON([account.to_dict() for account in ACCOUNT.subjects])
 
 
 @authenticated

@@ -358,6 +358,11 @@ class Account(HISModel):
         else:
             yield self
 
+    @property
+    def info(self):
+        """Returns brief account information."""
+        return {'id': account.id, 'email': account.email}
+
     def login(self, passwd):
         """Performs a login."""
         if self.can_login:

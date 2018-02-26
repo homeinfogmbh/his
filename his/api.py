@@ -13,9 +13,9 @@ __all__ = ['DATA', 'authenticated', 'authorized', 'admin', 'root']
 
 
 DATA = PostData(
-    no_data_provided=NoDataProvided(),
-    non_utf8_data=InvalidUTF8Data(),
-    non_json_data=InvalidJSON())
+    no_data_provided=NoDataProvided,
+    non_utf8_data=InvalidUTF8Data,
+    non_json_data=InvalidJSON)
 
 
 def authenticated(function):

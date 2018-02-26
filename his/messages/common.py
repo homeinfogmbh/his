@@ -60,10 +60,12 @@ class Message(JSON, metaclass=MetaMessage):
 
     def __init__(self, *data, **fields):
         """Initializes the message."""
+        language = request.args.get('lang', 'de_DE')
+
         try:
-            message = self.__class__.locales[request.args.get('lang', 'de_DE')]
+            message = self.__class__.locales[language]
         except KeyError:
-            raise LanguageNotFound(lang)
+            raise LanguageNotFound(language)
 
         if data:
             message = message.format(*data)

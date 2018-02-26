@@ -2,12 +2,11 @@
 
 from configparser import ConfigParser
 
+from flask import request
+
 from wsgilib import JSON
 
 __all__ = ['MessageNotFound', 'LanguageNotFound', 'locales', 'Message']
-
-
-DEFAULT_LANGUAGE = 'de_DE'
 
 
 class MessageNotFound(Exception):
@@ -59,10 +58,10 @@ class Message(JSON, metaclass=MetaMessage):
     STATUS = 200
     ABSTRACT = True
 
-    def __init__(self, *data, lang=DEFAULT_LANGUAGE, **fields):
+    def __init__(self, *data, **fields):
         """Initializes the message."""
         try:
-            message = self.__class__.locales[lang]  # Set by metaclass.
+            message = self.__class__.locales[request.args.get('lang', 'de_DE')]
         except KeyError:
             raise LanguageNotFound(lang)
 

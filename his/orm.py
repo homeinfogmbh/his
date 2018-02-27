@@ -361,7 +361,7 @@ class Account(HISModel):
     @property
     def info(self):
         """Returns brief account information."""
-        return {'id': account.id, 'email': account.email}
+        return {'id': self.id, 'email': self.email}
 
     def login(self, passwd):
         """Performs a login."""

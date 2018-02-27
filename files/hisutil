@@ -115,7 +115,7 @@ def add_service(name, description, promote):
         exit_(1)
 
     service.save()
-    print('Service added,')
+    print('Service added.')
 
 
 def add_customer_service(service, customer, begin, end, date_format):

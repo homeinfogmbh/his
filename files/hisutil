@@ -109,11 +109,12 @@ def add_service(name, description, promote):
     """Adds a new service."""
 
     try:
-        return Service.add(name, description=description, promote=promote)
+        service = Service.add(name, description=description, promote=promote)
     except ServiceExistsError:
         print('Service already exists.', file=stderr)
         exit_(1)
 
+    service.save()
     print('Service added,')
 
 

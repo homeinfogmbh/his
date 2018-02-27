@@ -170,7 +170,7 @@ def main(options):
     elif options['service']:
         if options['add']:
             add_service(
-                options['<service>'], options['--description'],
+                options['<name>'], options['--description'],
                 options['--promote'])
         elif options['add-customer']:
             add_customer_service(

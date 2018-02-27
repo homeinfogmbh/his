@@ -22,12 +22,12 @@ specified date and time [default: %Y-%m-%dT%H:%M:%S].
 from datetime import datetime
 from random import choice
 from string import digits, ascii_letters
-from sys import stderr
+from sys import exit as exit_, stderr
 
 from docopt import docopt
 
 from homeinfo.crm import Customer
-from his.orm import AccountExists, Account, Service, CustomerService, \
+from his.orm import AccountExistsError, Account, Service, CustomerService, \
     AccountService
 
 
@@ -54,7 +54,7 @@ def get_account(name):
         return Account.get(Account.name == name)
     except Account.DoesNotExist:
         print('No such account: {}.'.format(name))
-        exit(2)
+        exit_(2)
 
 
 def get_customer(customer):
@@ -64,13 +64,13 @@ def get_customer(customer):
         customer = int(customer)
     except ValueError:
         print('Invalid customer ID: {}.'.format(customer), file=stderr)
-        exit(1)
+        exit_(1)
 
     try:
         return Customer.get(Customer.id == customer)
     except Customer.DoesNotExist:
         print('No such customer: {}.'.format(customer), file=stderr)
-        exit(2)
+        exit_(2)
 
 
 def get_service(name):
@@ -80,7 +80,7 @@ def get_service(name):
         return Service.get(Service.name == name)
     except Service.DoesNotExist:
         print('No such service: "{}".'.format(name), file=stderr)
-        exit(4)
+        exit_(4)
 
 
 def add_account(customer, name, email, passwd):
@@ -93,13 +93,13 @@ def add_account(customer, name, email, passwd):
     try:
         account = Account.add(
             get_customer(customer), name, email, passwd=passwd)
-    except AccountExists as e:
-        print('Account already exists for field "{}".'.format(e.field),
-              file=stderr)
-        exit(3)
-    else:
-        account.save()  # Account.add() does not perform save()
-        print(account)
+    except AccountExistsError as account_exists:
+        print('Account already exists for field "{}".'.format(
+            account_exists.field), file=stderr)
+        exit_(3)
+
+    account.save()  # Account.add() does not perform save()
+    print(account)
 
 
 def add_customer_service(customer, service, begin, end, date_format):
@@ -143,7 +143,7 @@ def add_account_service(account, service):
     print(account_service)
 
 
-def main():
+def main(options):
     """Runs the HIS utility."""
 
     if options['account']:
@@ -153,16 +153,12 @@ def main():
                 options['--passwd'])
     elif options['customer-service']:
         if options['add']:
-            customer = options['<customer>']
-            service = options['<service>']
             add_customer_service(
                 options['<customer>'], options['<service>'],
                 options['--begin'], options['--end'],
                 options['--date-format'])
     elif options['account-service']:
         if options['add']:
-            account = options['<account>']
-            service = options['<service>']
             add_account_service(options['<account>'], options['<service>'])
 
 

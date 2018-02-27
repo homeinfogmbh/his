@@ -1,23 +1,26 @@
 #! /usr/bin/env python3
-"""hisutil
+"""hisutil.
 
 Manage HIS settings.
 
 Usage:
     hisutil account add <name> <email> <customer> [--passwd=<passwd>]
-    hisutil customer-service add <customer> <service> [--begin=<begin>] \
+    hisutil service add <name> [--description=<description>] [--promote]
+    hisutil service <service> add-customer <customer>[--begin=<begin>] \
 [--end=<end>] [--date-format=<date_format>]
-    hisutil account-service add <account> <service>
+    hisutil service <service> add-account <account>
 
 Options:
-    --passwd=<passwd>                   Sets the desired password.
-    --begin=<begin>                     Sets the begin date and time for \
-service validity.
-    --end=<end>                         Sets the end date and time for \
-service validity.
-    --date-format=<date_format>         Sets the date format for the \
-specified date and time [default: %Y-%m-%dT%H:%M:%S].
-    --help                              Print this page.
+    --passwd=<passwd>               Sets the desired password.
+    --description=<description>     Specified the service's description.
+    --promote                       Flags to promote the service.
+    --begin=<begin>                 Sets the begin date and time for
+                                    service validity.
+    --end=<end>                     Sets the end date and time for
+                                    service validity.
+    --date-format=<date_format>     Sets the date format for the specified date
+                                    and time [default: %Y-%m-%dT%H:%M:%S].
+    --help                          Print this page.
 """
 from datetime import datetime
 from random import choice
@@ -27,12 +30,12 @@ from sys import exit as exit_, stderr
 from docopt import docopt
 
 from homeinfo.crm import Customer
-from his.orm import AccountExistsError, Account, Service, CustomerService, \
-    AccountService
+from his.orm import ServiceExistsError, AccountExistsError, Account, Service, \
+    CustomerService, AccountService
 
 
 def randchars(count, pool=None):
-    """Yields random chars from the pool"""
+    """Yields random chars from the pool."""
 
     if pool is None:
         pool = digits + ascii_letters
@@ -42,13 +45,13 @@ def randchars(count, pool=None):
 
 
 def genpw(length=16, pool=None):
-    """Generates a safe, radom password"""
+    """Generates a safe, radom password."""
 
     return ''.join(randchars(length, pool=pool))
 
 
 def get_account(name):
-    """Gets an account by its name"""
+    """Gets an account by its name."""
 
     try:
         return Account.get(Account.name == name)
@@ -58,7 +61,7 @@ def get_account(name):
 
 
 def get_customer(customer):
-    """Gets the customer from the customer's id as a string"""
+    """Gets the customer from the customer's id as a string."""
 
     try:
         customer = int(customer)
@@ -74,7 +77,7 @@ def get_customer(customer):
 
 
 def get_service(name):
-    """Returns the respective service"""
+    """Returns the respective service."""
 
     try:
         return Service.get(Service.name == name)
@@ -84,7 +87,7 @@ def get_service(name):
 
 
 def add_account(customer, name, email, passwd):
-    """Adds the respective account"""
+    """Adds the respective account."""
 
     if not passwd:
         passwd = genpw()
@@ -102,8 +105,20 @@ def add_account(customer, name, email, passwd):
     print(account)
 
 
-def add_customer_service(customer, service, begin, end, date_format):
-    """Adds a new customer-service mapping"""
+def add_service(name, description, promote):
+    """Adds a new service."""
+
+    try:
+        return Service.add(name, description=description, promote=promote)
+    except ServiceExistsError:
+        print('Service already exists.', file=stderr)
+        exit_(1)
+
+    print('Service added,')
+
+
+def add_customer_service(service, customer, begin, end, date_format):
+    """Adds a new customer-service mapping."""
 
     if begin is not None:
         begin = datetime.strptime(begin, date_format)
@@ -126,8 +141,8 @@ def add_customer_service(customer, service, begin, end, date_format):
     print(customer_service)
 
 
-def add_account_service(account, service):
-    """Adds a new account-service mapping"""
+def add_account_service(service, account):
+    """Adds a new account-service mapping."""
 
     account = get_account(account)
     service = get_service(service)
@@ -151,15 +166,17 @@ def main(options):
             add_account(
                 options['<customer>'], options['<name>'], options['<email>'],
                 options['--passwd'])
-    elif options['customer-service']:
+    elif options['service']:
         if options['add']:
+            add_service(
+                options['<service>'], options['--description'],
+                options['--promote'])
+        elif options['add-customer']:
             add_customer_service(
-                options['<customer>'], options['<service>'],
-                options['--begin'], options['--end'],
-                options['--date-format'])
-    elif options['account-service']:
-        if options['add']:
-            add_account_service(options['<account>'], options['<service>'])
+                options['<service>'], options['<customer>'],
+                options['--begin'], options['--end'], options['--date-format'])
+        elif options['add-account']:
+            add_account_service(options['<service>'], options['<account>'])
 
 
 if __name__ == '__main__':

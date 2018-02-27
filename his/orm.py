@@ -18,6 +18,7 @@ from his.crypto import hash_password, verify_password
 from his.messages import AccountLocked, InvalidCredentials, DurationOutOfBounds
 
 __all__ = [
+    'ServiceExistsError',
     'AccountExistsError',
     'AmbiguousDataError',
     'his_db',
@@ -47,6 +48,12 @@ class InconsistencyError(Exception):
 
     def __str__(self):
         return self.msg
+
+
+class ServiceExistsError(Exception):
+    """Indicates that the respective account already exists."""
+
+    pass
 
 
 class AccountExistsError(Exception):
@@ -138,6 +145,20 @@ class Service(HISModel):
     def __str__(self):
         """Returns the service's name."""
         return self.name
+
+    @classmethod
+    def add(cls, name, description=None, promote=True):
+        """Adds a new service."""
+        try:
+            cls.get(cls.name == name)
+        except cls.DoesNotExist:
+            service = cls()
+            service.name = name
+            service.description = description
+            service.promote = promote
+            return service
+
+        raise ServiceExistsError()
 
     def authorized(self, account):
         """Determines whether the respective account

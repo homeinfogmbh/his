@@ -20,7 +20,6 @@
 
   Requires:
     * his.js
-    * jquery.js
 */
 "use strict";
 
@@ -54,8 +53,10 @@ his.session.getUrl = function (sessionToken) {
   Opens a session.
 */
 his.session.login = function (userName, passwd, args) {
-  var data = {'user_name': userName, 'passwd': passwd};
-  var promise = his.post(his.session.getUrl(), JSON.stringify(data), args, ajaxQuery);
+  var url = his.session.getUrl();
+  var credentials = {'user_name': userName, 'passwd': passwd};
+  var data = JSON.stringify(credentials);
+  var promise = his.post(url, data, args);
   promise.then(his.setSession);
   return promise;
 }
@@ -64,35 +65,41 @@ his.session.login = function (userName, passwd, args) {
 /*
   Lists active sessions.
 */
-his.session.get = function (args, ajaxQuery) {
-  return his.get(his.session.getUrl(), args, ajaxQuery);
+his.session.list = function (args) {
+  var url = his.session.getUrl();
+  return his.get(url, args);
 }
 
 
 /*
   Gets session data.
 */
-his.session.get = function (args, ajaxQuery) {
-  var sessionToken = his.getSession().token;
-  return his.post(his.session.getUrl(sessionToken), null, args, ajaxQuery);
+his.session.get = function (token, args) {
+  var sessionToken = token || his.getSession().token;
+  var url = his.session.getUrl();
+  return his.get(url, args);
 }
 
 
 /*
   Refreshes a session.
 */
-his.session.refresh = function (args, ajaxQuery) {
+his.session.refresh = function (args) {
   var sessionToken = his.getSession().token;
-  return his.put(his.session.getUrl(sessionToken), null, args, ajaxQuery);
+  var url = his.session.getUrl(sessionToken);
+  var promise = his.put(url, null, args);
+  promise.then(his.setSession);
+  return promise;
 }
 
 
 /*
   Ends a session.
 */
-his.session.close = function (args, ajaxQuery) {
+his.session.close = function (args) {
   var sessionToken = his.getSession().token;
-  var promise = his.delete(his.session.getUrl(sessionToken), args, ajaxQuery);
+  var url = his.session.getUrl(sessionToken)
+  var promise = his.delete(url, args);
   promise.then(his.terminateSession);
   return promise;
 }

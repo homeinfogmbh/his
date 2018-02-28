@@ -20,7 +20,6 @@
 
   Requires:
     * his.js
-    * jquery.js
 */
 "use strict";
 
@@ -53,39 +52,49 @@ his.account.getUrl = function (accountName) {
 /*
   Lists available accounts.
 */
-his.account.list = function (args, ajaxQuery) {
-  his.auth.get(his.account.getUrl(), args, ajaxQuery);
+his.account.list = function (args) {
+  var url = his.account.getUrl();
+  return his.auth.get(url, args);
 }
 
 
 /*
   Gets the specified account.
 */
-his.account.get = function (name, args, ajaxQuery) {
-  his.auth.get(his.account.getUrl(name), args, ajaxQuery);
+his.account.get = function (name, args) {
+  var url = his.account.getUrl(name);
+  return his.auth.get(url, args);
 }
 
 
 /*
   Adds an account.
 */
-his.account.add = function (account, args, ajaxQuery) {
-  his.auth.post(his.account.getUrl(), JSON.stringify(account), args, ajaxQuery);
+his.account.add = function (account, args) {
+  var url = his.account.getUrl();
+  var data = JSON.stringify(account);
+  return his.auth.post(url, data, args);
 }
 
 
 /*
   Adds an account.
 */
-his.account.patch = function (name, account, args, ajaxQuery) {
-  his.auth.patch(his.account.getUrl(name), JSON.stringify(account), args, ajaxQuery);
+his.account.patch = function (name, account, args) {
+  var url = his.account.getUrl(name);
+  var data = JSON.stringify(account);
+  return his.auth.patch(url, data, args);
 }
 
 
 /*
   Constructor for a new account object.
 */
-his.account.Account = function (customer, name, email, /**/ passwd, user) {
+his.account.Account = function (
+    /* Mandatory arguments. */
+    customer, name, email,
+    /* Optional arguments. */
+    passwd, user) {
   if (customer == null) {
     throw 'No customer specified.';
   } else {

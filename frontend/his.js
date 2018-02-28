@@ -79,7 +79,8 @@ his.AjaxQuery = function (method, url, args, data) {
   Makes an AJAX call to the respective HIS backend.
 */
 his.query = function (method, url, data, args) {
-  return $.ajax(new his.AjaxQuery(method, url, args, data));
+  var ajaxQuery = new his.AjaxQuery(method, url, args, data);
+  return $.ajax(ajaxQuery);
 }
 
 
@@ -171,7 +172,7 @@ his.auth = his.auth || {};
 
 
 /*
-  Authorized GET request.
+  Performs an authorized GET request.
 */
 his.auth.get = function (url, args) {
   return his.get(url, his.authorized(args));
@@ -179,7 +180,7 @@ his.auth.get = function (url, args) {
 
 
 /*
-  Authorized POST request.
+  Performs an authorized POST request.
 */
 his.auth.post = function (url, data, args) {
   return his.post(url, data, his.authorized(args));
@@ -187,7 +188,7 @@ his.auth.post = function (url, data, args) {
 
 
 /*
-  Authorized PATCH request.
+  Performs an authorized PATCH request.
 */
 his.auth.patch = function (url, data, args) {
   return his.patch(url, data, his.authorized(args));
@@ -195,7 +196,7 @@ his.auth.patch = function (url, data, args) {
 
 
 /*
-  Authorized PUT request.
+  Performs an authorized PUT request.
 */
 his.auth.put = function (url, data, args) {
   return his.put(url, data, his.authorized(args));
@@ -203,7 +204,7 @@ his.auth.put = function (url, data, args) {
 
 
 /*
-  Authorized DELETE request.
+  Performs an authorized DELETE request.
 */
 his.auth.delete = function (url, args) {
   return his.delete(url, his.authorized(args));

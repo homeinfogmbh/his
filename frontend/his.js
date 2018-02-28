@@ -74,6 +74,9 @@ his.makeQuery = function (method, url, args, data) {
   if (data != null) {
     query.data = data;
   }
+
+  console.log('Generated query: ' + JSON.stringify(query));
+  return query;
 }
 
 
@@ -81,7 +84,7 @@ his.makeQuery = function (method, url, args, data) {
   Makes an AJAX call to the respective HIS backend.
 */
 his.query = function (method, url, data, args) {
-  var ajaxQuery = new his.AjaxQuery(method, url, args, data);
+  var ajaxQuery = his.makeQuery(method, url, args, data);
   return $.ajax(ajaxQuery);
 }
 

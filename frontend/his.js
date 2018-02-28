@@ -41,7 +41,7 @@ his.BASE_URL = 'https://his.homeinfo.de'
 */
 his.getUrl = function (baseUrl, args) {
   if (args != null) {
-    argsList = []
+    var argsList = []
 
     for (arg in args) {
       if (args.hasOwnProperty(arg)) {

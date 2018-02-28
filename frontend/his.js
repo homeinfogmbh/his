@@ -52,7 +52,7 @@ his.getUrl = function (baseUrl, args) {
         if (value == null) {
           argsList.push(arg)
         } else {
-          argsList.push([arg, value].join('='));
+          argsList.push(arg + '=' +  value);
         }
       }
     }
@@ -69,87 +69,89 @@ his.getUrl = function (baseUrl, args) {
 /*
   Updates a basic AJAX query.
 */
-his.updateQuery = function (query, method, url, args, data) {
-  if (query == null) {
-    query = {};
+his.updateQuery = function (ajaxQuery, method, url, args, data) {
+  if (ajaxQuery == null) {
+    ajaxQuery = {};
   }
 
   if (url != null) {
-    query.url = his.getUrl(url, args);
+    ajaxQuery.url = his.getUrl(url, args);
   }
 
   if (method != null) {
-    query.type = method;
+    ajaxQuery.type = method;
   }
 
   if (data != null) {
-    query.data = data;
+    ajaxQuery.data = data;
   }
 
-  return query;
-}
-
-
-/*
-  Returns a basic AJAX query object containg
-  the respective callback methods.
-*/
-his.makeQuery = function (success, error, statusCode) {
-  var query = {};
-
-  if (success != null) {
-    query.success = success;
-  }
-
-  if (error != null) {
-    query.error = error;
-  }
-
-  if (statusCode != null) {
-    query.statusCode = statusCode;
-  }
-
-  return query;
+  return ajaxQuery;
 }
 
 
 /*
   Makes an AJAX call to the respective HIS backend.
 */
-his.query = function (method, url, args, data, query) {
-  $.ajax(his.updateQuery(query, method, url, args, data));
+his.query = function (method, url, data, args, ajaxQuery) {
+  $.ajax(his.updateQuery(ajaxQuery, method, url, args, data));
 }
 
 
 /*
-  Makes an POST request to the respective HIS backend.
+  Updates a request's arguments to make the request authorized.
+  I.e. include the session token.
 */
-his.post = function (url, args, data, query) {
-  his.query('POST', url, args, data, query);
+his.authorized = function (args) {
+  if (args != null) {
+    if (! args.hasOwnProperty('session')) {
+      args.session = his.getSession().token;
+    }
+  } else {
+    args = {'session': his.getSession().token};
+  }
+
+  return args;
 }
 
 
 /*
   Makes an GET request to the respective HIS backend.
 */
-his.get = function (url, args, query) {
-  his.query('GET', url, args, null, query);
+his.get = function (url, args, ajaxQuery) {
+  his.query('GET', url, null, args, ajaxQuery);
 }
 
 
 /*
-  Makes an DELETE request to the respective HIS backend.
+  Makes an POST request to the respective HIS backend.
 */
-his.delete = function (url, args, query) {
-  his.query('DELETE', url, args, null, query);
+his.post = function (url, data, args, ajaxQuery) {
+  his.query('POST', url, data, args, ajaxQuery);
 }
 
 
 /*
   Makes an PATCH request to the respective HIS backend.
 */
-his.patch = function (url, args, data, query) {
-  his.query('PATCH', url, args, data, query);
+his.patch = function (url, data, args, ajaxQuery) {
+  his.query('PATCH', url, data, args, ajaxQuery);
+}
+
+
+/*
+  Makes an PUT request to the respective HIS backend.
+*/
+his.put = function (url, data, args, ajaxQuery) {
+  his.query('PUT', url, data, args, ajaxQuery);
+}
+
+
+/*
+  Makes an DELETE request to the respective HIS backend.
+*/
+his.delete = function (url, args, ajaxQuery) {
+  his.query('DELETE', url, null, args, ajaxQuery);
 }
 
 
@@ -172,60 +174,52 @@ his.setSession = function (session) {
 /*
   Clears the session from the local storage.
 */
-his.setSession = function () {
+his.terminateSession = function () {
   localStorage.removeItem('his.session');
 }
 
 
 /*
-  HIS session API.
+  Authorized requests (with session).
 */
-his.session = his.session || {};
+his.auth = his.auth || {};
 
 
 /*
-  Returns a URL for session queries.
+  Authorized GET request.
 */
-his.session.getUrl = function (endpoint) {
-  var url = his.BASE_URL + '/session';
-
-  if (endpoint != null) {
-    url += '/' + endpoint;
-  }
-
-  return url;
+his.auth.get = function (url, args, ajaxQuery) {
+  his.get(url, his.authorized(args), ajaxQuery);
 }
 
 
 /*
-  Opens a session.
+  Authorized POST request.
 */
-his.session.login = function (success, error, statusCode) {
-  var query = his.makeQuery(
-    function (json) {
-      his.setSession(json);
-
-      if (success != null) {
-        success(json);
-      }
-    },
-    error,
-    statusCode
-  );
-  return function (userName, passwd, args) {
-    var data = {'user_name': userName, 'passwd': passwd};
-    his.post(his.session.getUrl(), args, JSON.stringify(data), query);
-  }
+his.auth.post = function (url, data, args, ajaxQuery) {
+  his.post(url, data, his.authorized(args), ajaxQuery);
 }
 
 
 /*
-  Gets session data.
+  Authorized PATCH request.
 */
-his.session.get = function (success, error, statusCode) {
-  var query = his.makeQuery(success, error, statusCode);
-  return function (token, args) {
-    var sessionToken = token || his.getSession().token;
-    his.post(his.session.getUrl(sessionToken), args, JSON.stringify(data), query);
-  }
+his.auth.patch = function (url, data, args, ajaxQuery) {
+  his.patch(url, data, his.authorized(args), ajaxQuery);
+}
+
+
+/*
+  Authorized PUT request.
+*/
+his.auth.put = function (url, data, args, ajaxQuery) {
+  his.put(url, data, his.authorized(args), ajaxQuery);
+}
+
+
+/*
+  Authorized DELETE request.
+*/
+his.auth.delete = function (url, args , ajaxQuery) {
+  his.delete(url, his.authorized(args), ajaxQuery);
 }

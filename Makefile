@@ -2,10 +2,15 @@ FILE_LIST = ./.installed_files.txt
 
 .PHONY: pull push clean install uninstall
 
-default: | pull clean install
+default: | pull clean backend frontend
 
-install:
+backend:
 	@ ./setup.py install --record $(FILE_LIST)
+
+frontend:
+	@ mkdir -p /srv/http/de/homeinfo/javascript/his
+	@ chmod 755 /srv/http/de/homeinfo/javascript/his
+	@ install -m 644 frontend/*.js /srv/http/de/homeinfo/javascript/his/
 
 uninstall:
 	@ while read FILE; do echo "Removing: $$FILE"; rm "$$FILE"; done < $(FILE_LIST)

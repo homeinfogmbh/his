@@ -40,61 +40,46 @@ his.BASE_URL = 'https://backend.homeinfo.de/his'
   The args parameter is expected to be a JSON object.
 */
 his.getUrl = function (baseUrl, args) {
-  var url = baseUrl + '?session=' + his.session.getToken();
-
   if (args != null) {
     argsList = []
 
     for (arg in args) {
       if (args.hasOwnProperty(arg)) {
-        var value = args[arg];
-
-        if (value == null) {
+        if (args[arg] == null) {
           argsList.push(arg)
         } else {
-          argsList.push(arg + '=' +  value);
+          argsList.push(arg + '=' +  args[arg]);
         }
       }
     }
 
     if (argsList.length > 0) {
-      return url + '&' + argsList.join('&');
+      return baseUrl + '&' + argsList.join('&');
     }
   }
 
-  return url
+  return baseUrl
 }
 
 
 /*
-  Updates a basic AJAX query.
+  Contructor for an AJAX query.
 */
-his.updateQuery = function (ajaxQuery, method, url, args, data) {
-  if (ajaxQuery == null) {
-    ajaxQuery = {};
-  }
-
-  if (url != null) {
-    ajaxQuery.url = his.getUrl(url, args);
-  }
-
-  if (method != null) {
-    ajaxQuery.type = method;
-  }
+his.AjaxQuery = function (method, url, args, data) {
+  this.type = method;
+  this.url = his.getUrl(url, args);
 
   if (data != null) {
-    ajaxQuery.data = data;
+    this.data = data;
   }
-
-  return ajaxQuery;
 }
 
 
 /*
   Makes an AJAX call to the respective HIS backend.
 */
-his.query = function (method, url, data, args, ajaxQuery) {
-  $.ajax(his.updateQuery(ajaxQuery, method, url, args, data));
+his.query = function (method, url, data, args) {
+  return $.ajax(new his.AjaxQuery(method, url, args, data));
 }
 
 
@@ -118,40 +103,40 @@ his.authorized = function (args) {
 /*
   Makes an GET request to the respective HIS backend.
 */
-his.get = function (url, args, ajaxQuery) {
-  his.query('GET', url, null, args, ajaxQuery);
+his.get = function (url, args) {
+  return his.query('GET', url, null, args);
 }
 
 
 /*
   Makes an POST request to the respective HIS backend.
 */
-his.post = function (url, data, args, ajaxQuery) {
-  his.query('POST', url, data, args, ajaxQuery);
+his.post = function (url, data, args) {
+  return his.query('POST', url, data, args);
 }
 
 
 /*
   Makes an PATCH request to the respective HIS backend.
 */
-his.patch = function (url, data, args, ajaxQuery) {
-  his.query('PATCH', url, data, args, ajaxQuery);
+his.patch = function (url, data, args) {
+  return his.query('PATCH', url, data, args);
 }
 
 
 /*
   Makes an PUT request to the respective HIS backend.
 */
-his.put = function (url, data, args, ajaxQuery) {
-  his.query('PUT', url, data, args, ajaxQuery);
+his.put = function (url, data, args) {
+  return his.query('PUT', url, data, args);
 }
 
 
 /*
   Makes an DELETE request to the respective HIS backend.
 */
-his.delete = function (url, args, ajaxQuery) {
-  his.query('DELETE', url, null, args, ajaxQuery);
+his.delete = function (url, args) {
+  return his.query('DELETE', url, null, args);
 }
 
 
@@ -188,38 +173,38 @@ his.auth = his.auth || {};
 /*
   Authorized GET request.
 */
-his.auth.get = function (url, args, ajaxQuery) {
-  his.get(url, his.authorized(args), ajaxQuery);
+his.auth.get = function (url, args) {
+  return his.get(url, his.authorized(args));
 }
 
 
 /*
   Authorized POST request.
 */
-his.auth.post = function (url, data, args, ajaxQuery) {
-  his.post(url, data, his.authorized(args), ajaxQuery);
+his.auth.post = function (url, data, args) {
+  return his.post(url, data, his.authorized(args));
 }
 
 
 /*
   Authorized PATCH request.
 */
-his.auth.patch = function (url, data, args, ajaxQuery) {
-  his.patch(url, data, his.authorized(args), ajaxQuery);
+his.auth.patch = function (url, data, args) {
+  return his.patch(url, data, his.authorized(args));
 }
 
 
 /*
   Authorized PUT request.
 */
-his.auth.put = function (url, data, args, ajaxQuery) {
-  his.put(url, data, his.authorized(args), ajaxQuery);
+his.auth.put = function (url, data, args) {
+  return his.put(url, data, his.authorized(args));
 }
 
 
 /*
   Authorized DELETE request.
 */
-his.auth.delete = function (url, args , ajaxQuery) {
-  his.delete(url, his.authorized(args), ajaxQuery);
+his.auth.delete = function (url, args) {
+  return his.delete(url, his.authorized(args));
 }

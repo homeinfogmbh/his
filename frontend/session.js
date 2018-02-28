@@ -53,20 +53,11 @@ his.session.getUrl = function (sessionToken) {
 /*
   Opens a session.
 */
-his.session.login = function (userName, passwd, args, ajaxQuery) {
-  var originalSuccessFunction = ajaxQuery.success;
-
-  function wrappedSuccessFunction (json) {
-    his.setSession(json);
-
-    if (originalSuccessFunction != null) {
-        originalSuccessFunction(json);
-    }
-  };
-
-  ajaxQuery.success = wrappedSuccessFunction;
+his.session.login = function (userName, passwd, args) {
   var data = {'user_name': userName, 'passwd': passwd};
-  his.post(his.session.getUrl(), JSON.stringify(data), args, ajaxQuery);
+  var promise = his.post(his.session.getUrl(), JSON.stringify(data), args, ajaxQuery);
+  promise.then(his.setSession);
+  return promise;
 }
 
 
@@ -74,34 +65,25 @@ his.session.login = function (userName, passwd, args, ajaxQuery) {
   Lists active sessions.
 */
 his.session.get = function (args, ajaxQuery) {
-  his.get(his.session.getUrl(), args, ajaxQuery);
+  return his.get(his.session.getUrl(), args, ajaxQuery);
 }
 
 
 /*
   Gets session data.
 */
-his.session.get = function (token, args, ajaxQuery) {
-  var sessionToken = token || his.getSession().token;
-  his.post(his.session.getUrl(sessionToken), null, args, ajaxQuery);
+his.session.get = function (args, ajaxQuery) {
+  var sessionToken = his.getSession().token;
+  return his.post(his.session.getUrl(sessionToken), null, args, ajaxQuery);
 }
 
 
 /*
   Refreshes a session.
 */
-his.session.refresh = function (token, duration, args, ajaxQuery) {
-  var sessionToken = token || his.getSession().token;
-
-  if (duration != null) {
-    if (args != null) {
-      args.duration = duration;
-    } else {
-      args = {'duration': duration};
-    }
-  }
-
-  his.put(his.session.getUrl(sessionToken), null, args, ajaxQuery);
+his.session.refresh = function (args, ajaxQuery) {
+  var sessionToken = his.getSession().token;
+  return his.put(his.session.getUrl(sessionToken), null, args, ajaxQuery);
 }
 
 
@@ -109,17 +91,8 @@ his.session.refresh = function (token, duration, args, ajaxQuery) {
   Ends a session.
 */
 his.session.close = function (args, ajaxQuery) {
-  var originalSuccessFunction = ajaxQuery.success;
-
-  function wrappedSuccessFunction (json) {
-    his.terminateSession();
-
-    if (originalSuccessFunction != null) {
-        originalSuccessFunction(json);
-    }
-  };
-
-  ajaxQuery.success = wrappedSuccessFunction;
-  var sessionToken = his.getSession().token
-  his.delete(his.session.getUrl(sessionToken), args, ajaxQuery);
+  var sessionToken = his.getSession().token;
+  var promise = his.delete(his.session.getUrl(sessionToken), args, ajaxQuery);
+  promise.then(his.terminateSession);
+  return promise;
 }

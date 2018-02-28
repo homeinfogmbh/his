@@ -80,9 +80,9 @@ his.account.add = function (account, args) {
 /*
   Adds an account.
 */
-his.account.patch = function (name, account, args) {
+his.account.patch = function (name, accountPatch, args) {
   var url = his.account.getUrl(name);
-  var data = JSON.stringify(account);
+  var data = JSON.stringify(accountPatch);
   return his.auth.patch(url, data, args);
 }
 

@@ -39,7 +39,7 @@ his.account = his.account || {};
   Returns the respective account URL.
 */
 his.account.getUrl = function (accountName) {
-  var url = his.BASE_URL + '/session';
+  var url = his.BASE_URL + '/account';
 
   if (accountName != null) {
     url += '/' + accountName;

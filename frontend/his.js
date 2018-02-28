@@ -91,10 +91,10 @@ his.query = function (method, url, data, args) {
 his.authorized = function (args) {
   if (args != null) {
     if (! args.hasOwnProperty('session')) {
-      args.session = his.getSession().token;
+      args.session = his.getSessionToken();
     }
   } else {
-    args = {'session': his.getSession().token};
+    args = {'session': his.getSessionToken()};
   }
 
   return args;
@@ -162,6 +162,20 @@ his.setSession = function (session) {
 */
 his.terminateSession = function () {
   localStorage.removeItem('his.session');
+}
+
+
+/*
+  Safely returns the session token.
+*/
+his.getSessionToken = function () {
+  var session = his.getSession();
+
+  if (session == null) {
+    return null;
+  }
+
+  return session.token;
 }
 
 

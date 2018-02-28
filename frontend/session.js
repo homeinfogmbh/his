@@ -50,20 +50,6 @@ his.session.getUrl = function (sessionToken) {
 
 
 /*
-  Safely returns the session token.
-*/
-his.session.getToken = function () {
-  var session = his.getSession();
-
-  if (session == null) {
-    return null;
-  }
-
-  return session.token;
-}
-
-
-/*
   Opens a session.
 */
 his.session.login = function (userName, passwd, args) {
@@ -89,7 +75,7 @@ his.session.list = function (args) {
   Gets session data.
 */
 his.session.get = function (token, args) {
-  var sessionToken = token || his.session.getToken();
+  var sessionToken = token || his.getSessionToken();
   var url = his.session.getUrl();
   return his.get(url, args);
 }
@@ -99,7 +85,7 @@ his.session.get = function (token, args) {
   Refreshes a session.
 */
 his.session.refresh = function (args) {
-  var sessionToken = his.session.getToken();
+  var sessionToken = his.getSessionToken();
   var url = his.session.getUrl(sessionToken);
   var promise = his.put(url, null, args);
   promise.then(his.setSession);
@@ -111,7 +97,7 @@ his.session.refresh = function (args) {
   Ends a session.
 */
 his.session.close = function (args) {
-  var sessionToken = his.session.getToken();
+  var sessionToken = his.getSessionToken();
   var url = his.session.getUrl(sessionToken);
   var promise = his.delete(url, args);
   promise.then(his.terminateSession);

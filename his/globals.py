@@ -24,7 +24,7 @@ def get_session():
     try:
         return Session.get(Session.token == session_token)
     except Session.DoesNotExist:
-        raise NoSuchSession(token=session_token)
+        raise NoSuchSession()
 
 
 def get_account():

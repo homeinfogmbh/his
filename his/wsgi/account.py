@@ -11,7 +11,7 @@ from his.orm import AccountExistsError, AmbiguousDataError, \
     Account, CustomerSettings
 from wsgilib import JSON
 
-__all__ = ['ROUTES']
+__all__ = ['account_by_name', 'ROUTES']
 
 
 def _account_by_name(name_or_id):
@@ -28,7 +28,7 @@ def _account_by_name(name_or_id):
         return Account.get(Account.name == name_or_id)
 
 
-def get_authorized_account(name_or_id):
+def account_by_name(name_or_id):
     """Safely returns the respective account while preventing spoofing."""
 
     if ACCOUNT.root:
@@ -142,7 +142,7 @@ def get(name):
         # Return the account of the current session.
         return JSON(ACCOUNT.to_dict())
 
-    return JSON(get_authorized_account(name).to_dict())
+    return JSON(account_by_name(name).to_dict())
 
 
 @authenticated
@@ -179,7 +179,7 @@ def patch(name):
     if name == '!':
         return patch_account(ACCOUNT, only=('passwd', 'email'))
 
-    account = get_authorized_account(name)
+    account = account_by_name(name)
 
     if ACCOUNT.root:
         return patch_account(account)

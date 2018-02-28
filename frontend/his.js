@@ -65,15 +65,15 @@ his.getUrl = function (baseUrl, args) {
 /*
   Contructor for an AJAX query.
 */
-his.AjaxQuery = function (method, url, args, data, dataType='json') {
-  this.type = method;
-  this.url = his.getUrl(url, args);
-
-  if (data != null) {
-    this.data = data;
+his.makeQuery = function (method, url, args, data) {
+  var query = {
+    'type': method,
+    'url': his.getUrl(url, args)
   }
 
-  this.dataType = dataType;
+  if (data != null) {
+    query.data = data;
+  }
 }
 
 

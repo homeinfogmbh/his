@@ -14,21 +14,42 @@ from wsgilib import JSON
 __all__ = ['ROUTES']
 
 
-def account_by_name(name_or_id):
+def _account_by_name(name_or_id):
     """Returns the respective account by its name."""
 
     try:
         ident = int(name_or_id)
     except ValueError:
-        try:
-            return Account.get(Account.name == name_or_id)
-        except Account.DoesNotExist:
-            raise NoSuchAccount()
+        return Account.get(Account.name == name_or_id)
 
     try:
         return Account.get(Account.id == ident)
     except Account.DoesNotExist:
-        raise NoSuchAccount()
+        return Account.get(Account.name == name_or_id)
+
+
+def get_authorized_account(name_or_id):
+    """Safely returns the respective account while preventing spoofing."""
+
+    if ACCOUNT.root:
+        try:
+            return _account_by_name(name_or_id)
+        except Account.DoesNotExist:
+            raise NoSuchAccount()
+
+    try:
+        account = _account_by_name(name_or_id)
+    except Account.DoesNotExist:
+        raise NotAuthorized()   # Prevent account name spoofing.
+
+
+    if ACCOUNT.admin:
+        if account.customer == CUSTOMER:
+            return JSON(account.to_dict())
+    elif ACCOUNT == account:
+        return JSON(account.to_dict())
+
+    raise NotAuthorized()
 
 
 def add_account():
@@ -121,19 +142,7 @@ def get(name):
         # Return the account of the current session.
         return JSON(ACCOUNT.to_dict())
 
-    account = account_by_name(name)
-
-    if ACCOUNT.root:
-        return JSON(account.to_dict())
-    elif ACCOUNT.admin:
-        if account.customer == CUSTOMER:
-            return JSON(account.to_dict())
-
-        raise NotAuthorized()
-    elif ACCOUNT == account:
-        return JSON(account.to_dict())
-
-    raise NotAuthorized()
+    return JSON(get_authorized_account(name).to_dict())
 
 
 @authenticated
@@ -170,7 +179,7 @@ def patch(name):
     if name == '!':
         return patch_account(ACCOUNT, only=('passwd', 'email'))
 
-    account = account_by_name(name)
+    account = get_authorized_account(name)
 
     if ACCOUNT.root:
         return patch_account(account)

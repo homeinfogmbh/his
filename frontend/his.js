@@ -43,7 +43,7 @@ his.getUrl = function (baseUrl, args) {
   if (args != null) {
     var argsList = []
 
-    for (arg in args) {
+    for (var arg in args) {
       if (args.hasOwnProperty(arg)) {
         if (args[arg] == null) {
           argsList.push(arg)

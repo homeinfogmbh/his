@@ -54,7 +54,7 @@ his.getUrl = function (baseUrl, args) {
     }
 
     if (argsList.length > 0) {
-      return baseUrl + '&' + argsList.join('&');
+      return baseUrl + '?' + argsList.join('&');
     }
   }
 

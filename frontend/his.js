@@ -29,7 +29,7 @@
 var his = his || {};
 
 
-his.BASE_URL = 'https://backend.homeinfo.de/his'
+his.BASE_URL = 'https://his.homeinfo.de'
 
 
 /*
@@ -65,18 +65,13 @@ his.getUrl = function (baseUrl, args) {
 /*
   Contructor for an AJAX query.
 */
-his.makeQuery = function (method, url, args, data) {
-  var query = {
-    'type': method,
-    'url': his.getUrl(url, args)
-  }
+his.AjaxQuery = function (method, url, args, data) {
+  this.type = method;
+  this.url = his.getUrl(url, args);
 
   if (data != null) {
-    query.data = data;
+    this.data = data;
   }
-
-  console.log('Generated query: ' + JSON.stringify(query));
-  return query;
 }
 
 
@@ -84,7 +79,7 @@ his.makeQuery = function (method, url, args, data) {
   Makes an AJAX call to the respective HIS backend.
 */
 his.query = function (method, url, data, args) {
-  var ajaxQuery = his.makeQuery(method, url, args, data);
+  var ajaxQuery = new his.AjaxQuery(method, url, args, data);
   return $.ajax(ajaxQuery);
 }
 

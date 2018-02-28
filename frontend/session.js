@@ -54,7 +54,7 @@ his.session.getUrl = function (sessionToken) {
 */
 his.session.login = function (userName, passwd, args) {
   var url = his.session.getUrl();
-  var credentials = {'user_name': userName, 'passwd': passwd};
+  var credentials = {'account': userName, 'passwd': passwd};
   var data = JSON.stringify(credentials);
   var promise = his.post(url, data, args);
   promise.then(his.setSession);

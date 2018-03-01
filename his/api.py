@@ -24,7 +24,7 @@ def authenticated(function):
     """
 
     @wraps(function)
-    def authentication_wrapper(*args, **kwargs):
+    def wrapper(*args, **kwargs):
         """Wraps the respective function
         with preceding authentication.
         """
@@ -36,7 +36,7 @@ def authenticated(function):
 
         raise AccountLocked()
 
-    return authentication_wrapper
+    return wrapper
 
 
 def authorized(service_name):
@@ -44,11 +44,11 @@ def authorized(service_name):
     checks to the respective function.
     """
 
-    def authorized_decorator(function):
+    def decorator(function):
         """Wraps the respective function."""
 
         @wraps(function)
-        def authorized_wrapper(*args, **kwargs):
+        def wrapper(*args, **kwargs):
             """Wraps the respective function
             with preceding authentication.
             """
@@ -62,34 +62,34 @@ def authorized(service_name):
 
             raise NotAuthorized()
 
-        return authorized_wrapper
+        return wrapper
 
-    return authorized_decorator
+    return decorator
 
 
 def admin(function):
     """Decorator to check for administrative services."""
 
     @wraps(function)
-    def admin_wrapper(*args, **kwargs):
+    def wrapper(*args, **kwargs):
         """Checks whether the session's account is an administrator."""
         if SESSION.account.admin:
             return function(*args, **kwargs)
 
         raise NotAuthorized()
 
-    return admin_wrapper
+    return wrapper
 
 
 def root(function):
     """Decorator to check for root services."""
 
     @wraps(function)
-    def root_wrapper(*args, **kwargs):
+    def wrapper(*args, **kwargs):
         """Checks whether the session's account is root."""
         if SESSION.account.root:
             return function(*args, **kwargs)
 
         raise NotAuthorized()
 
-    return root_wrapper
+    return wrapper

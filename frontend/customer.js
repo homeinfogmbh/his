@@ -49,3 +49,23 @@ his.customer.getUrl = function (customerName) {
 }
 
 
+/*
+  Returns the respective customer.
+*/
+his.customer.get = function (customer, args) {
+  if (customer == null) {
+    customer = '!';
+  }
+
+  var url = his.customer.getUrl(customer);
+  return his.auth.get(url, args);
+}
+
+
+/*
+  Returns the current customer's logo.
+*/
+his.customer.logo = function (args) {
+  var url = his.BASE_URL + '/customer-logo';
+  return his.auth.get(url, args);
+}

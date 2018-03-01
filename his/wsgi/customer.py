@@ -40,7 +40,7 @@ def settings():
 
 @authenticated
 @root
-def list():
+def list_():
     """Lists available customers."""
 
     return JSON([customer.to_dict() for customer in Customer])
@@ -75,6 +75,6 @@ def get_logo():
 
 
 ROUTES = (
-    ('GET', '/customer', get, 'list_customers'),
+    ('GET', '/customer', list_, 'list_customers'),
     ('GET', '/customer/<ident>', get, 'get_customer'),
     ('GET', '/customer-logo', get_logo, 'get_customer_logo'))

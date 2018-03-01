@@ -1,11 +1,11 @@
-"""Customer-level meta services"""
+"""Customer-level meta services."""
 
 from flask import jsonify
 
 from homeinfo.crm import Customer
-from wsgilib import Binary
+from wsgilib import JSON, Binary
 
-from his.api import authenticated
+from his.api import authenticated, root
 from his.globals import ACCOUNT, CUSTOMER
 from his.messages.account import NotAuthorized
 from his.messages.customer import NoSuchCustomer, CustomerUnconfigured
@@ -39,6 +39,14 @@ def settings():
 
 
 @authenticated
+@root
+def list():
+    """Lists available customers."""
+
+    return JSON([customer.to_dict() for customer in Customer])
+
+
+@authenticated
 def get(ident):
     """Allows services"""
 
@@ -67,5 +75,6 @@ def get_logo():
 
 
 ROUTES = (
+    ('GET', '/customer', get, 'list_customers'),
     ('GET', '/customer/<ident>', get, 'get_customer'),
     ('GET', '/customer-logo', get_logo, 'get_customer_logo'))

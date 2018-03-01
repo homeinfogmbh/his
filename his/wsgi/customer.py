@@ -35,7 +35,7 @@ def settings():
     try:
         CustomerSettings.get(CustomerSettings.customer == CUSTOMER)
     except CustomerSettings.DoesNotExist:
-        raise CustomerUnconfigured() from None
+        raise CustomerUnconfigured()
 
 
 @authenticated

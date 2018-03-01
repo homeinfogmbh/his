@@ -11,7 +11,7 @@ from his.messages.service import NoServiceSpecified, NoSuchService, \
 from his.orm import InconsistencyError, Service, CustomerService, \
     AccountService
 from his.wsgi.account import account_by_name
-from his.wsgi.customer import customer_by_cid
+from his.wsgi.customer import customer_by_name
 
 __all__ = ['ROUTES']
 
@@ -33,7 +33,7 @@ def add_customer_service():
     json = DATA.json
 
     try:
-        customer = customer_by_cid(json['customer'])
+        customer = customer_by_name(json['customer'])
     except KeyError:
         raise NoCustomerSpecified()
 

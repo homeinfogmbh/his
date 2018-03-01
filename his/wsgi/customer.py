@@ -15,18 +15,18 @@ from his.orm import CustomerSettings
 __all__ = ['ROUTES']
 
 
-def customer_by_cid(cid):
+def customer_by_name(name):
     """Returns the customer by the respective customer ID."""
 
+    if name == '!':
+        return CUSTOMER
+
     try:
-        cid = int(cid)
+        cid = int(name)
     except ValueError:
         raise InvalidCustomerID()
 
-    try:
-        return Customer.get(Customer.id == cid)
-    except Customer.DoesNotExist:
-        raise NoSuchCustomer()
+    return Customer.get(Customer.id == cid)
 
 
 def settings():
@@ -39,16 +39,22 @@ def settings():
 
 
 @authenticated
-def get(customer):
+def get(ident):
     """Allows services"""
 
-    if customer == '!':
-        return jsonify(CUSTOMER.to_dict())
+    if ACCOUNT.root:
+        try:
+            customer = customer_by_name(ident)
+        except Customer.DoesNotExist:
+            raise NoSuchCustomer()
+    elif ACCOUNT.admin:
+        try:
+            customer = customer_by_name(ident)
+        except Customer.DoesNotExist:
+            raise NotAuthorized()
 
-    customer = customer_by_cid(customer)
-
-    if ACCOUNT.root or CUSTOMER == customer:
-        return jsonify(customer.to_dict())
+        if CUSTOMER == customer:
+            return jsonify(customer.to_dict())
 
     raise NotAuthorized()
 
@@ -61,5 +67,5 @@ def get_logo():
 
 
 ROUTES = (
-    ('GET', '/customer/<customer>', get, 'get_customer'),
+    ('GET', '/customer/<ident>', get, 'get_customer'),
     ('GET', '/customer-logo', get_logo, 'get_customer_logo'))

@@ -244,7 +244,7 @@ class Account(HISModel):
     name = CharField(64)
     pwhash = CharField(255)
     email = CharField(64)
-    created = DateTimeField()
+    created = DateTimeField(default=datetime.now)
     deleted = DateTimeField(null=True, default=None)
     last_login = DateTimeField(null=True, default=None)
     failed_logins = IntegerField(default=0)

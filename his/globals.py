@@ -35,16 +35,16 @@ def get_account():
     except KeyError:
         return SESSION.account
 
-    if SESSION.account.root or SESSION.account.admin:
+    if SESSION.account.root:
         try:
-            account = Account.find(account)
+            return Account.find(account)
         except Account.DoesNotExist:
             raise NoSuchAccount()
-
-        if SESSION.account.root:
-            return account
-        elif SESSION.account.admin and account.customer == CUSTOMER.id:
-            return account
+    elif SESSION.account.admin:
+        try:
+            return Account.find(account, customer=CUSTOMER.id)
+        except Account.DoesNotExist:
+            raise NoSuchAccount()
 
     raise NotAuthorized()
 

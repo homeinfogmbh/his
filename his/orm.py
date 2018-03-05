@@ -313,14 +313,18 @@ class Account(HISModel):
             (cls.customer == customer) & (cls.admin == 1))
 
     @classmethod
-    def find(cls, id_or_name):
+    def find(cls, id_or_name, customer=None):
         """Find account by primary key or login name."""
+        customer_expr = True if customer is None else cls.customer == customer
+
         try:
             ident = int(id_or_name)
         except ValueError:
-            return cls.get(cls.name == id_or_name)
+            sel_expr = cls.name == id_or_name
+        else:
+            sel_expr = cls.id == ident
 
-        return cls.get(cls.id == ident)
+        return cls.get(customer_expr & sel_expr)
 
     def passwd(self, passwd):
         """Sets the password."""

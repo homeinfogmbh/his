@@ -9,8 +9,6 @@ setup(
     author='Richard Neumann',
     requires=['homeinfo.crm'],
     packages=['his', 'his.messages', 'his.wsgi'],
-    scripts=['files/hisd', 'files/hisutil', 'files/his-session-cleanup'],
-    data_files=[
-        ('/usr/lib/systemd/system', ['files/his.service']),
-        ('/etc/his.d/locale', ['files/his.ini'])],
+    scripts=['files/hisutil', 'files/his-session-cleanup'],
+    data_files=[('/etc/his.d/locale', ['files/his.ini'])],
     description='HOMEINFO Integrated Services.')

@@ -145,7 +145,7 @@ his.delete = function (url, args) {
   Retrieves the session from local storage.
 */
 his.getSession = function () {
-  return JSON.parse(sessionStorage.getItem('his.session'));
+  return JSON.parse(localStorage.getItem('his.session'));
 }
 
 
@@ -153,7 +153,7 @@ his.getSession = function () {
   Writes the session to local storage.
 */
 his.setSession = function (session) {
-  sessionStorage.setItem('his.session', JSON.stringify(session));
+  localStorage.setItem('his.session', JSON.stringify(session));
 }
 
 
@@ -161,7 +161,7 @@ his.setSession = function (session) {
   Clears the session from the local storage.
 */
 his.terminateSession = function () {
-  sessionStorage.removeItem('his.session');
+  localStorage.removeItem('his.session');
 }
 
 

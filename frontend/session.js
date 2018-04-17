@@ -76,7 +76,7 @@ his.session.list = function (args) {
 */
 his.session.get = function (token, args) {
   var sessionToken = token || his.getSessionToken();
-  var url = his.session.getUrl();
+  var url = his.session.getUrl(sessionToken);
   return his.get(url, args);
 }
 

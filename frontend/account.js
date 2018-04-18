@@ -38,7 +38,7 @@ his.account = his.account || {};
 /*
   Returns the respective account URL.
 */
-his.account.getUrl = function (accountName) {
+his.account._getUrl = function (accountName) {
   var url = his.BASE_URL + '/account';
 
   if (accountName != null) {
@@ -53,7 +53,7 @@ his.account.getUrl = function (accountName) {
   Lists available accounts.
 */
 his.account.list = function (args) {
-  var url = his.account.getUrl();
+  var url = his.account._getUrl();
   return his.auth.get(url, args);
 }
 
@@ -63,7 +63,7 @@ his.account.list = function (args) {
 */
 his.account.get = function (name, args) {
   name = name || '!';
-  var url = his.account.getUrl(name);
+  var url = his.account._getUrl(name);
   return his.auth.get(url, args);
 }
 
@@ -72,7 +72,7 @@ his.account.get = function (name, args) {
   Adds an account.
 */
 his.account.add = function (account, args) {
-  var url = his.account.getUrl();
+  var url = his.account._getUrl();
   var data = JSON.stringify(account);
   return his.auth.post(url, data, args);
 }
@@ -83,7 +83,7 @@ his.account.add = function (account, args) {
 */
 his.account.patch = function (name, accountPatch, args) {
   name = name || '!';
-  var url = his.account.getUrl(name);
+  var url = his.account._getUrl(name);
   var data = JSON.stringify(accountPatch);
   return his.auth.patch(url, data, args);
 }

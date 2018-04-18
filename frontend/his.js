@@ -30,12 +30,13 @@ var his = his || {};
 
 
 his.BASE_URL = 'https://his.homeinfo.de'
+his.SESSION_KEY = 'his.session';
 
 
 /*
   HIS URL arguments class.
 */
-his.argsToString = function (object) {
+his._argsToString = function (object) {
   if (object == null) {
     return '';
   }
@@ -66,9 +67,9 @@ his.argsToString = function (object) {
   The base URL itself must not contain any arguments.
   The args parameter is expected to be a JSON object.
 */
-his.getUrl = function (baseUrl, args) {
+his._getUrl = function (baseUrl, args) {
   if (args != null) {
-    return baseUrl + '?' + his.argsToString(args);
+    return baseUrl + '?' + his._argsToString(args);
   }
 
   return baseUrl;
@@ -78,9 +79,9 @@ his.getUrl = function (baseUrl, args) {
 /*
   Contructor for an AJAX query.
 */
-his.AjaxQuery = function (method, url, args, data) {
+his._AjaxQuery = function (method, url, args, data) {
   this.type = method;
-  this.url = his.getUrl(url, args);
+  this.url = his._getUrl(url, args);
 
   if (data != null) {
     this.data = data;
@@ -91,8 +92,8 @@ his.AjaxQuery = function (method, url, args, data) {
 /*
   Makes an AJAX call to the respective HIS backend.
 */
-his.query = function (method, url, data, args) {
-  var ajaxQuery = new his.AjaxQuery(method, url, args, data);
+his._query = function (method, url, data, args) {
+  var ajaxQuery = new his._AjaxQuery(method, url, args, data);
   return jQuery.ajax(ajaxQuery);
 }
 
@@ -118,7 +119,7 @@ his.authorized = function (args) {
   Makes an GET request to the respective HIS backend.
 */
 his.get = function (url, args) {
-  return his.query('GET', url, null, args);
+  return his._query('GET', url, null, args);
 }
 
 
@@ -126,7 +127,7 @@ his.get = function (url, args) {
   Makes an POST request to the respective HIS backend.
 */
 his.post = function (url, data, args) {
-  return his.query('POST', url, data, args);
+  return his._query('POST', url, data, args);
 }
 
 
@@ -134,7 +135,7 @@ his.post = function (url, data, args) {
   Makes an PATCH request to the respective HIS backend.
 */
 his.patch = function (url, data, args) {
-  return his.query('PATCH', url, data, args);
+  return his._query('PATCH', url, data, args);
 }
 
 
@@ -142,7 +143,7 @@ his.patch = function (url, data, args) {
   Makes an PUT request to the respective HIS backend.
 */
 his.put = function (url, data, args) {
-  return his.query('PUT', url, data, args);
+  return his._query('PUT', url, data, args);
 }
 
 
@@ -150,7 +151,7 @@ his.put = function (url, data, args) {
   Makes an DELETE request to the respective HIS backend.
 */
 his.delete = function (url, args) {
-  return his.query('DELETE', url, null, args);
+  return his._query('DELETE', url, null, args);
 }
 
 
@@ -158,32 +159,13 @@ his.delete = function (url, args) {
   Retrieves the session from local storage.
 */
 his.getSession = function () {
-  var sessionString = localStorage.getItem('his.session');
+  var sessionString = localStorage.getItem(his.SESSION_KEY);
 
   if (sessionString == null) {
     throw 'Not logged in.';
   }
 
   return JSON.parse(sessionString);
-}
-
-
-/*
-  Writes the session to local storage.
-*/
-his.setSession = function (session) {
-  localStorage.setItem('his.session', JSON.stringify(session));
-  return session;
-}
-
-
-/*
-  Clears the session from the local storage.
-*/
-his.terminateSession = function () {
-  var session = his.getSession();
-  localStorage.removeItem('his.session');
-  return session;
 }
 
 

@@ -63,6 +63,6 @@ his.locale.get = function (locale) {
 /*
   Deletes the current locale.
 */
-his.locale.get = function (locale) {
+his.locale.delete = function (locale) {
   localStorage.removeItem('his.locale');
 }

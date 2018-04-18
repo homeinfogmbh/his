@@ -38,7 +38,7 @@ his.service = his.service || {};
 /*
   Returns the respective service URL.
 */
-his.service.getUrl = function (endpoint) {
+his.service._getUrl = function (endpoint) {
   var url = his.BASE_URL + '/service';
 
   if (endpoint != null) {
@@ -53,7 +53,7 @@ his.service.getUrl = function (endpoint) {
   Lists available services.
 */
 his.service.list = function (service, args) {
-  var url = his.service.getUrl();
+  var url = his.service._getUrl();
   return his.auth.get(url, args);
 }
 
@@ -62,7 +62,7 @@ his.service.list = function (service, args) {
   Lists customer services.
 */
 his.service.listAccountServices = function (service, args) {
-  var url = his.service.getUrl('customer');
+  var url = his.service._getUrl('customer');
   return his.auth.get(url, args);
 }
 
@@ -71,7 +71,7 @@ his.service.listAccountServices = function (service, args) {
   Lists account services.
 */
 his.service.listAccountServices = function (service, args) {
-  var url = his.service.getUrl('account');
+  var url = his.service._getUrl('account');
   return his.auth.get(url, args);
 }
 
@@ -83,9 +83,9 @@ his.service.add = function (service, args) {
   var url;
 
   if (service.hasOwnProperty('customer')) {
-    url = his.service.getUrl('customer');
+    url = his.service._getUrl('customer');
   } else if (service.hasOwnProperty('account')) {
-    url = his.service.getUrl('account');
+    url = his.service._getUrl('account');
   }
 
   return his.auth.post(url, data, args);

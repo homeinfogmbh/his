@@ -38,7 +38,7 @@ his.customer = his.customer || {};
 /*
   Returns the respective customer URL.
 */
-his.customer.getUrl = function (customerName) {
+his.customer._getUrl = function (customerName) {
   var url = his.BASE_URL + '/customer';
 
   if (customerName != null) {
@@ -57,7 +57,7 @@ his.customer.get = function (customer, args) {
     customer = '!';
   }
 
-  var url = his.customer.getUrl(customer);
+  var url = his.customer._getUrl(customer);
   return his.auth.get(url, args);
 }
 

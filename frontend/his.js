@@ -110,12 +110,12 @@ his.query = function (method, url, data, args) {
   I.e. include the session token.
 */
 his.authorized = function (args) {
-  if (args != null) {
-    if (! args.hasOwnProperty('session')) {
-      args.session = his.getSessionToken();
-    }
-  } else {
-    args = {'session': his.getSessionToken()};
+  if (args == null) {
+    return his.Args({'session': his.getSessionToken()});
+  }
+
+  if (! args.hasOwnProperty('session')) {
+    args.session = his.getSessionToken();
   }
 
   return args;

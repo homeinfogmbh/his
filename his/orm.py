@@ -242,7 +242,7 @@ class Account(HISModel):
     user = ForeignKeyField(
         Employee, db_column='user', null=True, related_name='accounts')
     name = CharField(64)
-    pwhash = CharField(255)
+    _pwhash = CharField(255, column_name='pwhash')
     email = CharField(64)
     created = DateTimeField(default=datetime.now)
     deleted = DateTimeField(null=True, default=None)
@@ -330,7 +330,7 @@ class Account(HISModel):
 
     def passwd(self, passwd):
         """Sets the password."""
-        self.pwhash = hash_password(passwd)
+        self._pwhash = hash_password(passwd)
 
     passwd = property(None, passwd)
 
@@ -393,7 +393,7 @@ class Account(HISModel):
     def login(self, passwd):
         """Performs a login."""
         if self.can_login:
-            if verify_password(self.pwhash, passwd):
+            if verify_password(self._pwhash, passwd):
                 self.failed_logins = 0
                 self.last_login = datetime.now()
                 self.save()

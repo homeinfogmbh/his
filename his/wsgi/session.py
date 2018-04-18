@@ -102,7 +102,7 @@ def close(session_token):
     try:
         session = Session.get(Session.token == session_token)
     except Session.DoesNotExist:
-        raise NoSuchSession(status=200)     # Return success status code.
+        raise NoSuchSession()
 
     session.close()
     return jsonify({'closed': session.token})

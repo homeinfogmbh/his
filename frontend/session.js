@@ -36,6 +36,20 @@ his.session = his.session || {};
 
 
 /*
+  Conditionally removes the session from localStorage
+  if session termination call failed.
+*/
+his.session._terminateIfGone = function (error) {
+  // Remove session of session does not exist or is gone.
+  if (error.status == 404 || error.status == 404) {
+    return Promise.resolve(his.terminateSession());
+  }
+
+  return Promise.reject(error);
+}
+
+
+/*
   Returns a URL for session queries.
 */
 his.session.getUrl = function (sessionToken) {
@@ -108,5 +122,5 @@ his.session.close = function (args) {
 
   var url = his.session.getUrl(sessionToken);
   var promise = his.delete(url, args);
-  return promise.then(his.terminateSession);
+  return promise.then(his.terminateSession, his.session._terminateIfGone);
 }

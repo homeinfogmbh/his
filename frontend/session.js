@@ -84,7 +84,12 @@ his.session.get = function (token, args) {
   Refreshes a session.
 */
 his.session.refresh = function (args) {
-  var sessionToken = his.getSessionToken();
+  try {
+    var sessionToken = his.getSessionToken();
+  } catch (error) {
+    return new Error(error);
+  }
+
   var url = his.session.getUrl(sessionToken);
   var promise = his.put(url, null, args);
   return promise.then(his.setSession);
@@ -95,7 +100,12 @@ his.session.refresh = function (args) {
   Ends a session.
 */
 his.session.close = function (args) {
-  var sessionToken = his.getSessionToken();
+  try {
+    var sessionToken = his.getSessionToken();
+  } catch (error) {
+    return new Error(error);
+  }
+
   var url = his.session.getUrl(sessionToken);
   var promise = his.delete(url, args);
   return promise.then(his.terminateSession);

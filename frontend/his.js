@@ -145,7 +145,13 @@ his.delete = function (url, args) {
   Retrieves the session from local storage.
 */
 his.getSession = function () {
-  return JSON.parse(localStorage.getItem('his.session'));
+  var sessionString = localStorage.getItem('his.session');
+
+  if (sessionString == null) {
+    throw 'Not logged in.';
+  }
+
+  return JSON.parse(sessionString);
 }
 
 
@@ -162,7 +168,7 @@ his.setSession = function (session) {
   Clears the session from the local storage.
 */
 his.terminateSession = function () {
-  var session = localStorage.getItem('his.session');
+  var session = his.getSession();
   localStorage.removeItem('his.session');
   return session;
 }
@@ -172,13 +178,7 @@ his.terminateSession = function () {
   Safely returns the session token.
 */
 his.getSessionToken = function () {
-  var session = his.getSession();
-
-  if (session == null) {
-    return null;
-  }
-
-  return session.token;
+  return his.getSession().token;
 }
 
 

@@ -48,12 +48,14 @@ his.Args = function (json) {
     var args = []
 
     for (var attribute in this) {
-      if (this.hasOwnProperty(arg) && typeof arg != 'object') {
-        console.log('Attribute: ' + attribute + ', type: ' + typeof this[attribute]);
-        if (this[attribute] == null) {
+      var value = this[attribute];
+
+      if (this.hasOwnProperty(attribute) && typeof value != 'object') {
+        console.log('Attribute: ' + attribute + ', type: ' + typeof value);
+        if (value == null) {
           args.push(attribute)
         } else {
-          args.push(attribute + '=' + this[attribute]);
+          args.push(attribute + '=' + value);
         }
       }
     }

@@ -57,8 +57,7 @@ his.session.login = function (userName, passwd, args) {
   var credentials = {'account': userName, 'passwd': passwd};
   var data = JSON.stringify(credentials);
   var promise = his.post(url, data, args);
-  promise.then(his.setSession);
-  return promise;
+  return promise.then(his.setSession);
 }
 
 
@@ -88,8 +87,7 @@ his.session.refresh = function (args) {
   var sessionToken = his.getSessionToken();
   var url = his.session.getUrl(sessionToken);
   var promise = his.put(url, null, args);
-  promise.then(his.setSession);
-  return promise;
+  return promise.then(his.setSession);
 }
 
 
@@ -100,6 +98,5 @@ his.session.close = function (args) {
   var sessionToken = his.getSessionToken();
   var url = his.session.getUrl(sessionToken);
   var promise = his.delete(url, args);
-  promise.then(his.terminateSession);
-  return promise;
+  return promise.then(his.terminateSession);
 }

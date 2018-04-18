@@ -111,7 +111,7 @@ his.query = function (method, url, data, args) {
 */
 his.authorized = function (args) {
   if (args == null) {
-    return his.Args({'session': his.getSessionToken()});
+    return new his.Args({'session': his.getSessionToken()});
   }
 
   if (! args.hasOwnProperty('session')) {

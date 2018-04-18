@@ -50,8 +50,7 @@ his.Args = function (json) {
     for (var attribute in this) {
       var value = this[attribute];
 
-      if (this.hasOwnProperty(attribute) && typeof value != 'object') {
-        console.log('Attribute: ' + attribute + ', type: ' + typeof value);
+      if (this.hasOwnProperty(attribute) && typeof value != 'function') {
         if (value == null) {
           args.push(attribute)
         } else {

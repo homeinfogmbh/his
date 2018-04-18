@@ -40,8 +40,6 @@ his.session = his.session || {};
   if session termination call failed.
 */
 his.session._terminateIfGone = function (error) {
-  console.log('Error: ' + JSON.stringify(error));
-
   // Remove session of session does not exist or is gone.
   if (error.status == 404 || error.status == 404) {
     return Promise.resolve(his.terminateSession());

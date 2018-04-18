@@ -80,7 +80,7 @@ his.AjaxQuery = function (method, url, args, data) {
 */
 his.query = function (method, url, data, args) {
   var ajaxQuery = new his.AjaxQuery(method, url, args, data);
-  return $.ajax(ajaxQuery);
+  return jQuery.ajax(ajaxQuery);
 }
 
 
@@ -154,6 +154,7 @@ his.getSession = function () {
 */
 his.setSession = function (session) {
   localStorage.setItem('his.session', JSON.stringify(session));
+  return session;
 }
 
 
@@ -161,7 +162,9 @@ his.setSession = function (session) {
   Clears the session from the local storage.
 */
 his.terminateSession = function () {
+  var session = localStorage.getItem('his.session');
   localStorage.removeItem('his.session');
+  return session;
 }
 
 

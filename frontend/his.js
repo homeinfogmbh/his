@@ -67,7 +67,7 @@ his.argsToString = function (object) {
   The args parameter is expected to be a JSON object.
 */
 his.getUrl = function (baseUrl, args) {
-  if (args != null && ! jQuery.isEmptyObject(args)) {
+  if (args != null) {
     return baseUrl + '?' + his.argsToString(args);
   }
 

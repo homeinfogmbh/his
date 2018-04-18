@@ -35,36 +35,28 @@ his.BASE_URL = 'https://his.homeinfo.de'
 /*
   HIS URL arguments class.
 */
-his.Args = function (json) {
-  if (json != null) {
-    for (var prop in json) {
-      if (json.hasOwnProperty(prop)) {
-        this[prop] = json[prop];
-      }
-    }
-  }
-
-  this.toString = function () {
-    var args = []
-
-    for (var attribute in this) {
-      var value = this[attribute];
-
-      if (this.hasOwnProperty(attribute) && typeof value != 'function') {
-        if (value == null) {
-          args.push(attribute)
-        } else {
-          args.push(attribute + '=' + value);
-        }
-      }
-    }
-
-    if (args.length > 0) {
-      return args.join('&');
-    }
-
+his.argsToString = function (object) {
+  if (object == null) {
     return '';
   }
+
+  var args = []
+
+  for (var attribute in object) {
+    if (object.hasOwnProperty(attribute)) {
+      if (object[attribute] == null) {
+        args.push(attribute)
+      } else {
+        args.push(attribute + '=' + object[attribute]);
+      }
+    }
+  }
+
+  if (args.length > 0) {
+    return args.join('&');
+  }
+
+  return '';
 }
 
 /*
@@ -75,8 +67,8 @@ his.Args = function (json) {
   The args parameter is expected to be a JSON object.
 */
 his.getUrl = function (baseUrl, args) {
-  if (args != null) {
-    return baseUrl + '?' + args;
+  if (args != null && ! jQuery.isEmptyObject(args)) {
+    return baseUrl + '?' + his.argsToString(args);
   }
 
   return baseUrl;
@@ -111,7 +103,7 @@ his.query = function (method, url, data, args) {
 */
 his.authorized = function (args) {
   if (args == null) {
-    return new his.Args({'session': his.getSessionToken()});
+    return {'session': his.getSessionToken()};
   }
 
   if (! args.hasOwnProperty('session')) {

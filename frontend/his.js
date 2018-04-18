@@ -33,6 +33,39 @@ his.BASE_URL = 'https://his.homeinfo.de'
 
 
 /*
+  HIS URL arguments class.
+*/
+his.Args = function (json) {
+  if (json != null) {
+    for (var prop in json) {
+      if (json.hasOwnProperty(prop)) {
+        this[prop] = json[prop];
+      }
+    }
+  }
+
+  this.toString = function () {
+    var args = []
+
+    for (var arg in this) {
+      if (this.hasOwnProperty(arg)) {
+        if (this[arg] == null) {
+          args.push(arg)
+        } else {
+          args.push(arg + '=' + this[arg]);
+        }
+      }
+    }
+
+    if (args.length > 0) {
+      return args.join('&');
+    }
+
+    return '';
+  }
+}
+
+/*
   Converts a base URL and optional arguments
   into a full-featured HIS URL.
 
@@ -41,24 +74,10 @@ his.BASE_URL = 'https://his.homeinfo.de'
 */
 his.getUrl = function (baseUrl, args) {
   if (args != null) {
-    var argsList = []
-
-    for (var arg in args) {
-      if (args.hasOwnProperty(arg)) {
-        if (args[arg] == null) {
-          argsList.push(arg)
-        } else {
-          argsList.push(arg + '=' +  args[arg]);
-        }
-      }
-    }
-
-    if (argsList.length > 0) {
-      return baseUrl + '?' + argsList.join('&');
-    }
+    return baseUrl + '?' + args;
   }
 
-  return baseUrl
+  return baseUrl;
 }
 
 

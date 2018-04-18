@@ -48,7 +48,7 @@ his.Args = function (json) {
     var args = []
 
     for (var arg in this) {
-      if (this.hasOwnProperty(arg)) {
+      if (this.hasOwnProperty(arg) && typeof arg != 'object') {
         if (this[arg] == null) {
           args.push(arg)
         } else {

@@ -97,6 +97,7 @@ his.session.refresh = function (args) {
 his.session.close = function (args) {
   var sessionToken = his.getSessionToken();
   var url = his.session.getUrl(sessionToken);
-  var promise = his.delete(url, args);
-  return promise.then(his.terminateSession);
+  // Terminate session in any case.
+  his.terminateSession(sessionToken);
+  return his.delete(url, args);
 }

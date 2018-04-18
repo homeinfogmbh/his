@@ -47,12 +47,13 @@ his.Args = function (json) {
   this.toString = function () {
     var args = []
 
-    for (var arg in this) {
+    for (var attribute in this) {
       if (this.hasOwnProperty(arg) && typeof arg != 'object') {
-        if (this[arg] == null) {
-          args.push(arg)
+        console.log('Attribute: ' + attribute + ', type: ' + typeof this[attribute]);
+        if (this[attribute] == null) {
+          args.push(attribute)
         } else {
-          args.push(arg + '=' + this[arg]);
+          args.push(attribute + '=' + this[attribute]);
         }
       }
     }

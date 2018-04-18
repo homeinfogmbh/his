@@ -87,7 +87,7 @@ his.session.refresh = function (args) {
   try {
     var sessionToken = his.getSessionToken();
   } catch (error) {
-    return new Error(error);
+    return Promise.reject(error);
   }
 
   var url = his.session.getUrl(sessionToken);
@@ -103,7 +103,7 @@ his.session.close = function (args) {
   try {
     var sessionToken = his.getSessionToken();
   } catch (error) {
-    return new Error(error);
+    return Promise.reject(error);
   }
 
   var url = his.session.getUrl(sessionToken);

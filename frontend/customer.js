@@ -1,71 +1,71 @@
 /*
-  customer.js - HOMEINFO Integrated Services customer library.
+    customer.js - HOMEINFO Integrated Services customer library.
 
-  (C) 2017 HOMEINFO - Digitale Informationssysteme GmbH
+    (C) 2017 HOMEINFO - Digitale Informationssysteme GmbH
 
-  This library is free software: you can redistribute it and/or modify
-  it under the terms of the GNU General Public License as published by
-  the Free Software Foundation, either version 3 of the License, or
-  (at your option) any later version.
+    This library is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
 
-  This library is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-  GNU General Public License for more details.
+    This library is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
 
-  You should have received a copy of the GNU General Public License
-  along with this library.  If not, see <http://www.gnu.org/licenses/>.
+    You should have received a copy of the GNU General Public License
+    along with this library.  If not, see <http://www.gnu.org/licenses/>.
 
-  Maintainer: Richard Neumann <r dot neumann at homeinfo period de>
+    Maintainer: Richard Neumann <r dot neumann at homeinfo period de>
 
-  Requires:
-    * his.js
+    Requires:
+        * his.js
 */
-"use strict";
+'use strict';
 
 /*
-  HIS core namespace.
+    HIS core namespace.
 */
 var his = his || {};
 
 
 /*
-  HIS customer API.
+    HIS customer API.
 */
 his.customer = his.customer || {};
 
 
 /*
-  Returns the respective customer URL.
+    Returns the respective customer URL.
 */
 his.customer._getUrl = function (customerName) {
-  var url = his.BASE_URL + '/customer';
+    var url = his.BASE_URL + '/customer';
 
-  if (customerName != null) {
-    url += '/' + customerName;
-  }
+    if (customerName != null) {
+        url += '/' + customerName;
+    }
 
-  return url;
-}
+    return url;
+};
 
 
 /*
-  Returns the respective customer.
+    Returns the respective customer.
 */
 his.customer.get = function (customer, args) {
-  if (customer == null) {
-    customer = '!';
-  }
+    if (customer == null) {
+        customer = '!';
+    }
 
-  var url = his.customer._getUrl(customer);
-  return his.auth.get(url, args);
-}
+    var url = his.customer._getUrl(customer);
+    return his.auth.get(url, args);
+};
 
 
 /*
-  Returns the current customer's logo.
+    Returns the current customer's logo.
 */
 his.customer.logo = function (args) {
-  var url = his.BASE_URL + '/customer-logo';
-  return his.auth.get(url, args);
-}
+    var url = his.BASE_URL + '/customer-logo';
+    return his.auth.get(url, args);
+};

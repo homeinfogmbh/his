@@ -1,92 +1,92 @@
 /*
-  service.js - HOMEINFO Integrated Services service library.
+    service.js - HOMEINFO Integrated Services service library.
 
-  (C) 2017 HOMEINFO - Digitale Informationssysteme GmbH
+    (C) 2017 HOMEINFO - Digitale Informationssysteme GmbH
 
-  This library is free software: you can redistribute it and/or modify
-  it under the terms of the GNU General Public License as published by
-  the Free Software Foundation, either version 3 of the License, or
-  (at your option) any later version.
+    This library is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
 
-  This library is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-  GNU General Public License for more details.
+    This library is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
 
-  You should have received a copy of the GNU General Public License
-  along with this library.  If not, see <http://www.gnu.org/licenses/>.
+    You should have received a copy of the GNU General Public License
+    along with this library.  If not, see <http://www.gnu.org/licenses/>.
 
-  Maintainer: Richard Neumann <r dot neumann at homeinfo period de>
+    Maintainer: Richard Neumann <r dot neumann at homeinfo period de>
 
-  Requires:
-    * his.js
+    Requires:
+        * his.js
 */
-"use strict";
+'use strict';
 
 /*
-  HIS core namespace.
+    HIS core namespace.
 */
 var his = his || {};
 
 
 /*
-  HIS service API.
+    HIS service API.
 */
 his.service = his.service || {};
 
 
 /*
-  Returns the respective service URL.
+    Returns the respective service URL.
 */
 his.service._getUrl = function (endpoint) {
-  var url = his.BASE_URL + '/service';
+    var url = his.BASE_URL + '/service';
 
-  if (endpoint != null) {
-    url += '/' + endpoint;
-  }
+    if (endpoint != null) {
+        url += '/' + endpoint;
+    }
 
-  return url;
-}
+    return url;
+};
 
 
 /*
-  Lists available services.
+    Lists available services.
 */
 his.service.list = function (service, args) {
-  var url = his.service._getUrl();
-  return his.auth.get(url, args);
-}
+    var url = his.service._getUrl();
+    return his.auth.get(url, args);
+};
 
 
 /*
-  Lists customer services.
+    Lists customer services.
 */
 his.service.listAccountServices = function (service, args) {
-  var url = his.service._getUrl('customer');
-  return his.auth.get(url, args);
-}
+    var url = his.service._getUrl('customer');
+    return his.auth.get(url, args);
+};
 
 
 /*
-  Lists account services.
+    Lists account services.
 */
 his.service.listAccountServices = function (service, args) {
-  var url = his.service._getUrl('account');
-  return his.auth.get(url, args);
-}
+    var url = his.service._getUrl('account');
+    return his.auth.get(url, args);
+};
 
 
 /*
-  Adds a customer or account services.
+    Adds a customer or account services.
 */
 his.service.add = function (service, args) {
-  var url;
+    var url;
 
-  if (service.hasOwnProperty('customer')) {
-    url = his.service._getUrl('customer');
-  } else if (service.hasOwnProperty('account')) {
-    url = his.service._getUrl('account');
-  }
+    if (service.hasOwnProperty('customer')) {
+        url = his.service._getUrl('customer');
+    } else if (service.hasOwnProperty('account')) {
+        url = his.service._getUrl('account');
+    }
 
-  return his.auth.post(url, data, args);
-}
+    return his.auth.post(url, null, args);
+};

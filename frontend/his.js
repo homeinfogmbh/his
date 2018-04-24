@@ -35,6 +35,18 @@ his.DEBUG = false;
 
 
 /*
+    Logs debug messages.
+*/
+his._debug = function (message) {
+    if (his.DEBUG) {
+        /* eslint-disable no-console */
+        console.log('[DEBUG] his: ' + message);
+        /* eslint-enable no-console */
+    }
+};
+
+
+/*
     HIS URL arguments class.
 */
 his._argsToString = function (object) {
@@ -99,14 +111,8 @@ his._AjaxQuery = function (method, url, args, data) {
 */
 his._query = function (method, url, data, args) {
     var ajaxQuery = new his._AjaxQuery(method, url, args, data);
-
-    if (his.DEBUG) {
-        /* eslint-disable no-console */
-        console.log('[DEBUG] his: Performing ajax query.');
-        console.log('[DEBUG] his: ' + ajaxQuery);
-        /* eslint-enable no-console */
-    }
-
+    his._debug('Performing ajax query.');
+    his._debug(ajaxQuery);
     return jQuery.ajax(ajaxQuery);
 };
 

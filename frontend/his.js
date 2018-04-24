@@ -31,6 +31,7 @@ var his = his || {};
 
 his.BASE_URL = 'https://his.homeinfo.de';
 his.SESSION_KEY = 'his.session';
+his.DEBUG = false;
 
 
 /*
@@ -86,6 +87,10 @@ his._AjaxQuery = function (method, url, args, data) {
     if (data != null) {
         this.data = data;
     }
+
+    this.toString = function () {
+        return JSON.stringify(this);
+    };
 };
 
 
@@ -94,6 +99,14 @@ his._AjaxQuery = function (method, url, args, data) {
 */
 his._query = function (method, url, data, args) {
     var ajaxQuery = new his._AjaxQuery(method, url, args, data);
+
+    if (his.DEBUG) {
+        /* eslint-disable no-console */
+        console.log('[DEBUG] his: Performing ajax query.');
+        console.log('[DEBUG] his: ' + ajaxQuery);
+        /* eslint-enable no-console */
+    }
+
     return jQuery.ajax(ajaxQuery);
 };
 

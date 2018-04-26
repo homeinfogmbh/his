@@ -50,7 +50,7 @@ def authorized(service_name):
         @wraps(function)
         def wrapper(*args, **kwargs):
             """Wraps the respective function
-            with preceding authentication.
+            with preceding authorization.
             """
             try:
                 service = Service.get(Service.name == service_name)

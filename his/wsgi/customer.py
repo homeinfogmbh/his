@@ -15,7 +15,7 @@ from his.orm import CustomerSettings
 __all__ = ['ROUTES']
 
 
-def customer_by_name(name):
+def _customer_by_name(name):
     """Returns the customer by the respective customer ID."""
 
     if name == '!':
@@ -26,7 +26,17 @@ def customer_by_name(name):
     except ValueError:
         raise InvalidCustomerID()
 
-    return Customer.get(Customer.id == cid)
+    try:
+        customer = Customer.get(Customer.id == cid)
+    except Customer.DoesNotExist:
+        raise NoSuchCustomer()
+
+    if ACCOUNT.root:
+        return customer
+    elif ACCOUNT.admin and CUSTOMER == ACCOUNT.customer:
+        return customer
+
+    raise NoSuchCustomer()
 
 
 def settings():
@@ -50,21 +60,7 @@ def list_():
 def get(ident):
     """Allows services"""
 
-    if ACCOUNT.root:
-        try:
-            customer = customer_by_name(ident)
-        except Customer.DoesNotExist:
-            raise NoSuchCustomer()
-    elif ACCOUNT.admin:
-        try:
-            customer = customer_by_name(ident)
-        except Customer.DoesNotExist:
-            raise NoSuchCustomer()
-
-        if CUSTOMER == customer:
-            return jsonify(customer.to_dict())
-
-    raise NotAuthorized()
+    return jsonify(_customer_by_name(ident).to_dict())
 
 
 @authenticated

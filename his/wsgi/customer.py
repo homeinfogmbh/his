@@ -39,7 +39,7 @@ def _customer_by_name(name):
     raise NoSuchCustomer()
 
 
-def settings():
+def _settings():
     """Returns the respective customer settings."""
 
     try:
@@ -67,7 +67,7 @@ def get(ident):
 def get_logo():
     """Allows services"""
 
-    return Binary(settings().logo)
+    return Binary(_settings().logo)
 
 
 ROUTES = (

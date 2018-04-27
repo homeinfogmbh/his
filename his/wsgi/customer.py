@@ -59,7 +59,7 @@ def get(ident):
         try:
             customer = customer_by_name(ident)
         except Customer.DoesNotExist:
-            raise NotAuthorized()
+            raise NoSuchCustomer()
 
         if CUSTOMER == customer:
             return jsonify(customer.to_dict())

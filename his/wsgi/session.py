@@ -14,7 +14,6 @@ from his.orm import Account, Session
 __all__ = ['ROUTES']
 
 DURATION = 15
-CURRENT_SESSION_PLACEHOLDERS = ('!', '')
 
 
 def _get_duration():
@@ -28,7 +27,7 @@ def _get_session_by_token(session_token):
     session token with authorization checks.
     """
 
-    if session_token in CURRENT_SESSION_PLACEHOLDERS:
+    if session_token == '!':
         return SESSION
 
     try:

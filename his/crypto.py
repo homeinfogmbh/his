@@ -6,7 +6,11 @@ from string import ascii_letters, digits, punctuation
 from argon2 import PasswordHasher
 from argon2.exceptions import VerifyMismatchError
 
-__all__ = ['PasswordTooShortError', 'hash_password', 'verify_password']
+__all__ = [
+    'PasswordTooShortError',
+    'hash_password',
+    'verify_password',
+    'genpw']
 
 
 _PASSWORD_HASHER = PasswordHasher()

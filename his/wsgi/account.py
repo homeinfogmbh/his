@@ -28,7 +28,7 @@ def _account_by_name(name_or_id):
         return Account.get(Account.name == name_or_id)
 
 
-def account_by_name(name_or_id):
+def _auth_account_by_name(name_or_id):
     """Safely returns the respective account while preventing spoofing."""
 
     if ACCOUNT.root:
@@ -51,7 +51,7 @@ def account_by_name(name_or_id):
     raise NotAuthorized()
 
 
-def add_account():
+def _add_account():
     """Adds an account for the current customer."""
 
     json = DATA.json
@@ -92,7 +92,7 @@ def add_account():
     return AccountCreated()
 
 
-def patch_account(account, only=None):
+def _patch_account(account, only=None):
     """Patches the respective account with the provided
     dictionary and an optional field restriction.
     """
@@ -141,7 +141,7 @@ def get(name):
         # Return the account of the current session.
         return JSON(ACCOUNT.to_dict())
 
-    return JSON(account_by_name(name).to_dict())
+    return JSON(_auth_account_by_name(name).to_dict())
 
 
 @authenticated
@@ -149,7 +149,7 @@ def add():
     """Create a new account."""
 
     if ACCOUNT.root:
-        return add_account()
+        return _add_account()
     elif ACCOUNT.admin:
         try:
             settings = CustomerSettings.get(
@@ -158,13 +158,13 @@ def add():
             raise CustomerUnconfigured()
 
         if settings.max_accounts is None:
-            return add_account()
+            return _add_account()
 
         accounts = sum(1 for _ in Account.select().where(
             Account.customer == CUSTOMER))
 
         if accounts < settings.max_accounts:
-            return add_account()
+            return _add_account()
 
         raise AccountsExhausted()
 
@@ -176,14 +176,14 @@ def patch(name):
     """Modifies an account."""
 
     if name == '!':
-        return patch_account(ACCOUNT, only=('passwd', 'email'))
+        return _patch_account(ACCOUNT, only=('passwd', 'email'))
 
-    account = account_by_name(name)
+    account = _auth_account_by_name(name)
 
     if ACCOUNT.root:
-        return patch_account(account)
+        return _patch_account(account)
     elif ACCOUNT.admin and CUSTOMER == account.customer:
-        return patch_account(
+        return _patch_account(
             account, only=('name', 'passwd', 'email', 'admin'))
 
     raise NotAuthorized()

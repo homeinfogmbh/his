@@ -42,7 +42,6 @@ def account_by_name(name_or_id):
     except Account.DoesNotExist:
         raise NotAuthorized()   # Prevent account name spoofing.
 
-
     if ACCOUNT.admin:
         if account.customer == CUSTOMER:
             return JSON(account.to_dict())

@@ -102,7 +102,7 @@ def list_customer_services():
 
     return JSON([customer_service.service.to_dict() for customer_service
                  in CustomerService.select().where(
-                    CustomerService.customer == CUSTOMER.id)])
+                     CustomerService.customer == CUSTOMER.id)])
 
 
 @authenticated

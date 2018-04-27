@@ -34,10 +34,10 @@ def login():
         account = Account.get(Account.name == account)
     except Account.DoesNotExist:
         raise InvalidCredentials()
-    else:
-        if account.login(passwd):
-            session = Session.open(account, duration=get_duration())
-            return jsonify(session.to_dict())
+
+    if account.login(passwd):
+        session = Session.open(account, duration=get_duration())
+        return jsonify(session.to_dict())
 
     raise InvalidCredentials()
 

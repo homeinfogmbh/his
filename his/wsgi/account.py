@@ -28,7 +28,7 @@ def _account_by_name(name_or_id):
         return Account.get(Account.name == name_or_id)
 
 
-def _auth_account_by_name(name_or_id):
+def account_by_name(name_or_id):
     """Safely returns the respective account while preventing spoofing."""
 
     if ACCOUNT.root:
@@ -141,7 +141,7 @@ def get(name):
         # Return the account of the current session.
         return JSON(ACCOUNT.to_dict())
 
-    return JSON(_auth_account_by_name(name).to_dict())
+    return JSON(account_by_name(name).to_dict())
 
 
 @authenticated
@@ -178,7 +178,7 @@ def patch(name):
     if name == '!':
         return _patch_account(ACCOUNT, only=('passwd', 'email'))
 
-    account = _auth_account_by_name(name)
+    account = account_by_name(name)
 
     if ACCOUNT.root:
         return _patch_account(account)

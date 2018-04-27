@@ -11,10 +11,10 @@ from his.messages.customer import NoSuchCustomer, CustomerUnconfigured
 from his.messages.data import InvalidCustomerID
 from his.orm import CustomerSettings
 
-__all__ = ['ROUTES']
+__all__ = ['customer_by_name', 'ROUTES']
 
 
-def _customer_by_name(name):
+def customer_by_name(name):
     """Returns the customer by the respective customer ID."""
 
     if name == '!':
@@ -59,7 +59,7 @@ def list_():
 def get(ident):
     """Allows services"""
 
-    return jsonify(_customer_by_name(ident).to_dict())
+    return jsonify(customer_by_name(ident).to_dict())
 
 
 @authenticated

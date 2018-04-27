@@ -7,7 +7,6 @@ from wsgilib import JSON, Binary
 
 from his.api import authenticated, root
 from his.globals import ACCOUNT, CUSTOMER
-from his.messages.account import NotAuthorized
 from his.messages.customer import NoSuchCustomer, CustomerUnconfigured
 from his.messages.data import InvalidCustomerID
 from his.orm import CustomerSettings

@@ -4,20 +4,46 @@ from json import loads
 
 from flask import request, jsonify
 
+from his.api import authenticated
+from his.globals import ACCOUNT, SESSION
 from his.messages.account import NotAuthorized
 from his.messages.session import MissingCredentials, InvalidCredentials, \
-    NoSessionSpecified, NoSuchSession, SessionExpired
+    NoSuchSession, SessionExpired
 from his.orm import Account, Session
 
 __all__ = ['ROUTES']
 
 DURATION = 15
+CURRENT_SESSION_PLACEHOLDERS = ('!', '')
 
 
-def get_duration():
+def _get_duration():
     """Returns the repsective session duration in minutes."""
 
     return int(request.args.get('duration', DURATION))
+
+
+def _get_session_by_token(session_token):
+    """Returns the respective session by the
+    session token with authorization checks.
+    """
+
+    if session_token in CURRENT_SESSION_PLACEHOLDERS:
+        return SESSION
+
+    try:
+        session = Session.get(Session.token == session_token)
+    except Session.DoesNotExist:
+        raise NoSuchSession()
+
+    if SESSION.token == session.token:
+        return session
+    elif ACCOUNT.root:
+        return session
+    elif ACCOUNT.admin and session.account.customer == ACCOUNT.customer:
+        return session
+
+    raise NoSuchSession()
 
 
 def login():
@@ -36,74 +62,55 @@ def login():
         raise InvalidCredentials()
 
     if account.login(passwd):
-        session = Session.open(account, duration=get_duration())
+        session = Session.open(account, duration=_get_duration())
         return jsonify(session.to_dict())
 
     raise InvalidCredentials()
 
 
+@authenticated
 def list_():
     """Lists all sessions iff specified session is root."""
 
-    try:
-        session = request.args['session']
-    except KeyError:
-        raise NoSessionSpecified()
+    if ACCOUNT.root:
+        sessions = {session.token: session.to_dict() for session in Session}
+        return jsonify(sessions)
+    elif ACCOUNT.admin:
+        sessions = {
+            session.token: session.to_dict() for session in
+            Session.select().join(Account).where(
+                Account.customer == ACCOUNT.customer)}
+        return jsonify(sessions)
 
-    try:
-        session = Session.get(Session.token == session)
-    except Session.DoesNotExist:
-        raise NoSuchSession()
-
-    if session.alive:
-        if session.account.root:
-            sessions = {
-                session.token: session.to_dict() for session in Session}
-            return jsonify(sessions)
-
-        raise NotAuthorized()
-
-    raise SessionExpired()
+    raise NotAuthorized()
 
 
+@authenticated
 def get(session_token):
     """Lists the respective session."""
 
-    try:
-        session = Session.get(Session.token == session_token)
-    except Session.DoesNotExist:
-        raise NoSuchSession()
-
-    if session.alive:
-        return jsonify(session.to_dict())
-
-    raise SessionExpired()
+    jsonify(_get_session_by_token(session_token).to_dict())
 
 
+@authenticated
 def refresh(session_token):
     """Refreshes an existing session."""
 
-    try:
-        session = Session.get(Session.token == session_token)
-    except Session.DoesNotExist:
-        raise NoSuchSession()
+    session = _get_session_by_token(session_token)
 
-    if session.renew(duration=get_duration()):
+    if session.renew(duration=_get_duration()):
         return jsonify(session.to_dict())
 
     raise SessionExpired()
 
 
+@authenticated
 def close(session_token):
     """Tries to close a specific session identified by its token or
     all sessions for a certain account specified by its name.
     """
 
-    try:
-        session = Session.get(Session.token == session_token)
-    except Session.DoesNotExist:
-        raise NoSuchSession()
-
+    session = _get_session_by_token(session_token)
     session.close()
     return jsonify({'closed': session.token})
 

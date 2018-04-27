@@ -99,7 +99,7 @@ his.session.login = function (userName, passwd, args) {
 */
 his.session.list = function (args) {
     var url = his.session._getUrl();
-    return his.get(url, args);
+    return his.auth.get(url, args);
 };
 
 
@@ -107,24 +107,19 @@ his.session.list = function (args) {
     Gets session data.
 */
 his.session.get = function (token, args) {
-    var sessionToken = token || his.getSessionToken();
+    var sessionToken = token || '!';
     var url = his.session._getUrl(sessionToken);
-    return his.get(url, args);
+    return his.auth.get(url, args);
 };
 
 
 /*
     Refreshes a session.
 */
-his.session.refresh = function (args) {
-    try {
-        var sessionToken = his.getSessionToken();
-    } catch (error) {
-        return Promise.reject(error);
-    }
-
+his.session.refresh = function (token, args) {
+    var sessionToken = token || '!';
     var url = his.session._getUrl(sessionToken);
-    var promise = his.put(url, null, args);
+    var promise = his.auth.put(url, null, args);
     return promise.then(his.session._set);
 };
 
@@ -132,14 +127,9 @@ his.session.refresh = function (args) {
 /*
     Ends a session.
 */
-his.session.close = function (args) {
-    try {
-        var sessionToken = his.getSessionToken();
-    } catch (error) {
-        return Promise.reject(error);
-    }
-
+his.session.close = function (token, args) {
+    var sessionToken = token || '!';
     var url = his.session._getUrl(sessionToken);
-    var promise = his.delete(url, args);
+    var promise = his.auth.delete(url, args);
     return promise.then(his.session._remove, his.session._handleTerminationError);
 };

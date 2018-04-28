@@ -42,6 +42,7 @@ his.locale.DEFAULT = 'de_DE';
     Sets the current locale.
 */
 his.locale.set = function (locale) {
+    locale = locale || his.locale.DEFAULT;
     localStorage.setItem('his.locale', locale);
 };
 

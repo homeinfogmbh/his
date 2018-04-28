@@ -294,7 +294,7 @@ class Account(HISModel):
                 elif passwd is not None:
                     account.passwd = passwd
                 elif pwhash is not None:
-                    account.pwhash = pwhash
+                    account._pwhash = pwhash
                 else:
                     raise PASSWD_XOR_PWHASH_ERROR
 

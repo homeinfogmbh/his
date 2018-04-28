@@ -59,7 +59,7 @@ his.session._remove = function () {
     termination call failed only because the session has gone.
 */
 his.session._handleTerminationError = function (error) {
-    // Remove session of session does not exist or is gone.
+    // Remove session if session does not exist or is gone.
     if (error.status == 404 || error.status == 404) {
         return Promise.resolve(his.session._remove());
     }

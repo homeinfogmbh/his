@@ -121,7 +121,7 @@ his._query = function (method, url, data, args) {
     Updates a request's arguments to make the request authorized.
     I.e. include the session token.
 */
-his.authorized = function (args) {
+his._authorized = function (args) {
     if (args == null) {
         return {'session': his.getSessionToken()};
     }
@@ -135,7 +135,7 @@ his.authorized = function (args) {
 
 
 /*
-    Makes an GET request to the respective HIS backend.
+    Makes a GET request to the respective HIS backend.
 */
 his.get = function (url, args) {
     return his._query('GET', url, null, args);
@@ -143,7 +143,7 @@ his.get = function (url, args) {
 
 
 /*
-    Makes an POST request to the respective HIS backend.
+    Makes a POST request to the respective HIS backend.
 */
 his.post = function (url, data, args) {
     return his._query('POST', url, data, args);
@@ -151,7 +151,7 @@ his.post = function (url, data, args) {
 
 
 /*
-    Makes an PATCH request to the respective HIS backend.
+    Makes a PATCH request to the respective HIS backend.
 */
 his.patch = function (url, data, args) {
     return his._query('PATCH', url, data, args);
@@ -159,7 +159,7 @@ his.patch = function (url, data, args) {
 
 
 /*
-    Makes an PUT request to the respective HIS backend.
+    Makes a PUT request to the respective HIS backend.
 */
 his.put = function (url, data, args) {
     return his._query('PUT', url, data, args);
@@ -206,7 +206,7 @@ his.auth = his.auth || {};
     Performs an authorized GET request.
 */
 his.auth.get = function (url, args) {
-    return his.get(url, his.authorized(args));
+    return his.get(url, his._authorized(args));
 };
 
 
@@ -214,7 +214,7 @@ his.auth.get = function (url, args) {
     Performs an authorized POST request.
 */
 his.auth.post = function (url, data, args) {
-    return his.post(url, data, his.authorized(args));
+    return his.post(url, data, his._authorized(args));
 };
 
 
@@ -222,7 +222,7 @@ his.auth.post = function (url, data, args) {
     Performs an authorized PATCH request.
 */
 his.auth.patch = function (url, data, args) {
-    return his.patch(url, data, his.authorized(args));
+    return his.patch(url, data, his._authorized(args));
 };
 
 
@@ -230,7 +230,7 @@ his.auth.patch = function (url, data, args) {
     Performs an authorized PUT request.
 */
 his.auth.put = function (url, data, args) {
-    return his.put(url, data, his.authorized(args));
+    return his.put(url, data, his._authorized(args));
 };
 
 
@@ -238,5 +238,5 @@ his.auth.put = function (url, data, args) {
     Performs an authorized DELETE request.
 */
 his.auth.delete = function (url, args) {
-    return his.delete(url, his.authorized(args));
+    return his.delete(url, his._authorized(args));
 };

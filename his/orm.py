@@ -38,8 +38,6 @@ DATABASE = MySQLDatabase(
     passwd=CONFIG['db']['PASSWD'],
     closing=True)
 
-PASSWD_XOR_PWHASH_ERROR = ValueError('Must specify either passwd or pwhash.')
-
 
 class InconsistencyError(Exception):
     """Indicates inconsistencies in database configuration."""
@@ -275,7 +273,7 @@ class Account(HISModel):
         return cls.select().where(cls.root == 1)
 
     @classmethod
-    def add(cls, customer, name, email, passwd=None, pwhash=None, user=None):
+    def add(cls, customer, name, email, passwd, user=None):
         """Adds a new account."""
         try:
             cls.get(cls.email == email)
@@ -288,16 +286,7 @@ class Account(HISModel):
                 account.name = name
                 account.email = email
                 account.created = datetime.now()
-
-                if passwd is not None and pwhash is not None:
-                    raise PASSWD_XOR_PWHASH_ERROR
-                elif passwd is not None:
-                    account.passwd = passwd
-                elif pwhash is not None:
-                    account._pwhash = pwhash
-                else:
-                    raise PASSWD_XOR_PWHASH_ERROR
-
+                account.passwd = passwd
                 account.user = user
                 return account
 

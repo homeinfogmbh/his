@@ -88,14 +88,7 @@ def list_():
 def get(session_token):
     """Lists the respective session."""
 
-    print('Getting session by token.', flush=True)
-    session = _get_session_by_token(session_token)
-    print('Converting session to dict.', flush=True)
-    session = session.to_dict()
-    print('JSONIFYing session.', flush=True)
-    session = jsonify(session)
-    print('Returning session.', flush=True)
-    return session
+    return jsonify(_get_session_by_token(session_token).to_dict())
 
 
 @authenticated

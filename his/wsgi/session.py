@@ -88,7 +88,10 @@ def list_():
 def get(session_token):
     """Lists the respective session."""
 
-    jsonify(_get_session_by_token(session_token).to_dict())
+    try:
+        jsonify(_get_session_by_token(session_token).to_dict())
+    except BaseException as bex:
+        return str(bex)
 
 
 @authenticated

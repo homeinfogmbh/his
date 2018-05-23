@@ -58,9 +58,12 @@ class Message(JSON, metaclass=MetaMessage):
     STATUS = 200
     ABSTRACT = True
 
-    def __init__(self, *data, **fields):
+    def __init__(self, *data, status=None, **fields):
         """Initializes the message."""
         language = request.args.get('lang', 'de_DE')
+
+        if status is None:
+            status = self.__class__.STATUS
 
         try:
             message = self.__class__.locales[language]
@@ -72,4 +75,4 @@ class Message(JSON, metaclass=MetaMessage):
 
         dictionary = {'message': message}
         dictionary.update(fields)
-        super().__init__(dictionary, status=self.__class__.STATUS)
+        super().__init__(dictionary, status=status)

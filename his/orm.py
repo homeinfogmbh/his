@@ -31,12 +31,7 @@ __all__ = [
     'CustomerSettings',
     'MODELS']
 
-DATABASE = MySQLDatabase(
-    CONFIG['db']['db'],
-    host=CONFIG['db']['HOST'],
-    user=CONFIG['db']['USER'],
-    passwd=CONFIG['db']['PASSWD'],
-    closing=True)
+DATABASE = MySQLDatabase.from_config(CONFIG['db'])
 
 
 class InconsistencyError(Exception):

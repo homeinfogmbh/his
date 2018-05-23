@@ -21,7 +21,6 @@ __all__ = [
     'ServiceExistsError',
     'AccountExistsError',
     'AmbiguousDataError',
-    'his_db',
     'HISModel',
     'Service',
     'CustomerService',
@@ -68,17 +67,6 @@ class AmbiguousDataError(Exception):
 
     def __str__(self):
         return self.field
-
-
-def his_db(service_name):
-    """Returns a database for the respective service."""
-
-    return MySQLDatabase(
-        'his_{}'.format(service_name),
-        host=CONFIG['db']['HOST'],
-        user=CONFIG['db']['USER'],
-        passwd=CONFIG['db']['PASSWD'],
-        closing=True)
 
 
 class AccountServicesProxy:

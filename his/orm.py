@@ -446,8 +446,10 @@ class AccountService(HISModel):
     class Meta:
         db_table = 'account_service'
 
-    account = ForeignKeyField(Account, db_column='account')
-    service = ForeignKeyField(Service, db_column='service')
+    account = ForeignKeyField(
+        Account, db_column='account', on_delete='CASCADE')
+    service = ForeignKeyField(
+        Service, db_column='service', on_delete='CASCADE')
 
     def __str__(self):
         return '{}@{}'.format(str(self.account), str(self.service))

@@ -258,7 +258,8 @@ class Account(HISModel):
         return cls.select().where(cls.root == 1)
 
     @classmethod
-    def add(cls, customer, name, email, passwd, user=None):
+    def add(cls, customer, name, email, passwd, user=None, admin=False,
+            root=False):
         """Adds a new account."""
         try:
             cls.get(cls.email == email)
@@ -273,6 +274,8 @@ class Account(HISModel):
                 account.created = datetime.now()
                 account.passwd = passwd
                 account.user = user
+                account.admin = admin
+                account.root = root
                 return account
 
             raise AccountExistsError('name')

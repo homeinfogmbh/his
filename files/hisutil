@@ -4,7 +4,8 @@
 Manage HIS settings.
 
 Usage:
-    hisutil account add <name> <email> <customer> [--passwd=<passwd>]
+    hisutil account add <name> <email> <customer> [--passwd=<passwd>] \
+[--admin] [--root]
     hisutil service add <name> [--description=<description>] [--promote]
     hisutil service <service> add-customer <customer>[--begin=<begin>] \
 [--end=<end>] [--date-format=<date_format>]
@@ -12,6 +13,8 @@ Usage:
 
 Options:
     --passwd=<passwd>               Sets the desired password.
+    --admin                         Makes the account an administrator.
+    --root                          Makes the account a root account.
     --description=<description>     Specified the service's description.
     --promote                       Flags to promote the service.
     --begin=<begin>                 Sets the begin date and time for
@@ -86,16 +89,21 @@ def get_service(name):
         exit_(4)
 
 
-def add_account(customer, name, email, passwd):
+def add_account(options):
     """Adds the respective account."""
+
+    passwd = options['--passwd']
 
     if not passwd:
         passwd = genpw()
         print('Generated password: {}'.format(passwd))
 
+    customer = get_customer(options['<customer>'])
+
     try:
         account = Account.add(
-            get_customer(customer), name, email, passwd=passwd)
+            customer, options['<name>'], options['<email>'], passwd=passwd,
+            admin=options['--admin'], root=options['--root'])
     except AccountExistsError as account_exists:
         print('Account already exists for field "{}".'.format(
             account_exists.field), file=stderr)
@@ -105,11 +113,13 @@ def add_account(customer, name, email, passwd):
     print(account)
 
 
-def add_service(name, description, promote):
+def add_service(options):
     """Adds a new service."""
 
     try:
-        service = Service.add(name, description=description, promote=promote)
+        service = Service.add(
+            options['<name>'], description=options['--description'],
+            promote=options['--promote'])
     except ServiceExistsError:
         print('Service already exists.', file=stderr)
         exit_(1)
@@ -118,17 +128,22 @@ def add_service(name, description, promote):
     print('Service added.')
 
 
-def add_customer_service(service, customer, begin, end, date_format):
+def add_customer_service(options):
     """Adds a new customer-service mapping."""
+
+    date_format = options['--date-format']
+    begin = options['--begin']
 
     if begin is not None:
         begin = datetime.strptime(begin, date_format)
 
+    end = options['--end']
+
     if end is not None:
         end = datetime.strptime(end, date_format)
 
-    customer = get_customer(customer)
-    service = get_service(service)
+    customer = get_customer(options['<customer>'])
+    service = get_service(options['<service>'])
 
     try:
         customer_service = CustomerService.get(
@@ -142,11 +157,11 @@ def add_customer_service(service, customer, begin, end, date_format):
     print(customer_service)
 
 
-def add_account_service(service, account):
+def add_account_service(options):
     """Adds a new account-service mapping."""
 
-    account = get_account(account)
-    service = get_service(service)
+    account = get_account(options['<account>'])
+    service = get_service(options['<service>'])
 
     try:
         account_service = AccountService.get(
@@ -164,20 +179,14 @@ def main(options):
 
     if options['account']:
         if options['add']:
-            add_account(
-                options['<customer>'], options['<name>'], options['<email>'],
-                options['--passwd'])
+            add_account(options)
     elif options['service']:
         if options['add']:
-            add_service(
-                options['<name>'], options['--description'],
-                options['--promote'])
+            add_service(options)
         elif options['add-customer']:
-            add_customer_service(
-                options['<service>'], options['<customer>'],
-                options['--begin'], options['--end'], options['--date-format'])
+            add_customer_service(options)
         elif options['add-account']:
-            add_account_service(options['<service>'], options['<account>'])
+            add_account_service(options)
 
 
 if __name__ == '__main__':

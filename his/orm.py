@@ -167,8 +167,10 @@ class CustomerService(HISModel):
     class Meta:
         db_table = 'customer_service'
 
-    customer = ForeignKeyField(Customer, db_column='account')
-    service = ForeignKeyField(Service, db_column='service')
+    customer = ForeignKeyField(
+        Customer, db_column='customer', on_delete='CASCADE')
+    service = ForeignKeyField(
+        Service, db_column='service', on_delete='CASCADE')
     begin = DateTimeField(null=True, default=None)
     end = DateTimeField(null=True, default=None)
 

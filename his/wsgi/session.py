@@ -1,10 +1,8 @@
 """HIS session service."""
 
-from json import loads
-
 from flask import request, jsonify
 
-from his.api import authenticated
+from his.api import DATA, authenticated
 from his.globals import ACCOUNT, SESSION
 from his.messages.account import NotAuthorized
 from his.messages.session import MissingCredentials, InvalidCredentials, \
@@ -48,7 +46,7 @@ def _get_session_by_token(session_token):
 def login():
     """Opens a new session for the respective account."""
 
-    json = loads(request.get_data().decode())
+    json = DATA.json
     account = json.get('account')
     passwd = json.get('passwd')
 

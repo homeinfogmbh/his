@@ -562,7 +562,8 @@ class CustomerSettings(HISModel):
     class Meta:
         db_table = 'customer_settings'
 
-    customer = ForeignKeyField(Customer, db_column='customer')
+    customer = ForeignKeyField(
+        Customer, db_column='customer', on_delete='CASCADE')
     max_accounts = IntegerField(null=True, default=10)
     _logo = IntegerField(db_column='logo', null=True)
     logo = FileProperty(_logo)

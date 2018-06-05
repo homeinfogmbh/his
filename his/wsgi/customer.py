@@ -1,7 +1,5 @@
 """Customer-level meta services."""
 
-from flask import jsonify
-
 from homeinfo.crm import Customer
 from wsgilib import JSON, Binary
 
@@ -59,7 +57,7 @@ def list_():
 def get(ident):
     """Allows services"""
 
-    return jsonify(customer_by_name(ident).to_dict())
+    return JSON(customer_by_name(ident).to_dict())
 
 
 @authenticated

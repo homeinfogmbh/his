@@ -1,6 +1,8 @@
 """HIS session service."""
 
-from flask import request, jsonify
+from flask import request
+
+from wsgilib import JSON
 
 from his.api import DATA, authenticated
 from his.globals import ACCOUNT, SESSION
@@ -60,7 +62,7 @@ def login():
 
     if account.login(passwd):
         session = Session.open(account, duration=_get_duration())
-        return jsonify(session.to_dict())
+        return JSON(session.to_dict())
 
     raise InvalidCredentials()
 
@@ -71,13 +73,13 @@ def list_():
 
     if ACCOUNT.root:
         sessions = {session.token: session.to_dict() for session in Session}
-        return jsonify(sessions)
+        return JSON(sessions)
     elif ACCOUNT.admin:
         sessions = {
             session.token: session.to_dict() for session in
             Session.select().join(Account).where(
                 Account.customer == ACCOUNT.customer)}
-        return jsonify(sessions)
+        return JSON(sessions)
 
     raise NotAuthorized()
 
@@ -86,7 +88,7 @@ def list_():
 def get(session_token):
     """Lists the respective session."""
 
-    return jsonify(_get_session_by_token(session_token).to_dict())
+    return JSON(_get_session_by_token(session_token).to_dict())
 
 
 @authenticated
@@ -96,7 +98,7 @@ def refresh(session_token):
     session = _get_session_by_token(session_token)
 
     if session.renew(duration=_get_duration()):
-        return jsonify(session.to_dict())
+        return JSON(session.to_dict())
 
     raise SessionExpired()
 
@@ -109,7 +111,7 @@ def close(session_token):
 
     session = _get_session_by_token(session_token)
     session.close()
-    return jsonify({'closed': session.token})
+    return JSON({'closed': session.token})
 
 
 ROUTES = (

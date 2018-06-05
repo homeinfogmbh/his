@@ -37,17 +37,14 @@ from his.orm import ServiceExistsError, AccountExistsError, Account, Service, \
     CustomerService, AccountService
 
 
-def randchars(count, pool=None):
+def randchars(count, pool=digits + ascii_letters):
     """Yields random chars from the pool."""
-
-    if pool is None:
-        pool = digits + ascii_letters
 
     for _ in range(count):
         yield choice(pool)
 
 
-def genpw(length=16, pool=None):
+def genpw(length=16, pool=digits + ascii_letters):
     """Generates a safe, radom password."""
 
     return ''.join(randchars(length, pool=pool))

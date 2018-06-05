@@ -470,7 +470,8 @@ class Session(HISModel):
 
     ALLOWED_DURATIONS = range(5, 31)
 
-    account = ForeignKeyField(Account, db_column='account')
+    account = ForeignKeyField(
+        Account, db_column='account', on_delete='CASCADE')
     token = CharField(64)   # A uuid4
     start = DateTimeField()
     end = DateTimeField()

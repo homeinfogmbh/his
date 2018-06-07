@@ -2,8 +2,7 @@
 
 from itertools import chain
 
-from wsgilib import Application
-
+from his.application import Application
 from his.wsgi import account, customer, service, session
 
 __all__ = ['APPLICATION']

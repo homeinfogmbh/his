@@ -41,7 +41,22 @@ class IncompleteData(DataError):
 class InvalidData(DataError):
     """Indicates missing data."""
 
-    pass
+    @classmethod
+    def from_field_not_nullable(cls, error):
+        """Initializes from a FieldNotNullable error."""
+        return cls(model=error.model, attr=error.attr, field=error.field)
+
+    @classmethod
+    def from_field_value_error(cls, error):
+        """Initializes from a FieldNotNullable error."""
+        return cls(
+            model=error.model, attr=error.attr, field=error.field,
+            value=error.value)
+
+    @classmethod
+    def from_invalid_keys(cls, error):
+        """Initializes from a FieldNotNullable error."""
+        return cls(keys=error.invalid_keys)
 
 
 class NotAnInteger(InvalidData):

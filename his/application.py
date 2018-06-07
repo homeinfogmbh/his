@@ -10,7 +10,7 @@ __all__ = ['Application']
 
 ERROR_HANDLERS = (
     (FieldNotNullable, InvalidData.from_field_not_nullable),
-    (FieldValueError, InvalidData.field_value_error),
+    (FieldValueError, InvalidData.from_field_value_error),
     (InvalidKeys, InvalidData.from_invalid_keys))
 
 

@@ -165,12 +165,12 @@ class CustomerService(HISModel):
     """Many-to-many Account <-> Services mapping."""
 
     class Meta:
-        db_table = 'customer_service'
+        table_name = 'customer_service'
 
     customer = ForeignKeyField(
-        Customer, db_column='customer', on_delete='CASCADE')
+        Customer, column_name='customer', on_delete='CASCADE')
     service = ForeignKeyField(
-        Service, db_column='service', on_delete='CASCADE')
+        Service, column_name='service', on_delete='CASCADE')
     begin = DateTimeField(null=True, default=None)
     end = DateTimeField(null=True, default=None)
 
@@ -221,9 +221,9 @@ class Account(HISModel):
     """A HIS account."""
 
     customer = ForeignKeyField(
-        Customer, db_column='customer', related_name='accounts')
+        Customer, column_name='customer', related_name='accounts')
     user = ForeignKeyField(
-        Employee, db_column='user', null=True, related_name='accounts')
+        Employee, column_name='user', null=True, related_name='accounts')
     name = CharField(64)
     _pwhash = CharField(255, column_name='pwhash')
     email = CharField(64)
@@ -449,12 +449,12 @@ class AccountService(HISModel):
     """Many-to-many Account <-> Service mapping."""
 
     class Meta:
-        db_table = 'account_service'
+        table_name = 'account_service'
 
     account = ForeignKeyField(
-        Account, db_column='account', on_delete='CASCADE')
+        Account, column_name='account', on_delete='CASCADE')
     service = ForeignKeyField(
-        Service, db_column='service', on_delete='CASCADE')
+        Service, column_name='service', on_delete='CASCADE')
 
     def __str__(self):
         return '{}@{}'.format(str(self.account), str(self.service))
@@ -474,7 +474,7 @@ class Session(HISModel):
     ALLOWED_DURATIONS = range(5, 31)
 
     account = ForeignKeyField(
-        Account, db_column='account', on_delete='CASCADE')
+        Account, column_name='account', on_delete='CASCADE')
     token = CharField(64)   # A uuid4
     start = DateTimeField()
     end = DateTimeField()
@@ -564,12 +564,12 @@ class CustomerSettings(HISModel):
     """Settings for a certain customer."""
 
     class Meta:
-        db_table = 'customer_settings'
+        table_name = 'customer_settings'
 
     customer = ForeignKeyField(
-        Customer, db_column='customer', on_delete='CASCADE')
+        Customer, column_name='customer', on_delete='CASCADE')
     max_accounts = IntegerField(null=True, default=10)
-    _logo = IntegerField(db_column='logo', null=True)
+    _logo = IntegerField(column_name='logo', null=True)
     logo = FileProperty(_logo)
 
 

@@ -11,7 +11,7 @@ setup(
     packages=['his', 'his.messages', 'his.wsgi'],
     scripts=['files/hisutil', 'files/his-session-cleanup'],
     data_files=[
-        ('/etc/his.d', ['files/pwreset.html'],
+        ('/etc/his.d', ['files/pwreset.html']),
         ('/etc/his.d/locale/his', [
             'files/locales/account.ini',
             'files/locales/customer.ini',

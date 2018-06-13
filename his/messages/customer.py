@@ -8,6 +8,12 @@ __all__ = [
     'CustomerUnconfigured']
 
 
+class _CustomerMessage(Message):
+    """Abstract common customer message."""
+
+    LOCALES = '/etc/his.d/locale/his/customer.ini'
+
+
 class NoCustomerSpecified(Message):
     """Indicates that no customer was specified."""
 

@@ -11,37 +11,43 @@ __all__ = [
     'MissingServiceTarget']
 
 
-class NoServiceSpecified(Message):
+class _ServiceMessage(Message):
+    """Abstract common service message."""
+
+    LOCALES = '/etc/his.d/locale/his/service.ini'
+
+
+class NoServiceSpecified(_ServiceMessage):
     """Indicates that no service has been specified."""
 
     STATUS = 406
 
 
-class NoSuchService(Message):
+class NoSuchService(_ServiceMessage):
     """Indicates that the requested service does not exist."""
 
     STATUS = 404
 
 
-class ServiceAdded(Message):
+class ServiceAdded(_ServiceMessage):
     """Indicates that the respective service has been added."""
 
     STATUS = 201
 
 
-class ServiceAlreadyEnabled(Message):
+class ServiceAlreadyEnabled(_ServiceMessage):
     """Indicates that the respective service is already enabled."""
 
     STATUS = 409
 
 
-class AmbiguousServiceTarget(Message):
+class AmbiguousServiceTarget(_ServiceMessage):
     """Indicates that the respective target is ambiguous."""
 
     STATUS = 406
 
 
-class MissingServiceTarget(Message):
+class MissingServiceTarget(_ServiceMessage):
     """Indicates that the respective target is missing."""
 
     STATUS = 406

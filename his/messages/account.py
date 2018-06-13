@@ -15,43 +15,49 @@ __all__ = [
     'PasswordTooShort']
 
 
-class NoAccountSpecified(Message):
+class _AccountMessage(Message):
+    """Abstract common account message."""
+
+    LOCALES = '/etc/his.d/locale/his/account.ini'
+
+
+class NoAccountSpecified(_AccountMessage):
     """Indicates that no account has been specified."""
 
     STATUS = 406
 
 
-class NoSuchAccount(Message):
+class NoSuchAccount(_AccountMessage):
     """Indicates that an account with the specified name does not exist."""
 
     STATUS = 404
 
 
-class AccountLocked(Message):
+class AccountLocked(_AccountMessage):
     """Indicates that the account is locked."""
 
     STATUS = 423
 
 
-class AccountCreated(Message):
+class AccountCreated(_AccountMessage):
     """Indicates that the account has been created."""
 
     STATUS = 201
 
 
-class AccountDeleted(Message):
+class AccountDeleted(_AccountMessage):
     """Indicates that the account has been deleted."""
 
     STATUS = 200
 
 
-class AccountPatched(Message):
+class AccountPatched(_AccountMessage):
     """Indicates that the account has been patched."""
 
     STATUS = 200
 
 
-class NotAuthorized(Message):
+class NotAuthorized(_AccountMessage):
     """Indicates that the an account is not
     authorized to perform the respective action.
     """
@@ -59,13 +65,13 @@ class NotAuthorized(Message):
     STATUS = 403
 
 
-class AccountExists(Message):
+class AccountExists(_AccountMessage):
     """Indicates that the respective account already exists."""
 
     STATUS = 409
 
 
-class AccountsExhausted(Message):
+class AccountsExhausted(_AccountMessage):
     """Indicates that the respective customer has
     exhauseted their respective account quota.
     """
@@ -73,7 +79,7 @@ class AccountsExhausted(Message):
     STATUS = 402
 
 
-class PasswordTooShort(Message):
+class PasswordTooShort(_AccountMessage):
     """Indicates that the provided password is too short."""
 
-    STATUS = 400
+    STATUS = 415

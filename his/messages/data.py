@@ -14,7 +14,13 @@ __all__ = [
     'InvalidCustomerID']
 
 
-class DataError(Message):
+class _DataMessage(Message):
+    """Abstract common data message."""
+
+    LOCALES = '/etc/his.d/locale/his/data.ini'
+
+
+class DataError(_DataMessage):
     """Indicates errors in sent data."""
 
     STATUS = 422

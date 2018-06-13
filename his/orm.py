@@ -80,7 +80,7 @@ class PasswordResetPending(Exception):
 def _gen_token():
     """Generates a unique random UUID4-based token."""
 
-    return str(uuid4)
+    return str(uuid4())
 
 
 class AccountServicesProxy:

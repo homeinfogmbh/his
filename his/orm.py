@@ -568,6 +568,7 @@ class Session(HISModel):
         """Converts the session to a dictionary."""
         dictionary = super().to_dict(**kwargs)
         dictionary['account'] = self.account.name
+        print('DEBUG SESSION:', dictionary, flush=True)
         return dictionary
 
 

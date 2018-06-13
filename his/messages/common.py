@@ -34,7 +34,7 @@ class MetaMessage(type):
         """Sets the class's respective locales."""
         super().__init__(*args, **kwargs)
 
-        if isinstance(cls.LOCALES, str):
+        if cls is not Message and isinstance(cls.LOCALES, str):
             cls.LOCALES, filename = ConfigParser(), cls.LOCALES
             cls.LOCALES.read(filename)
 

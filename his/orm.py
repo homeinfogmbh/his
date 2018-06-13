@@ -623,7 +623,7 @@ class PasswordResetToken(HISModel):
     @property
     def valid(self):
         """Determines whether the token is still valid."""
-        return self.created + self.VALIDITY < datetime.now()
+        return self.created + self.VALIDITY > datetime.now()
 
     def validate(self, token):
         """Validates the password reset."""

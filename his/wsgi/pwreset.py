@@ -86,6 +86,7 @@ def reset_password():
     except PasswordTooShortError as password_too_short:
         raise PasswordTooShort(minlen=password_too_short.minlen)
 
+    token.delete_instance()
     account.save()
     return PasswordSet()
 

@@ -9,7 +9,7 @@ may be implemented.
 from his.api import DATA, authenticated, authorized, admin, root
 from his.application import Application
 from his.globals import SESSION, ACCOUNT, CUSTOMER
-from his.messages.common import locales, Message
+from his.messages.common import Message
 from his.orm import Account
 
 __all__ = [
@@ -21,7 +21,6 @@ __all__ = [
     'authorized',
     'admin',
     'root',
-    'locales',
     'Application',
     'Message',
     'Account']

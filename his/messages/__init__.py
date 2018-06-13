@@ -3,8 +3,7 @@
 from his.messages.account import NoAccountSpecified, NoSuchAccount, \
     AccountLocked, AccountCreated, AccountDeleted, AccountPatched, \
     NotAuthorized, AccountExists, AccountsExhausted
-from his.messages.common import MessageNotFound, LanguageNotFound, locales, \
-    Message
+from his.messages.common import MessageNotFound, LanguageNotFound, Message
 from his.messages.customer import NoCustomerSpecified, NoSuchCustomer, \
     CustomerUnconfigured
 from his.messages.data import DataError, NoDataProvided, MissingData, \
@@ -19,7 +18,6 @@ from his.messages.session import MissingCredentials, InvalidCredentials, \
 __all__ = [
     'MessageNotFound',
     'LanguageNotFound',
-    'locales',
     'Message',
     # Account messages.
     'NoAccountSpecified',

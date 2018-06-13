@@ -6,7 +6,7 @@ from flask import request
 
 from wsgilib import JSON
 
-__all__ = ['MessageNotFound', 'LanguageNotFound', 'locales', 'Message']
+__all__ = ['MessageNotFound', 'LanguageNotFound', 'Message']
 
 
 class MessageNotFound(Exception):
@@ -27,14 +27,6 @@ class LanguageNotFound(Exception):
         self.lang = lang
 
 
-def locales(filename):
-    """Decorator to set the locales file."""
-
-    parser = ConfigParser()
-    parser.read(filename)
-    return parser
-
-
 class MetaMessage(type):
     """Metaclass for messages."""
 
@@ -42,33 +34,32 @@ class MetaMessage(type):
         """Sets the class's respective locales."""
         super().__init__(*args, **kwargs)
 
-        try:
-            del cls.ABSTRACT
-        except AttributeError:
-            try:
-                cls.locales = cls.LOCALES[cls.__name__]
-            except KeyError:
-                raise MessageNotFound(cls.__name__)
+        if isinstance(cls.LOCALES, str):
+            cls.LOCALES, filename = ConfigParser(), cls.LOCALES
+            cls.LOCALES.read(filename)
 
 
 class Message(JSON, metaclass=MetaMessage):
     """Indicates errors for the WebAPI."""
 
-    LOCALES = locales('/etc/his.d/locale/his.ini')
     STATUS = 200
-    ABSTRACT = True
 
     def __init__(self, *data, status=None, **fields):
         """Initializes the message."""
+        try:
+            locales = self.__class__.LOCALES[self.__class__.__name__]
+        except KeyError:
+            raise MessageNotFound(self.__class__.__name__)
+
         language = request.args.get('lang', 'de_DE')
+
+        try:
+            message = locales[language]
+        except KeyError:
+            raise LanguageNotFound(language)
 
         if status is None:
             status = self.__class__.STATUS
-
-        try:
-            message = self.__class__.locales[language]
-        except KeyError:
-            raise LanguageNotFound(language)
 
         if data:
             message = message.format(*data)

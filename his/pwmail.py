@@ -8,7 +8,7 @@ __all__ = ['mail_password_reset_link']
 
 
 PWRESET_CFG = CONFIG['pwreset']
-MAIL_CFG = CONFIG['email']
+MAIL_CFG = CONFIG['mail']
 
 MAILER = Mailer(
     MAIL_CFG['server'], int(MAIL_CFG['port']), MAIL_CFG['user'],
@@ -25,7 +25,8 @@ def mail_password_reset_link(password_reset_token):
     link = PWRESET_CFG['link'].format(password_reset_token.token)
     html = template.format(account=account.name, link=link)
     email = EMail(
-        PWRESET_CFG['subject'], PWRESET_CFG['sender'], account.email,
+        PWRESET_CFG['subject'], MAIL_CFG['sender'], account.email,
         html=html)
+    email.add_header('reply-to', PWRESET_CFG['reply_to'])
     MAILER.send([email])
     return True

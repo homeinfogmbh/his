@@ -21,6 +21,7 @@ __all__ = [
     'ServiceExistsError',
     'AccountExistsError',
     'AmbiguousDataError',
+    'PasswordResetPending',
     'HISModel',
     'Service',
     'CustomerService',
@@ -28,6 +29,7 @@ __all__ = [
     'AccountService',
     'Session',
     'CustomerSettings',
+    'PasswordResetToken',
     'MODELS']
 
 DATABASE = MySQLDatabase.from_config(CONFIG['db'])
@@ -67,6 +69,12 @@ class AmbiguousDataError(Exception):
 
     def __str__(self):
         return self.field
+
+
+class PasswordResetPending(Exception):
+    """Indicates that a password reset is already pending."""
+
+    pass
 
 
 class AccountServicesProxy:
@@ -475,10 +483,10 @@ class Session(HISModel):
 
     account = ForeignKeyField(
         Account, column_name='account', on_delete='CASCADE')
-    token = CharField(64)   # A uuid4
+    token = CharField(64, default=uuid4)
     start = DateTimeField()
     end = DateTimeField()
-    login = BooleanField()  # Login session or keep-alive?
+    login = BooleanField(default=True)  # Login session or keep-alive?
 
     def __repr__(self):
         """Returns a unique string representation."""
@@ -491,22 +499,25 @@ class Session(HISModel):
             self.login)
 
     @classmethod
-    def open(cls, account, duration=15):
+    def add(cls, account, duration):
         """Actually opens a new login session."""
         now = datetime.now()
+        session = cls()
+        session.account = account
+        session.start = now
+        session.end = now + duration
+        return session
 
-        if duration in cls.ALLOWED_DURATIONS:
-            duration = timedelta(minutes=duration)
-            session = cls()
-            session.account = account
-            session.token = str(uuid4())
-            session.start = now
-            session.end = now + duration
-            session.login = True
-            session.save()
-            return session
+    @classmethod
+    def open(cls, account, duration=15):
+        """Actually opens a new login session."""
+        if duration not in cls.ALLOWED_DURATIONS:
+            raise DurationOutOfBounds()
 
-        raise DurationOutOfBounds()
+        duration = timedelta(minutes=duration)
+        session = cls.add(account, duration)
+        session.save()
+        return session
 
     @classmethod
     def cleanup(cls, before=None):
@@ -573,4 +584,45 @@ class CustomerSettings(HISModel):
     logo = FileProperty(_logo)
 
 
-MODELS = (Service, CustomerService, Account, AccountService, Session)
+class PasswordResetToken(HISModel):
+    """Tokens to reset passwords."""
+
+    VALIDITY = timedelta(hours=1)
+
+    class Meta:
+        table_name = 'password_reset_token'
+
+    account = ForeignKeyField(
+        Account, column_name='account', on_delete='CASCADE')
+    token = CharField(64, default=uuid4)
+    created = DateTimeField(default=datetime.now)
+
+    @classmethod
+    def add(cls, account):
+        """Adds a new password reset token."""
+        try:
+            record = cls.get(cls.account == account)
+        except cls.DoesNotExist:
+            record = cls()
+            record.account = account
+            return record
+
+        if record.valid:
+            raise PasswordResetPending()
+
+        record.delete_instance()
+        return cls.add(account)
+
+    @property
+    def valid(self):
+        """Determines whether the token is still valid."""
+        return self.created + self.VALIDITY < datetime.now()
+
+    def validate(self, token):
+        """Validates the password reset."""
+        return self.valid and token == self.token
+
+
+MODELS = (
+    Service, CustomerService, Account, AccountService, Session,
+    CustomerSettings, PasswordResetToken)

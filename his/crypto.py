@@ -7,6 +7,7 @@ from argon2 import PasswordHasher
 from argon2.exceptions import VerifyMismatchError
 
 __all__ = [
+    'MIN_LEN',
     'PasswordTooShortError',
     'hash_password',
     'verify_password',
@@ -14,6 +15,7 @@ __all__ = [
 
 
 _PASSWORD_HASHER = PasswordHasher()
+MIN_LEN = 8
 
 
 class PasswordTooShortError(Exception):
@@ -31,7 +33,7 @@ class PasswordTooShortError(Exception):
             self.pwlen, self.minlen)
 
 
-def hash_password(passwd, minlen=8):
+def hash_password(passwd, minlen=MIN_LEN):
     """Creates a hash of the given password."""
 
     if len(passwd) < minlen:
@@ -51,7 +53,7 @@ def verify_password(pwhash, passwd):
         return False
 
 
-def genpw(pool=ascii_letters+digits+punctuation, length=8):
+def genpw(pool=ascii_letters+digits+punctuation, length=MIN_LEN):
     """Generates a password with the specified
     length from the character pool.
     """

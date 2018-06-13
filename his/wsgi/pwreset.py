@@ -44,14 +44,13 @@ def request_reset():
     except PasswordResetPending_:
         return PasswordResetPending()
 
-    password_reset_token.save()
-
     try:
-        recaptcha_response = json['recaptcha_response']
+        response = json['response']
     except KeyError:
         return NoReCaptchaResponseProvided()
 
-    if RE_CAPTCHA.validate(recaptcha_response):
+    if RE_CAPTCHA.validate(response):
+        password_reset_token.save()
         password_reset_token.email()
         return PasswordResetSent()
 

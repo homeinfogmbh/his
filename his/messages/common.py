@@ -34,9 +34,14 @@ class MetaMessage(type):
         """Sets the class's respective locales."""
         super().__init__(*args, **kwargs)
 
-        if cls is not Message and isinstance(cls.LOCALES, str):
-            cls.LOCALES, filename = ConfigParser(), cls.LOCALES
-            cls.LOCALES.read(filename)
+        try:
+            locales = cls.LOCALES
+        except AttributeError:
+            pass
+        else:
+            if isinstance(locales, str):
+                cls.LOCALES ConfigParser()
+                cls.LOCALES.read(locales)
 
 
 class Message(JSON, metaclass=MetaMessage):

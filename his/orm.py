@@ -77,6 +77,12 @@ class PasswordResetPending(Exception):
     pass
 
 
+def _gen_token():
+    """Generates a unique random UUID4-based token."""
+
+    return str(uuid4)
+
+
 class AccountServicesProxy:
     """Proxy to transparently handle an account's services."""
 
@@ -483,7 +489,7 @@ class Session(HISModel):
 
     account = ForeignKeyField(
         Account, column_name='account', on_delete='CASCADE')
-    token = CharField(64, default=uuid4)
+    token = CharField(64, default=_gen_token)
     start = DateTimeField()
     end = DateTimeField()
     login = BooleanField(default=True)  # Login session or keep-alive?
@@ -568,7 +574,6 @@ class Session(HISModel):
         """Converts the session to a dictionary."""
         dictionary = super().to_dict(**kwargs)
         dictionary['account'] = self.account.name
-        print('DEBUG SESSION:', dictionary, flush=True)
         return dictionary
 
 
@@ -595,7 +600,7 @@ class PasswordResetToken(HISModel):
 
     account = ForeignKeyField(
         Account, column_name='account', on_delete='CASCADE')
-    token = CharField(64, default=uuid4)
+    token = CharField(64, default=_gen_token)
     created = DateTimeField(default=datetime.now)
 
     @classmethod

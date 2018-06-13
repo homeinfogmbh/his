@@ -40,7 +40,7 @@ class MetaMessage(type):
             pass
         else:
             if isinstance(locales, str):
-                cls.LOCALES ConfigParser()
+                cls.LOCALES = ConfigParser()
                 cls.LOCALES.read(locales)
 
 

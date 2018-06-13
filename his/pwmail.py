@@ -11,7 +11,7 @@ PWRESET_CFG = CONFIG['pwreset']
 MAIL_CFG = CONFIG['mail']
 
 MAILER = Mailer(
-    MAIL_CFG['server'], int(MAIL_CFG['port']), MAIL_CFG['user'],
+    MAIL_CFG['host'], int(MAIL_CFG['port']), MAIL_CFG['user'],
     MAIL_CFG['passwd'])
 
 

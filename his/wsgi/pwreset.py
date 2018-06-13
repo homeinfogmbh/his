@@ -84,7 +84,7 @@ def reset_password():
 
     try:
         account.passwd = passwd
-    except PasswordTooShortError:
+    except PasswordTooShortError as password_too_short:
         raise PasswordTooShort(minlen=password_too_short.minlen)
 
     account.save()

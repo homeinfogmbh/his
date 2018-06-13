@@ -13,6 +13,7 @@ setup(
     data_files=[('/etc/his.d/locale/his', [
         'files/locales/account.ini',
         'files/locales/customer.ini',
+        'files/locales/recaptcha.ini',
         'files/locales/data.ini',
         'files/locales/pwreset.ini',
         'files/locales/service.ini',

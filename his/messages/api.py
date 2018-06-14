@@ -31,7 +31,7 @@ class MetaMessage(type):
     """Metaclass for messages."""
 
     def __init__(cls, *args, **kwargs):
-        """Sets the class's respective locales."""
+        """Reads and sets the message's respective locales."""
         super().__init__(*args, **kwargs)
 
         try:
@@ -45,7 +45,7 @@ class MetaMessage(type):
 
     @property
     def locales(cls):
-        """Returns the class' locales."""
+        """Returns the message's locales."""
         try:
             return cls.LOCALES[cls.__name__]
         except KeyError:
@@ -53,7 +53,7 @@ class MetaMessage(type):
 
 
 class Message(JSON, metaclass=MetaMessage):
-    """Indicates errors for the WebAPI."""
+    """Messages returned by the respective web application."""
 
     STATUS = 200
 

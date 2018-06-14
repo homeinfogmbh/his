@@ -1,6 +1,6 @@
 """Service related messages."""
 
-from his.messages.common import Message
+from his.messages.api import Message
 
 __all__ = [
     'NoServiceSpecified',

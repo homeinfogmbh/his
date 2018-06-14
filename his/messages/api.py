@@ -43,6 +43,14 @@ class MetaMessage(type):
                 cls.LOCALES = ConfigParser()
                 cls.LOCALES.read(locales)
 
+    @property
+    def locales(cls):
+        """Returns the class' locales."""
+        try:
+            return cls.LOCALES[cls.__name__]
+        except KeyError:
+            raise MessageNotFound(cls.__name__)
+
 
 class Message(JSON, metaclass=MetaMessage):
     """Indicates errors for the WebAPI."""
@@ -51,15 +59,10 @@ class Message(JSON, metaclass=MetaMessage):
 
     def __init__(self, *data, status=None, **fields):
         """Initializes the message."""
-        try:
-            locales = self.__class__.LOCALES[self.__class__.__name__]
-        except KeyError:
-            raise MessageNotFound(self.__class__.__name__)
-
         language = request.args.get('lang', 'de_DE')
 
         try:
-            message = locales[language]
+            message = self.__class__.locales[language]  # Class property!
         except KeyError:
             raise LanguageNotFound(language)
 

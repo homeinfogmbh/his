@@ -9,7 +9,7 @@ from peewee import PrimaryKeyField, ForeignKeyField, CharField, BooleanField, \
 from filedb import FileProperty
 from homeinfo.crm import Customer, Employee
 from homeinfo.misc import classproperty
-from peeweeplus import MySQLDatabase, JSONModel, TokenField
+from peeweeplus import MySQLDatabase, JSONModel, UUID4Field
 from timelib import strpdatetime
 
 from his.config import CONFIG
@@ -483,19 +483,19 @@ class Session(HISModel):
 
     account = ForeignKeyField(
         Account, column_name='account', on_delete='CASCADE')
-    token = TokenField()
+    token = UUID4Field()
     start = DateTimeField()
     end = DateTimeField()
     login = BooleanField(default=True)  # Login session or keep-alive?
 
     def __repr__(self):
         """Returns a unique string representation."""
-        return self.token
+        return self.token.hex
 
     def __str__(self):
         """Returns a human-readable representation."""
         return '{} - {}: {} ({})'.format(
-            self.start.isoformat(), self.end.isoformat(), self.token,
+            self.start.isoformat(), self.end.isoformat(), self.token.hex,
             self.login)
 
     @classmethod
@@ -594,7 +594,7 @@ class PasswordResetToken(HISModel):
 
     account = ForeignKeyField(
         Account, column_name='account', on_delete='CASCADE')
-    token = TokenField()
+    token = UUID4Field()
     created = DateTimeField(default=datetime.now)
 
     @classmethod

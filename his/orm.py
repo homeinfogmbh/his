@@ -1,7 +1,6 @@
 """ORM models."""
 
 from datetime import datetime, timedelta
-from uuid import uuid4
 from contextlib import suppress
 
 from peewee import PrimaryKeyField, ForeignKeyField, CharField, BooleanField, \
@@ -10,7 +9,7 @@ from peewee import PrimaryKeyField, ForeignKeyField, CharField, BooleanField, \
 from filedb import FileProperty
 from homeinfo.crm import Customer, Employee
 from homeinfo.misc import classproperty
-from peeweeplus import MySQLDatabase, JSONModel
+from peeweeplus import MySQLDatabase, JSONModel, TokenField
 from timelib import strpdatetime
 
 from his.config import CONFIG
@@ -76,12 +75,6 @@ class PasswordResetPending(Exception):
     """Indicates that a password reset is already pending."""
 
     pass
-
-
-def _gen_token():
-    """Generates a unique random UUID4-based token."""
-
-    return str(uuid4())
 
 
 class AccountServicesProxy:
@@ -490,7 +483,7 @@ class Session(HISModel):
 
     account = ForeignKeyField(
         Account, column_name='account', on_delete='CASCADE')
-    token = CharField(64, default=_gen_token)
+    token = TokenField()
     start = DateTimeField()
     end = DateTimeField()
     login = BooleanField(default=True)  # Login session or keep-alive?
@@ -601,7 +594,7 @@ class PasswordResetToken(HISModel):
 
     account = ForeignKeyField(
         Account, column_name='account', on_delete='CASCADE')
-    token = CharField(64, default=_gen_token)
+    token = TokenField()
     created = DateTimeField(default=datetime.now)
 
     @classmethod

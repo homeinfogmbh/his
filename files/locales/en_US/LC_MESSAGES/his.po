@@ -1,0 +1,91 @@
+# Translations template for HIS.
+# Copyright (C) 2018 HOMEINFO Digitale Informationssysteme GmbH.
+# This file is distributed under the same license as the HIS project.
+# Richard Neumann <r.neumann@homeinfo.de>, 2018.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: latest\n"
+"Report-Msgid-Bugs-To: info@homeinfo.de\n"
+"POT-Creation-Date: 2018-06-20 11:58+0100\n"
+"PO-Revision-Date: 2018-06-20 11:58+0100\n"
+"Last-Translator: Richard Neumann <r.neumann@homeinfo.de>\n"
+"Language-Team: English <info@homeinfo.de>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Hand\n"
+
+### Account messages. ###
+
+#: account.py:18
+msgid "NoAccountSpecified"
+msgstr "No account specified."
+
+#: account.py:24
+msgid "NoSuchAccount"
+msgstr "No such account."
+
+msgid "AccountLocked"
+msgstr "Account locked."
+
+msgid "AccountCreated"
+msgstr "Account created."
+
+msgid "AccountDeleted"
+msgstr "Account deleted."
+
+msgid "AccountPatched"
+msgstr "Account patched."
+
+msgid "NotAuthorized"
+msgstr "Not authorized."
+
+msgid "AccountExists"
+msgstr "Account already exists."
+
+msgid "AccountsExhausted"
+msgstr "Account quota exhausted."
+
+msgid "PasswordTooShort"
+msgstr "The provided password is too short."
+
+### Customer messages. ###
+
+msgid "NoCustomerSpecified"
+msgstr "No customer specified."
+
+msgid "NoSuchCustomer"
+msgstr "No such customer."
+
+msgid "CustomerUnconfigured"
+msgstr "Customer has no configuration."
+
+### Data messages. ###
+
+msgid "DataError"
+msgstr "Data error."
+
+msgid "NoDataProvided"
+msgstr "No data provided."
+
+msgid "MissingData"
+msgstr "Missing data."
+
+msgid "IncompleteData"
+msgstr "Incomplete data."
+
+msgid "InvalidData"
+msgstr "Invalid data."
+
+msgid "NotAnInteger"
+msgstr "Not an integer."
+
+msgid "InvalidUTF8Data"
+msgstr "Invalid UTF-8 data."
+
+msgid "InvalidJSON"
+msgstr "Invalid JSON object."
+
+msgid "InvalidCustomerID"
+msgstr "Invalid customer ID specified."

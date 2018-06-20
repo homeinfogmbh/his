@@ -6,3 +6,4 @@ build
 setup.cfg
 dist
 .buildconfig
+*.mo

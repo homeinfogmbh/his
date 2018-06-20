@@ -1,0 +1,91 @@
+# Translations template for HIS.
+# Copyright (C) 2018 HOMEINFO Digitale Informationssysteme GmbH.
+# This file is distributed under the same license as the HIS project.
+# Richard Neumann <r.neumann@homeinfo.de>, 2018.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: latest\n"
+"Report-Msgid-Bugs-To: info@homeinfo.de\n"
+"POT-Creation-Date: 2018-06-20 11:58+0100\n"
+"PO-Revision-Date: 2018-06-20 11:58+0100\n"
+"Last-Translator: Richard Neumann <r.neumann@homeinfo.de>\n"
+"Language-Team: German <info@homeinfo.de>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Hand\n"
+
+### Account messages. ###
+
+#: account.py:18
+msgid "NoAccountSpecified"
+msgstr "Kein Benutzerkonto angegeben."
+
+#: account.py:24
+msgid "NoSuchAccount"
+msgstr "Benutzerkonto nicht gefunden."
+
+msgid "AccountLocked"
+msgstr "Benutzerkonto gesperrt."
+
+msgid "AccountCreated"
+msgstr "Benutzerkonto erstellt."
+
+msgid "AccountDeleted"
+msgstr "Benutzerkonto gelöscht."
+
+msgid "AccountPatched"
+msgstr "Benutzerkonto geändert."
+
+msgid "NotAuthorized"
+msgstr "Zugriff verweigert."
+
+msgid "AccountExists"
+msgstr "Benutzerkonto existiert bereits."
+
+msgid "AccountsExhausted"
+msgstr "Maximale Anzahl an Benutzerkonten erreicht."
+
+msgid "PasswordTooShort"
+msgstr "Das angegebene Passwort ist zu kurz."
+
+### Customer messages. ###
+
+msgid "NoCustomerSpecified"
+msgstr "Keine Kundennummer angegeben."
+
+msgid "NoSuchCustomer"
+msgstr "Kein solcher Kunde."
+
+msgid "CustomerUnconfigured"
+msgstr "Kunde besitzt keine Konfiguration."
+
+### Data messages. ###
+
+msgid "DataError"
+msgstr "Datenfehler."
+
+msgid "NoDataProvided"
+msgstr "Keine Daten übermittelt."
+
+msgid "MissingData"
+msgstr "Felende Daten."
+
+msgid "IncompleteData"
+msgstr "Unvollständiger Datensatz."
+
+msgid "InvalidData"
+msgstr "Ungültige Daten."
+
+msgid "NotAnInteger"
+msgstr "Keine Ganzzahl."
+
+msgid "InvalidUTF8Data"
+msgstr "Fehlerhafte UTF-8 Daten."
+
+msgid "InvalidJSON"
+msgstr "Fehlerhaftes JSON Objekt."
+
+msgid "InvalidCustomerID"
+msgstr "Ungültige Kundennummer angegeben."

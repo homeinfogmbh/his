@@ -9,7 +9,7 @@ install:
 	@ mkdir -p /srv/http/de/homeinfo/javascript/his
 	@ chmod 755 /srv/http/de/homeinfo/javascript/his
 	@ install -m 644 frontend/*.js /srv/http/de/homeinfo/javascript/his/
-	@ ./install_locales.sh
+	@ install_locales
 
 uninstall:
 	@ while read FILE; do echo "Removing: $$FILE"; rm "$$FILE"; done < $(FILE_LIST)

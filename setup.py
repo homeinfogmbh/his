@@ -10,14 +10,5 @@ setup(
     requires=['homeinfo.crm'],
     packages=['his', 'his.messages', 'his.wsgi'],
     scripts=['files/hisutil', 'files/his-session-cleanup'],
-    data_files=[
-        ('/etc/his.d', ['files/pwreset.html']),
-        ('/etc/his.d/locale/his', [
-            'files/locales/account.ini',
-            'files/locales/customer.ini',
-            'files/locales/recaptcha.ini',
-            'files/locales/data.ini',
-            'files/locales/pwreset.ini',
-            'files/locales/service.ini',
-            'files/locales/session.ini'])],
+    data_files=[('/etc/his.d', ['files/pwreset.html'])],
     description='HOMEINFO Integrated Services.')

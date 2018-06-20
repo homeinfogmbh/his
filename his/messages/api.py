@@ -51,12 +51,12 @@ class Message(JSON):
 
     def __init__(self, *data, status=None, **fields):
         """Initializes the message."""
-        language = request.args.get('lang', 'de_DE')
-
         try:
             domain = self.__class__.DOMAIN
         except AttributeError:
             raise NoDomainSpecified(self.__class__)
+
+        language = request.args.get('lang', 'de_DE')
 
         try:
             locales = translation(domain, LOCALES_DIR, [language])

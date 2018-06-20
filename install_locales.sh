@@ -12,7 +12,7 @@ for LANG in *; do
 		mkdir -p "${TARGET_DIR}"
 
 		for PO in *.po; do
-			msgfmt "${PO}" -o "${TARGET_DIR}/${PO%.po}.mo"
+			msgfmt -v "${PO}" -o "${TARGET_DIR}/${PO%.po}.mo"
 		done
 
 		popd > /dev/null

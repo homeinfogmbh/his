@@ -89,3 +89,71 @@ msgstr "Fehlerhaftes JSON Objekt."
 
 msgid "InvalidCustomerID"
 msgstr "Ungültige Kundennummer angegeben."
+
+### Pasword reset messages. ###
+
+msgid "NoTokenSpecified"
+msgstr "Kein Token angegeben."
+
+msgid "NoPasswordSpecified"
+msgstr "Kein Passwort angegeben."
+
+msgid "PasswordResetSent"
+msgstr "Ein Link zum Zurücksetzen des Passworts wurde per E-Mail gesendet."
+
+msgid "PasswordResetPending"
+msgstr "Es wurde bereits eine Anfrage zum Zurücksetzen des Passworts getätigt."
+
+msgid "InvalidResetToken"
+msgstr "Das angegebende Token ist ungültig."
+
+msgid "PasswordSet"
+msgstr "Das neue Passwort wurde gesetzt."
+
+### ReCAPTCHA messages. ###
+
+msgid "NoReCaptchaResponseProvided"
+msgstr "Keine ReCAPTCHA Antwort angegeben."
+
+msgid "InvalidReCaptchaResponse"
+msgstr "Ungültige ReCAPTCHA Antwort."
+
+### Service messages. ###
+
+msgid "NoServiceSpecified"
+msgstr "Kein Dienst angegeben."
+
+msgid "NoSuchService"
+msgstr "Kein solcher Dienst."
+
+msgid "ServiceAdded"
+msgstr "Dienst hinzugefügt."
+
+msgid "ServiceAlreadyEnabled"
+msgstr "Dienst bereits freigeschaltet."
+
+msgid "AmbiguousServiceTarget"
+msgstr "Mehrdeutiges Ziel für Dienst."
+
+msgid "MissingServiceTarget"
+msgstr "Fehlendes Ziel für Dienst."
+
+### Session messages. ###
+
+msgstr "MissingCredentials"
+msgstr "Benutzername und / oder Passwort nicht angegeben."
+
+msgstr "InvalidCredentials"
+msgstr "Ungültiger Benutzername und / oder Passwort."
+
+msgstr "NoSessionSpecified"
+msgstr "Keine Sitzung angegeben."
+
+msgstr "NoSuchSession"
+msgstr "Keine solche Sitzung."
+
+msgstr "SessionExpired"
+msgstr "Sitzung abgelaufen."
+
+msgstr "DurationOutOfBounds"
+msgstr "Sitzungsdauer außerhalb des zulässigen Bereichs."

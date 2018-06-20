@@ -89,3 +89,71 @@ msgstr "Invalid JSON object."
 
 msgid "InvalidCustomerID"
 msgstr "Invalid customer ID specified."
+
+### Pasword reset messages. ###
+
+msgid "NoTokenSpecified"
+msgstr "No token specified."
+
+msgid "NoPasswordSpecified"
+msgstr "No password specified."
+
+msgid "PasswordResetSent"
+msgstr "A link to reset the password has been emailed."
+
+msgid "PasswordResetPending"
+msgstr "A request to reset the password has already been submitted."
+
+msgid "InvalidResetToken"
+msgstr "The reset token is invalid."
+
+msgid "PasswordSet"
+msgstr "The new password has been set."
+
+### ReCAPTCHA messages. ###
+
+msgid "NoReCaptchaResponseProvided"
+msgstr "No ReCAPTCHA response provided."
+
+msgid "InvalidReCaptchaResponse"
+msgstr "Invalid ReCAPTCHA response."
+
+### Service messages. ###
+
+msgid "NoServiceSpecified"
+msgstr "No service specified."
+
+msgid "NoSuchService"
+msgstr "No such service."
+
+msgid "ServiceAdded"
+msgstr "Service added."
+
+msgid "ServiceAlreadyEnabled"
+msgstr "Service already enabled."
+
+msgid "AmbiguousServiceTarget"
+msgstr "Ambiguous service target."
+
+msgid "MissingServiceTarget"
+msgstr "Missing service target."
+
+### Session messages. ###
+
+msgstr "MissingCredentials"
+msgstr "Missing credentials."
+
+msgstr "InvalidCredentials"
+msgstr "Invalid credentials."
+
+msgstr "NoSessionSpecified"
+msgstr "No session specified."
+
+msgstr "NoSuchSession"
+msgstr "No such session."
+
+msgstr "SessionExpired"
+msgstr "Session expired."
+
+msgstr "DurationOutOfBounds"
+msgstr "Session duration out of bounds."

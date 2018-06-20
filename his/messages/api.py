@@ -60,7 +60,7 @@ class Message(JSON):
 
         try:
             translation_ = translation(domain, LOCALES_DIR, [language])
-        except OSError:
+        except FileNotFoundError:
             raise LanguageNotFound(language)
 
         message = self.__class__.__name__

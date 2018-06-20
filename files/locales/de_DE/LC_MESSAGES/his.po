@@ -140,20 +140,20 @@ msgstr "Fehlendes Ziel für Dienst."
 
 ### Session messages. ###
 
-msgstr "MissingCredentials"
+msgid "MissingCredentials"
 msgstr "Benutzername und / oder Passwort nicht angegeben."
 
-msgstr "InvalidCredentials"
+msgid "InvalidCredentials"
 msgstr "Ungültiger Benutzername und / oder Passwort."
 
-msgstr "NoSessionSpecified"
+msgid "NoSessionSpecified"
 msgstr "Keine Sitzung angegeben."
 
-msgstr "NoSuchSession"
+msgid "NoSuchSession"
 msgstr "Keine solche Sitzung."
 
-msgstr "SessionExpired"
+msgid "SessionExpired"
 msgstr "Sitzung abgelaufen."
 
-msgstr "DurationOutOfBounds"
+msgid "DurationOutOfBounds"
 msgstr "Sitzungsdauer außerhalb des zulässigen Bereichs."

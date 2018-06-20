@@ -140,20 +140,20 @@ msgstr "Missing service target."
 
 ### Session messages. ###
 
-msgstr "MissingCredentials"
+msgid "MissingCredentials"
 msgstr "Missing credentials."
 
-msgstr "InvalidCredentials"
+msgid "InvalidCredentials"
 msgstr "Invalid credentials."
 
-msgstr "NoSessionSpecified"
+msgid "NoSessionSpecified"
 msgstr "No session specified."
 
-msgstr "NoSuchSession"
+msgid "NoSuchSession"
 msgstr "No such session."
 
-msgstr "SessionExpired"
+msgid "SessionExpired"
 msgstr "Session expired."
 
-msgstr "DurationOutOfBounds"
+msgid "DurationOutOfBounds"
 msgstr "Session duration out of bounds."

@@ -59,23 +59,23 @@ class Message(JSON):
             raise NoDomainSpecified(self.__class__)
 
         try:
-            translation_ = translation(domain, LOCALES_DIR, [language])
+            locales = translation(domain, LOCALES_DIR, [language])
         except FileNotFoundError:
             raise LanguageNotFound(language)
 
-        message = self.__class__.__name__
-        translated_message = translation_.gettext(message)
+        msgid = self.__class__.__name__
+        message = locales.gettext(msgid)
 
-        if translated_message == message:
-            raise MessageNotFound(message)
+        if message == msgid:
+            raise MessageNotFound(msgid)
 
         if status is None:
             status = self.__class__.STATUS
 
         if data:
-            translated_message = translated_message.format(*data)
+            message = message.format(*data)
 
-        dictionary = {'message': translated_message}
+        dictionary = {'message': message}
         dictionary.update(fields)
         super().__init__(dictionary, status=status)
 

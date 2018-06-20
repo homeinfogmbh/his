@@ -1,6 +1,6 @@
 """Service related messages."""
 
-from his.messages.api import Message
+from his.messages.api import HISMessage
 
 __all__ = [
     'NoServiceSpecified',
@@ -11,43 +11,37 @@ __all__ = [
     'MissingServiceTarget']
 
 
-class _ServiceMessage(Message):
-    """Abstract common service message."""
-
-    LOCALES = '/etc/his.d/locale/his/service.ini'
-
-
-class NoServiceSpecified(_ServiceMessage):
+class NoServiceSpecified(HISMessage):
     """Indicates that no service has been specified."""
 
     STATUS = 406
 
 
-class NoSuchService(_ServiceMessage):
+class NoSuchService(HISMessage):
     """Indicates that the requested service does not exist."""
 
     STATUS = 404
 
 
-class ServiceAdded(_ServiceMessage):
+class ServiceAdded(HISMessage):
     """Indicates that the respective service has been added."""
 
     STATUS = 201
 
 
-class ServiceAlreadyEnabled(_ServiceMessage):
+class ServiceAlreadyEnabled(HISMessage):
     """Indicates that the respective service is already enabled."""
 
     STATUS = 409
 
 
-class AmbiguousServiceTarget(_ServiceMessage):
+class AmbiguousServiceTarget(HISMessage):
     """Indicates that the respective target is ambiguous."""
 
     STATUS = 406
 
 
-class MissingServiceTarget(_ServiceMessage):
+class MissingServiceTarget(HISMessage):
     """Indicates that the respective target is missing."""
 
     STATUS = 406

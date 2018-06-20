@@ -1,6 +1,6 @@
 """Account related messages."""
 
-from his.messages.api import Message
+from his.messages.api import HISMessage
 
 __all__ = [
     'NoAccountSpecified',
@@ -15,49 +15,43 @@ __all__ = [
     'PasswordTooShort']
 
 
-class _AccountMessage(Message):
-    """Abstract common account message."""
-
-    LOCALES = '/etc/his.d/locale/his/account.ini'
-
-
-class NoAccountSpecified(_AccountMessage):
+class NoAccountSpecified(HISMessage):
     """Indicates that no account has been specified."""
 
     STATUS = 406
 
 
-class NoSuchAccount(_AccountMessage):
+class NoSuchAccount(HISMessage):
     """Indicates that an account with the specified name does not exist."""
 
     STATUS = 404
 
 
-class AccountLocked(_AccountMessage):
+class AccountLocked(HISMessage):
     """Indicates that the account is locked."""
 
     STATUS = 423
 
 
-class AccountCreated(_AccountMessage):
+class AccountCreated(HISMessage):
     """Indicates that the account has been created."""
 
     STATUS = 201
 
 
-class AccountDeleted(_AccountMessage):
+class AccountDeleted(HISMessage):
     """Indicates that the account has been deleted."""
 
     STATUS = 200
 
 
-class AccountPatched(_AccountMessage):
+class AccountPatched(HISMessage):
     """Indicates that the account has been patched."""
 
     STATUS = 200
 
 
-class NotAuthorized(_AccountMessage):
+class NotAuthorized(HISMessage):
     """Indicates that the an account is not
     authorized to perform the respective action.
     """
@@ -65,13 +59,13 @@ class NotAuthorized(_AccountMessage):
     STATUS = 403
 
 
-class AccountExists(_AccountMessage):
+class AccountExists(HISMessage):
     """Indicates that the respective account already exists."""
 
     STATUS = 409
 
 
-class AccountsExhausted(_AccountMessage):
+class AccountsExhausted(HISMessage):
     """Indicates that the respective customer has
     exhauseted their respective account quota.
     """
@@ -79,7 +73,7 @@ class AccountsExhausted(_AccountMessage):
     STATUS = 402
 
 
-class PasswordTooShort(_AccountMessage):
+class PasswordTooShort(HISMessage):
     """Indicates that the provided password is too short."""
 
     STATUS = 415

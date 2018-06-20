@@ -1,6 +1,6 @@
 """ HIS password reset messages."""
 
-from his.messages.api import Message
+from his.messages.api import HISMessage
 
 __all__ = [
     'NoTokenSpecified',
@@ -11,43 +11,37 @@ __all__ = [
     'PasswordSet']
 
 
-class _PwResetMessage(Message):
-    """Abstract common password reset message."""
-
-    LOCALES = '/etc/his.d/locale/his/pwreset.ini'
-
-
-class NoTokenSpecified(_PwResetMessage):
+class NoTokenSpecified(HISMessage):
     """Indicates that no reset token was specified."""
 
     STATUS = 400
 
 
-class NoPasswordSpecified(_PwResetMessage):
+class NoPasswordSpecified(HISMessage):
     """Indicates that no password was specified to set."""
 
     STATUS = 400
 
 
-class PasswordResetSent(_PwResetMessage):
+class PasswordResetSent(HISMessage):
     """Indicates that the password reset was sent."""
 
     STATUS = 200
 
 
-class PasswordResetPending(_PwResetMessage):
+class PasswordResetPending(HISMessage):
     """Indicates that a password request is already pending."""
 
     STATUS = 423
 
 
-class InvalidResetToken(_PwResetMessage):
+class InvalidResetToken(HISMessage):
     """Indicates that the request token is invalid."""
 
     STATUS = 401
 
 
-class PasswordSet(_PwResetMessage):
+class PasswordSet(HISMessage):
     """Indicates that the password was successfully set."""
 
     STATUS = 200

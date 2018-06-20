@@ -1,29 +1,18 @@
 """ReCAPTCHA related messages."""
 
-from his.messages.api import Message
+from his.messages.api import HISMessage
 
-__all__ = [
-    'NoReCaptchaResponseProvided',
-    'NoSuchService',
-    'ServiceAdded',
-    'ServiceAlreadyEnabled',
-    'AmbiguousServiceTarget',
-    'MissingServiceTarget']
+__all__ = ['NoReCaptchaResponseProvided', 'InvalidReCaptchaResponse']
 
 
-class _ReCaptchaMessage(Message):
-    """Abstract common service message."""
 
-    LOCALES = '/etc/his.d/locale/his/recaptcha.ini'
-
-
-class NoReCaptchaResponseProvided(_ReCaptchaMessage):
+class NoReCaptchaResponseProvided(HISMessage):
     """Indicates that no ReCAPTCHA response was provided."""
 
     STATUS = 400
 
 
-class InvalidReCaptchaResponse(_ReCaptchaMessage):
+class InvalidReCaptchaResponse(HISMessage):
     """Indicates that the ReCAPTCHA response was invalid."""
 
     STATUS = 401

@@ -1,6 +1,6 @@
 """Customer related messages."""
 
-from his.messages.api import Message
+from his.messages.api import HISMessage
 
 __all__ = [
     'NoCustomerSpecified',
@@ -8,25 +8,19 @@ __all__ = [
     'CustomerUnconfigured']
 
 
-class _CustomerMessage(Message):
-    """Abstract common customer message."""
-
-    LOCALES = '/etc/his.d/locale/his/customer.ini'
-
-
-class NoCustomerSpecified(Message):
+class NoCustomerSpecified(HISMessage):
     """Indicates that no customer was specified."""
 
     STATUS = 420
 
 
-class NoSuchCustomer(Message):
+class NoSuchCustomer(HISMessage):
     """Indicates that the customer does not exist."""
 
     STATUS = 404
 
 
-class CustomerUnconfigured(Message):
+class CustomerUnconfigured(HISMessage):
     """Indicates that there is no configuration
     available for the respective customer.
     """

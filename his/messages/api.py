@@ -1,12 +1,29 @@
 """HIS web API messages."""
 
-from configparser import ConfigParser
+from gettext import translation
 
 from flask import request
 
 from wsgilib import JSON
 
-__all__ = ['MessageNotFound', 'LanguageNotFound', 'Message']
+__all__ = [
+    'NoDomainSpecified',
+    'MessageNotFound',
+    'LanguageNotFound',
+    'Message',
+    'HISMessage']
+
+
+LOCALES_DIR = '/etc/his.d/locales'
+
+
+class NoDomainSpecified(Exception):
+    """Indicates that no domain was specified."""
+
+    def __init__(self, message):
+        """Sets the message with the missing domain."""
+        super().__init__(message)
+        self.message = message
 
 
 class MessageNotFound(Exception):
@@ -27,32 +44,7 @@ class LanguageNotFound(Exception):
         self.lang = lang
 
 
-class MetaMessage(type):
-    """Metaclass for messages."""
-
-    def __init__(cls, *args, **kwargs):
-        """Reads and sets the message's respective locales."""
-        super().__init__(*args, **kwargs)
-
-        try:
-            locales = cls.LOCALES
-        except AttributeError:
-            pass
-        else:
-            if isinstance(locales, str):
-                cls.LOCALES = ConfigParser()
-                cls.LOCALES.read(locales)
-
-    @property
-    def locales(cls):
-        """Returns the message's locales."""
-        try:
-            return cls.LOCALES[cls.__name__]
-        except KeyError:
-            raise MessageNotFound(cls.__name__)
-
-
-class Message(JSON, metaclass=MetaMessage):
+class Message(JSON):
     """Messages returned by the respective web application."""
 
     STATUS = 200
@@ -62,16 +54,33 @@ class Message(JSON, metaclass=MetaMessage):
         language = request.args.get('lang', 'de_DE')
 
         try:
-            message = self.__class__.locales[language]  # Class property!
-        except KeyError:
+            domain = self.__class__.DOMAIN
+        except AttributeError:
+            raise NoDomainSpecified(self.__class__)
+
+        try:
+            translation_ = translation(domain, LOCALES_DIR, [language])
+        except OSError:
             raise LanguageNotFound(language)
+
+        message = self.__class__.__name__
+        translated_message = translation_.gettext(message)
+
+        if translated_message == message:
+            raise MessageNotFound(message)
 
         if status is None:
             status = self.__class__.STATUS
 
         if data:
-            message = message.format(*data)
+            translated_message = translated_message.format(*data)
 
-        dictionary = {'message': message}
+        dictionary = {'message': translated_message}
         dictionary.update(fields)
         super().__init__(dictionary, status=status)
+
+
+class HISMessage(Message):
+    """A message for the HIS domain."""
+
+    DOMAIN = 'his'

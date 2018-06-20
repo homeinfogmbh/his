@@ -1,6 +1,6 @@
 """Data errors."""
 
-from his.messages.api import Message
+from his.messages.api import HISMessage
 
 __all__ = [
     'DataError',
@@ -14,13 +14,7 @@ __all__ = [
     'InvalidCustomerID']
 
 
-class _DataMessage(Message):
-    """Abstract common data message."""
-
-    LOCALES = '/etc/his.d/locale/his/data.ini'
-
-
-class DataError(_DataMessage):
+class DataError(HISMessage):
     """Indicates errors in sent data."""
 
     STATUS = 422

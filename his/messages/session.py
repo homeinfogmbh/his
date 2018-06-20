@@ -1,6 +1,6 @@
 """Session related messages."""
 
-from his.messages.api import Message
+from his.messages.api import HISMessage
 
 __all__ = [
     'MissingCredentials',
@@ -11,43 +11,37 @@ __all__ = [
     'DurationOutOfBounds']
 
 
-class _SessionMessage(Message):
-    """Abstract common session message."""
-
-    LOCALES = '/etc/his.d/locale/his/session.ini'
-
-
-class MissingCredentials(_SessionMessage):
+class MissingCredentials(HISMessage):
     """Indicates missing credentials."""
 
     STATUS = 401
 
 
-class InvalidCredentials(_SessionMessage):
+class InvalidCredentials(HISMessage):
     """Indicates invalid credentials."""
 
     STATUS = 401
 
 
-class NoSessionSpecified(_SessionMessage):
+class NoSessionSpecified(HISMessage):
     """Indicates a missing session."""
 
     STATUS = 420
 
 
-class NoSuchSession(_SessionMessage):
+class NoSuchSession(HISMessage):
     """Indicates that the specified session does not exist."""
 
     STATUS = 404
 
 
-class SessionExpired(_SessionMessage):
+class SessionExpired(HISMessage):
     """Indicates that the specified session has expired."""
 
     STATUS = 410
 
 
-class DurationOutOfBounds(_SessionMessage):
+class DurationOutOfBounds(HISMessage):
     """Indicates that an out of bounds duration
     was secified on session creation or renewal.
     """

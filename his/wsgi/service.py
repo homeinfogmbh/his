@@ -133,5 +133,5 @@ ROUTES = (
      'list_customer_services'),
     ('GET', '/service/account', list_account_services,
      'list_account_services'),
-    ('GET', '/service/<name>', list_service_customers,
+    ('GET', '/service/<name>/customers', list_service_customers,
      'list_service_customers'))

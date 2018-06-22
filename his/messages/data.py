@@ -44,14 +44,16 @@ class InvalidData(DataError):
     @classmethod
     def from_field_not_nullable(cls, error):
         """Initializes from a FieldNotNullable error."""
-        return cls(model=error.model, attr=error.attr, field=error.field)
+        return cls(
+            model=error.model.__name__, key=error.field.column_name,
+            field=error.field.__class__)
 
     @classmethod
     def from_field_value_error(cls, error):
         """Initializes from a FieldNotNullable error."""
         return cls(
-            model=error.model, attr=error.attr, field=error.field,
-            value=error.value)
+            model=error.model.__name__, key=error.field.column_name,
+            field=error.field.__class__, value=error.value)
 
     @classmethod
     def from_invalid_keys(cls, error):

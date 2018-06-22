@@ -114,6 +114,16 @@ def list_account_services():
                      AccountService.account == ACCOUNT.id)])
 
 
+@authenticated
+@root
+def list_service_customers(name):
+    """Lists the customers that may use the current service."""
+
+    return JSON([
+        customer_service.customer.to_dict() for customer_service
+        in CustomerService.select().join(Service).where(Service.name == name)])
+
+
 ROUTES = (
     ('POST', '/service/customer', add_customer_service,
      'add_customer_service'),
@@ -122,4 +132,6 @@ ROUTES = (
     ('GET', '/service/customer', list_customer_services,
      'list_customer_services'),
     ('GET', '/service/account', list_account_services,
-     'list_account_services'))
+     'list_account_services'),
+    ('GET', '/service/<name>', list_service_customers,
+     'list_service_customers'))

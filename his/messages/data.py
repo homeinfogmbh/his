@@ -41,31 +41,19 @@ class IncompleteData(DataError):
 class InvalidData(DataError):
     """Indicates missing data."""
 
-    def __init__(self, *args, **kwargs):
-        """Debug arguments."""
-        for index, arg in enumerate(args):
-            print('arg{}:'.format(index), arg, '({})'.format(type(arg)),
-                  flush=True)
-
-        for keyword, value in kwargs.items():
-            print('{}:'.format(keyword), value, '({})'.format(type(value)),
-                  flush=True)
-
-        super().__init__(*args, **kwargs)
-
     @classmethod
     def from_field_not_nullable(cls, error):
         """Initializes from a FieldNotNullable error."""
         return cls(
             model=error.model.__name__, key=error.field.column_name,
-            field=error.field.__class__)
+            field=error.field.__class__.__name__)
 
     @classmethod
     def from_field_value_error(cls, error):
         """Initializes from a FieldNotNullable error."""
         return cls(
             model=error.model.__name__, key=error.field.column_name,
-            field=error.field.__class__, value=error.value)
+            field=error.field.__class__.__name__, value=error.value)
 
     @classmethod
     def from_invalid_keys(cls, error):

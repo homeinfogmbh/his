@@ -78,6 +78,21 @@ msgstr "Incomplete data."
 msgid "InvalidData"
 msgstr "Invalid data."
 
+msgid "FieldValueError"
+msgstr "Invalid value for field."
+
+msgid "FieldNotNullable"
+msgstr "Field cannot be NULL."
+
+msgid "MissingKeyError"
+msgstr "Missing key."
+
+msgid "InvalidKeys"
+msgstr "Invalid keys."
+
+msgid "InvalidEnumerationValue"
+msgstr "Invalid enumeration value."
+
 msgid "NotAnInteger"
 msgstr "Not an integer."
 

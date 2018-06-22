@@ -8,6 +8,11 @@ __all__ = [
     'MissingData',
     'IncompleteData',
     'InvalidData',
+    'FieldValueError',
+    'FieldNotNullable',
+    'MissingKeyError',
+    'InvalidKeys',
+    'InvalidEnumerationValue',
     'NotAnInteger',
     'InvalidUTF8Data',
     'InvalidJSON',
@@ -42,24 +47,39 @@ class InvalidData(DataError):
     """Indicates missing data."""
 
     @classmethod
-    def from_field_not_nullable(cls, error):
-        """Initializes from a FieldNotNullable error."""
-        return cls(
-            model=error.model.__name__, key=error.field.column_name,
-            field=error.field.__class__.__name__)
+    def from_error(cls, error):
+        """Initializes from a peeweeplus.FieldNotNullable error."""
+        return cls(**error.to_dict())
 
-    @classmethod
-    def from_field_value_error(cls, error):
-        """Initializes from a FieldNotNullable error."""
-        return cls(
-            model=error.model.__name__, key=error.field.column_name,
-            field=error.field.__class__.__name__, value=repr(error.value),
-            type=type(value).__name__)
 
-    @classmethod
-    def from_invalid_keys(cls, error):
-        """Initializes from a FieldNotNullable error."""
-        return cls(keys=error.invalid_keys)
+class FieldValueError(InvalidData):
+    """Indicates that the value for the field is not valid."""
+
+    pass
+
+
+class FieldNotNullable(InvalidData):
+    """Indicates that the field is not nullable."""
+
+    pass
+
+
+class MissingKeyError(InvalidData):
+    """Indicates a missing key for the respective model."""
+
+    pass
+
+
+class InvalidKeys(InvalidData):
+    """Indicates that invalid keys were passed."""
+
+    pass
+
+
+class InvalidEnumerationValue(InvalidData):
+    """Indicates that an invalid enumeration value was passed."""
+
+    pass
 
 
 class NotAnInteger(InvalidData):

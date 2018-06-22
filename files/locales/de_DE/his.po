@@ -78,6 +78,21 @@ msgstr "Unvollständiger Datensatz."
 msgid "InvalidData"
 msgstr "Ungültige Daten."
 
+msgid "FieldValueError"
+msgstr "Ungültiger Datenwert für dieses Feld."
+
+msgid "FieldNotNullable"
+msgstr "Feld kann nicht NULL sein."
+
+msgid "MissingKeyError"
+msgstr "Fehlende Schlüsselwerte."
+
+msgid "InvalidKeys"
+msgstr "Ungültige Schlüsselwerte."
+
+msgid "InvalidEnumerationValue"
+msgstr "Ungültiger Aufzählungswert."
+
 msgid "NotAnInteger"
 msgstr "Keine Ganzzahl."
 

@@ -1,17 +1,20 @@
 """Basic HIS application."""
 
-from peeweeplus import FieldValueError, FieldNotNullable, InvalidKeys
+from peeweeplus import FieldValueError, FieldNotNullable, MissingKeyError, \
+    InvalidKeys, InvalidEnumerationValue
 from wsgilib import Application as _Application
 
-from his.messages.data import InvalidData
+from his.messages import data
 
 __all__ = ['Application']
 
 
 ERROR_HANDLERS = (
-    (FieldNotNullable, InvalidData.from_field_not_nullable),
-    (FieldValueError, InvalidData.from_field_value_error),
-    (InvalidKeys, InvalidData.from_invalid_keys))
+    (FieldValueError, data.FieldValueError.from_error),
+    (FieldNotNullable, data.FieldNotNullable.from_error),
+    (MissingKeyError, data.MissingKeyError.from_error),
+    (InvalidKeys, data.InvalidKeys.from_error),
+    (InvalidEnumerationValue, data.InvalidEnumerationValue.from_error))
 
 
 class Application(_Application):

@@ -47,54 +47,53 @@ his._debug = function (message) {
 
 
 /*
-    HIS URL arguments class.
+    Prototype for request arguments.
 */
-his._argsToString = function (object) {
-    if (object == null) {
-        return '';
-    }
-
-    var args = [];
-
-    for (var attribute in object) {
-        if (object.hasOwnProperty(attribute)) {
-            if (object[attribute] == null) {
-                args.push(attribute);
-            } else {
-                args.push(attribute + '=' + object[attribute]);
+his._RequestArgs = function (object) {
+    if (object != null) {
+        for (var attribute in object) {
+            if (object.hasOwnProperty(attribute)) {
+                this[attribute] = object[attribute];
             }
         }
     }
 
-    if (args.length > 0) {
-        return args.join('&');
-    }
+    this.toString = function () {
+        var args = [];
 
-    return '';
+        for (var attribute in this) {
+            if (this.hasOwnProperty(attribute)) {
+                if (typeof this[attribute] === 'function') {
+                    continue;
+                } else if (this[attribute] == null) {
+                    args.push(attribute);
+                } else {
+                    args.push(attribute + '=' + this[attribute]);
+                }
+            }
+        }
+
+        if (args.length > 0) {
+            return args.join('&');
+        }
+
+        return '';
+    };
 };
 
-/*
-    Converts a base URL and optional arguments
-    into a full-featured HIS URL.
-
-    The base URL itself must not contain any arguments.
-    The args parameter is expected to be a JSON object.
-*/
-his._getUrl = function (baseUrl, args) {
-    if (args != null) {
-        return baseUrl + '?' + his._argsToString(args);
-    }
-
-    return baseUrl;
-};
-
 
 /*
-    Contructor for an AJAX query.
+    Prototype for an AJAX query.
 */
 his._AjaxQuery = function (method, url, args, data) {
     this.type = method;
-    this.url = his._getUrl(url, args);
+    var requestArgs = his._RequestArgs(args).toString();
+
+    if (requestArgs) {
+        this.url = url + '?' + requestArgs;
+    } else {
+        this.url = url;
+    }
 
     if (data != null) {
         if (typeof data === 'string') {

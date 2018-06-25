@@ -39,7 +39,7 @@ his.session = his.session || {};
     Writes the session to local storage.
 */
 his.session._set = function (session) {
-    localStorage.setItem(his.SESSION_KEY, JSON.stringify(session));
+    sessionStorage.setItem(his.SESSION_KEY, JSON.stringify(session));
     return session;
 };
 
@@ -49,13 +49,13 @@ his.session._set = function (session) {
 */
 his.session._remove = function () {
     var session = his.getSession();
-    localStorage.removeItem(his.SESSION_KEY);
+    sessionStorage.removeItem(his.SESSION_KEY);
     return session;
 };
 
 
 /*
-    Removes the session from localStorage if the session
+    Removes the session from sessionStorage if the session
     termination call failed only because the session has gone.
 */
 his.session._handleTerminationError = function (error) {

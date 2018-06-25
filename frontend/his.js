@@ -178,7 +178,7 @@ his.delete = function (url, args) {
     Retrieves the session from local storage.
 */
 his.getSession = function () {
-    var sessionString = localStorage.getItem(his.SESSION_KEY);
+    var sessionString = sessionStorage.getItem(his.SESSION_KEY);
 
     if (sessionString == null) {
         throw 'Not logged in.';

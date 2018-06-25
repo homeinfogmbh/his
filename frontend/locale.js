@@ -43,7 +43,7 @@ his.locale.DEFAULT = 'de_DE';
 */
 his.locale.set = function (locale) {
     locale = locale || his.locale.DEFAULT;
-    localStorage.setItem('his.locale', locale);
+    sessionStorage.setItem('his.locale', locale);
 };
 
 
@@ -51,7 +51,7 @@ his.locale.set = function (locale) {
     Sets the current locale.
 */
 his.locale.get = function () {
-    var locale = localStorage.getItem('his.locale');
+    var locale = sessionStorage.getItem('his.locale');
 
     if (locale == null) {
         return his.locale.DEFAULT;
@@ -65,5 +65,5 @@ his.locale.get = function () {
     Deletes the current locale.
 */
 his.locale.delete = function () {
-    localStorage.removeItem('his.locale');
+    sessionStorage.removeItem('his.locale');
 };

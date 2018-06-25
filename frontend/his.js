@@ -97,7 +97,11 @@ his._AjaxQuery = function (method, url, args, data) {
     this.url = his._getUrl(url, args);
 
     if (data != null) {
-        this.data = data;
+        if (typeof data === 'string') {
+            this.data = data;
+        } else {
+            this.data = JSON.stringify(data);
+        }
     }
 
     this.toString = function () {

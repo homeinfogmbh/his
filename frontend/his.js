@@ -87,10 +87,11 @@ his._RequestArgs = function (object) {
 */
 his._AjaxQuery = function (method, url, args, data) {
     this.type = method;
-    var requestArgs = his._RequestArgs(args).toString();
+    var requestArgs = new his._RequestArgs(args);
+    var requestString = requestArgs.toString();
 
-    if (requestArgs) {
-        this.url = url + '?' + requestArgs;
+    if (requestString) {
+        this.url = url + '?' + requestString;
     } else {
         this.url = url;
     }

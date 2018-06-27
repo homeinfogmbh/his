@@ -3,17 +3,17 @@
 from datetime import datetime, timedelta
 from contextlib import suppress
 
+from argon2.exceptions import VerifyMismatchError
 from peewee import PrimaryKeyField, ForeignKeyField, CharField, BooleanField, \
     DateTimeField, IntegerField, DoesNotExist
 
 from filedb import FileProperty
 from homeinfo.crm import Customer, Employee
 from homeinfo.misc import classproperty
-from peeweeplus import MySQLDatabase, JSONModel, UUID4Field
+from peeweeplus import MySQLDatabase, JSONModel, UUID4Field, Argon2Field
 from timelib import strpdatetime
 
 from his.config import CONFIG
-from his.crypto import hash_password, verify_password
 from his.messages import AccountLocked, InvalidCredentials, DurationOutOfBounds
 from his.pwmail import mail_password_reset_link
 
@@ -233,7 +233,7 @@ class Account(HISModel):
     user = ForeignKeyField(
         Employee, column_name='user', null=True, related_name='accounts')
     name = CharField(64)
-    _pwhash = CharField(255, column_name='pwhash')
+    passwd = Argon2Field()
     email = CharField(64)
     created = DateTimeField(default=datetime.now)
     deleted = DateTimeField(null=True, default=None)
@@ -313,12 +313,6 @@ class Account(HISModel):
 
         return cls.get(customer_expr & sel_expr)
 
-    def passwd(self, passwd):
-        """Sets the password."""
-        self._pwhash = hash_password(passwd)
-
-    passwd = property(None, passwd)
-
     @property
     def locked(self):
         """Determines whether the user is locked."""
@@ -378,15 +372,17 @@ class Account(HISModel):
     def login(self, passwd):
         """Performs a login."""
         if self.can_login:
-            if verify_password(self._pwhash, passwd):
-                self.failed_logins = 0
-                self.last_login = datetime.now()
+            try:
+                self.passwd.verify(passwd)
+            except VerifyMismatchError:
+                self.failed_logins += 1
                 self.save()
-                return True
+                raise InvalidCredentials()
 
-            self.failed_logins += 1
+            self.failed_logins = 0
+            self.last_login = datetime.now()
             self.save()
-            raise InvalidCredentials()
+            return True
 
         raise AccountLocked()
 

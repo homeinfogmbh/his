@@ -1,10 +1,10 @@
 """Password reset API."""
 
+from peeweeplus import PasswordTooShortError
 from recaptcha import ReCaptcha
 
 from his.api import DATA
 from his.config import CONFIG
-from his.crypto import PasswordTooShortError
 from his.messages.account import NoAccountSpecified, PasswordTooShort
 from his.messages.pwreset import NoTokenSpecified, NoPasswordSpecified, \
     PasswordResetSent, PasswordResetPending, InvalidResetToken, PasswordSet

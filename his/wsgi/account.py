@@ -1,7 +1,9 @@
 """Account management."""
 
+from peeweeplus import PasswordTooShortError
+
 from his.api import DATA, authenticated
-from his.crypto import PasswordTooShortError, genpw
+from his.crypto import genpw
 from his.globals import ACCOUNT, CUSTOMER
 from his.messages.account import NoSuchAccount, NotAuthorized, AccountExists, \
     AccountCreated, AccountPatched, AccountsExhausted, PasswordTooShort

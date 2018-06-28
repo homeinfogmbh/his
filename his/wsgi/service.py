@@ -11,12 +11,12 @@ from his.messages.service import NoServiceSpecified, NoSuchService, \
 from his.orm import InconsistencyError, Service, CustomerService, \
     AccountService
 from his.wsgi.account import get_account
-from his.wsgi.customer import customer_by_name
+from his.wsgi.customer import get_customer
 
 __all__ = ['ROUTES']
 
 
-def service_by_name(name):
+def get_service(name):
     """Returns the respective service."""
 
     try:
@@ -33,12 +33,12 @@ def add_customer_service():
     json = DATA.json
 
     try:
-        customer = customer_by_name(json['customer'])
+        customer = get_customer(json['customer'])
     except KeyError:
         raise NoCustomerSpecified()
 
     try:
-        service = service_by_name(json['service'])
+        service = get_service(json['service'])
     except KeyError:
         raise NoServiceSpecified()
 
@@ -72,7 +72,7 @@ def add_account_service():
         raise NotAuthorized()
 
     try:
-        service = service_by_name(json['service'])
+        service = get_service(json['service'])
     except KeyError:
         raise NoServiceSpecified()
 

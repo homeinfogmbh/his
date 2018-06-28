@@ -10,7 +10,7 @@ from his.messages.service import NoServiceSpecified, NoSuchService, \
     ServiceAdded, ServiceAlreadyEnabled
 from his.orm import InconsistencyError, Service, CustomerService, \
     AccountService
-from his.wsgi.account import account_by_name
+from his.wsgi.account import get_account
 from his.wsgi.customer import customer_by_name
 
 __all__ = ['ROUTES']
@@ -64,7 +64,7 @@ def add_account_service():
     json = DATA.json
 
     try:
-        account = account_by_name(json['account'])
+        account = get_account(json['account'])
     except KeyError:
         raise NoAccountSpecified()
 

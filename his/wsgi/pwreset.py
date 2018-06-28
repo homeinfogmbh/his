@@ -32,6 +32,15 @@ def request_reset():
     """Attempts a password reset request."""
 
     json = DATA.json
+
+    try:
+        response = json['response']
+    except KeyError:
+        return NoReCaptchaResponseProvided()
+
+    if not RE_CAPTCHA.validate(response):
+        return InvalidReCaptchaResponse()
+
     name = json.get('account')
 
     if not name:
@@ -44,17 +53,9 @@ def request_reset():
     except PasswordResetPending_:
         return PasswordResetPending()
 
-    try:
-        response = json['response']
-    except KeyError:
-        return NoReCaptchaResponseProvided()
-
-    if RE_CAPTCHA.validate(response):
-        password_reset_token.save()
-        password_reset_token.email()
-        return PasswordResetSent()
-
-    return InvalidReCaptchaResponse()
+    password_reset_token.save()
+    password_reset_token.email()
+    return PasswordResetSent()
 
 
 def reset_password():

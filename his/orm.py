@@ -614,10 +614,6 @@ class PasswordResetToken(HISModel):
         """Determines whether the token is still valid."""
         return self.created + self.VALIDITY > datetime.now()
 
-    def validate(self, token):
-        """Validates the password reset."""
-        return self.valid and token == self.token
-
     def email(self):
         """Emails the reset link to the respective account."""
         return mail_password_reset_link(self)

@@ -1,5 +1,7 @@
 """Password reset API."""
 
+from uuid import UUID
+
 from peeweeplus import PasswordTooShortError
 from recaptcha import ReCaptcha
 
@@ -67,6 +69,7 @@ def reset_password():
     if not token:
         return NoTokenSpecified()
 
+    token = UUID(token)
     passwd = json.get('passwd')
 
     if not passwd:

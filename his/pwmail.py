@@ -32,7 +32,7 @@ def mail_password_reset_link(password_reset_token):
         template = file.read()
 
     account = password_reset_token.account
-    link = PWRESET_CFG['link'].format(password_reset_token.token)
+    link = PWRESET_CFG['link'].format(password_reset_token.token.hex)
     html = template.format(account=account.name, link=href(link))
     email = EMail(
         PWRESET_CFG['subject'], MAIL_CFG['sender'], account.email,

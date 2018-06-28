@@ -108,8 +108,7 @@ def _patch_account(account, only=None):
                 invalid_keys.append(key)
 
     try:
-        account.patch(patch_dict)
-        account.save()
+        account.patch(patch_dict).save()
     except (TypeError, ValueError):
         raise InvalidData()
     except PasswordTooShortError as password_too_short:

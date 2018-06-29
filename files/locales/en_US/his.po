@@ -127,10 +127,16 @@ msgstr "The new password has been set."
 
 ### ReCAPTCHA messages. ###
 
-msgid "NoReCaptchaResponseProvided"
+msgid "NoResponseProvided"
 msgstr "No ReCAPTCHA response provided."
 
-msgid "InvalidReCaptchaResponse"
+msgid "NoSiteKeyProvided"
+msgstr "No ReCAPTCHA site key provided."
+
+msgid "SiteNotConfigured"
+msgstr "This site is not configured to use ReCAPTCHA."
+
+msgid "InvalidResponse"
 msgstr "Invalid ReCAPTCHA response."
 
 ### Service messages. ###

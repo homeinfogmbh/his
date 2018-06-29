@@ -105,9 +105,7 @@ def refresh(session_token):
 
 @authenticated
 def close(session_token):
-    """Tries to close a specific session identified by its token or
-    all sessions for a certain account specified by its name.
-    """
+    """Closes the provided session."""
 
     session = _get_session_by_token(session_token)
     session.close()

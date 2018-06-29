@@ -24,7 +24,7 @@ def _get_account(name):
     try:
         return Account.get(Account.name == name)
     except Account.DoesNotExist:
-        raise PasswordResetSent()   # Avoid spoofing.
+        raise PasswordResetSent()   # Avoid account sniffing.
 
 
 def request_reset():

@@ -26,7 +26,7 @@ def _get_account(name_or_id):
 
 
 def get_account(name_or_id):
-    """Safely returns the respective account while preventing spoofing."""
+    """Safely returns the respective account."""
 
     if ACCOUNT.root:
         try:
@@ -37,7 +37,7 @@ def get_account(name_or_id):
     try:
         account = _get_account(name_or_id)
     except Account.DoesNotExist:
-        raise NotAuthorized()   # Prevent account name spoofing.
+        raise NotAuthorized()   # Prevent account name sniffing.
 
     if ACCOUNT.admin:
         if account.customer == CUSTOMER:

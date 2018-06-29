@@ -33,7 +33,7 @@ def request_reset():
     json = DATA.json
 
     try:
-        site_key = json['siteKey']
+        site_key = json['sitekey']
     except KeyError:
         raise NoSiteKeyProvided()
 

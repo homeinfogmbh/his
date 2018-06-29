@@ -3,7 +3,7 @@
 from uuid import UUID
 
 from peeweeplus import PasswordTooShortError
-from recaptcha import ValidationError, ReCaptcha
+from recaptcha import VerificationError, ReCaptcha
 
 from his.api import DATA
 from his.config import RECAPTCHA
@@ -48,8 +48,8 @@ def request_reset():
         raise NoResponseProvided()
 
     try:
-        ReCaptcha(secret).validate(response)
-    except ValidationError:
+        ReCaptcha(secret).verify(response)
+    except VerificationError:
         raise InvalidResponse()
 
     name = json.get('account')

@@ -8,7 +8,7 @@ from peewee import PrimaryKeyField, ForeignKeyField, CharField, BooleanField, \
     DateTimeField, IntegerField, DoesNotExist
 
 from filedb import FileProperty
-from homeinfo.crm import Customer, Employee
+from mdb import Customer, Employee
 from peeweeplus import MySQLDatabase, JSONModel, UUID4Field, Argon2Field
 from timelib import strpdatetime
 

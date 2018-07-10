@@ -32,7 +32,8 @@ from sys import exit as exit_, stderr
 
 from docopt import docopt
 
-from homeinfo.crm import Customer
+from mdb import Customer
+
 from his.orm import ServiceExistsError, AccountExistsError, Account, Service, \
     CustomerService, AccountService
 

@@ -1,6 +1,6 @@
 """Customer-level meta services."""
 
-from homeinfo.crm import Customer
+from mdb import Customer
 from wsgilib import JSON, Binary
 
 from his.api import authenticated, root

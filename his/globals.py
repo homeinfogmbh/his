@@ -3,7 +3,7 @@
 from flask import request
 from werkzeug.local import LocalProxy
 
-from homeinfo.crm import Customer
+from mdb import Customer
 
 from his.messages import NoSuchAccount, NotAuthorized, NoSuchCustomer, \
     InvalidCustomerID, NoSessionSpecified, NoSuchSession

@@ -7,7 +7,7 @@ setup(
     name='his',
     version='latest',
     author='Richard Neumann',
-    requires=['homeinfo.crm'],
+    requires=['mdb'],
     packages=['his', 'his.messages', 'his.wsgi'],
     scripts=['files/hisutil', 'files/his-session-cleanup'],
     data_files=[('/etc/his.d', ['files/pwreset.html'])],

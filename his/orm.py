@@ -9,7 +9,6 @@ from peewee import PrimaryKeyField, ForeignKeyField, CharField, BooleanField, \
 
 from filedb import FileProperty
 from homeinfo.crm import Customer, Employee
-from homeinfo.misc import classproperty
 from peeweeplus import MySQLDatabase, JSONModel, UUID4Field, Argon2Field
 from timelib import strpdatetime
 
@@ -258,12 +257,6 @@ class Account(HISModel):
     def __str__(self):
         """Returns the login name and appropriate customer."""
         return '{}@{}'.format(repr(self), self.customer.id)
-
-    @classproperty
-    @classmethod
-    def superadmins(cls):
-        """Yields all root users aka. super-admins."""
-        return cls.select().where(cls.root == 1)
 
     @classmethod
     def add(cls, customer, name, email, passwd, user=None, admin=False,

@@ -146,7 +146,8 @@ def add():
 
     if ACCOUNT.root:
         return _add_account()
-    elif ACCOUNT.admin:
+
+    if ACCOUNT.admin:
         try:
             settings = CustomerSettings.get(
                 CustomerSettings.customer == CUSTOMER)
@@ -178,7 +179,8 @@ def patch(name):
 
     if ACCOUNT.root:
         return _patch_account(account)
-    elif ACCOUNT.admin and CUSTOMER == account.customer:
+
+    if ACCOUNT.admin and CUSTOMER == account.customer:
         return _patch_account(
             account, only=('name', 'passwd', 'email', 'admin'))
 

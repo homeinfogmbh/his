@@ -28,9 +28,11 @@ def get_customer(name):
     except Customer.DoesNotExist:
         raise NoSuchCustomer()
 
-    if ACCOUNT.root:
-        return customer
-    elif ACCOUNT.admin and CUSTOMER == ACCOUNT.customer:
+    conditions = (
+        lambda: ACCOUNT.root,
+        lambda: ACCOUNT.admin and CUSTOMER == ACCOUNT.customer)
+
+    if any(condition() for condition in conditions):
         return customer
 
     raise NoSuchCustomer()

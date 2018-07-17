@@ -36,11 +36,12 @@ def _get_session_by_token(session_token):
     except Session.DoesNotExist:
         raise NoSuchSession()
 
-    if SESSION.token == session.token:
-        return session
-    elif ACCOUNT.root:
-        return session
-    elif ACCOUNT.admin and session.account.customer == ACCOUNT.customer:
+    conditions = (
+        lambda: SESSION.token == session.token,
+        lambda: ACCOUNT.root,
+        lambda: ACCOUNT.admin and session.account.customer == ACCOUNT.customer)
+
+    if any(condition() for condition in conditions):
         return session
 
     raise NoSuchSession()
@@ -73,14 +74,13 @@ def list_():
     """Lists all sessions iff specified session is root."""
 
     if ACCOUNT.root:
-        sessions = {session.token: session.to_dict() for session in Session}
-        return JSON(sessions)
-    elif ACCOUNT.admin:
-        sessions = {
+        return JSON({session.token: session.to_dict() for session in Session})
+
+    if ACCOUNT.admin:
+        return JSON({
             session.token: session.to_dict() for session in
             Session.select().join(Account).where(
-                Account.customer == ACCOUNT.customer)}
-        return JSON(sessions)
+                Account.customer == ACCOUNT.customer)})
 
     raise NotAuthorized()
 

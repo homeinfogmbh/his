@@ -162,7 +162,8 @@ class Service(HISModel):
         """
         if account.root:
             return True
-        elif self in CustomerService.services(account.customer):
+
+        if self in CustomerService.services(account.customer):
             return account.admin or self in account.services
 
         return False

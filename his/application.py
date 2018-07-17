@@ -1,5 +1,7 @@
 """Basic HIS application."""
 
+from itertools import chain
+
 from peeweeplus import FieldValueError, FieldNotNullable, MissingKeyError, \
     InvalidKeys, InvalidEnumerationValue
 from wsgilib import Application as _Application
@@ -20,9 +22,10 @@ ERROR_HANDLERS = (
 class Application(_Application):
     """Extends wsgilib's application."""
 
-    def __init__(self, *args, cors=False, debug=False, errorhandlers=(),
+    def __init__(self, *args, cors=False, debug=False, errorhandlers=None,
                  **kwargs):
         """Sets default error handlers."""
+        errorhandlers = tuple(chain(ERROR_HANDLERS, errorhandlers or ()))
         super().__init__(
-            *args, cors=cors, debug=debug,
-            errorhandlers=ERROR_HANDLERS + errorhandlers, **kwargs)
+            *args, cors=cors, debug=debug, errorhandlers=errorhandlers,
+            **kwargs)

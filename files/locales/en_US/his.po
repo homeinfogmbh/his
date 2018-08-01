@@ -66,9 +66,6 @@ msgstr "Customer has no configuration."
 msgid "DataError"
 msgstr "Data error."
 
-msgid "NoDataProvided"
-msgstr "No data provided."
-
 msgid "MissingData"
 msgstr "Missing data."
 
@@ -95,12 +92,6 @@ msgstr "Invalid enumeration value."
 
 msgid "NotAnInteger"
 msgstr "Not an integer."
-
-msgid "InvalidUTF8Data"
-msgstr "Invalid UTF-8 data."
-
-msgid "InvalidJSON"
-msgstr "Invalid JSON object."
 
 msgid "InvalidCustomerID"
 msgstr "Invalid customer ID specified."

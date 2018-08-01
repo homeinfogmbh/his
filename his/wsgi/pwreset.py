@@ -2,10 +2,11 @@
 
 from uuid import UUID
 
+from flask import request
+
 from peeweeplus import PasswordTooShortError
 from recaptcha import VerificationError, ReCaptcha
 
-from his.api import DATA
 from his.config import RECAPTCHA
 from his.messages.account import NoAccountSpecified, PasswordTooShort
 from his.messages.pwreset import NoTokenSpecified, NoPasswordSpecified, \
@@ -30,10 +31,8 @@ def _get_account(name):
 def request_reset():
     """Attempts a password reset request."""
 
-    json = DATA.json
-
     try:
-        site_key = json['sitekey']
+        site_key = request.json['sitekey']
     except KeyError:
         raise NoSiteKeyProvided()
 
@@ -43,7 +42,7 @@ def request_reset():
         raise SiteNotConfigured()
 
     try:
-        response = json['response']
+        response = request.json['response']
     except KeyError:
         raise NoResponseProvided()
 
@@ -52,7 +51,7 @@ def request_reset():
     except VerificationError:
         raise InvalidResponse()
 
-    name = json.get('account')
+    name = request.json.get('account')
 
     if not name:
         raise NoAccountSpecified()
@@ -72,14 +71,13 @@ def request_reset():
 def reset_password():
     """Actually performs a password reset."""
 
-    json = DATA.json
-    token = json.get('token')
+    token = request.json.get('token')
 
     if not token:
         raise NoTokenSpecified()
 
     token = UUID(token)
-    passwd = json.get('passwd')
+    passwd = request.json.get('passwd')
 
     if not passwd:
         raise NoPasswordSpecified()

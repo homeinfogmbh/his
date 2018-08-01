@@ -1,8 +1,10 @@
 """HIS meta services."""
 
+from flask import request
+
 from wsgilib import JSON
 
-from his.api import DATA, authenticated, root, admin
+from his.api import authenticated, root, admin
 from his.globals import SESSION, ACCOUNT, CUSTOMER
 from his.messages.account import NotAuthorized, NoAccountSpecified
 from his.messages.customer import NoCustomerSpecified
@@ -30,15 +32,13 @@ def get_service(name):
 def add_customer_service():
     """Allows the respective customer to use the given service."""
 
-    json = DATA.json
-
     try:
-        customer = get_customer(json['customer'])
+        customer = get_customer(request.json['customer'])
     except KeyError:
         raise NoCustomerSpecified()
 
     try:
-        service = get_service(json['service'])
+        service = get_service(request.json['service'])
     except KeyError:
         raise NoServiceSpecified()
 
@@ -61,10 +61,8 @@ def add_customer_service():
 def add_account_service():
     """Allows the respective account to use the given service."""
 
-    json = DATA.json
-
     try:
-        account = get_account(json['account'])
+        account = get_account(request.json['account'])
     except KeyError:
         raise NoAccountSpecified()
 
@@ -72,7 +70,7 @@ def add_account_service():
         raise NotAuthorized()
 
     try:
-        service = get_service(json['service'])
+        service = get_service(request.json['service'])
     except KeyError:
         raise NoServiceSpecified()
 

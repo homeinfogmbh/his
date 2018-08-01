@@ -66,9 +66,6 @@ msgstr "Kunde besitzt keine Konfiguration."
 msgid "DataError"
 msgstr "Datenfehler."
 
-msgid "NoDataProvided"
-msgstr "Keine Daten übermittelt."
-
 msgid "MissingData"
 msgstr "Felende Daten."
 
@@ -95,12 +92,6 @@ msgstr "Ungültiger Aufzählungswert."
 
 msgid "NotAnInteger"
 msgstr "Keine Ganzzahl."
-
-msgid "InvalidUTF8Data"
-msgstr "Fehlerhafte UTF-8 Daten."
-
-msgid "InvalidJSON"
-msgstr "Fehlerhaftes JSON Objekt."
 
 msgid "InvalidCustomerID"
 msgstr "Ungültige Kundennummer angegeben."

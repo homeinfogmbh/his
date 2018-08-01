@@ -85,7 +85,7 @@ his._RequestArgs = function (object) {
 /*
     Prototype for an AJAX query.
 */
-his._AjaxQuery = function (method, url, args, data) {
+his._AjaxQuery = function (method, url, args, data, contentType) {
     this.type = method;
     var requestArgs = new his._RequestArgs(args);
     var requestString = requestArgs.toString();
@@ -96,10 +96,16 @@ his._AjaxQuery = function (method, url, args, data) {
         this.url = url;
     }
 
+    if (contentType == null) {
+        this.contentType = 'application/json';
+    } else {
+        this.contentType = contentType;
+    }
+
     if (data != null) {
         if (typeof data === 'string') {
             this.data = data;
-        } else {
+        } else if (contentType == 'application/json') {
             this.data = JSON.stringify(data);
         }
     }
@@ -113,8 +119,8 @@ his._AjaxQuery = function (method, url, args, data) {
 /*
     Makes an AJAX call to the respective HIS backend.
 */
-his._query = function (method, url, data, args) {
-    var ajaxQuery = new his._AjaxQuery(method, url, args, data);
+his._query = function (method, url, args, data, contentType) {
+    var ajaxQuery = new his._AjaxQuery(method, url, args, data, contentType);
     his._debug('Performing ajax query.');
     his._debug(ajaxQuery);
     return jQuery.ajax(ajaxQuery);
@@ -142,31 +148,31 @@ his._authorized = function (args) {
     Makes a GET request to the respective HIS backend.
 */
 his.get = function (url, args) {
-    return his._query('GET', url, null, args);
+    return his._query('GET', url, args);
 };
 
 
 /*
     Makes a POST request to the respective HIS backend.
 */
-his.post = function (url, data, args) {
-    return his._query('POST', url, data, args);
+his.post = function (url, args, data, contentType) {
+    return his._query('POST', url, args, data, contentType);
 };
 
 
 /*
     Makes a PATCH request to the respective HIS backend.
 */
-his.patch = function (url, data, args) {
-    return his._query('PATCH', url, data, args);
+his.patch = function (url, args, data, contentType) {
+    return his._query('PATCH', url, args, data, contentType);
 };
 
 
 /*
     Makes a PUT request to the respective HIS backend.
 */
-his.put = function (url, data, args) {
-    return his._query('PUT', url, data, args);
+his.put = function (url, args, data, contentType) {
+    return his._query('PUT', url, args, data, contentType);
 };
 
 
@@ -174,7 +180,7 @@ his.put = function (url, data, args) {
     Makes an DELETE request to the respective HIS backend.
 */
 his.delete = function (url, args) {
-    return his._query('DELETE', url, null, args);
+    return his._query('DELETE', url, args);
 };
 
 
@@ -217,24 +223,24 @@ his.auth.get = function (url, args) {
 /*
     Performs an authorized POST request.
 */
-his.auth.post = function (url, data, args) {
-    return his.post(url, data, his._authorized(args));
+his.auth.post = function (url, args, data, contentType) {
+    return his.post(url, his._authorized(args), data, contentType);
 };
 
 
 /*
     Performs an authorized PATCH request.
 */
-his.auth.patch = function (url, data, args) {
-    return his.patch(url, data, his._authorized(args));
+his.auth.patch = function (url, args, data, contentType) {
+    return his.patch(url, his._authorized(args), data, contentType);
 };
 
 
 /*
     Performs an authorized PUT request.
 */
-his.auth.put = function (url, data, args) {
-    return his.put(url, data, his._authorized(args));
+his.auth.put = function (url, args, data, contentType) {
+    return his.put(url, his._authorized(args), data, contentType);
 };
 
 

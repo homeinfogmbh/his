@@ -81,7 +81,7 @@ his.account.add = function (account, args) {
 /*
     Adds an account.
 */
-his.account.patch = function (name, accountPatch, args) {
+his.account.patch = function (name, args, accountPatch) {
     name = name || '!';
     var url = his.account._getUrl(name);
     var data = JSON.stringify(accountPatch);

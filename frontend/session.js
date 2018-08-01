@@ -89,7 +89,7 @@ his.session.login = function (userName, passwd, args) {
     var url = his.session._getUrl();
     var credentials = {'account': userName, 'passwd': passwd};
     var data = JSON.stringify(credentials);
-    var promise = his.post(url, data, args);
+    var promise = his.post(url, args, data);
     return promise.then(his.session._set);
 };
 

@@ -97,9 +97,7 @@ his._AjaxQuery = function (method, url, args, data, contentType) {
     }
 
     if (contentType == null) {
-        this.contentType = 'application/json';
-    } else {
-        this.contentType = contentType;
+        contentType = 'application/json';
     }
 
     if (data != null) {
@@ -109,6 +107,8 @@ his._AjaxQuery = function (method, url, args, data, contentType) {
             this.data = JSON.stringify(data);
         }
     }
+
+    this.contentType = contentType;
 
     this.toString = function () {
         return JSON.stringify(this);

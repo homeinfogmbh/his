@@ -4,7 +4,6 @@ from his.messages.api import HISMessage
 
 __all__ = [
     'DataError',
-    'NoDataProvided',
     'MissingData',
     'IncompleteData',
     'InvalidData',
@@ -14,8 +13,6 @@ __all__ = [
     'InvalidKeys',
     'InvalidEnumerationValue',
     'NotAnInteger',
-    'InvalidUTF8Data',
-    'InvalidJSON',
     'InvalidCustomerID']
 
 

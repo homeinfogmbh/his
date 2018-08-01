@@ -122,7 +122,7 @@ his._AjaxQuery = function (method, url, args, data, contentType) {
 his._query = function (method, url, args, data, contentType) {
     var ajaxQuery = new his._AjaxQuery(method, url, args, data, contentType);
     his._debug('Performing ajax query.');
-    his._debug(JSON.stringify(ajaxQuery));
+    his._debug(JSON.stringify(ajaxQuery, null, 2));
     return jQuery.ajax(ajaxQuery);
 };
 

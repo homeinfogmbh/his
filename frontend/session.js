@@ -60,7 +60,7 @@ his.session._remove = function () {
 */
 his.session._handleTerminationError = function (error) {
     // Remove session if session does not exist or is gone.
-    if (error.status == 404 || error.status == 404) {
+    if (error.status == 404 || error.status == 410) {
         return Promise.resolve(his.session._remove());
     }
 

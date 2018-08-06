@@ -2,7 +2,7 @@
 
 from functools import wraps
 
-from his.globals import SESSION
+from his.globals import SESSION, ACCOUNT
 from his.messages import NotAuthorized, AccountLocked, NoSuchService, \
     SessionExpired
 from his.orm import Service
@@ -21,13 +21,18 @@ def authenticated(function):
         """Wraps the respective function
         with preceding authentication.
         """
-        if SESSION.account.usable:
-            if SESSION.alive:
-                return function(*args, **kwargs)
-
+        if not SESSION.alive:
             raise SessionExpired()
 
-        raise AccountLocked()
+        account = SESSION.account
+
+        if not account.usable:
+            raise AccountLocked()
+
+        if not account.root and not ACCOUNT.usable:
+            raise AccountLocked()
+
+        return function(*args, **kwargs)
 
     return wrapper
 

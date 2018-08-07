@@ -21,13 +21,13 @@ def authenticated(function):
         """Wraps the respective function
         with preceding authentication.
         """
-        if SESSION.account.usable:
-            if SESSION.alive:
-                return function(*args, **kwargs)
-
+        if not SESSION.alive:
             raise SessionExpired()
 
-        raise AccountLocked()
+        if not SESSION.account.usable:
+            raise AccountLocked()
+
+        return function(*args, **kwargs)
 
     return wrapper
 

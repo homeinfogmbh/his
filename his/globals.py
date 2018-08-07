@@ -5,8 +5,8 @@ from werkzeug.local import LocalProxy
 
 from mdb import Customer
 
-from his.messages import NoSuchAccount, NotAuthorized, NoSuchCustomer, \
-    InvalidCustomerID, NoSessionSpecified, NoSuchSession
+from his.messages import NoSuchAccount, AccountLocked, NotAuthorized, \
+    NoSuchCustomer, InvalidCustomerID, NoSessionSpecified, NoSuchSession
 from his.orm import Session, Account
 
 
@@ -42,9 +42,14 @@ def get_account():
             raise NoSuchAccount()
     elif SESSION.account.admin:
         try:
-            return Account.find(account, customer=CUSTOMER.id)
+            account = Account.find(account, customer=CUSTOMER.id)
         except Account.DoesNotExist:
             raise NoSuchAccount()
+
+        if account.usable:
+            return account
+
+        raise AccountLocked()
 
     raise NotAuthorized()
 

@@ -73,8 +73,10 @@ his._RequestArgs = function (object) {
             }
         }
 
-        if (args.length > 0) {
-            return args.join('&');
+        var string = args.join('&');
+
+        if (string) {
+            return '?' + string;
         }
 
         return '';
@@ -88,13 +90,7 @@ his._RequestArgs = function (object) {
 his._AjaxQuery = function (method, url, args, data, contentType) {
     this.type = method;
     var requestArgs = new his._RequestArgs(args);
-    var requestString = requestArgs.toString();
-
-    if (requestString) {
-        this.url = url + '?' + requestString;
-    } else {
-        this.url = url;
-    }
+    this.url = url + requestArgs;
 
     if (contentType == null) {
         contentType = 'application/json';

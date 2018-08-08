@@ -392,24 +392,6 @@ class Account(HISModel):
 
         return dictionary
 
-    def patch(self, dictionary, **kwargs):
-        """Patches the record from a JSON-like dictionary.""":
-        try:
-            customer = dictionary.pop('customer')
-        except KeyError:
-            pass
-        else:
-            dictionary['customer'] = Customer.get(Customer.id == customer).id
-
-        try:
-            user = dictionary.pop('user')
-        except KeyError:
-            pass
-        else:
-            dictionary['user'] = Employee.get(Employee.id == user).id
-
-        return super().patch(dictionary, **kwargs)
-
 
 class AccountService(HISModel):
     """Many-to-many Account <-> Service mapping."""

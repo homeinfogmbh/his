@@ -232,9 +232,9 @@ class Account(HISModel):
         Customer, column_name='customer', related_name='accounts')
     user = ForeignKeyField(
         Employee, column_name='user', null=True, related_name='accounts')
-    name = CharField(64)
+    name = CharField(64, unique=True)
     passwd = Argon2Field()
-    email = CharField(64)
+    email = CharField(64, unique=True)
     created = DateTimeField(default=datetime.now)
     deleted = DateTimeField(null=True, default=None)
     last_login = DateTimeField(null=True, default=None)
@@ -392,55 +392,23 @@ class Account(HISModel):
 
         return dictionary
 
-    def patch(self, dictionary):
-        """Patches the record from a JSON-like dictionary."""
+    def patch(self, dictionary, **kwargs):
+        """Patches the record from a JSON-like dictionary.""":
         try:
-            email = dictionary['email']
+            customer = dictionary.pop('customer')
         except KeyError:
             pass
         else:
-            try:
-                self.__class__.get(self.__class__.email == email)
-            except DoesNotExist:
-                self.email = email
-            else:
-                raise AmbiguousDataError('email')
-
-        with suppress(KeyError):
-            self.passwd = dictionary['passwd']
-
-        with suppress(KeyError):
-            self.admin = dictionary['admin']
-
-        with suppress(KeyError):
-            self.customer = Customer.get(
-                Customer.id == dictionary['customer'])
-
-        with suppress(KeyError):
-            self.user = Employee.get(Employee.id == dictionary['user'])
+            dictionary['customer'] = Customer.get(Customer.id == customer).id
 
         try:
-            name = dictionary['name']
+            user = dictionary.pop('user')
         except KeyError:
             pass
         else:
-            try:
-                self.__class__.get(self.__class__.name == name)
-            except DoesNotExist:
-                self.name = name
-            else:
-                raise AmbiguousDataError('name')
+            dictionary['user'] = Employee.get(Employee.id == user).id
 
-        with suppress(KeyError):
-            self.failed_logins = dictionary['failed_logins']
-
-        with suppress(KeyError):
-            self.locked_until = strpdatetime(dictionary['locked_until'])
-
-        with suppress(KeyError):
-            self.disabled = dictionary['disabled']
-
-        return self
+        return super().patch(dictionary, **kwargs)
 
 
 class AccountService(HISModel):

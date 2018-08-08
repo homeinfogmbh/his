@@ -18,6 +18,10 @@ from wsgilib import JSON
 __all__ = ['get_account', 'ROUTES']
 
 
+_USER_FIELDS = ('passwd', 'email')
+_ADMIN_FIELDS = ('name', 'passwd', 'email', 'admin')
+
+
 def _get_account(name_or_id):
     """Returns the respective account by its name or ID."""
 
@@ -90,35 +94,19 @@ def _add_account():
     return AccountCreated()
 
 
-def _patch_account(account, only=None):
+def _patch_account(account, allow=()):
     """Patches the respective account with the provided
     dictionary and an optional field restriction.
     """
 
-    invalid_keys = []
-
-    if only is None:
-        patch_dict = request.json
-    else:
-        patch_dict = {}
-
-        for key, value in request.json.items():
-            if key in only:
-                patch_dict[key] = value
-            else:
-                invalid_keys.append(key)
-
     try:
-        account.patch(patch_dict).save()
+        account.patch(request.json, allow=allow).save()
     except (TypeError, ValueError):
         raise InvalidData()
     except PasswordTooShortError as password_too_short:
         raise PasswordTooShort(minlen=password_too_short.minlen)
     except AmbiguousDataError as error:
         raise DataError(field=str(error))
-
-    if invalid_keys:
-        return AccountPatched(invalid_keys=invalid_keys)
 
     return AccountPatched()
 
@@ -174,7 +162,7 @@ def patch(name):
     """Modifies an account."""
 
     if name == '!':
-        return _patch_account(ACCOUNT, only=('passwd', 'email'))
+        return _patch_account(ACCOUNT, allow=_USER_FIELDS)
 
     account = get_account(name)
 
@@ -182,8 +170,7 @@ def patch(name):
         return _patch_account(account)
 
     if ACCOUNT.admin and CUSTOMER == account.customer:
-        return _patch_account(
-            account, only=('name', 'passwd', 'email', 'admin'))
+        return _patch_account(account, allow=_ADMIN_FIELDS)
 
     raise NotAuthorized()
 

@@ -380,18 +380,6 @@ class Account(HISModel):
 
         raise AccountLocked()
 
-    def to_dict(self, null=False, **kwargs):
-        """Returns the account as a JSON-like dictionary."""
-        dictionary = super().to_dict(null=null, **kwargs)
-        dictionary['customer'] = self.customer.id
-
-        if self.user is not None:
-            dictionary['user'] = self.user.to_dict()
-        elif null:
-            dictionary['user'] = None
-
-        return dictionary
-
 
 class AccountService(HISModel):
     """Many-to-many Account <-> Service mapping."""
@@ -503,12 +491,6 @@ class Session(HISModel):
             return False
 
         raise DurationOutOfBounds()
-
-    def to_dict(self, **kwargs):
-        """Converts the session to a dictionary."""
-        dictionary = super().to_dict(**kwargs)
-        dictionary['account'] = self.account.name
-        return dictionary
 
 
 class CustomerSettings(HISModel):

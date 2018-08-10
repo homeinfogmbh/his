@@ -85,6 +85,28 @@ his._RequestArgs = function (object) {
 
 
 /*
+    Determines the content type from the given data.
+*/
+his._getDataAndContentType = function (data) {
+    if (data instanceof FormData) {
+        return 'multipart/form-data';
+    } else if (data instanceof File) {
+        return 'multipart/form-data';
+    } else if (data instanceof Blob) {
+        return 'application/octet-stream';
+    } else if (typeof data === 'string' || data instanceof String) {
+        return 'text/plain';
+    } else if (data instanceof Element) {
+        return 'text/html';
+    } else if (data instanceof Object) {
+        return 'application/json';
+    }
+
+    return null;
+};
+
+
+/*
     Prototype for an AJAX query.
 */
 his._AjaxQuery = function (method, url, args, data, contentType) {
@@ -92,14 +114,12 @@ his._AjaxQuery = function (method, url, args, data, contentType) {
     var requestArgs = new his._RequestArgs(args);
     this.url = url + requestArgs;
 
-    if (contentType == null) {
-        contentType = 'application/json';
-    }
-
     if (data != null) {
-        if (typeof data === 'string') {
-            this.data = data;
-        } else if (contentType == 'application/json') {
+        if (contentType == null) {
+            contentType = his._getContentType(data);
+        }
+
+        if (contentType == 'application/json' && data instanceof Object) {
             this.data = JSON.stringify(data);
         }
     }

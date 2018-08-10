@@ -87,7 +87,7 @@ his._RequestArgs = function (object) {
 /*
     Determines the content type from the given data.
 */
-his._getDataAndContentType = function (data) {
+his._getContentType = function (data) {
     if (data instanceof FormData) {
         return 'multipart/form-data';
     } else if (data instanceof File) {

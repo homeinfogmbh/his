@@ -1,14 +1,15 @@
 """ORM models."""
 
 from datetime import datetime, timedelta
+from uuid import uuid4
 
 from argon2.exceptions import VerifyMismatchError
 from peewee import AutoField, ForeignKeyField, CharField, BooleanField, \
-    DateTimeField, IntegerField, DoesNotExist
+    DateTimeField, IntegerField, UUIDField
 
 from filedb import FileProperty
 from mdb import Customer, Employee
-from peeweeplus import MySQLDatabase, JSONModel, UUID4Field, Argon2Field
+from peeweeplus import MySQLDatabase, JSONModel, JSONField, Argon2Field
 
 from his.config import CONFIG
 from his.messages import AccountLocked, InvalidCredentials, DurationOutOfBounds
@@ -119,19 +120,16 @@ class HISModel(JSONModel):
         database = DATABASE
         schema = database.database
 
-    id = AutoField()
-    JSON_FIELDS = {id: 'id'}
+    id = JSONField(AutoField)
 
 
 class Service(HISModel):
     """Registers services of HIS."""
 
-    name = CharField(32, null=True, default=None)
-    description = CharField(255, null=True, default=None)
+    name = JSONField(CharField, 32, null=True, default=None)
+    description = JSONField(CharField, 255, null=True, default=None)
     # Flag whether the service shall be promoted.
-    promote = BooleanField(default=True)
-    JSON_FIELDS = {
-        name: 'name', description: 'description', promote: 'promote'}
+    promote = JSONField(BooleanField, default=True)
 
     def __str__(self):
         """Returns the service's name."""
@@ -176,14 +174,12 @@ class CustomerService(HISModel):
     class Meta:
         table_name = 'customer_service'
 
-    customer = ForeignKeyField(
-        Customer, column_name='customer', on_delete='CASCADE')
-    service = ForeignKeyField(
-        Service, column_name='service', on_delete='CASCADE')
-    begin = DateTimeField(null=True, default=None)
-    end = DateTimeField(null=True, default=None)
-    JSON_FIELDS = {
-        customer: 'customer', service: 'service', begin: 'begin', end: 'end'}
+    customer = JSONField(
+        ForeignKeyField, Customer, column_name='customer', on_delete='CASCADE')
+    service = JSONField(
+        ForeignKeyField, Service, column_name='service', on_delete='CASCADE')
+    begin = JSONField(DateTimeField, null=True, default=None)
+    end = JSONField(DateTimeField, null=True, default=None)
 
     def __str__(self):
         return '{}@{}'.format(repr(self.customer), str(self.service))
@@ -231,29 +227,28 @@ class CustomerService(HISModel):
 class Account(HISModel):
     """A HIS account."""
 
-    customer = ForeignKeyField(
-        Customer, column_name='customer', related_name='accounts')
-    user = ForeignKeyField(
-        Employee, column_name='user', null=True, related_name='accounts')
-    name = CharField(64, unique=True)
+    customer = JSONField(
+        ForeignKeyField, Customer, column_name='customer',
+        related_name='accounts')
+    user = JSONField(
+        ForeignKeyField, Employee, column_name='user', null=True,
+        related_name='accounts')
+    name = JSONField(CharField, 64, unique=True)
     passwd = Argon2Field()
-    email = CharField(64, unique=True)
-    created = DateTimeField(default=datetime.now)
-    deleted = DateTimeField(null=True, default=None)
-    last_login = DateTimeField(null=True, default=None)
-    failed_logins = IntegerField(default=0)
-    locked_until = DateTimeField(null=True, default=None)
-    disabled = BooleanField(default=False)
+    email = JSONField(CharField, 64, unique=True)
+    created = JSONField(DateTimeField, default=datetime.now)
+    deleted = JSONField(DateTimeField, null=True, default=None)
+    last_login = JSONField(
+        DateTimeField, null=True, default=None, key='lastLogin')
+    failed_logins = JSONField(IntegerField, default=0, key='failedLogins')
+    locked_until = JSONField(
+        DateTimeField, null=True, default=None, key='lockedUntil')
+    disabled = JSONField(BooleanField, default=False)
     # Flag, whether the account is an administrator of its customer (=company).
-    admin = BooleanField(default=False)
+    admin = JSONField(BooleanField, default=False)
     # Flag, whether the user is a super-admin of the system.
     # Such accounts can do ANYTHING!
-    root = BooleanField(default=False)
-    JSON_FIELDS = {
-        customer: 'customer', user: 'user', name: 'name', email: 'email',
-        created: 'created', deleted: 'deleted', last_login: 'lastLogin',
-        failed_logins: 'failedLogins', locked_until: 'lockedUntil',
-        disabled: 'disabled', admin: 'admin', root: 'root'}
+    root = JSONField(BooleanField, default=False)
 
     def __int__(self):
         """Returns the account's ID."""
@@ -273,10 +268,10 @@ class Account(HISModel):
         """Adds a new account."""
         try:
             cls.get(cls.email == email)
-        except DoesNotExist:
+        except cls.DoesNotExist:
             try:
                 cls.get(cls.name == name)
-            except DoesNotExist:
+            except cls.DoesNotExist:
                 account = cls()
                 account.customer = customer
                 account.name = name
@@ -395,11 +390,10 @@ class AccountService(HISModel):
     class Meta:
         table_name = 'account_service'
 
-    account = ForeignKeyField(
-        Account, column_name='account', on_delete='CASCADE')
-    service = ForeignKeyField(
-        Service, column_name='service', on_delete='CASCADE')
-    JSON_FIELDS = {account: 'account', service: 'service'}
+    account = JSONField(
+        ForeignKeyField, Account, column_name='account', on_delete='CASCADE')
+    service = JSONField(
+        ForeignKeyField, Service, column_name='service', on_delete='CASCADE')
 
     def __str__(self):
         return '{}@{}'.format(str(self.account), str(self.service))
@@ -420,7 +414,7 @@ class Session(HISModel):
 
     account = ForeignKeyField(
         Account, column_name='account', on_delete='CASCADE')
-    token = UUID4Field()
+    token = UUIDField(default=uuid4)
     start = DateTimeField()
     end = DateTimeField()
     login = BooleanField(default=True)  # Login session or keep-alive?
@@ -502,12 +496,12 @@ class CustomerSettings(HISModel):
     class Meta:
         table_name = 'customer_settings'
 
-    customer = ForeignKeyField(
-        Customer, column_name='customer', on_delete='CASCADE')
-    max_accounts = IntegerField(null=True, default=10)
+    customer = JSONField(
+        ForeignKeyField, Customer, column_name='customer', on_delete='CASCADE')
+    max_accounts = JSONField(
+        IntegerField, null=True, default=10, key='maxAccounts')
     _logo = IntegerField(column_name='logo', null=True)
     logo = FileProperty(_logo)
-    JSON_FIELDS = {customer: 'customer', max_accounts: 'maxAccounts'}
 
 
 class PasswordResetToken(HISModel):
@@ -518,10 +512,10 @@ class PasswordResetToken(HISModel):
     class Meta:
         table_name = 'password_reset_token'
 
-    account = ForeignKeyField(
-        Account, column_name='account', on_delete='CASCADE')
-    token = UUID4Field()
-    created = DateTimeField(default=datetime.now)
+    account = JSONField(
+        ForeignKeyField, Account, column_name='account', on_delete='CASCADE')
+    token = JSONField(UUIDField, default=uuid4)
+    created = JSONField(DateTimeField, default=datetime.now)
 
     @classmethod
     def add(cls, account):

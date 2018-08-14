@@ -412,15 +412,12 @@ class Session(HISModel):
 
     ALLOWED_DURATIONS = range(5, 31)
 
-    account = ForeignKeyField(
-        Account, column_name='account', on_delete='CASCADE')
-    token = UUIDField(default=uuid4)
-    start = DateTimeField()
-    end = DateTimeField()
-    login = BooleanField(default=True)  # Login session or keep-alive?
-    JSON_FIELDS = {
-        account: 'account', token: 'token', start: 'start', end: 'end',
-        login: 'login'}
+    account = JSONField(
+        ForeignKeyField, Account, column_name='account', on_delete='CASCADE')
+    token = JSONField(UUIDField, default=uuid4)
+    start = JSONField(DateTimeField)
+    end = JSONField(DateTimeField)
+    login = JSONField(BooleanField, default=True)
 
     def __repr__(self):
         """Returns a unique string representation."""

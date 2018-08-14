@@ -30,7 +30,7 @@ def get_customer(name):
 
     conditions = (
         lambda: ACCOUNT.root,
-        lambda: ACCOUNT.admin and CUSTOMER == ACCOUNT.customer)
+        lambda: ACCOUNT.admin and customer == ACCOUNT.customer)
 
     if any(condition() for condition in conditions):
         return customer

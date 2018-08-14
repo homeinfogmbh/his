@@ -1,16 +1,14 @@
 """ORM models."""
 
 from datetime import datetime, timedelta
-from contextlib import suppress
 
 from argon2.exceptions import VerifyMismatchError
-from peewee import PrimaryKeyField, ForeignKeyField, CharField, BooleanField, \
+from peewee import AutoField, ForeignKeyField, CharField, BooleanField, \
     DateTimeField, IntegerField, DoesNotExist
 
 from filedb import FileProperty
 from mdb import Customer, Employee
 from peeweeplus import MySQLDatabase, JSONModel, UUID4Field, Argon2Field
-from timelib import strpdatetime
 
 from his.config import CONFIG
 from his.messages import AccountLocked, InvalidCredentials, DurationOutOfBounds
@@ -121,7 +119,8 @@ class HISModel(JSONModel):
         database = DATABASE
         schema = database.database
 
-    id = PrimaryKeyField()
+    id = AutoField()
+    JSON_FIELDS = {id: 'id'}
 
 
 class Service(HISModel):
@@ -131,6 +130,8 @@ class Service(HISModel):
     description = CharField(255, null=True, default=None)
     # Flag whether the service shall be promoted.
     promote = BooleanField(default=True)
+    JSON_FIELDS = {
+        name: 'name', description: 'description', promote: 'promote'}
 
     def __str__(self):
         """Returns the service's name."""
@@ -181,6 +182,8 @@ class CustomerService(HISModel):
         Service, column_name='service', on_delete='CASCADE')
     begin = DateTimeField(null=True, default=None)
     end = DateTimeField(null=True, default=None)
+    JSON_FIELDS = {
+        customer: 'customer', service: 'service', begin: 'begin', end: 'end'}
 
     def __str__(self):
         return '{}@{}'.format(repr(self.customer), str(self.service))
@@ -246,6 +249,11 @@ class Account(HISModel):
     # Flag, whether the user is a super-admin of the system.
     # Such accounts can do ANYTHING!
     root = BooleanField(default=False)
+    JSON_FIELDS = {
+        customer: 'customer', user: 'user', name: 'name', email: 'email',
+        created: 'created', deleted: 'deleted', last_login: 'lastLogin',
+        failed_logins: 'failedLogins', locked_until: 'lockedUntil',
+        disabled: 'disabled', admin: 'admin', root: 'root'}
 
     def __int__(self):
         """Returns the account's ID."""
@@ -391,6 +399,7 @@ class AccountService(HISModel):
         Account, column_name='account', on_delete='CASCADE')
     service = ForeignKeyField(
         Service, column_name='service', on_delete='CASCADE')
+    JSON_FIELDS = {account: 'account', service: 'service'}
 
     def __str__(self):
         return '{}@{}'.format(str(self.account), str(self.service))
@@ -415,6 +424,9 @@ class Session(HISModel):
     start = DateTimeField()
     end = DateTimeField()
     login = BooleanField(default=True)  # Login session or keep-alive?
+    JSON_FIELDS = {
+        account: 'account', token: 'token', start: 'start', end: 'end',
+        login: 'login'}
 
     def __repr__(self):
         """Returns a unique string representation."""
@@ -466,15 +478,6 @@ class Session(HISModel):
         """Determines whether the session is active."""
         return self.start <= datetime.now() < self.end
 
-    def reload(self):
-        """Re-loads the session information from the database."""
-        return self.__class__.get(
-            (self.__class__.account == self.account) &
-            (self.__class__.token == self.token) &
-            (self.__class__.start == self.start) &
-            (self.__class__.end == self.end) &
-            (self.__class__.login == self.login))
-
     def close(self):
         """Closes the session."""
         return self.delete_instance()
@@ -504,6 +507,7 @@ class CustomerSettings(HISModel):
     max_accounts = IntegerField(null=True, default=10)
     _logo = IntegerField(column_name='logo', null=True)
     logo = FileProperty(_logo)
+    JSON_FIELDS = {customer: 'customer', max_accounts: 'maxAccounts'}
 
 
 class PasswordResetToken(HISModel):

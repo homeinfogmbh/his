@@ -118,7 +118,7 @@ def list_service_customers(name):
     """Lists the customers that may use the current service."""
 
     return JSON([
-        customer_service.customer.to_dict() for customer_service
+        customer_service.customer.to_dict(company=True) for customer_service
         in CustomerService.select().join(Service).where(Service.name == name)])
 
 

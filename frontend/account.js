@@ -73,8 +73,7 @@ his.account.get = function (name, args) {
 */
 his.account.add = function (account, args) {
     var url = his.account._getUrl();
-    var data = JSON.stringify(account);
-    return his.auth.post(url, args, data);
+    return his.auth.post(url, args, account);
 };
 
 
@@ -84,8 +83,7 @@ his.account.add = function (account, args) {
 his.account.patch = function (name, args, accountPatch) {
     name = name || '!';
     var url = his.account._getUrl(name);
-    var data = JSON.stringify(accountPatch);
-    return his.auth.patch(url, args, data);
+    return his.auth.patch(url, args, accountPatch);
 };
 
 

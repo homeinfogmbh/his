@@ -12,11 +12,11 @@ __all__ = ['Application']
 
 
 ERROR_HANDLERS = (
-    (FieldValueError, data.FieldValueError.from_error),
-    (FieldNotNullable, data.FieldNotNullable.from_error),
-    (MissingKeyError, data.MissingKeyError.from_error),
-    (InvalidKeys, data.InvalidKeys.from_error),
-    (InvalidEnumerationValue, data.InvalidEnumerationValue.from_error))
+    (FieldValueError, data.FieldValueError.from_fve),
+    (FieldNotNullable, data.FieldNotNullable.from_fnn),
+    (MissingKeyError, data.MissingKeyError.from_mke),
+    (InvalidKeys, data.InvalidKeys.from_iks),
+    (InvalidEnumerationValue, data.InvalidEnumerationValue.from_iev)
 
 
 class Application(_Application):

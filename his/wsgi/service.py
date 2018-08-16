@@ -87,9 +87,9 @@ def list_services():
     """Lists promoted services."""
 
     if SESSION.account.root:
-        return JSON([service.to_dict() for service in Service])
+        return JSON([service.to_json() for service in Service])
 
-    return JSON([service.to_dict() for service in Service.select().where(
+    return JSON([service.to_json() for service in Service.select().where(
         Service.promote == 1)])
 
 
@@ -98,7 +98,7 @@ def list_services():
 def list_customer_services():
     """Lists services of the respective customer."""
 
-    return JSON([customer_service.service.to_dict() for customer_service
+    return JSON([customer_service.service.to_json() for customer_service
                  in CustomerService.select().where(
                      CustomerService.customer == CUSTOMER.id)])
 
@@ -107,7 +107,7 @@ def list_customer_services():
 def list_account_services():
     """Lists services of the respective account."""
 
-    return JSON([account_service.service.to_dict() for account_service
+    return JSON([account_service.service.to_json() for account_service
                  in AccountService.select().where(
                      AccountService.account == ACCOUNT.id)])
 
@@ -118,7 +118,7 @@ def list_service_customers(name):
     """Lists the customers that may use the current service."""
 
     return JSON([
-        customer_service.customer.to_dict(company=True) for customer_service
+        customer_service.customer.to_json(company=True) for customer_service
         in CustomerService.select().join(Service).where(Service.name == name)])
 
 

@@ -63,7 +63,7 @@ def login():
 
     if account.login(passwd):
         session = Session.open(account, duration=_get_duration())
-        return JSON(session.to_dict())
+        return JSON(session.to_json())
 
     raise InvalidCredentials()
 
@@ -73,11 +73,11 @@ def list_():
     """Lists all sessions iff specified session is root."""
 
     if ACCOUNT.root:
-        return JSON({session.token: session.to_dict() for session in Session})
+        return JSON({session.token: session.to_json() for session in Session})
 
     if ACCOUNT.admin:
         return JSON({
-            session.token: session.to_dict() for session in
+            session.token: session.to_json() for session in
             Session.select().join(Account).where(
                 Account.customer == ACCOUNT.customer)})
 
@@ -88,7 +88,7 @@ def list_():
 def get(session_token):
     """Lists the respective session."""
 
-    return JSON(_get_session_by_token(session_token).to_dict())
+    return JSON(_get_session_by_token(session_token).to_json())
 
 
 @authenticated
@@ -98,7 +98,7 @@ def refresh(session_token):
     session = _get_session_by_token(session_token)
 
     if session.renew(duration=_get_duration()):
-        return JSON(session.to_dict())
+        return JSON(session.to_json())
 
     raise SessionExpired()
 

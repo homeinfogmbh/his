@@ -52,14 +52,14 @@ def _settings():
 def list_():
     """Lists available customers."""
 
-    return JSON([customer.to_dict(company=True) for customer in Customer])
+    return JSON([customer.to_json(company=True) for customer in Customer])
 
 
 @authenticated
 def get(ident):
     """Allows services"""
 
-    return JSON(get_customer(ident).to_dict())
+    return JSON(get_customer(ident).to_json())
 
 
 @authenticated

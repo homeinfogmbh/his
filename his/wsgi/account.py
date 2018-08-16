@@ -47,9 +47,9 @@ def get_account(name_or_id):
 
     if ACCOUNT.admin:
         if account.customer == CUSTOMER:
-            return JSON(account.to_dict())
+            return JSON(account.to_json())
     elif ACCOUNT == account:
-        return JSON(account.to_dict())
+        return JSON(account.to_json())
 
     raise NotAuthorized()
 
@@ -100,7 +100,7 @@ def _patch_account(account, allow=()):
     """
 
     try:
-        account.patch(request.json, allow=allow).save()
+        account.patch_json(request.json, allow=allow).save()
     except (TypeError, ValueError):
         raise InvalidData()
     except PasswordTooShortError as password_too_short:
@@ -115,7 +115,7 @@ def _patch_account(account, allow=()):
 def list_():
     """List one or many accounts."""
 
-    return JSON([account.to_dict() for account in ACCOUNT.subjects])
+    return JSON([account.to_json() for account in ACCOUNT.subjects])
 
 
 @authenticated
@@ -124,9 +124,9 @@ def get(name):
 
     if name == '!':
         # Return the account of the current session.
-        return JSON(ACCOUNT.to_dict())
+        return JSON(ACCOUNT.to_json())
 
-    return JSON(get_account(name).to_dict())
+    return JSON(get_account(name).to_json())
 
 
 @authenticated

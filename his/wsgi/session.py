@@ -54,18 +54,22 @@ def login():
     passwd = request.json.get('passwd')
 
     if not account or not passwd:
-        raise MissingCredentials()
+        return MissingCredentials()
 
     try:
         account = Account.get(Account.name == account)
     except Account.DoesNotExist:
-        raise InvalidCredentials()
+        return InvalidCredentials()
 
     if account.login(passwd):
+        if account.passwd.needs_rehash:
+            account.passwd = passwd
+            account.save()
+
         session = Session.open(account, duration=_get_duration())
         return JSON(session.to_json())
 
-    raise InvalidCredentials()
+    return InvalidCredentials()
 
 
 @authenticated
@@ -81,7 +85,7 @@ def list_():
             Session.select().join(Account).where(
                 Account.customer == ACCOUNT.customer)})
 
-    raise NotAuthorized()
+    return NotAuthorized()
 
 
 @authenticated
@@ -100,7 +104,7 @@ def refresh(session_token):
     if session.renew(duration=_get_duration()):
         return JSON(session.to_json())
 
-    raise SessionExpired()
+    return SessionExpired()
 
 
 @authenticated

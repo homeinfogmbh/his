@@ -34,34 +34,34 @@ def request_reset():
     try:
         site_key = request.json['sitekey']
     except KeyError:
-        raise NoSiteKeyProvided()
+        return NoSiteKeyProvided()
 
     try:
         secret = RECAPTCHA[site_key]
     except KeyError:
-        raise SiteNotConfigured()
+        return SiteNotConfigured()
 
     try:
         response = request.json['response']
     except KeyError:
-        raise NoResponseProvided()
+        return NoResponseProvided()
 
     try:
         ReCaptcha(secret).verify(response)
     except VerificationError:
-        raise InvalidResponse()
+        return InvalidResponse()
 
     name = request.json.get('account')
 
     if not name:
-        raise NoAccountSpecified()
+        return NoAccountSpecified()
 
     account = _get_account(name)
 
     try:
         password_reset_token = PasswordResetToken.add(account)
     except PasswordResetPending_:
-        raise PasswordResetPending()
+        return PasswordResetPending()
 
     password_reset_token.save()
     password_reset_token.email()
@@ -74,28 +74,28 @@ def reset_password():
     token = request.json.get('token')
 
     if not token:
-        raise NoTokenSpecified()
+        return NoTokenSpecified()
 
     token = UUID(token)
     passwd = request.json.get('passwd')
 
     if not passwd:
-        raise NoPasswordSpecified()
+        return NoPasswordSpecified()
 
     try:
         token = PasswordResetToken.get(PasswordResetToken.token == token)
     except PasswordResetToken.DoesNotExist:
-        raise InvalidResetToken()
+        return InvalidResetToken()
 
     if not token.valid:
-        raise InvalidResetToken()
+        return InvalidResetToken()
 
     account = token.account
 
     try:
         account.passwd = passwd
     except PasswordTooShortError as password_too_short:
-        raise PasswordTooShort(minlen=password_too_short.minlen)
+        return PasswordTooShort(minlen=password_too_short.minlen)
 
     token.delete_instance()
     account.save()

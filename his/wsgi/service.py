@@ -35,12 +35,12 @@ def add_customer_service():
     try:
         customer = get_customer(request.json['customer'])
     except KeyError:
-        raise NoCustomerSpecified()
+        return NoCustomerSpecified()
 
     try:
         service = get_service(request.json['service'])
     except KeyError:
-        raise NoServiceSpecified()
+        return NoServiceSpecified()
 
     try:
         CustomerService.get(
@@ -64,20 +64,20 @@ def add_account_service():
     try:
         account = get_account(request.json['account'])
     except KeyError:
-        raise NoAccountSpecified()
+        return NoAccountSpecified()
 
     if account not in ACCOUNT.subjects:
-        raise NotAuthorized()
+        return NotAuthorized()
 
     try:
         service = get_service(request.json['service'])
     except KeyError:
-        raise NoServiceSpecified()
+        return NoServiceSpecified()
 
     try:
         account.services.add(service)
     except InconsistencyError:
-        raise NotAuthorized()
+        return NotAuthorized()
 
     return ServiceAdded()
 

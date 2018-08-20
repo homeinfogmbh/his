@@ -141,7 +141,7 @@ def add():
             settings = CustomerSettings.get(
                 CustomerSettings.customer == CUSTOMER)
         except CustomerSettings.DoesNotExist:
-            raise CustomerUnconfigured()
+            return CustomerUnconfigured()
 
         if settings.max_accounts is None:
             return _add_account()
@@ -152,9 +152,9 @@ def add():
         if accounts < settings.max_accounts:
             return _add_account()
 
-        raise AccountsExhausted()
+        return AccountsExhausted()
 
-    raise NotAuthorized()
+    return NotAuthorized()
 
 
 @authenticated
@@ -172,7 +172,7 @@ def patch(name):
     if ACCOUNT.admin and CUSTOMER == account.customer:
         return _patch_account(account, allow=_ADMIN_FIELDS)
 
-    raise NotAuthorized()
+    return NotAuthorized()
 
 
 ROUTES = (

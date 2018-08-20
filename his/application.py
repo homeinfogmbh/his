@@ -16,7 +16,7 @@ ERROR_HANDLERS = (
     (FieldNotNullable, data.FieldNotNullable.from_fnn),
     (MissingKeyError, data.MissingKeyError.from_mke),
     (InvalidKeys, data.InvalidKeys.from_iks),
-    (InvalidEnumerationValue, data.InvalidEnumerationValue.from_iev)
+    (InvalidEnumerationValue, data.InvalidEnumerationValue.from_iev))
 
 
 class Application(_Application):

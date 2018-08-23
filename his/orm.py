@@ -469,7 +469,7 @@ class Session(HISModel):
     @property
     def live_account(self):
         """Returns the live account from the database."""
-        return Account.get(Account.id == self.acccount_id)
+        return Account.get(Account.id == self.account_id)
 
     def close(self):
         """Closes the session."""

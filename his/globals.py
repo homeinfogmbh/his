@@ -31,14 +31,14 @@ def get_account():
     try:
         account = request.args['account']
     except KeyError:
-        return SESSION.live_account
+        return SESSION.account
 
-    if SESSION.live_account.root:
+    if SESSION.account.root:
         try:
             return Account.find(account)
         except Account.DoesNotExist:
             raise NoSuchAccount()
-    elif SESSION.live_account.admin:
+    elif SESSION.account.admin:
         try:
             account = Account.find(account, customer=CUSTOMER.id)
         except Account.DoesNotExist:
@@ -62,7 +62,7 @@ def get_customer():
     except (TypeError, ValueError):
         raise InvalidCustomerID()
 
-    if SESSION.live_account.root:
+    if SESSION.account.root:
         try:
             return Customer.get(Customer.id == cid)
         except Customer.DoesNotExist:

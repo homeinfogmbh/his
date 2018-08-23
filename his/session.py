@@ -60,7 +60,10 @@ class _SessionCache(dict):
         self.clear()
 
         for session in Session:
-            self[session.token.hex] = session
+            if session.alive:
+                self[session.token.hex] = session
+            else:
+                session.delete_instance()
 
         self.last_refresh = datetime.now()
 

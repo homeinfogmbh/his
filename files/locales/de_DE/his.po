@@ -96,9 +96,6 @@ msgstr "Keine Ganzzahl."
 msgid "InvalidCustomerID"
 msgstr "Ungültige Kundennummer angegeben."
 
-msgid "InvalidUUID"
-msgstr "Ungültige UUID."
-
 ### Pasword reset messages. ###
 
 msgid "NoTokenSpecified"
@@ -132,17 +129,6 @@ msgstr "Die Seite ist nicht für ReCAPTCHA konfiguriert."
 
 msgid "InvalidResponse"
 msgstr "Ungültige ReCAPTCHA Antwort."
-
-### Request messages. ###
-
-msgid "RequestGroupSizeOutOfBounds"
-msgstr "Größe der Request-Gruppe außerhalb des zulässigen Bereichs."
-
-msgid "RequestGroupLimitExceeded"
-msgstr "Request-Gruppen Limit erricht."
-
-msgid "NoSuchRequestGroup"
-msgstr "Keine solche Request-Gruppe."
 
 ### Service messages. ###
 

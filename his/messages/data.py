@@ -102,9 +102,3 @@ class InvalidCustomerID(InvalidData):
     """Indicates that an invalid customer ID was specified."""
 
     pass
-
-
-class InvalidUUID(InvalidData):
-    """Indicates that the respective data is not a valid UUID."""
-
-    pass

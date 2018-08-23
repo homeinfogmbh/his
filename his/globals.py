@@ -1,23 +1,20 @@
 """HIS environment proxies, faking globals."""
 
-from uuid import UUID
-
 from flask import request
 from werkzeug.local import LocalProxy
 
 from mdb import Customer
 
 from his.messages import NoSuchAccount, AccountLocked, NotAuthorized, \
-    NoSuchCustomer, InvalidCustomerID, NoSessionSpecified, NoSuchSession, \
-    InvalidUUID
-from his.orm import Session, Account
-from his.request import REQUEST_GROUPS
+    NoSuchCustomer, InvalidCustomerID, NoSessionSpecified
+from his.orm import Account
+from his.session import SESSIONS
 
 
 __all__ = ['SESSION', 'ACCOUNT', 'CUSTOMER']
 
 
-def _get_session():
+def get_session():
     """Returns the session from the database."""
 
     try:
@@ -25,32 +22,7 @@ def _get_session():
     except KeyError:
         raise NoSessionSpecified()
 
-    try:
-        return Session.get(Session.token == session_token)
-    except Session.DoesNotExist:
-        raise NoSuchSession()
-
-
-def _get_request_group():
-    """Returns the session of the respective request group."""
-
-    try:
-        request_group_token = UUID(request.args['request_group'])
-    except (TypeError, ValueError):
-        raise InvalidUUID()
-
-    return REQUEST_GROUPS.get(request_group_token)
-
-
-def get_session():
-    """Returns the session or raises an error."""
-
-    try:
-        request_group = _get_request_group()
-    except KeyError:
-        return _get_session()
-
-    return request_group.use()
+    return SESSIONS[session_token]
 
 
 def get_account():

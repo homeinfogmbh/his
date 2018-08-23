@@ -96,6 +96,9 @@ msgstr "Not an integer."
 msgid "InvalidCustomerID"
 msgstr "Invalid customer ID specified."
 
+msgid "InvalidUUID"
+msgstr "Invalid UUID."
+
 ### Pasword reset messages. ###
 
 msgid "NoTokenSpecified"
@@ -129,6 +132,17 @@ msgstr "This site is not configured to use ReCAPTCHA."
 
 msgid "InvalidResponse"
 msgstr "Invalid ReCAPTCHA response."
+
+### Request messages. ###
+
+msgid "RequestGroupSizeOutOfBounds"
+msgstr "Request group size out of bounds."
+
+msgid "RequestGroupLimitExceeded"
+msgstr "Request group limit exceeded."
+
+msgid "NoSuchRequestGroup"
+msgstr "No such request group."
 
 ### Service messages. ###
 

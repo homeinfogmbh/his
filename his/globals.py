@@ -1,6 +1,6 @@
 """HIS environment proxies, faking globals."""
 
-from functools import lru_cache
+from uuid import UUID
 
 from flask import request
 from werkzeug.local import LocalProxy
@@ -8,16 +8,22 @@ from werkzeug.local import LocalProxy
 from mdb import Customer
 
 from his.messages import NoSuchAccount, AccountLocked, NotAuthorized, \
-    NoSuchCustomer, InvalidCustomerID, NoSessionSpecified, NoSuchSession
+    NoSuchCustomer, InvalidCustomerID, NoSessionSpecified, NoSuchSession, \
+    InvalidUUID
 from his.orm import Session, Account
+from his.request import REQUEST_GROUPS
 
 
 __all__ = ['SESSION', 'ACCOUNT', 'CUSTOMER']
 
 
-@lru_cache()
-def _get_session(session_token):
-    """Returns the session or raises an error."""
+def _get_session():
+    """Returns the session from the database."""
+
+    try:
+        session_token = request.args['session']
+    except KeyError:
+        raise NoSessionSpecified()
 
     try:
         return Session.get(Session.token == session_token)
@@ -25,15 +31,24 @@ def _get_session(session_token):
         raise NoSuchSession()
 
 
+def _get_request_group_session():
+    """Returns the session of the respective request group."""
+
+    try:
+        request_group_token = UUID(request.args['request_group'])
+    except (TypeError, ValueError):
+        raise InvalidUUID()
+
+    return REQUEST_GROUPS.get_session(request_group_token)
+
+
 def get_session():
     """Returns the session or raises an error."""
 
     try:
-        session_token = request.args['session']
+        return _get_request_group_session()
     except KeyError:
-        raise NoSessionSpecified()
-
-    return _get_session(session_token)
+        return _get_session()
 
 
 def get_account():

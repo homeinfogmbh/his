@@ -17,7 +17,7 @@ class _SessionCache(dict):
 
     def __new__(cls, timeout=TIMEOUT):
         """Creates a new session cache."""
-        super().__new__(cls)
+        return super().__new__(cls)
 
     def __init__(self, timeout):
         """Sets the respective timeout."""

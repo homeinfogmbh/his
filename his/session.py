@@ -9,8 +9,7 @@ from his.orm import Session
 __all__ = ['SESSIONS']
 
 
-TIMEOUT = 60    # Seconds.
-INTERVAL = timedelta(seconds=TIMEOUT)
+INTERVAL = timedelta(seconds=60)
 
 
 class _SessionCache(dict):

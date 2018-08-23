@@ -14,7 +14,8 @@ __all__ = ['ROUTES']
 def post(size):
     """Creates a new request group."""
 
-    return JSON(REQUEST_GROUPS.add(SESSION, size))
+    request_group = REQUEST_GROUPS.add(SESSION, size)
+    return JSON(request_group.to_json())
 
 
 ROUTES = (('POST', '/requestgroup/<int:size>', post, 'add_request_group'),)

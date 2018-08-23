@@ -66,7 +66,7 @@ class _RequestGroupCache(dict):
         uuid = uuid4()
         request_group = _RequestGroup(uuid, session, size)
         self[uuid] = request_group
-        return request_group.to_json()
+        return request_group
 
     def get(self, request_group_token):
         """Returns the respective request group iff it is valid."""

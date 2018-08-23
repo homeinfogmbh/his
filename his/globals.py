@@ -1,5 +1,7 @@
 """HIS environment proxies, faking globals."""
 
+from functools import lru_cache
+
 from flask import request
 from werkzeug.local import LocalProxy
 
@@ -13,6 +15,16 @@ from his.orm import Session, Account
 __all__ = ['SESSION', 'ACCOUNT', 'CUSTOMER']
 
 
+@lru_cache()
+def _get_session(session_token):
+    """Returns the session or raises an error."""
+
+    try:
+        return Session.get(Session.token == session_token)
+    except Session.DoesNotExist:
+        raise NoSuchSession()
+
+
 def get_session():
     """Returns the session or raises an error."""
 
@@ -21,10 +33,7 @@ def get_session():
     except KeyError:
         raise NoSessionSpecified()
 
-    try:
-        return Session.get(Session.token == session_token)
-    except Session.DoesNotExist:
-        raise NoSuchSession()
+    return _get_session(session_token)
 
 
 def get_account():

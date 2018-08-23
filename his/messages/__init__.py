@@ -7,7 +7,7 @@ from his.messages.api import MessageNotFound, LanguageNotFound, Message
 from his.messages.customer import NoCustomerSpecified, NoSuchCustomer, \
     CustomerUnconfigured
 from his.messages.data import DataError, MissingData, IncompleteData, \
-    InvalidData, NotAnInteger, InvalidCustomerID, InvalidUUID
+    InvalidData, NotAnInteger, InvalidCustomerID
 from his.messages.service import NoServiceSpecified, NoSuchService, \
     ServiceAdded, ServiceAlreadyEnabled, AmbiguousServiceTarget, \
     MissingServiceTarget
@@ -40,7 +40,6 @@ __all__ = [
     'InvalidData',
     'NotAnInteger',
     'InvalidCustomerID',
-    'InvalidUUID',
     # Service messages.
     'NoServiceSpecified',
     'NoSuchService',

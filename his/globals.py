@@ -15,7 +15,7 @@ from his.orm import Session, Account
 __all__ = ['SESSION', 'ACCOUNT', 'CUSTOMER']
 
 
-#@lru_cache()
+@lru_cache()
 def _get_session(session_token):
     """Returns the session or raises an error."""
 
@@ -42,7 +42,7 @@ def get_account():
     try:
         account = request.args['account']
     except KeyError:
-        return SESSION.account
+        return Account.get(Account.id == SESSION.account_id)
 
     if SESSION.account.root:
         try:

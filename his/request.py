@@ -17,14 +17,15 @@ MAX_SIZE = 256
 class _RequestGroup:
     """A group of requests."""
 
-    __slots__ = ('_session', 'size', 'id', 'uses', 'start')
+    __slots__ = ('token', 'session', 'size', 'uses', 'start')
 
-    def __init__(self, session, size):
+    def __init__(self, token, session, size):
         """Sets the amount of requests in this group."""
         if size > MAX_SIZE:
             raise RequestGroupSizeOutOfBounds(size=size, max=MAX_SIZE)
 
-        self._session = session
+        self.token = token
+        self.session = session
         self.size = size
         self.uses = 0
         self.start = datetime.now()
@@ -39,14 +40,22 @@ class _RequestGroup:
         """Determines whether the request is valid."""
         return self.uses < self.size and not self.expired
 
-    @property
-    def session(self):
+    def use(self):
         """Returns a cached session."""
         if self.valid:
             self.uses += 1
-            return self._session
+            return self.session
 
         raise RequestGroupLimitExceeded()
+
+    def to_json(self):
+        """Returns a JSON-ish dictionary."""
+        return {
+            'token': self.token.hex,
+            'session': self.session.hex,
+            'size': self.size,
+            'uses': self.uses,
+            'start': self.start.isoformat()}
 
 
 class _RequestGroupCache(dict):
@@ -54,9 +63,12 @@ class _RequestGroupCache(dict):
 
     def add(self, session, size):
         """Adds a request group with the respective size."""
-        self[uuid4()] = _RequestGroup(session, size)
+        uuid = uuid4()
+        request_group = _RequestGroup(uuid, session, size)
+        self[uuid] = request_group
+        return request_group.to_json()
 
-    def get_session(self, request_group_token):
+    def get(self, request_group_token):
         """Returns the respective request group iff it is valid."""
         try:
             request_group = self[request_group_token]
@@ -67,7 +79,7 @@ class _RequestGroupCache(dict):
             self.cleanup()
 
         if request_group.valid:
-            return request_group.session
+            return request_group
 
         self.pop(request_group_token)
         raise RequestGroupLimitExceeded()

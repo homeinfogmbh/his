@@ -31,7 +31,7 @@ def _get_session():
         raise NoSuchSession()
 
 
-def _get_request_group_session():
+def _get_request_group():
     """Returns the session of the respective request group."""
 
     try:
@@ -39,16 +39,18 @@ def _get_request_group_session():
     except (TypeError, ValueError):
         raise InvalidUUID()
 
-    return REQUEST_GROUPS.get_session(request_group_token)
+    return REQUEST_GROUPS.get(request_group_token)
 
 
 def get_session():
     """Returns the session or raises an error."""
 
     try:
-        return _get_request_group_session()
+        request_group = _get_request_group()
     except KeyError:
         return _get_session()
+
+    return request_group.use()
 
 
 def get_account():

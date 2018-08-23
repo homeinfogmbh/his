@@ -2,7 +2,7 @@
 
 from datetime import datetime, timedelta
 
-from his.messages.session import NoSuchSession
+from his.messages.session import NoSuchSession, SessionExpired
 from his.orm import Session
 
 
@@ -26,15 +26,18 @@ class _SessionCache(dict):
 
     def __getitem__(self, session_token):
         """Returns the respective session."""
-        if self.needs_reload:
-            self.reload()
+        now = datetime.now()
+        reload = False
 
         try:
-            session = super().__getitem__(session_token)
+            cached, session = super().__getitem__(session_token)
         except KeyError:
             reload = True
         else:
-            reload = not session.alive
+            if now - cached > INTERVAL:
+                reload = True
+            elif not session.alive:
+                reload = True
 
         if reload:
             try:
@@ -42,29 +45,12 @@ class _SessionCache(dict):
             except Session.DoesNotExist:
                 raise NoSuchSession()
 
-            self[session_token] = session
+            if not session.alive:
+                raise SessionExpired()
+
+            self[session_token] = (now, session)
 
         return session
-
-    @property
-    def needs_reload(self):
-        """Determines whether all sessions should be reloaded."""
-        if self.last_refresh is None:
-            return True
-
-        return datetime.now() - self.last_refresh > INTERVAL
-
-    def reload(self):
-        """Reloads the session cache."""
-        self.clear()
-
-        for session in Session:
-            if session.alive:
-                self[session.token.hex] = session
-            else:
-                session.delete_instance()
-
-        self.last_refresh = datetime.now()
 
 
 SESSIONS = _SessionCache()

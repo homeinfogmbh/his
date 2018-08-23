@@ -42,6 +42,7 @@ def get_account():
     try:
         account = request.args['account']
     except KeyError:
+        print('Getting acccount from database.', flush=True)
         return Account.get(Account.id == SESSION.account_id)
 
     if SESSION.account.root:

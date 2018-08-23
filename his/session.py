@@ -10,19 +10,19 @@ __all__ = ['SESSIONS']
 
 
 TIMEOUT = 60    # Seconds.
+INTERVAL = timedelta(seconds=TIMEOUT)
 
 
 class _SessionCache(dict):
     """Cached sessions."""
 
-    def __new__(cls, timeout=TIMEOUT):
+    def __new__(cls):
         """Creates a new session cache."""
         return super().__new__(cls)
 
-    def __init__(self, timeout):
-        """Sets the respective timeout."""
+    def __init__(self):
+        """Sets the last refresh."""
         super().__init__()
-        self.timeout = timeout
         self.last_refresh = None
 
     def __getitem__(self, session_token):
@@ -48,17 +48,12 @@ class _SessionCache(dict):
         return session
 
     @property
-    def interval(self):
-        """Returns the refresh interval."""
-        return timedelta(seconds=self.timeout)
-
-    @property
     def needs_reload(self):
         """Determines whether all sessions should be reloaded."""
         if self.last_refresh is None:
             return True
 
-        return datetime.now() - self.last_refresh > self.interval
+        return datetime.now() - self.last_refresh > INTERVAL
 
     def reload(self):
         """Reloads the session cache."""

@@ -42,15 +42,14 @@ def get_account():
     try:
         account = request.args['account']
     except KeyError:
-        print('Getting acccount from database.', flush=True)
-        return Account.get(Account.id == SESSION.account_id)
+        return SESSION.live_account
 
-    if SESSION.account.root:
+    if SESSION.live_account.root:
         try:
             return Account.find(account)
         except Account.DoesNotExist:
             raise NoSuchAccount()
-    elif SESSION.account.admin:
+    elif SESSION.live_account.admin:
         try:
             account = Account.find(account, customer=CUSTOMER.id)
         except Account.DoesNotExist:
@@ -74,7 +73,7 @@ def get_customer():
     except (TypeError, ValueError):
         raise InvalidCustomerID()
 
-    if SESSION.account.root:
+    if SESSION.live_account.root:
         try:
             return Customer.get(Customer.id == cid)
         except Customer.DoesNotExist:

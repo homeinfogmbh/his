@@ -466,6 +466,11 @@ class Session(HISModel):
         """Determines whether the session is active."""
         return self.start <= datetime.now() < self.end
 
+    @property
+    def live_account(self):
+        """Returns the live account from the database."""
+        return Account.get(Account.id == self.acccount_id)
+
     def close(self):
         """Closes the session."""
         return self.delete_instance()

@@ -6,12 +6,12 @@ from werkzeug.local import LocalProxy
 from mdb import Customer
 
 from his.messages import NoSuchAccount, AccountLocked, NotAuthorized, \
-    NoSuchCustomer, InvalidCustomerID, NoSessionSpecified
+    NoSuchCustomer, InvalidCustomerID, NoSessionSpecified, MissingData
 from his.orm import Account
 from his.session import SESSIONS
 
 
-__all__ = ['SESSION', 'ACCOUNT', 'CUSTOMER']
+__all__ = ['SESSION', 'ACCOUNT', 'CUSTOMER', 'JSON']
 
 
 def get_session():
@@ -71,6 +71,17 @@ def get_customer():
     raise NotAuthorized()
 
 
+def get_json():
+    """Returns posted JSON data."""
+
+    json = request.json
+
+    if json is None:
+        raise MissingData()
+
+    return json
+
+
 class ModelProxy(LocalProxy):
     """Proxies ORM models."""
 
@@ -82,3 +93,4 @@ class ModelProxy(LocalProxy):
 SESSION = ModelProxy(get_session)
 ACCOUNT = ModelProxy(get_account)
 CUSTOMER = ModelProxy(get_customer)
+JSON = LocalProxy(get_json)

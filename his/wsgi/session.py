@@ -5,7 +5,7 @@ from flask import request
 from wsgilib import JSON
 
 from his.api import authenticated
-from his.globals import ACCOUNT, SESSION
+from his.globals import ACCOUNT, SESSION, JSON_DATA
 from his.messages.account import NotAuthorized
 from his.messages.session import MissingCredentials, InvalidCredentials, \
     NoSuchSession, SessionExpired
@@ -50,8 +50,8 @@ def _get_session_by_token(session_token):
 def login():
     """Opens a new session for the respective account."""
 
-    account = request.json.get('account')
-    passwd = request.json.get('passwd')
+    account = JSON_DATA.get('account')
+    passwd = JSON_DATA.get('passwd')
 
     if not account or not passwd:
         return MissingCredentials()

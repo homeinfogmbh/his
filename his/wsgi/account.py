@@ -1,12 +1,10 @@
 """Account management."""
 
-from flask import request
-
 from peeweeplus import PasswordTooShortError
 
 from his.api import authenticated
 from his.crypto import genpw
-from his.globals import ACCOUNT, CUSTOMER
+from his.globals import ACCOUNT, CUSTOMER, JSON_DATA
 from his.messages.account import NoSuchAccount, NotAuthorized, AccountExists, \
     AccountCreated, AccountPatched, AccountsExhausted, PasswordTooShort
 from his.messages.customer import CustomerUnconfigured
@@ -61,17 +59,17 @@ def _add_account():
     password_generated = False
 
     try:
-        name = request.json['name']
+        name = JSON_DATA['name']
     except KeyError:
         missing_fields.append('name')
 
     try:
-        email = request.json['email']
+        email = JSON_DATA['email']
     except KeyError:
         missing_fields.append('email')
 
     try:
-        passwd = request.json['passwd']
+        passwd = JSON_DATA['passwd']
     except KeyError:
         passwd = genpw()
         password_generated = True
@@ -100,7 +98,7 @@ def _patch_account(account, allow=()):
     """
 
     try:
-        account.patch_json(request.json, allow=allow).save()
+        account.patch_json(JSON_DATA, allow=allow).save()
     except (TypeError, ValueError):
         raise InvalidData()
     except PasswordTooShortError as password_too_short:

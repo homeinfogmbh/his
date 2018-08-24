@@ -11,7 +11,7 @@ from his.orm import Account
 from his.session import SESSIONS
 
 
-__all__ = ['SESSION', 'ACCOUNT', 'CUSTOMER', 'JSON']
+__all__ = ['SESSION', 'ACCOUNT', 'CUSTOMER', 'JSON_DATA']
 
 
 def get_session():
@@ -71,7 +71,7 @@ def get_customer():
     raise NotAuthorized()
 
 
-def get_json():
+def get_json_data():
     """Returns posted JSON data."""
 
     json = request.json
@@ -93,4 +93,4 @@ class ModelProxy(LocalProxy):
 SESSION = ModelProxy(get_session)
 ACCOUNT = ModelProxy(get_account)
 CUSTOMER = ModelProxy(get_customer)
-JSON = LocalProxy(get_json)
+JSON_DATA = LocalProxy(get_json_data)

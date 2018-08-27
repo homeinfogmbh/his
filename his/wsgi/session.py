@@ -62,10 +62,6 @@ def login():
         return InvalidCredentials()
 
     if account.login(passwd):
-        if account.passwd.needs_rehash:
-            account.passwd = passwd
-            account.save()
-
         session = Session.open(account, duration=_get_duration())
         return JSON(session.to_json())
 

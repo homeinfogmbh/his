@@ -373,6 +373,9 @@ class Account(HISModel):
                 self.save()
                 raise InvalidCredentials()
 
+            if self.passwd.needs_rehash:
+                self.passwd = passwd
+
             self.failed_logins = 0
             self.last_login = datetime.now()
             self.save()

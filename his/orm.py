@@ -8,7 +8,7 @@ from peewee import ForeignKeyField, CharField, BooleanField, DateTimeField, \
     IntegerField, UUIDField
 
 from filedb import FileProperty
-from mdb import Customer, Employee
+from mdb import Customer
 from peeweeplus import MySQLDatabase, JSONModel, Argon2Field
 
 from his.config import CONFIG
@@ -227,8 +227,6 @@ class Account(HISModel):
 
     customer = ForeignKeyField(
         Customer, column_name='customer', related_name='accounts')
-    user = ForeignKeyField(
-        Employee, column_name='user', null=True, related_name='accounts')
     name = CharField(64, unique=True)
     passwd = Argon2Field()
     email = CharField(64, unique=True)
@@ -240,7 +238,7 @@ class Account(HISModel):
     disabled = BooleanField(default=False)
     # Flag, whether the account is an administrator of its customer (=company).
     admin = BooleanField(default=False)
-    # Flag, whether the user is a super-admin of the system.
+    # Flag, whether the account is root.
     # Such accounts can do ANYTHING!
     root = BooleanField(default=False)
     JSON_KEYS = {
@@ -260,7 +258,7 @@ class Account(HISModel):
         return '{}@{}'.format(repr(self), self.customer.id)
 
     @classmethod
-    def add(cls, customer, name, email, passwd, user=None, admin=False,
+    def add(cls, customer, name, email, passwd, admin=False,
             root=False):
         """Adds a new account."""
         try:
@@ -275,7 +273,6 @@ class Account(HISModel):
                 account.email = email
                 account.created = datetime.now()
                 account.passwd = passwd
-                account.user = user
                 account.admin = admin
                 account.root = root
                 return account
@@ -309,7 +306,7 @@ class Account(HISModel):
 
     @property
     def locked(self):
-        """Determines whether the user is locked."""
+        """Determines whether the account is locked."""
         if self.locked_until is None:
             return False
 
@@ -349,11 +346,12 @@ class Account(HISModel):
     @property
     def subjects(self):
         """Yields accounts this account can manage."""
+        cls = type(self)
+
         if self.root:
-            yield from self.__class__
+            yield from cls
         elif self.admin:
-            for account in self.__class__.select().where(
-                    self.__class__.customer == self.customer):
+            for account in cls.select().where(cls.customer == self.customer):
                 yield account
         else:
             yield self

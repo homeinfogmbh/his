@@ -4,6 +4,7 @@ from collections import namedtuple
 from datetime import datetime, timedelta
 from functools import lru_cache
 from json import dumps
+from uuid import UUID
 
 from requests import get, patch, delete
 
@@ -46,7 +47,7 @@ class CachedSession(namedtuple('CachedSession', (
     def from_json(cls, json):
         """Creates a cached session from a JSON-ish dict."""
         account_id = json.pop('account')
-        token = json.pop('token')
+        token = UUID(json.pop('token'))
         start = strpdatetime(json.pop('start'))
         end = strpdatetime(json.pop('end'))
         login = json.pop('login')
@@ -99,7 +100,7 @@ class CachedSession(namedtuple('CachedSession', (
         """Returns a JSON-ish dict."""
         return {
             'account': self.account_id,
-            'token': self.token,
+            'token': self.token.hex,
             'start': self.start.isoformat(),
             'end': self.end.isoformat(),
             'login': self.login}

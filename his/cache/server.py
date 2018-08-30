@@ -64,9 +64,6 @@ CACHE = SessionCache()
 def get_session(session_token):
     """Returns the respective session."""
 
-    cached_session = CACHE[session_token]
-    print('Cached session:', cached_session, flush=True)
-    print('Cached session JSON:', cached_session.to_json(), flush=True)
     return JSON(CACHE[session_token].to_json())
 
 

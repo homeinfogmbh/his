@@ -99,8 +99,6 @@ def _patch_account(account, allow=()):
 
     try:
         account.patch_json(JSON_DATA, allow=allow)
-    except (TypeError, ValueError):
-        raise InvalidData()
     except PasswordTooShortError as password_too_short:
         raise PasswordTooShort(minlen=password_too_short.minlen)
     except AmbiguousDataError as error:

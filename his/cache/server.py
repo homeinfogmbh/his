@@ -2,6 +2,8 @@
 
 from contextlib import suppress
 from datetime import datetime, timedelta
+from json import dumps
+from tempfile import NamedTemporaryFile
 
 from flask import request
 
@@ -63,6 +65,11 @@ CACHE = SessionCache()
 @APPLICATION.route('/<session_token>', methods=['GET'])
 def get_session(session_token):
     """Returns the respective session."""
+
+    with NamedTemporaryFile(
+            delete=False, prefix='sessions_', suffix='.json') as tmp:
+        tmp.write(dumps(CACHE), indent=2)
+        print('Dumped cache to:', tmp.name, flush=True)
 
     return JSON(CACHE[session_token].to_json())
 

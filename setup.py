@@ -8,7 +8,7 @@ setup(
     version='latest',
     author='Richard Neumann',
     requires=['mdb'],
-    packages=['his', 'his.messages', 'his.wsgi'],
+    packages=['his', 'his.cache', 'his.messages', 'his.wsgi'],
     scripts=['files/hisutil', 'files/his-session-cleanup'],
     data_files=[('/etc/his.d', ['files/pwreset.html'])],
     description='HOMEINFO Integrated Services.')

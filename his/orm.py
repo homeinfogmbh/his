@@ -9,11 +9,10 @@ from peewee import ForeignKeyField, CharField, BooleanField, DateTimeField, \
 
 from filedb import FileProperty
 from mdb import Customer
-from peeweeplus import MySQLDatabase, JSONModel, Argon2Field
+from peeweeplus import InvalidKeys, MySQLDatabase, JSONModel, Argon2Field
 
 from his.config import CONFIG
-from his.messages import AccountLocked, InvalidCredentials, \
-    DurationOutOfBounds, InvalidData
+from his.messages import AccountLocked, InvalidCredentials, DurationOutOfBounds
 from his.pwmail import mail_password_reset_link
 
 
@@ -390,7 +389,7 @@ class Account(HISModel):
         invalid = {key for key in json if key not in allow} if allow else None
 
         if invalid:
-            raise InvalidData(keys=invalid)
+            raise InvalidKeys(invalid)
 
         return super().patch_json(json, **kwargs)
 

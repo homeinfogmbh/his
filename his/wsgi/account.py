@@ -16,8 +16,8 @@ from wsgilib import JSON
 __all__ = ['get_account', 'ROUTES']
 
 
-_USER_FIELDS = ('passwd', 'email')
-_ADMIN_FIELDS = ('name', 'passwd', 'email', 'admin')
+_USER_FIELDS = ('fullName', 'passwd', 'email')
+_ADMIN_FIELDS = ('name', 'fullName', 'passwd', 'email', 'admin')
 
 
 def _get_account(name_or_id):

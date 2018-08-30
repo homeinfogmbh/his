@@ -12,7 +12,8 @@ from mdb import Customer
 from peeweeplus import MySQLDatabase, JSONModel, Argon2Field
 
 from his.config import CONFIG
-from his.messages import AccountLocked, InvalidCredentials, DurationOutOfBounds
+from his.messages import AccountLocked, InvalidCredentials, \
+    DurationOutOfBounds, InvalidData
 from his.pwmail import mail_password_reset_link
 
 
@@ -383,6 +384,15 @@ class Account(HISModel):
             return True
 
         raise AccountLocked()
+
+    def patch_json(self, json, allow=(), **kwargs):
+        """Patches the account with fields limited to allow."""
+        invalid = {key for key in json if key not in allow} if allow else None
+
+        if invalid:
+            raise InvalidData(keys=invalid)
+
+        return super().patch_json(json, **kwargs)
 
 
 class AccountService(HISModel):

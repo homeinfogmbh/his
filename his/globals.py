@@ -5,10 +5,10 @@ from werkzeug.local import LocalProxy
 
 from mdb import Customer
 
+from his.cache.session import CachedSession
 from his.messages import NoSuchAccount, AccountLocked, NotAuthorized, \
     NoSuchCustomer, InvalidCustomerID, NoSessionSpecified, MissingData
 from his.orm import Account
-from his.session import SESSIONS
 
 
 __all__ = ['SESSION', 'ACCOUNT', 'CUSTOMER', 'JSON_DATA']
@@ -22,7 +22,7 @@ def get_session():
     except KeyError:
         raise NoSessionSpecified()
 
-    return SESSIONS[session_token]
+    return CachedSession.from_cache(session_token)
 
 
 def get_account():

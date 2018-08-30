@@ -15,6 +15,7 @@ from his.config import CONFIG
 from his.messages import AccountLocked, InvalidCredentials, DurationOutOfBounds
 from his.pwmail import mail_password_reset_link
 
+
 __all__ = [
     'ServiceExistsError',
     'AccountExistsError',
@@ -29,6 +30,7 @@ __all__ = [
     'CustomerSettings',
     'PasswordResetToken',
     'MODELS']
+
 
 DATABASE = MySQLDatabase.from_config(CONFIG['db'])
 
@@ -408,8 +410,6 @@ class AccountService(HISModel):
 class Session(HISModel):
     """A session related to an account."""
 
-    ALLOWED_DURATIONS = range(5, 31)
-
     account = ForeignKeyField(
         Account, column_name='account', on_delete='CASCADE')
     token = UUIDField(default=uuid4)
@@ -466,23 +466,6 @@ class Session(HISModel):
     def alive(self):
         """Determines whether the session is active."""
         return self.start <= datetime.now() < self.end
-
-    def close(self):
-        """Closes the session."""
-        return self.delete_instance()
-
-    def renew(self, duration=15):
-        """Renews the session."""
-        if duration in self.ALLOWED_DURATIONS:
-            if self.alive:
-                self.end = datetime.now() + timedelta(minutes=duration)
-                self.login = False
-                self.save()
-                return True
-
-            return False
-
-        raise DurationOutOfBounds()
 
 
 class CustomerSettings(HISModel):

@@ -71,7 +71,11 @@ def get_session(session_token):
         tmp.write(dumps(CACHE, indent=2))
         print('Dumped cache to:', tmp.name, flush=True)
 
-    return JSON(CACHE[session_token].to_json())
+    try:
+        return JSON(CACHE[session_token].to_json())
+    except Exception as exception:
+        print('Exception:', exception, flush=True)
+        raise
 
 
 @APPLICATION.route('/<session_token>', methods=['PATCH'])

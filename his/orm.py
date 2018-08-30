@@ -229,7 +229,8 @@ class Account(HISModel):
 
     customer = ForeignKeyField(
         Customer, column_name='customer', related_name='accounts')
-    name = CharField(64, unique=True)
+    name = CharField(64, unique=True)   # Login name.
+    full_name = CharField(255, null=True)   # Optional full user name.
     passwd = Argon2Field()
     email = CharField(64, unique=True)
     created = DateTimeField(default=datetime.now)
@@ -244,8 +245,8 @@ class Account(HISModel):
     # Such accounts can do ANYTHING!
     root = BooleanField(default=False)
     JSON_KEYS = {
-        'lastLogin': last_login, 'failedLogins': failed_logins,
-        'lockedUntil': locked_until}
+        'fullName': full_name, 'lastLogin': last_login,
+        'failedLogins': failed_logins, 'lockedUntil': locked_until}
 
     def __int__(self):
         """Returns the account's ID."""

@@ -68,7 +68,7 @@ def get_session(session_token):
 
     with NamedTemporaryFile(
             delete=False, prefix='sessions_', suffix='.json') as tmp:
-        tmp.write(dumps(CACHE), indent=2)
+        tmp.write(dumps(CACHE, indent=2))
         print('Dumped cache to:', tmp.name, flush=True)
 
     return JSON(CACHE[session_token].to_json())

@@ -69,6 +69,12 @@ class CachedSession(namedtuple('CachedSession', (
         """Returns the session cache server URL."""
         return CONFIG['cache']['url'].format(self.token)
 
+    def _update(self, end, login):
+        """Commits the current session data."""
+        json = {'end': end.isoformat(), 'login': login}
+        response = patch(self._url, json=json)
+        return response.status_code == 200
+
     def close(self):
         """Closes the session."""
         response = delete(self._url)
@@ -78,19 +84,12 @@ class CachedSession(namedtuple('CachedSession', (
 
         return False
 
-    def save(self):
-        """Commits the current session data."""
-        response = patch(self._url, json=self.to_json())
-        return response.status_code == 200
-
     def renew(self, duration=15):
         """Renews the session."""
         if duration in Session.ALLOWED_DURATIONS:
             if self.alive:
-                self.end = datetime.now() + timedelta(minutes=duration)
-                self.login = False
-                self.save()
-                return True
+                end = datetime.now() + timedelta(minutes=duration)
+                return self._update(end, False)
 
             return False
 

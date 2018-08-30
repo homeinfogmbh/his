@@ -79,6 +79,11 @@ def update_session(session_token):
     session.end = strpdatetime(request.json.pop('end'))
     session.login = request.json.pop('login', False)
     session.save()
+
+    # Force rehash of updated session.
+    with suppress(KeyError):
+        CACHE.pop(session_token)
+
     return 'Session updated.'
 
 

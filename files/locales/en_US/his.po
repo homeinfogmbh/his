@@ -87,6 +87,9 @@ msgstr "Missing key."
 msgid "InvalidKeys"
 msgstr "Invalid keys."
 
+msgid "NonUniqueValue"
+msgstr "Non-unique value."
+
 msgid "InvalidEnumerationValue"
 msgstr "Invalid enumeration value."
 

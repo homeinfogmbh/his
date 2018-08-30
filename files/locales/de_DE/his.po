@@ -87,6 +87,9 @@ msgstr "Fehlende Schlüsselwerte."
 msgid "InvalidKeys"
 msgstr "Ungültige Schlüsselwerte."
 
+msgid "NonUniqueValue"
+msgstr "Nicht-eindeutiger Wert."
+
 msgid "InvalidEnumerationValue"
 msgstr "Ungültiger Aufzählungswert."
 

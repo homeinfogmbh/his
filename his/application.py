@@ -3,7 +3,7 @@
 from itertools import chain
 
 from peeweeplus import FieldValueError, FieldNotNullable, MissingKeyError, \
-    InvalidKeys, InvalidEnumerationValue
+    InvalidKeys, NonUniqueValue, InvalidEnumerationValue
 from wsgilib import Application as _Application
 
 from his.messages import data
@@ -16,6 +16,7 @@ ERROR_HANDLERS = (
     (FieldNotNullable, data.FieldNotNullable.from_fnn),
     (MissingKeyError, data.MissingKeyError.from_mke),
     (InvalidKeys, data.InvalidKeys.from_iks),
+    (NonUniqueValue, data.NonUniqueValue.from_nuv),
     (InvalidEnumerationValue, data.InvalidEnumerationValue.from_iev))
 
 

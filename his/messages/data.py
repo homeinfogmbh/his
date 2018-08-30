@@ -11,6 +11,7 @@ __all__ = [
     'FieldNotNullable',
     'MissingKeyError',
     'InvalidKeys',
+    'NonUniqueValue',
     'InvalidEnumerationValue',
     'NotAnInteger',
     'InvalidCustomerID']
@@ -81,6 +82,17 @@ class InvalidKeys(InvalidData):
     def from_iks(cls, iks):
         """Creates the message from the peeweeplus.InvalidKeys error."""
         return cls(keys=iks.invalid_keys)
+
+
+class NonUniqueValue(InvalidData):
+    """Indicates that a non-unique value was given
+    for a field that requires a unique value.
+    """
+
+    @classmethod
+    def from_nuv(cls, nuv):
+        """Creates the message from the peeweeplus.NonUniqueValue error."""
+        return cls(key=nuv.key, value=nuv.value)
 
 
 class InvalidEnumerationValue(InvalidData):

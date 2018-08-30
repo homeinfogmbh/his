@@ -11,13 +11,10 @@ from timelib import strpdatetime
 
 from his.config import CONFIG
 from his.messages.session import NoSuchSession, DurationOutOfBounds
-from his.orm import Account
+from his.orm import Account, Session
 
 
 __all__ = ['CachedSession']
-
-
-ALLOWED_DURATIONS = range(5, 31)
 
 
 class CachedSession(namedtuple('CachedSession', (
@@ -87,7 +84,7 @@ class CachedSession(namedtuple('CachedSession', (
 
     def renew(self, duration=15):
         """Renews the session."""
-        if duration in ALLOWED_DURATIONS:
+        if duration in Session.ALLOWED_DURATIONS:
             if self.alive:
                 self.end = datetime.now() + timedelta(minutes=duration)
                 self.login = False

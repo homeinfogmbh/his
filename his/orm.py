@@ -410,6 +410,8 @@ class AccountService(HISModel):
 class Session(HISModel):
     """A session related to an account."""
 
+    ALLOWED_DURATIONS = range(5, 31)
+
     account = ForeignKeyField(
         Account, column_name='account', on_delete='CASCADE')
     token = UUIDField(default=uuid4)

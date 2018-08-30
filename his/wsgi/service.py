@@ -3,7 +3,7 @@
 from wsgilib import JSON
 
 from his.api import authenticated, root, admin
-from his.globals import SESSION, ACCOUNT, CUSTOMER, JSON_DATA
+from his.globals import ACCOUNT, CUSTOMER, JSON_DATA
 from his.messages.account import NotAuthorized, NoAccountSpecified
 from his.messages.customer import NoCustomerSpecified
 from his.messages.service import NoServiceSpecified, NoSuchService, \
@@ -84,7 +84,7 @@ def add_account_service():
 def list_services():
     """Lists promoted services."""
 
-    if SESSION.account.root:
+    if ACCOUNT.root:
         return JSON([service.to_json() for service in Service])
 
     return JSON([service.to_json() for service in Service.select().where(

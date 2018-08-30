@@ -67,7 +67,7 @@ def get_session(session_token):
     """Returns the respective session."""
 
     with NamedTemporaryFile(
-            delete=False, prefix='sessions_', suffix='.json') as tmp:
+            mode='w', delete=False, prefix='sessions_', suffix='.json') as tmp:
         tmp.write(dumps(CACHE, indent=2))
         print('Dumped cache to:', tmp.name, flush=True)
 

@@ -48,8 +48,8 @@ class FieldValueError(InvalidData):
     def from_fve(cls, fve):
         """Creates the messsage from a peeweeplus.FieldValueError."""
         return cls(model=fve.model.__name__, field=type(fve.field).__name__,
-                   attribute=fve.field.name, column=fve.field.column_name,
-                   key=fve.field.json_key, value=str(fve.value),
+                   attribute=fve.attribute, column=fve.field.column_name,
+                   key=fve.key, value=str(fve.value),
                    type=type(fve.value).__name__)
 
 
@@ -60,8 +60,8 @@ class FieldNotNullable(InvalidData):
     def from_fnn(cls, fnn):
         """Creates the message from a peeweeplus.FieldNotNullable error."""
         return cls(model=fnn.model.__name__, field=type(fnn.field).__name__,
-                   attribute=fnn.field.name, column=fnn.field.column_name,
-                   key=fnn.field.json_key)
+                   attribute=fnn.attribute, column=fnn.field.column_name,
+                   key=fnn.key)
 
 
 class MissingKeyError(InvalidData):

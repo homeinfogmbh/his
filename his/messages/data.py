@@ -71,8 +71,8 @@ class MissingKeyError(InvalidData):
     def from_mke(cls, mke):
         """Creates the message from the peeweeplus.MissingKeyError."""
         return cls(model=mke.model.__name__, field=type(mke.field).__name__,
-                   attribute=mke.field.name, column=mke.field.column_name,
-                   key=mke.field.json_key)
+                   attribute=mke.attribute, column=mke.field.column_name,
+                   key=mke.key)
 
 
 class InvalidKeys(InvalidData):

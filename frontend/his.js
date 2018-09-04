@@ -115,6 +115,8 @@ his._AjaxQuery = function (method, url, args, data, contentType) {
     this.url = url + requestArgs;
 
     if (data != null) {
+        this.data = data;
+
         if (contentType == null) {
             contentType = his._getContentType(data);
         }

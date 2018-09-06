@@ -244,9 +244,6 @@ class Account(HISModel):
     # Flag, whether the account is root.
     # Such accounts can do ANYTHING!
     root = BooleanField(default=False)
-    JSON_KEYS = {
-        'fullName': full_name, 'lastLogin': last_login,
-        'failedLogins': failed_logins, 'lockedUntil': locked_until}
 
     def __int__(self):
         """Returns the account's ID."""
@@ -491,7 +488,6 @@ class CustomerSettings(HISModel):
     max_accounts = IntegerField(null=True, default=10)
     _logo = IntegerField(column_name='logo', null=True)
     logo = FileProperty(_logo)
-    JSON_KEYS = {'maxAccounts': max_accounts}
 
 
 class PasswordResetToken(HISModel):

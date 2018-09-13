@@ -1,6 +1,21 @@
 test_name: Customer API
 
 stages:
+  - name: Login
+    request:
+      url: https://his.homeinfo.de/session
+      method: POST
+      headers:
+        content-type: application/json
+      json:
+        account: test
+        passwd: jeey7OoFei3Ahsha
+    response:
+      status_code: 200
+      save:
+        body:
+          session: token
+
   - name: List customers
     request:
       url: https://his.homeinfo.de/customer?session={session}

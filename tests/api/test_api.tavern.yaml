@@ -14,8 +14,6 @@ stages:
       status_code: 200
       save:
         session_token: token
-
-stages:
   - name: Get session information
     request:
       url: https://his.homeinfo.de/session/!?session={session_token}

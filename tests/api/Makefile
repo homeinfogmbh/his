@@ -3,4 +3,4 @@
 default: | test
 
 test:
-	@ /usr/local/bin/py.test -xvv *.tavern.yaml
+	@ /usr/local/bin/py.test -xvvv *.tavern.yaml

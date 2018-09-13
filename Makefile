@@ -1,27 +1,14 @@
 FILE_LIST = ./.installed_files.txt
 
-.PHONY: pull push clean install uninstall
+.PHONY: pull backend frontend
 
-default: | pull clean install
-
-install:
-	@ pushd backend
-	@ ./setup.py install --record $(FILE_LIST)
-	@ mkdir -p /srv/http/de/homeinfo/javascript/his
-	@ chmod 755 /srv/http/de/homeinfo/javascript/his
-	@ install -m 644 frontend/*.js /srv/http/de/homeinfo/javascript/his/
-	@ install_locales
-	@ popd
-
-uninstall:
-	@ while read FILE; do echo "Removing: $$FILE"; rm "$$FILE"; done < $(FILE_LIST)
-	@ rm -rf /srv/http/de/homeinfo/javascript/his
-
-clean:
-	@ rm -Rf ./build
+default: | pull backend
 
 pull:
 	@ git pull
 
-push:
-	@ git push
+backend:
+	@ make -C backend
+
+frontend:
+	@ make -C frontend

@@ -3,4 +3,4 @@
 default: | test
 
 test:
-	@ python -m unittest *.py
+	@ python *.py

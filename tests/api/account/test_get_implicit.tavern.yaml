@@ -1,0 +1,27 @@
+test_name: Get account (implicit)
+
+stages:
+  - name: Login (misc.)
+    request:
+      url: https://his.homeinfo.de/session
+      method: POST
+      headers:
+        content-type: application/json
+      json:
+        account: test
+        passwd: jeey7OoFei3Ahsha
+    response:
+      status_code: 200
+      save:
+        body:
+          session: token
+
+  - name: Get account (implicit)
+    request:
+      url: https://his.homeinfo.de/account/!?session={session}
+      method: GET
+    response:
+      status_code: 200
+      save:
+        body:
+          account: name

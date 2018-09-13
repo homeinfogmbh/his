@@ -2,7 +2,7 @@ FILE_LIST = ./.installed_files.txt
 
 .PHONY: pull backend frontend
 
-default: | pull backend
+default: | pull backend frontend
 
 pull:
 	@ git pull

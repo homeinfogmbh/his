@@ -3,4 +3,4 @@
 default: | test
 
 test:
-	@ python *.py
+	@ /usr/bin/env python3 -m unittest *.py

@@ -1,0 +1,30 @@
+test_name: Customer API
+
+stages:
+  - name: List customers
+    request:
+      url: https://his.homeinfo.de/customer?session={session}
+      method: GET
+    response:
+      status_code: 403
+
+  - name: Get customer (implicit)
+    request:
+      url: https://his.homeinfo.de/customer/!?session={session}
+      method: GET
+    response:
+      status_code: 200
+
+  - name: Get customer (explicit)
+    request:
+      url: https://his.homeinfo.de/customer/{customer}?session={session}
+      method: GET
+    response:
+      status_code: 200
+
+  - name: Get customer logo
+    request:
+      url: https://his.homeinfo.de/customer-logo?session={session}
+      method: GET
+    response:
+      status_code: 200

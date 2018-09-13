@@ -35,6 +35,9 @@ def get_customer(name):
     if any(condition() for condition in conditions):
         return customer
 
+    if customer.id == CUSTOMER.id:
+        return CUSTOMER
+
     raise NoSuchCustomer()
 
 

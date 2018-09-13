@@ -19,7 +19,7 @@
     Maintainer: Richard Neumann <r dot neumann at homeinfo period de>
 
     Requires:
-        * jquery.js
+        * his.js
 */
 'use strict';
 
@@ -27,11 +27,7 @@ var his = his || {};
 his.cache = his.cache || {};
 
 
-his.cache.strf = function(template, ...args) {
-    for (var i = 0; i < args.length; i++) {
-        console.log('Arg #' + i + ': ' + args[i]);
-    }
-
+his.cache.strf = function(template, args) {
     return template.replace(/{(\d+)}/g, function(match, index) {
         return args[index] != null ? args[index] : match;
     });
@@ -42,10 +38,21 @@ his.cache.strf = function(template, ...args) {
     Callback generator to store the respective
     value using the provided instance and keys.
 */
-his.cache.cache = function (instance, ...keys) {
+his.cache.cache = function (cache, identifiers) {
     return function(json) {
-        instance.cache(json, ...keys);
+        cache.cache(json, ...identifiers);
         return json;
+    };
+};
+
+
+/*
+    Callback to mark the respective cache as dirty.
+*/
+his.cache.markDirty = function (cache) {
+    return function (result) {
+        cache.markDirty();
+        return result;
     };
 };
 
@@ -58,9 +65,13 @@ his.cache.CacheEntry = function (cached, lifetime, value) {
     this.lifetime = lifetime;   // Lifetime in milliseconds.
     this.value = value;         // Cached JSON value.
 
+    this.getExpiration = function () {
+        return this.cached + this.lifetime;
+    };
+
     this.isValid = function () {
         var now = (new Date()).getTime();
-        return this.cached + this.lifetime <= now;
+        return this.getExpiration() >= now;
     };
 };
 
@@ -70,73 +81,101 @@ his.cache.CacheEntry = function (cached, lifetime, value) {
     Takes a local storarge slot key, a URL template
     and an optional cache lifetime in seconds.
 */
-his.cache.CachedEndPoint = function (slot, urlTemplate, lifetime) {
-    this.slot = slot;
-    this.urlTemplate = urlTemplate;
+his.cache.CachedEndPoint = function (slot, urlTemplate, authenticated, lifetime) {
+    this._slot = slot;
+    this._urlTemplate = urlTemplate;
 
-    if (lifetime == null) {
-        lifetime = 30 * 60 * 1000;  // 30 minutes in milliseconds.
+    if (authenticated == null) {
+        authenticated = true;
     }
 
-    this.lifetime = lifetime * 1000;  // Convert to milliseconds.
-    this.dirty = false;
+    this._authenticated = authenticated;
+
+    if (lifetime == null) {
+        lifetime = 30 * 60;     // 30 minutes in seconds.
+    }
+
+    this._lifetime = lifetime * 1000;  // Convert to milliseconds.
+    this._dirty = false;
 
     /*
-        Returns the key path for localStorage.
+        Returns the cache's content.
     */
-    this._getKey = function (...keys) {
-        var key;
-
-        if (keys.length > 1) {
-            key = '(' + keys.join(',') + ')';
-        } else {
-            key = keys[0];
-        }
-
-        return this.slot + '.' + key;
-    };
-
-    /*
-        Returns the cached value for the provided keys.
-    */
-    this._getCached = function (...keys) {
-        var raw = localStorage.getItem(this._getKey(...keys));
+    this._getCache = function () {
+        var raw = localStorage.getItem(this._slot);
 
         if (raw == null) {
-            return null;
+            return {};
         }
 
         var json = JSON.parse(raw);
 
         if (json == null) {
-            return null;
+            return {};
         }
 
-        return his.cache.CacheEntry(json.cached, json.lifetime, json.value);
+        return json;
     };
 
     /*
-        Calls the respective endpoint.
+        Returns the cache entry's key.
     */
-    this._getHttp = function(...keys) {
-        var url = his.cache.strf(this.urlTemplate, ...keys);
-        return jQuery.ajax({url: url, method: 'GET', dataType: 'json'});
+    this._getKey = function (identifiers) {
+        return '[' + identifiers.join(',') + ']';
+    };
+
+    /*
+        Returns the cached value for the provided keys.
+    */
+    this._getCacheEntry = function (identifiers) {
+        var cache = this._getCache();
+        his.debug('Current cache content:\n' + JSON.stringify(cache, null, 2));
+        var key = this._getKey(identifiers);
+        var rawEntry = cache[key];
+
+        if (rawEntry == null) {
+            return null;
+        }
+
+        return new his.cache.CacheEntry(rawEntry.cached, rawEntry.lifetime, rawEntry.value);
+    };
+
+    /*
+        Returns the formatted URL template.
+    */
+    this._getUrl = function (identifiers) {
+        return his.cache.strf(this._urlTemplate, identifiers);
+    };
+
+    /*
+        Calls the respective HTTP endpoint.
+    */
+    this._get = function(identifiers, args) {
+        var url = this._getUrl(identifiers);
+
+        if (this._authenticated) {
+            return his.auth.get(url, args);
+        }
+
+        return his.get(url, args);
     };
 
     /*
         Caches the provided JSON data using the respective keys.
     */
-    this.cache = function (json, ...keys) {
-        var lifetime = this.lifetime;
-        var record = {
-            cached: (new Date()).getTime(),
+    this.cache = function (json, ...identifiers) {
+        var cache = this._getCache();
+        var now = (new Date()).getTime();
+        var lifetime = this._lifetime;
+        var key = this._getKey(identifiers);
+        cache[key] = {
+            cached: now,
             lifetime: lifetime,
             value: json
         };
-
-        var string = JSON.stringify(record);
-        var key = this._getKey(...keys);
-        localStorage.setItem(key, string);
+        var string = JSON.stringify(cache);
+        localStorage.setItem(this._slot, string);
+        this._dirty = false;
     };
 
     /*
@@ -146,13 +185,29 @@ his.cache.CachedEndPoint = function (slot, urlTemplate, lifetime) {
         Otherwise it will query the HTTP API and update the cache
         with the value returned by the API.
     */
-    this.get = function (...keys) {
-        var cacheEntry = this._getCached(...keys);
+    this.get = function (...identifiers) {
+        var cacheEntry = this._getCacheEntry(identifiers);
 
-        if (cacheEntry.isValid() & ! this.needsRefresh()) {
-            return Promise.resolve(cacheEntry.value);
+        if (cacheEntry != null) {
+            if (cacheEntry.isValid() & ! this._dirty) {
+                return Promise.resolve(cacheEntry.value);
+            }
         }
 
-        return this._getHttp(...keys).then(his.cache.cache(this, ...keys));
+        return this._get(identifiers).then(his.cache.cache(this, identifiers));
+    };
+
+    /*
+        Marks the cache as dirty.
+    */
+    this.markDirty = function () {
+        this._dirty = true;
+    };
+
+    /*
+        Removes all cached data.
+    */
+    this.clear = function () {
+        localStorage.removeItem(this._slot);
     };
 };

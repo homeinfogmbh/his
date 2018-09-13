@@ -14,7 +14,6 @@ class TestService(unittest.TestCase):
         self.assertIsInstance(Service.name, CharField)
         self.assertIsInstance(Service.description, CharField)
         self.assertIsInstance(Service.promote, BooleanField)
-        self.assertIsInstance(Service.foobar, dict)
 
 
 class TestAccount(unittest.TestCase):

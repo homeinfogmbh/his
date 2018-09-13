@@ -45,9 +45,9 @@ def get_account(name_or_id):
 
     if ACCOUNT.admin:
         if account.customer == CUSTOMER:
-            return JSON(account.to_json())
+            return account
     elif ACCOUNT == account:
-        return JSON(account.to_json())
+        return account
 
     raise NotAuthorized()
 

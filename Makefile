@@ -1,11 +1,12 @@
-FILE_LIST = ./.installed_files.txt
+.PHONY: pull test backend frontend
 
-.PHONY: pull backend frontend
-
-default: | pull backend frontend
+default: | pull test backend frontend
 
 pull:
 	@ git pull
+
+test:
+	@ make -C tests
 
 backend:
 	@ make -C backend

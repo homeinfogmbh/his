@@ -5,11 +5,13 @@ FILE_LIST = ./.installed_files.txt
 default: | pull clean install
 
 install:
+	@ pushd backend
 	@ ./setup.py install --record $(FILE_LIST)
 	@ mkdir -p /srv/http/de/homeinfo/javascript/his
 	@ chmod 755 /srv/http/de/homeinfo/javascript/his
 	@ install -m 644 frontend/*.js /srv/http/de/homeinfo/javascript/his/
 	@ install_locales
+	@ popd
 
 uninstall:
 	@ while read FILE; do echo "Removing: $$FILE"; rm "$$FILE"; done < $(FILE_LIST)

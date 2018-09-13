@@ -2,8 +2,6 @@ test_name: HIS Core API
 
 stages:
   - name: Login
-
-    # Define the request to be made...
     request:
       url: https://his.homeinfo.de/session
       method: POST
@@ -12,8 +10,17 @@ stages:
       json:
         account: test
         passwd: jeey7OoFei3Ahsha
-
-    # ...and the expected response code and body
     response:
       status_code: 200
+      save:
+        session_token: token
 
+stages:
+  - name: Get session information
+    request:
+      url: https://his.homeinfo.de/session/!?session={session_token}
+      method: GET
+    response:
+      status_code: 200
+      save:
+        session_token: token

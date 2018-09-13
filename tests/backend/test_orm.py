@@ -1,15 +1,15 @@
 import unittest
 
 from peewee import CharField, BooleanField
-from his import orm
+from his.orm import Service
 
 
 class TestService(unittest.TestCase):
 
     def test_fields(self):
-        self.assertIsInstance(orm.Service.name, CharField)
-        self.assertIsInstance(orm.Service.description, CharField)
-        self.assertIsInstance(orm.Service.description, BooleanField)
+        self.assertIsInstance(Service.name, CharField)
+        self.assertIsInstance(Service.description, CharField)
+        self.assertIsInstance(Service.promote, BooleanField)
 
 
 if __name__ == '__main__':

@@ -21,7 +21,7 @@ stages:
       url: https://his.homeinfo.de/account?session={session}
       method: GET
     response:
-      status_code: 403
+      status_code: 200
 
   - name: Get account (implicit)
     request:

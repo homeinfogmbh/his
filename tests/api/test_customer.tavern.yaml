@@ -1,7 +1,7 @@
 test_name: Customer API
 
 stages:
-  - name: Login
+  - name: Login (Misc.)
     request:
       url: https://his.homeinfo.de/session
       method: POST
@@ -15,6 +15,16 @@ stages:
       save:
         body:
           session: token
+
+  - name: Get customer  (Misc.)
+    request:
+      url: https://his.homeinfo.de/account/!?session={session}
+      method: GET
+    response:
+      status_code: 200
+      save:
+        body:
+          customer: customer
 
   - name: List customers
     request:

@@ -1,0 +1,19 @@
+test_name: HIS Core API
+
+stages:
+  - name: Login
+
+    # Define the request to be made...
+    request:
+      url: https://his.homeinfo.de/session
+      method: POST
+      headers:
+        content-type: application/json
+      json:
+        account: test
+        passwd: jeey7OoFei3Ahsha
+
+    # ...and the expected response code and body
+    response:
+      status_code: 200
+

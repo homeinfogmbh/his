@@ -1,4 +1,4 @@
-test_name: HIS Core API
+test_name: HIS session API
 
 stages:
   - name: Login
@@ -14,11 +14,25 @@ stages:
       status_code: 200
       save:
         body:
-          session_token: token
+          session: token
 
-  - name: Get session information
+  - name: List sessions
     request:
-      url: https://his.homeinfo.de/session/!?session={session_token}
+      url: https://his.homeinfo.de/session?session={session}
+      method: GET
+    response:
+      status_code: 403
+
+  - name: Get session information (implicit)
+    request:
+      url: https://his.homeinfo.de/session/!?session={session}
+      method: GET
+    response:
+      status_code: 200
+
+  - name: Get session information (explicit)
+    request:
+      url: https://his.homeinfo.de/session/{session}?session={session}
       method: GET
     response:
       status_code: 200

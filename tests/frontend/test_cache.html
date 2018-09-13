@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<head>
+    <meta charset="UTF-8"></meta>
+    <script src="https://libraries.homeinfo.de/jquery/jquery-latest.min.js"></script>
+    <script src="../../frontend/his.js"></script>
+    <script src="../../frontend/session.js"></script>
+    <script src="../../frontend/cache.js"></script>
+    <script src="test_cache.js"></script>
+</head>
+<body>
+    <input id="userName" type="text" placeholder="User name..."/>
+    <input id="passwd" type="password"/>
+    <button onclick="login();">Login.</button>
+    <button onclick="queryEndPoint();">Query end point.</button>
+    <button onclick="clearCache();">Clear cache.</button>
+    <br/>
+    <pre id="output">Cache content goes here.</pre>
+</body>

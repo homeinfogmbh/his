@@ -16,7 +16,7 @@ stages:
         body:
           session: token
 
-  - name: Get customer  (Misc.)
+  - name: Get customer ID (Misc.)
     request:
       url: https://his.homeinfo.de/account/!?session={session}
       method: GET
@@ -43,13 +43,6 @@ stages:
   - name: Get customer (explicit)
     request:
       url: https://his.homeinfo.de/customer/{customer}?session={session}
-      method: GET
-    response:
-      status_code: 200
-
-  - name: Get customer logo
-    request:
-      url: https://his.homeinfo.de/customer-logo?session={session}
       method: GET
     response:
       status_code: 200

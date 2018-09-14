@@ -107,7 +107,7 @@ def add_account(options):
             account_exists.field), file=stderr)
         exit_(3)
 
-    account.save()  # Account.add() does not perform save()
+    account.save()  # Account.add() does not perform save().
     print(account)
 
 
@@ -189,3 +189,4 @@ def main(options):
 
 if __name__ == '__main__':
     main(docopt(__doc__))
+

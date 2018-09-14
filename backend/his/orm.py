@@ -185,7 +185,7 @@ class CustomerService(HISModel):
         return '{}@{}'.format(repr(self.customer), str(self.service))
 
     @classmethod
-    def add(cls, customer, service, begin, end):
+    def add(cls, customer, service, begin=None, end=None):
         """Adds a new customer service."""
         customer_service = cls()
         customer_service.customer = customer

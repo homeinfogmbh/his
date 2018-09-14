@@ -15,6 +15,7 @@ frontend:
 	@ make -C frontend
 
 restart:
+	@ echo "Restarting web services..."
 	@ fixuwsgi -q
 
 api-test:

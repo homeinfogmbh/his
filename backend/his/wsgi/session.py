@@ -5,7 +5,7 @@ from flask import request
 from wsgilib import JSON
 
 from his.api import authenticated
-from his.cache.session import CachedSession
+from his.cache.session import APICachedSession
 from his.globals import ACCOUNT, SESSION, JSON_DATA
 from his.messages.account import NotAuthorized
 from his.messages.session import MissingCredentials, InvalidCredentials, \
@@ -32,7 +32,7 @@ def _get_session_by_token(session_token):
     if session_token == '!':
         return SESSION
 
-    session = CachedSession.from_cache(session_token)
+    session = APICachedSession.from_cache(session_token)
     conditions = (
         lambda: SESSION.token == session.token,
         lambda: ACCOUNT.root,

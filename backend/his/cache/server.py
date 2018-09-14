@@ -9,7 +9,7 @@ from timelib import strpdatetime
 from wsgilib import JSON
 
 from his.application import Application
-from his.cache.session import CachedSession
+from his.cache.session import ServerCachedSession
 from his.messages.session import NoSuchSession, SessionExpired
 from his.orm import Session
 
@@ -39,21 +39,21 @@ class SessionCache:
             record.delete_instance()
             raise SessionExpired()
 
-        cached_session = CachedSession.from_record(record)
-        self._sessions[session_token] = (datetime.now(), cached_session)
-        return cached_session
+        session = ServerCachedSession.from_record(record)
+        self._sessions[session_token] = (datetime.now(), session)
+        return session
 
     def get(self, session_token):
         """Returns the respective session."""
         try:
-            cached, cached_session = self._sessions[session_token]
+            cached, session = self._sessions[session_token]
         except KeyError:
             return self.reload(session_token)
 
-        if datetime.now() - cached > INTERVAL or not cached_session.alive:
+        if datetime.now() - cached > INTERVAL or not session.alive:
             return self.reload(session_token)
 
-        return cached_session
+        return session
 
     def close(self, session_token):
         """Closes the respective session."""

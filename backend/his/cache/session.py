@@ -65,6 +65,14 @@ class CachedSession(namedtuple('CachedSession', (
         return self.start <= datetime.now() < self.end
 
     @property
+    def record(self):
+        """Returns the appropriate record."""
+        try:
+            return Session.get(Session.token == self.token)
+        except Session.DoesNotExist:
+            raise NoSuchSession()
+
+    @property
     def _url(self):
         """Returns the session cache server URL."""
         return CONFIG['cache']['url'].format(self.token)

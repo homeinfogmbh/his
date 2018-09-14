@@ -1,6 +1,5 @@
 """Session cache server."""
 
-from contextlib import suppress
 from datetime import datetime, timedelta
 
 from flask import request
@@ -55,6 +54,15 @@ class SessionCache:
 
         return session
 
+    def refresh(self, session_token):
+        """Refreshes the respective session."""
+        session = self.get(session_token)
+        record = session.record
+        record.end = strpdatetime(request.json.pop('end'))
+        record.login = request.json.pop('login', False)
+        record.save()
+        return self.reload(session_token)
+
     def close(self, session_token):
         """Closes the respective session."""
         try:
@@ -81,21 +89,13 @@ def get_session(session_token):
 def update_session(session_token):
     """Returns the respective session."""
 
-    session = CACHE.get(session_token)
-    record = session.record
-    record.end = strpdatetime(request.json.pop('end'))
-    record.login = request.json.pop('login', False)
-    record.save()
-    session = CACHE.reload(session_token)   # Force re-cache.
+    session = CACHE.refresh(session_token)
     return session.to_json()
 
 
 @APPLICATION.route('/<session_token>', methods=['DELETE'])
 def close_session(session_token):
     """Returns the respective session."""
-
-    with suppress(Session.DoesNotExist):
-        Session.get(Session.token == session_token).delete_instance()
 
     CACHE.close(session_token)
     return JSON({'closed': session_token})

@@ -1,6 +1,6 @@
 .PHONY: backend frontend api
 
-default: | backend api
+default: | backend frontend
 
 backend:
 	@ make -C backend

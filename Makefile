@@ -1,6 +1,6 @@
-.PHONY: pull test backend frontend
+.PHONY: pull test backend frontend restart api-test
 
-default: | pull test backend frontend
+default: | pull test backend frontend restart api-test
 
 pull:
 	@ git pull
@@ -13,3 +13,9 @@ backend:
 
 frontend:
 	@ make -C frontend
+
+restart:
+	@ fixuwsgi -q
+
+api-test:
+	@ make -C tests api

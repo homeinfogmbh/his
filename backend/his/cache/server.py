@@ -1,6 +1,8 @@
 """Session cache server."""
 
 from datetime import datetime, timedelta
+from functools import wraps
+from uuid import UUID
 
 from flask import request
 
@@ -20,6 +22,16 @@ INTERVAL = timedelta(seconds=60)
 APPLICATION = Application('SessionCacheServer')
 
 
+def with_uuid(function):
+    """Converts the first argument into a UUID."""
+
+    @wraps(function)
+    def wrapper(token, *args, **kwargs):
+        return function(UUID(token), *args, **kwargs)
+
+    return wrapper
+
+
 class SessionCache:
     """Cached sessions."""
 
@@ -27,10 +39,10 @@ class SessionCache:
         """Sets the last refresh."""
         self._sessions = {}
 
-    def reload(self, session_token):
-        """Updates the respective session."""
+    def reload(self, token):
+        """Updates the respective session from the database."""
         try:
-            record = Session.get(Session.token == session_token)
+            record = Session.get(Session.token == token)
         except Session.DoesNotExist:
             raise NoSuchSession()
 
@@ -39,63 +51,67 @@ class SessionCache:
             raise SessionExpired()
 
         session = ServerCachedSession.from_record(record)
-        self._sessions[session_token] = (datetime.now(), session)
+        self._sessions[token] = (datetime.now(), session)
         return session
 
-    def get(self, session_token):
+    def get(self, token):
         """Returns the respective session."""
         try:
-            cached, session = self._sessions[session_token]
+            cached, session = self._sessions[token]
         except KeyError:
-            return self.reload(session_token)
+            return self.reload(token)
 
         if datetime.now() - cached > INTERVAL or not session.alive:
-            return self.reload(session_token)
+            return self.reload(token)
 
         return session
 
-    def refresh(self, session_token):
+    def refresh(self, token):
         """Refreshes the respective session."""
-        session = self.get(session_token)
+        session = self.get(token)
         record = session.record
         record.end = strpdatetime(request.json.pop('end'))
         record.login = request.json.pop('login', False)
         record.save()
-        return self.reload(session_token)
+        return self.reload(token)
 
-    def close(self, session_token):
+    def close(self, token):
         """Closes the respective session."""
         try:
-            record = Session.get(Session.token == session_token)
+            record = Session.get(Session.token == token)
         except Session.DoesNotExist:
-            self._sessions.pop(session_token, None)
+            self._sessions.pop(token, None)
             return
 
         record.delete_instance()
-        self._sessions.pop(session_token, None)
+        self._sessions.pop(token, None)
 
 
 CACHE = SessionCache()
 
 
-@APPLICATION.route('/<session_token>', methods=['GET'])
-def get_session(session_token):
+@APPLICATION.route('/<token>', methods=['GET'])
+@with_uuid
+def get_session(token):
     """Returns the respective session."""
 
-    return JSON(CACHE.get(session_token).to_json())
+    session = CACHE.get(token)
+    return JSON(session.to_json())
 
 
-@APPLICATION.route('/<session_token>', methods=['PATCH'])
-def update_session(session_token):
+@APPLICATION.route('/<token>', methods=['PATCH'])
+@with_uuid
+def update_session(token):
     """Returns the respective session."""
 
-    session = CACHE.refresh(session_token)
+    session = CACHE.refresh(token)
     return session.to_json()
 
 
-@APPLICATION.route('/<session_token>', methods=['DELETE'])
-def close_session(session_token):
+@APPLICATION.route('/<token>', methods=['DELETE'])
+@with_uuid
+def close_session(token):
     """Returns the respective session."""
 
-    CACHE.close(session_token)
-    return JSON({'closed': session_token})
+    CACHE.close(token)
+    return JSON({'closed': token.hex})

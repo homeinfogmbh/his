@@ -1,5 +1,7 @@
 """HIS session service."""
 
+from functools import wraps
+
 from flask import request
 
 from wsgilib import JSON
@@ -9,7 +11,7 @@ from his.cache.session import APICachedSession
 from his.globals import ACCOUNT, SESSION, JSON_DATA
 from his.messages.account import NotAuthorized
 from his.messages.session import MissingCredentials, InvalidCredentials, \
-    NoSuchSession, SessionExpired
+    NoSuchSession
 from his.orm import Account, Session
 
 __all__ = ['ROUTES']
@@ -42,6 +44,16 @@ def _get_session_by_token(session_token):
         return session
 
     raise NoSuchSession()
+
+
+def with_session(function):
+    """Converts the first argument of function into a sesion."""
+
+    @wraps(function)
+    def wrapper(session_token, *args, **kwargs):
+        return function(_get_session_by_token(session_token), *args, **kwargs)
+
+    return wrapper
 
 
 def login():
@@ -82,30 +94,27 @@ def list_():
 
 
 @authenticated
-def get(session_token):
+@with_session
+def get(session):
     """Lists the respective session."""
 
-    return JSON(_get_session_by_token(session_token).to_json())
+    return JSON(session.to_json())
 
 
 @authenticated
-def refresh(session_token):
+@with_session
+def refresh(session):
     """Refreshes an existing session."""
 
-    session = _get_session_by_token(session_token)
-
-    if session.renew(duration=_get_duration()):
-        session = _get_session_by_token(session_token)
-        return JSON(session.to_json())
-
-    return SessionExpired()
+    session = session.renew(duration=_get_duration())
+    return JSON(session.to_json())
 
 
 @authenticated
-def close(session_token):
+@with_session
+def close(session):
     """Closes the provided session."""
 
-    session = _get_session_by_token(session_token)
     session.close()
     return JSON({'closed': session.token})
 

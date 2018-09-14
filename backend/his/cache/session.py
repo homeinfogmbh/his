@@ -79,6 +79,9 @@ class APICachedSession(_CachedSession):
         """Returns the respective session from the cache."""
         response = get(CONFIG['cache']['url'].format(session_token))
 
+        if response.status_code == 500:
+            raise Exception(response.text)
+
         if response.status_code == 200:
             return cls.from_json(response.json())
 
@@ -98,11 +101,22 @@ class APICachedSession(_CachedSession):
     def _update(self, end):
         """Updates the session in the cache."""
         json = {'end': end.isoformat(), 'login': False}
-        return patch(self.url, json=json)
+        response = patch(self.url, json=json)
+
+        if response.status_code == 500:
+            raise Exception(response.text)
+
+        if response.status_code == 200:
+            return response.json
+
+        raise SessionExpired()
 
     def close(self):
         """Closes the session."""
         response = delete(self.url)
+
+        if response.status_code == 500:
+            raise Exception(response.text)
 
         if response.status_code == 200:
             return response.json
@@ -114,10 +128,8 @@ class APICachedSession(_CachedSession):
         if duration in Session.ALLOWED_DURATIONS:
             if self.alive:
                 end = datetime.now() + timedelta(minutes=duration)
-                response = self._update(end)
-
-                if response.status_code == 200:
-                    return type(self).from_json(response.json)
+                json = self._update(end)
+                return type(self).from_json(json)
 
             raise SessionExpired()
 

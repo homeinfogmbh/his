@@ -5,7 +5,7 @@ from uuid import UUID
 from peeweeplus import PasswordTooShortError
 from recaptcha import VerificationError, ReCaptcha
 
-from his.config import RECAPTCHA
+from his.config import PWRESET
 from his.globals import JSON_DATA
 from his.messages.account import NoAccountSpecified, PasswordTooShort
 from his.messages.pwreset import NoTokenSpecified, NoPasswordSpecified, \
@@ -36,9 +36,12 @@ def request_reset():
         return NoSiteKeyProvided()
 
     try:
-        secret = RECAPTCHA[site_key]
+        options = PWRESET[site_key]
     except KeyError:
         return SiteNotConfigured()
+
+    secret = options['secret']
+    url = options.get('url', 'https://his.homeinfo.de/pwreset.html')
 
     try:
         response = JSON_DATA['response']
@@ -63,7 +66,7 @@ def request_reset():
         return PasswordResetPending()
 
     password_reset_token.save()
-    password_reset_token.email()
+    password_reset_token.email(url)
     return PasswordResetSent()
 
 

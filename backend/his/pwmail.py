@@ -25,14 +25,14 @@ def href(url, caption=None):
     return HREF.format(url, caption)
 
 
-def mail_password_reset_link(password_reset_token):
+def mail_password_reset_link(password_reset_token, url):
     """Mails the respective password reset link."""
 
     with open(PWRESET_CFG['template']) as file:
         template = file.read()
 
     account = password_reset_token.account
-    link = PWRESET_CFG['link'].format(password_reset_token.token.hex)
+    link = url + '?token={}'.format(password_reset_token.token.hex)
     html = template.format(account=account.name, link=href(link))
     email = EMail(
         PWRESET_CFG['subject'], MAIL_CFG['sender'], account.email,

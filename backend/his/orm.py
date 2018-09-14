@@ -524,9 +524,9 @@ class PasswordResetToken(HISModel):
         """Determines whether the token is still valid."""
         return self.created + self.VALIDITY > datetime.now()
 
-    def email(self):
+    def email(self, url):
         """Emails the reset link to the respective account."""
-        return mail_password_reset_link(self)
+        return mail_password_reset_link(self, url)
 
 
 MODELS = (

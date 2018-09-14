@@ -95,6 +95,7 @@ def refresh(session_token):
     session = _get_session_by_token(session_token)
 
     if session.renew(duration=_get_duration()):
+        session = _get_session_by_token(session_token)
         return JSON(session.to_json())
 
     return SessionExpired()

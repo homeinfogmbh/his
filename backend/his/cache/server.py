@@ -105,7 +105,7 @@ def update_session(token):
     """Returns the respective session."""
 
     session = CACHE.refresh(token)
-    return session.to_json()
+    return JSON(session.to_json())
 
 
 @APPLICATION.route('/<token>', methods=['DELETE'])

@@ -107,7 +107,7 @@ class APICachedSession(_CachedSession):
             raise Exception(response.text)
 
         if response.status_code == 200:
-            return response.json
+            return response.json()
 
         raise SessionExpired()
 

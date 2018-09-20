@@ -5,13 +5,22 @@ from peeweeplus import PasswordTooShortError
 from his.api import authenticated
 from his.crypto import genpw
 from his.globals import ACCOUNT, CUSTOMER, JSON_DATA
-from his.messages.account import NoSuchAccount, NotAuthorized, AccountExists, \
-    AccountCreated, AccountPatched, AccountsExhausted, PasswordTooShort
+from his.messages.account import AccountCreated
+from his.messages.account import AccountExists
+from his.messages.account import AccountPatched
+from his.messages.account import AccountsExhausted
+from his.messages.account import NoSuchAccount
+from his.messages.account import NotAuthorized
+from his.messages.account import PasswordTooShort
 from his.messages.customer import CustomerUnconfigured
-from his.messages.data import DataError, MissingData, InvalidData
-from his.orm import AccountExistsError, AmbiguousDataError, \
-    Account, CustomerSettings
+from his.messages.data import DataError
+from his.messages.data import MissingData
+from his.orm import Account
+from his.orm import AccountExistsError
+from his.orm import AmbiguousDataError
+from his.orm import CustomerSettings
 from wsgilib import JSON
+
 
 __all__ = ['get_account', 'ROUTES']
 
@@ -20,33 +29,27 @@ _USER_FIELDS = ('fullName', 'passwd', 'email')
 _ADMIN_FIELDS = ('name', 'fullName', 'passwd', 'email', 'admin')
 
 
-def _get_account(name_or_id):
-    """Returns the respective account by its name or ID."""
-
-    try:
-        return Account.get(Account.id == int(name_or_id))
-    except (ValueError, Account.DoesNotExist):
-        return Account.get(Account.name == name_or_id)
-
-
-def get_account(name_or_id):
+def get_account(name):
     """Safely returns the respective account."""
+
+    if name == '!':
+        return Account.get(Account.name == ACCOUNT.name)
 
     if ACCOUNT.root:
         try:
-            return _get_account(name_or_id)
+            return Account.get(Account.name == name)
         except Account.DoesNotExist:
             raise NoSuchAccount()
 
     try:
-        account = _get_account(name_or_id)
+        account = Account.get(Account.name == name)
     except Account.DoesNotExist:
         raise NotAuthorized()   # Prevent account name sniffing.
 
     if ACCOUNT.admin:
         if account.customer == CUSTOMER:
             return account
-    elif ACCOUNT == account:
+    elif ACCOUNT.name == account.name and ACCOUNT.id == account.id:
         return account
 
     raise NotAuthorized()
@@ -158,9 +161,6 @@ def add():
 def patch(name):
     """Modifies an account."""
 
-    if name == '!':
-        return _patch_account(ACCOUNT, allow=_USER_FIELDS)
-
     account = get_account(name)
 
     if ACCOUNT.root:
@@ -168,6 +168,9 @@ def patch(name):
 
     if ACCOUNT.admin and CUSTOMER == account.customer:
         return _patch_account(account, allow=_ADMIN_FIELDS)
+
+    if ACCOUNT.id == account.id:
+        return _patch_account(account, allow=_USER_FIELDS)
 
     return NotAuthorized()
 

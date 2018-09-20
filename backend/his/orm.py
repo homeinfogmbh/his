@@ -1,11 +1,16 @@
 """ORM models."""
 
 from datetime import datetime, timedelta
+from email.utils import parseaddr
 from uuid import uuid4
 
 from argon2.exceptions import VerifyMismatchError
-from peewee import ForeignKeyField, CharField, BooleanField, DateTimeField, \
-    IntegerField, UUIDField
+from peewee import BooleanField
+from peewee import CharField
+from peewee import DateTimeField
+from peewee import ForeignKeyField
+from peewee import IntegerField
+from peewee import UUIDField
 
 from filedb import FileProperty
 from mdb import Customer
@@ -258,28 +263,40 @@ class Account(HISModel):
         return '{}@{}'.format(repr(self), self.customer.id)
 
     @classmethod
-    def add(cls, customer, name, email, passwd, admin=False,
-            root=False):
+    def add(cls, customer, name, email, passwd, admin=False, root=False):
         """Adds a new account."""
+        if len(name) < 3:
+            raise ValueError('Account name too short.')
+
+        _, email = parseaddr(email)
+
+        if email.length < 6 or '@' not in email:
+            raise ValueError('Invalid email address.')
+
         try:
             cls.get(cls.email == email)
         except cls.DoesNotExist:
-            try:
-                cls.get(cls.name == name)
-            except cls.DoesNotExist:
-                account = cls()
-                account.customer = customer
-                account.name = name
-                account.email = email
-                account.created = datetime.now()
-                account.passwd = passwd
-                account.admin = admin
-                account.root = root
-                return account
+            pass
+        else:
+            raise AccountExistsError('email')
 
+        try:
+            cls.get(cls.name == name)
+        except cls.DoesNotExist:
+            pass
+        else:
             raise AccountExistsError('name')
 
-        raise AccountExistsError('email')
+        account = cls()
+        account.customer = customer
+        account.name = name
+        account.email = email
+        account.created = datetime.now()
+        account.passwd = passwd
+        account.admin = admin
+        account.root = root
+        return account
+
 
     @classmethod
     def admins(cls, customer=None):

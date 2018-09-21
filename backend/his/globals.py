@@ -1,5 +1,7 @@
 """HIS environment proxies, faking globals."""
 
+from logging import getLogger
+
 from flask import request
 from werkzeug.local import LocalProxy
 
@@ -14,13 +16,21 @@ from his.orm import Account
 __all__ = ['SESSION', 'ACCOUNT', 'CUSTOMER', 'JSON_DATA']
 
 
+LOGGER = getLogger(__file__)
+
+
 def get_session():
     """Returns the session from the cache."""
 
     try:
-        session_token = request.args['session']
+        session_token = request.cookies['session']
     except KeyError:
-        raise NoSessionSpecified()
+        try:
+            session_token = request.args['session']
+        except KeyError:
+            raise NoSessionSpecified()
+
+        LOGGER.warning('Session insecurely specified via request arg.')
 
     return APICachedSession.from_cache(session_token)
 

@@ -7,12 +7,13 @@ from flask import request
 from wsgilib import JSON
 
 from his.api import authenticated
-from his.cache.session import APICachedSession
 from his.globals import ACCOUNT, SESSION, JSON_DATA
 from his.messages.account import NotAuthorized
-from his.messages.session import MissingCredentials, InvalidCredentials, \
-    NoSuchSession
+from his.messages.session import InvalidCredentials
+from his.messages.session import MissingCredentials
+from his.messages.session import NoSuchSession
 from his.orm import Account, Session
+from his.session import APICachedSession
 
 __all__ = ['ROUTES']
 

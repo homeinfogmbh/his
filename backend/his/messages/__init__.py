@@ -29,7 +29,6 @@ __all__ = [
     'AccountExists',
     'AccountsExhausted',
     # Customer messages.
-    'InvalidCustomerID',
     'NoCustomerSpecified',
     'NoSuchCustomer',
     'CustomerUnconfigured',

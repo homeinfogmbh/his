@@ -7,9 +7,14 @@ from werkzeug.local import LocalProxy
 
 from mdb import Customer
 
-from his.cache.session import APICachedSession
-from his.messages import NoSuchAccount, AccountLocked, NotAuthorized, \
-    NoSuchCustomer, InvalidCustomerID, NoSessionSpecified, MissingData
+from his.session import APICachedSession
+from his.messages.account import AccountLocked
+from his.messages.account import NoSuchAccount
+from his.messages.account import NotAuthorized
+from his.messages.customer import NoSuchCustomer
+from his.messages.data import InvalidCustomerID
+from his.messages.data import MissingData
+from his.messages.session import NoSessionSpecified
 from his.orm import Account
 
 

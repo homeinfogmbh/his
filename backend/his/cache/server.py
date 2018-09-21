@@ -10,9 +10,9 @@ from timelib import strpdatetime
 from wsgilib import JSON
 
 from his.application import Application
-from his.cache.session import ServerCachedSession
 from his.messages.session import NoSuchSession, SessionExpired
 from his.orm import Session
+from his.session import ServerCachedSession
 
 
 __all__ = ['APPLICATION']

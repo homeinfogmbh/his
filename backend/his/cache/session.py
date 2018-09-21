@@ -11,8 +11,9 @@ from requests import get, patch, delete
 from timelib import strpdatetime
 
 from his.config import CONFIG
-from his.messages.session import NoSuchSession, SessionExpired, \
-    DurationOutOfBounds
+from his.messages.session import DurationOutOfBounds
+from his.messages.session import NoSuchSession
+from his.messages.session import SessionExpired
 from his.orm import Account, Session
 
 

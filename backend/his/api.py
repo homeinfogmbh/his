@@ -4,10 +4,12 @@ from functools import wraps
 
 from his.config import CONFIG
 from his.globals import SESSION
-from his.messages import AccountLocked
-from his.messages import NoSuchService
-from his.messages import NotAuthorized
-from his.messages import SessionExpired
+from his.messages.account import AccountLocked
+from his.messages.account import NotAuthorized
+from his.messages.service import NoSuchService
+from his.messages.session import NoSessionSpecified
+from his.messages.session import NoSuchSession
+from his.messages.session import SessionExpired
 from his.orm import Service
 
 
@@ -19,12 +21,19 @@ __all__ = [
     'root']
 
 
-def set_session_cookie(response):
+def set_session_cookie(response, *, quiet=False):
     """Adds the session cookie to the response."""
 
     domain = CONFIG['auth']['domain']
-    token = SESSION.token.hex
-    response.set_cookie('session', token, domain=domain)
+
+    try:
+        token = SESSION.token.hex
+    except (NoSessionSpecified, NoSuchSession, SessionExpired):
+        if not quiet:
+            raise
+    else:
+        response.set_cookie('session', token, domain=domain)
+
     return response
 
 
@@ -44,7 +53,7 @@ def authenticated(function):
         if not SESSION.account.usable:
             raise AccountLocked()
 
-        return set_session_cookie(function(*args, **kwargs))
+        return function(*args, **kwargs)
 
     return wrapper
 

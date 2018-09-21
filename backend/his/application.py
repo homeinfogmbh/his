@@ -1,5 +1,6 @@
 """Basic HIS application."""
 
+from functools import partial
 from itertools import chain
 
 from peeweeplus import FieldValueError, FieldNotNullable, MissingKeyError, \
@@ -7,6 +8,8 @@ from peeweeplus import FieldValueError, FieldNotNullable, MissingKeyError, \
 from wsgilib import Application as _Application
 
 from his.messages import data
+from his.api import set_session_cookie
+
 
 __all__ = ['Application']
 
@@ -30,3 +33,4 @@ class Application(_Application):
         super().__init__(
             *args, cors=cors, debug=debug, errorhandlers=errorhandlers,
             **kwargs)
+        self.after_request(partial(set_session_cookie, quiet=True))

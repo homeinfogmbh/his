@@ -11,7 +11,21 @@ from his.messages import SessionExpired
 from his.orm import Service
 
 
-__all__ = ['authenticated', 'authorized', 'admin', 'root']
+__all__ = [
+    'set_session_cookie',
+    'authenticated',
+    'authorized',
+    'admin',
+    'root']
+
+
+def set_session_cookie(response):
+    """Adds the session cookie to the response."""
+
+    domain = CONFIG['auth']['domain']
+    token = SESSION.token.hex
+    response.set_cookie('session', token, domain=domain)
+    return response
 
 
 def authenticated(function):
@@ -30,10 +44,7 @@ def authenticated(function):
         if not SESSION.account.usable:
             raise AccountLocked()
 
-        response = function(*args, **kwargs)
-        response.set_cookie(
-            'session', SESSION.token.hex, domain=CONFIG['auth']['domain'])
-        return response
+        return set_session_cookie(function(*args, **kwargs))
 
     return wrapper
 

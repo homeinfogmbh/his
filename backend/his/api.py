@@ -92,7 +92,7 @@ def admin(function):
     @wraps(function)
     def wrapper(*args, **kwargs):
         """Checks whether the session's account is an administrator."""
-        if SESSION.account.admin:
+        if SESSION.account.root or SESSION.account.admin:
             return function(*args, **kwargs)
 
         raise NotAuthorized()

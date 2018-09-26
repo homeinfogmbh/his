@@ -270,7 +270,7 @@ class Account(HISModel):
 
         _, email = parseaddr(email)
 
-        if email.length < 6 or '@' not in email:
+        if len(email) < 6 or '@' not in email:
             raise ValueError('Invalid email address.')
 
         try:

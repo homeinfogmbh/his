@@ -39,6 +39,27 @@ from his.orm import ServiceExistsError, AccountExistsError, Account, Service, \
     CustomerService, AccountService
 
 
+def read_passwd():
+    """Reads a password."""
+
+    while True:
+        try:
+            passwd = getpass('Password: ')
+        except EOFError:
+            continue
+
+        try:
+            repeat = getpass('Repeat password: ')
+        except EOFError:
+            continue
+
+        if passwd == repeat:
+            return passwd
+
+        print('Passwords do not match.', file=stderr)
+        continue
+
+
 def randchars(count, pool=digits + ascii_letters):
     """Yields random chars from the pool."""
 
@@ -92,13 +113,11 @@ def add_account(options):
     """Adds the respective account."""
 
     if options['--passwd']:
-        passwd = getpass('Password: ')
-        _passwd_repeat = getpass('Repeat password: ')
-
-        if passwd != _passwd_repeat:
-            print('Passwords do not match.', file=stderr)
-        else:
-            _passwd_repeat = None
+        try:
+            passwd = read_passwd()
+        except KeyboardInterrupt:
+            print('Aborted by user.', file=stderr)
+            exit_(1)
 
     if not passwd:
         passwd = genpw()

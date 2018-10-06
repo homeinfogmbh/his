@@ -12,7 +12,7 @@ Usage:
     hisutil service <service> add-account <account>
 
 Options:
-    --passwd=<passwd>               Sets the desired password.
+    --passwd                        Reads the desired password from a prompt.
     --admin                         Makes the account an administrator.
     --root                          Makes the account a root account.
     --description=<description>     Specified the service's description.
@@ -26,6 +26,7 @@ Options:
     --help                          Print this page.
 """
 from datetime import datetime
+from getpass import getpass
 from random import choice
 from string import digits, ascii_letters
 from sys import exit as exit_, stderr
@@ -90,7 +91,14 @@ def get_service(name):
 def add_account(options):
     """Adds the respective account."""
 
-    passwd = options['--passwd']
+    if options['--passwd']:
+        passwd = getpass('Password: ')
+        _passwd_repeat = getpass('Repeat password: ')
+
+        if passwd != _passwd_repeat:
+            print('Passwords do not match.', file=stderr)
+        else:
+            _passwd_repeat = None
 
     if not passwd:
         passwd = genpw()
@@ -189,4 +197,3 @@ def main(options):
 
 if __name__ == '__main__':
     main(docopt(__doc__))
-

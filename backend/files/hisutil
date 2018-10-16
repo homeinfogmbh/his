@@ -4,8 +4,7 @@
 Manage HIS settings.
 
 Usage:
-    hisutil account add <name> <email> <customer> [--passwd=<passwd>] \
-[--admin] [--root]
+    hisutil account add <name> <email> <customer> [--passwd] [--admin] [--root]
     hisutil service add <name> [--description=<description>] [--promote]
     hisutil service <service> add-customer <customer>[--begin=<begin>] \
 [--end=<end>] [--date-format=<date_format>]

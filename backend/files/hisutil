@@ -52,7 +52,7 @@ def read_passwd():
         except EOFError:
             continue
 
-        if passwd == repeat:
+        if passwd and passwd == repeat:
             return passwd
 
         print('Passwords do not match.', file=stderr)
@@ -117,8 +117,7 @@ def add_account(options):
         except KeyboardInterrupt:
             print('Aborted by user.', file=stderr)
             exit_(1)
-
-    if not passwd:
+    else:
         passwd = genpw()
         print('Generated password: {}'.format(passwd))
 

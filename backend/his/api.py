@@ -1,5 +1,7 @@
 """HIS main API."""
 
+from flask import request
+
 from functools import wraps
 
 from his.globals import SESSION
@@ -29,7 +31,7 @@ def set_session_cookie(response, *, quiet=False):
         if not quiet:
             raise
     else:
-        response.set_cookie('session', token)
+        response.set_cookie('session', token, domain=request.host)
 
     return response
 

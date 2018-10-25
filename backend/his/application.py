@@ -34,7 +34,8 @@ class Application(_Application):
     def __init__(self, *args, debug=False, errorhandlers=None, **kwargs):
         """Sets default error handlers."""
         errorhandlers = tuple(chain(ERROR_HANDLERS, errorhandlers or ()))
-        domains = tuple(chain(*(service.domains for service in Service)))
+        domains = [
+            domain.domain for service in Service for domain in service.domains]
         cors = {'origins': domains, 'supports_credentials': True}
         super().__init__(
             *args, cors=cors, debug=debug, errorhandlers=errorhandlers,

@@ -27,6 +27,8 @@ LOGGER = getLogger(__file__)
 def get_session():
     """Returns the session from the cache."""
 
+    print('Cookies:', request.cookies, flush=True)
+
     try:
         session_token = request.cookies['session']
     except KeyError:

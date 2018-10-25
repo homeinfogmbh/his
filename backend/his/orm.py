@@ -28,6 +28,7 @@ __all__ = [
     'PasswordResetPending',
     'HISModel',
     'Service',
+    'ServiceDomain',
     'CustomerService',
     'Account',
     'AccountService',
@@ -172,6 +173,17 @@ class Service(HISModel):
             return account.admin or self in account.services
 
         return False
+
+
+class ServiceDomain(HISModel):
+    """Domains for the respective services."""
+
+    class Meta:
+        table_name = 'service_domain'
+
+    service = ForeignKeyField(
+        Service, column_name='service', backref='domains', on_delete='CASCADE')
+    domain = CharField(255)
 
 
 class CustomerService(HISModel):
@@ -548,5 +560,5 @@ class PasswordResetToken(HISModel):
 
 
 MODELS = (
-    Service, CustomerService, Account, AccountService, Session,
+    Service, ServiceDomain, CustomerService, Account, AccountService, Session,
     CustomerSettings, PasswordResetToken)

@@ -34,6 +34,7 @@ class Application(_Application):
         """Sets default error handlers."""
         errorhandlers = tuple(chain(ERROR_HANDLERS, errorhandlers or ()))
         cors = {'origins': list(domains()), 'supports_credentials': True}
+        print('CORS settings:', cors, flush=True)
         super().__init__(
             *args, cors=cors, debug=debug, errorhandlers=errorhandlers,
             **kwargs)

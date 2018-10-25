@@ -1,7 +1,5 @@
 """HIS main API."""
 
-from flask import request
-
 from functools import wraps
 
 from his.globals import SESSION
@@ -15,11 +13,20 @@ from his.orm import Service
 
 
 __all__ = [
+    'domains',
     'set_session_cookie',
     'authenticated',
     'authorized',
     'admin',
     'root']
+
+
+def domains():
+    """Returns a list of domains for the cookie."""
+
+    for service in Service:
+        for domain in service.domains:
+            yield domain.domain
 
 
 def set_session_cookie(response, *, quiet=False):
@@ -31,7 +38,8 @@ def set_session_cookie(response, *, quiet=False):
         if not quiet:
             raise
     else:
-        response.set_cookie('session', token, domain=request.host)
+        for domain in domains():
+            response.set_cookie('session', token, domain=domain)
 
     return response
 

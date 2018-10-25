@@ -6,7 +6,7 @@ from flask import request
 
 from wsgilib import JSON
 
-from his.api import authenticated
+from his.api import authenticated, domains
 from his.globals import ACCOUNT, SESSION, JSON_DATA
 from his.messages.account import NotAuthorized
 from his.messages.session import InvalidCredentials
@@ -74,7 +74,11 @@ def login():
     if account.login(passwd):
         session = Session.open(account, duration=_get_duration())
         response = JSON(session.to_json())
-        response.set_cookie('session', session.token.hex, domain=request.host)
+        token = session.token.hex
+
+        for domain in domains():
+            response.set_cookie('session', token, domain=domain)
+
         return response
 
     return InvalidCredentials()

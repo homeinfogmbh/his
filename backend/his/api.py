@@ -31,7 +31,8 @@ def set_session_cookie(response, *, quiet=False):
         if not quiet:
             raise
     else:
-        response.set_cookie('session', token, domain=request.host)
+        domain = request.headers.get('Referer')
+        response.set_cookie('session', token, domain=domain)
 
     return response
 

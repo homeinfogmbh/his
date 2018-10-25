@@ -74,7 +74,9 @@ def login():
     if account.login(passwd):
         session = Session.open(account, duration=_get_duration())
         response = JSON(session.to_json())
-        response.set_cookie('session', session.token.hex, domain=request.host)
+        token = session.token.hex
+        domain = request.headers.get('Referer')
+        response.set_cookie('session', token, domain=domain)
         return response
 
     return InvalidCredentials()

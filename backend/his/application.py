@@ -33,7 +33,8 @@ class Application(_Application):
     def __init__(self, *args, debug=False, errorhandlers=None, **kwargs):
         """Sets default error handlers."""
         errorhandlers = tuple(chain(ERROR_HANDLERS, errorhandlers or ()))
+        cors = {'supports_credentials': True}
         super().__init__(
-            *args, cors=True, debug=debug, errorhandlers=errorhandlers,
+            *args, cors=cors, debug=debug, errorhandlers=errorhandlers,
             **kwargs)
         self.after_request(partial(set_session_cookie, quiet=True))

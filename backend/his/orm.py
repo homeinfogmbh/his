@@ -131,7 +131,8 @@ class HISModel(JSONModel):
 class Service(HISModel):
     """Registers services of HIS."""
 
-    name = CharField(32, null=True, default=None)
+    name = CharField(32, default=None)
+    domain = CharField(255)
     description = CharField(255, null=True, default=None)
     # Flag whether the service shall be promoted.
     promote = BooleanField(default=True)

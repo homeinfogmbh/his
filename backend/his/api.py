@@ -1,8 +1,9 @@
 """HIS main API."""
 
+from flask import request
+
 from functools import wraps
 
-from his.config import CONFIG
 from his.globals import SESSION
 from his.messages.account import AccountLocked
 from his.messages.account import NotAuthorized
@@ -24,15 +25,13 @@ __all__ = [
 def set_session_cookie(response, *, quiet=False):
     """Adds the session cookie to the response."""
 
-    domain = CONFIG['auth']['domain']
-
     try:
         token = SESSION.token.hex
     except (NoSessionSpecified, NoSuchSession, SessionExpired):
         if not quiet:
             raise
     else:
-        response.set_cookie('session', token, domain=domain)
+        response.set_cookie('session', token, domain=request.host)
 
     return response
 

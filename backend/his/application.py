@@ -37,6 +37,7 @@ class Application(_Application):
         domains = [
             domain.domain for service in Service for domain in service.domains]
         cors = {'origins': domains, 'supports_credentials': True}
+        print('CORS:', cors, flush=True)
         super().__init__(
             *args, cors=cors, debug=debug, errorhandlers=errorhandlers,
             **kwargs)

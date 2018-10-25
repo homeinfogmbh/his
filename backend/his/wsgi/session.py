@@ -75,7 +75,10 @@ def login():
         session = Session.open(account, duration=_get_duration())
         response = JSON(session.to_json())
         token = session.token.hex
-        response.set_cookie('session', token, domain='*')
+
+        for domain in domains():
+            response.set_cookie('session', token, domain=domain)
+
         return response
 
     return InvalidCredentials()

@@ -12,7 +12,7 @@ from peeweeplus import NonUniqueValue
 from wsgilib import Application as _Application
 
 from his.api import set_session_cookie
-from his.orm import Service
+#from his.orm import Service
 from his.messages import data
 
 
@@ -34,11 +34,10 @@ class Application(_Application):
     def __init__(self, *args, debug=False, errorhandlers=None, **kwargs):
         """Sets default error handlers."""
         errorhandlers = tuple(chain(ERROR_HANDLERS, errorhandlers or ()))
-        domains = [
-            domain.domain for service in Service for domain in service.domains]
-        cors = {'origins': domains, 'supports_credentials': True}
-        print('CORS:', cors, flush=True)
+        #domains = [
+        #    domain.domain for service in Service for domain in service.domains]
+        #cors = {'origins': domains, 'supports_credentials': True}
         super().__init__(
-            *args, cors=cors, debug=debug, errorhandlers=errorhandlers,
+            *args, cors=True, debug=debug, errorhandlers=errorhandlers,
             **kwargs)
         self.after_request(partial(set_session_cookie, quiet=True))

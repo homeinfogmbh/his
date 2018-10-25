@@ -30,7 +30,6 @@ var his = his || {};
 
 
 his.BASE_URL = 'https://his.homeinfo.de';
-his.SESSION_KEY = 'his.session';
 his.DEBUG = false;
 
 
@@ -109,7 +108,7 @@ his._getContentType = function (data) {
 /*
     Prototype for an AJAX query.
 */
-his._AjaxQuery = function (method, url, args, data, contentType) {
+his._AjaxQuery = function (method, url, args, data, contentType, withCredentials) {
     this.type = method;
     var requestArgs = new his._RequestArgs(args);
     this.url = url + requestArgs;
@@ -128,6 +127,10 @@ his._AjaxQuery = function (method, url, args, data, contentType) {
 
     this.contentType = contentType;
 
+    if (withCredentials) {
+        this.xhrFields = {withCredentials: true};
+    }
+
     this.toString = function () {
         return JSON.stringify(this);
     };
@@ -137,28 +140,11 @@ his._AjaxQuery = function (method, url, args, data, contentType) {
 /*
     Makes an AJAX call to the respective HIS backend.
 */
-his._query = function (method, url, args, data, contentType) {
-    var ajaxQuery = new his._AjaxQuery(method, url, args, data, contentType);
+his._query = function (method, url, args, data, contentType, withCredentials) {
+    var ajaxQuery = new his._AjaxQuery(method, url, args, data, contentType, withCredentials);
     his.debug('Performing ajax query.');
     his.debug(JSON.stringify(ajaxQuery, null, 2));
     return jQuery.ajax(ajaxQuery);
-};
-
-
-/*
-    Updates a request's arguments to make the request authorized.
-    I.e. include the session token.
-*/
-his._authorized = function (args) {
-    if (args == null) {
-        return {'session': his.getSessionToken()};
-    }
-
-    if (! args.hasOwnProperty('session')) {
-        args.session = his.getSessionToken();
-    }
-
-    return args;
 };
 
 
@@ -203,28 +189,6 @@ his.delete = function (url, args) {
 
 
 /*
-    Retrieves the session from local storage.
-*/
-his.getSession = function () {
-    var sessionString = sessionStorage.getItem(his.SESSION_KEY);
-
-    if (sessionString == null) {
-        throw 'Not logged in.';
-    }
-
-    return JSON.parse(sessionString);
-};
-
-
-/*
-    Safely returns the session token.
-*/
-his.getSessionToken = function () {
-    return his.getSession().token;
-};
-
-
-/*
     Authorized requests (with session).
 */
 his.auth = his.auth || {};
@@ -234,7 +198,7 @@ his.auth = his.auth || {};
     Performs an authorized GET request.
 */
 his.auth.get = function (url, args) {
-    return his.get(url, his._authorized(args));
+    return his._query('GET', url, args, null, null, true);
 };
 
 
@@ -242,7 +206,7 @@ his.auth.get = function (url, args) {
     Performs an authorized POST request.
 */
 his.auth.post = function (url, args, data, contentType) {
-    return his.post(url, his._authorized(args), data, contentType);
+    return his._query('POST', url, args, data, contentType, true);
 };
 
 
@@ -250,7 +214,7 @@ his.auth.post = function (url, args, data, contentType) {
     Performs an authorized PATCH request.
 */
 his.auth.patch = function (url, args, data, contentType) {
-    return his.patch(url, his._authorized(args), data, contentType);
+    return his._query('PATCH', url, args, data, contentType, true);
 };
 
 
@@ -258,7 +222,7 @@ his.auth.patch = function (url, args, data, contentType) {
     Performs an authorized PUT request.
 */
 his.auth.put = function (url, args, data, contentType) {
-    return his.put(url, his._authorized(args), data, contentType);
+    return his._query('PUT', url, args, data, contentType, true);
 };
 
 
@@ -266,5 +230,5 @@ his.auth.put = function (url, args, data, contentType) {
     Performs an authorized DELETE request.
 */
 his.auth.delete = function (url, args) {
-    return his.delete(url, his._authorized(args));
+    return his._query('DELETE', url, args, null, null, true);
 };

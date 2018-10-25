@@ -128,7 +128,10 @@ his._AjaxQuery = function (method, url, args, data, contentType, withCredentials
     this.contentType = contentType;
 
     if (withCredentials) {
-        this.xhrFields = {withCredentials: true};
+        this.xhrFields = {
+            withCredentials: true
+        };
+        this.crossDomain = true;
     }
 
     this.toString = function () {

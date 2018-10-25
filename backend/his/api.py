@@ -2,6 +2,8 @@
 
 from functools import wraps
 
+from functoolsplus import coerce
+
 from his.globals import SESSION
 from his.messages.account import AccountLocked
 from his.messages.account import NotAuthorized
@@ -21,6 +23,7 @@ __all__ = [
     'root']
 
 
+@coerce(frozenset)
 def domains():
     """Returns a list of domains for the cookie."""
 

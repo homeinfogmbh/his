@@ -132,9 +132,8 @@ class HISModel(JSONModel):
 class Service(HISModel):
     """Registers services of HIS."""
 
-    name = CharField(32, default=None)
-    domain = CharField(255)
-    description = CharField(255, null=True, default=None)
+    name = CharField(32, null=True)
+    description = CharField(255, null=True)
     # Flag whether the service shall be promoted.
     promote = BooleanField(default=True)
 
@@ -196,8 +195,8 @@ class CustomerService(HISModel):
         Customer, column_name='customer', on_delete='CASCADE')
     service = ForeignKeyField(
         Service, column_name='service', on_delete='CASCADE')
-    begin = DateTimeField(null=True, default=None)
-    end = DateTimeField(null=True, default=None)
+    begin = DateTimeField(null=True)
+    end = DateTimeField(null=True)
 
     def __str__(self):
         return '{}@{}'.format(repr(self.customer), str(self.service))
@@ -252,10 +251,10 @@ class Account(HISModel):
     passwd = Argon2Field()
     email = CharField(64, unique=True)
     created = DateTimeField(default=datetime.now)
-    deleted = DateTimeField(null=True, default=None)
-    last_login = DateTimeField(null=True, default=None)
+    deleted = DateTimeField(null=True)
+    last_login = DateTimeField(null=True)
     failed_logins = IntegerField(default=0)
-    locked_until = DateTimeField(null=True, default=None)
+    locked_until = DateTimeField(null=True)
     disabled = BooleanField(default=False)
     # Flag, whether the account is an administrator of its customer (=company).
     admin = BooleanField(default=False)

@@ -11,7 +11,7 @@ from peeweeplus import MissingKeyError
 from peeweeplus import NonUniqueValue
 from wsgilib import Application as _Application
 
-from his.api import set_session_cookie
+from his.api import domains, set_session_cookie
 from his.messages import data
 
 
@@ -33,7 +33,7 @@ class Application(_Application):
     def __init__(self, *args, debug=False, errorhandlers=None, **kwargs):
         """Sets default error handlers."""
         errorhandlers = tuple(chain(ERROR_HANDLERS, errorhandlers or ()))
-        cors = {'supports_credentials': True}
+        cors = {'origins': tuple(domains()), 'supports_credentials': True}
         super().__init__(
             *args, cors=cors, debug=debug, errorhandlers=errorhandlers,
             **kwargs)

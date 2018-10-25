@@ -41,8 +41,7 @@ def set_session_cookie(response, *, quiet=False):
         if not quiet:
             raise
     else:
-        for domain in domains():
-            response.set_cookie('session', token, domain=domain)
+        response.set_cookie('session', token, domain='*')
 
     return response
 

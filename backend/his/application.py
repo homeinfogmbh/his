@@ -35,7 +35,7 @@ class Application(_Application):
         errorhandlers = tuple(chain(ERROR_HANDLERS, errorhandlers or ()))
         origins = list(domains())
         cors = {
-            'resources': {r'/*': {'origins': origins}},
+            'resources': {r'/*': {'origins': '*'}},
             'origins': origins,
             'supports_credentials': True}
         print('CORS settings:', cors, flush=True)

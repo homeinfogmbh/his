@@ -138,8 +138,8 @@ msgstr "Ungültige ReCAPTCHA Antwort."
 msgid "RequestError"
 msgstr "Ungültige Anfrage."
 
-msgid "MissingContentType"
-msgstr "Fehlender Content-Typ."
+msgid "InvalidContentType"
+msgstr "Ungültiger Content-Typ."
 
 ### Service messages. ###
 

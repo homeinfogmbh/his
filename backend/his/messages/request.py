@@ -3,7 +3,7 @@
 from his.messages.api import HISMessage
 
 
-__all__ = ['RequestError', 'MissingContentType']
+__all__ = ['RequestError', 'InvalidContentType']
 
 
 class RequestError(HISMessage):
@@ -12,7 +12,7 @@ class RequestError(HISMessage):
     STATUS = 400
 
 
-class MissingContentType(RequestError):
-    """Indicates a missing content type."""
+class InvalidContentType(RequestError):
+    """Indicates an invalid content type."""
 
-    pass
+    STATUS = 406

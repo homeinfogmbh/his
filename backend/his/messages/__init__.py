@@ -29,7 +29,7 @@ from his.messages.recaptcha import NoResponseProvided
 from his.messages.recaptcha import NoSiteKeyProvided
 from his.messages.recaptcha import SiteNotConfigured
 from his.messages.recaptcha import InvalidResponse
-from his.messages.request import RequestError, MissingContentType
+from his.messages.request import RequestError, InvalidContentType
 from his.messages.service import NoServiceSpecified
 from his.messages.service import NoSuchService
 from his.messages.service import ServiceAdded
@@ -83,7 +83,7 @@ __all__ = [
     'InvalidResponse',
     # Request messages.
     'RequestError',
-    'MissingContentType',
+    'InvalidContentType',
     # Service messages.
     'NoServiceSpecified',
     'NoSuchService',

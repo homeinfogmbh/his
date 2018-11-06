@@ -2,9 +2,7 @@
 
 from gettext import translation
 
-from flask import request
-
-from wsgilib import JSON
+from wsgilib import LANGUAGES, JSON
 
 __all__ = [
     'NoDomainSpecified',
@@ -44,6 +42,21 @@ class LanguageNotFound(Exception):
         self.lang = lang
 
 
+def get_locales(domain):
+    """Returns the fist best locale."""
+
+    for language in LANGUAGES.keys():
+        language_alt = language.replace('-', '_')
+
+        for lang in (language, language_alt):
+            try:
+                return translation(domain, LOCALES_DIR, [lang])
+            except FileNotFoundError:
+                continue
+
+    raise LanguageNotFound(list(LANGUAGES))
+
+
 class Message(JSON):
     """Messages returned by the respective web application."""
 
@@ -56,15 +69,8 @@ class Message(JSON):
         except AttributeError:
             raise NoDomainSpecified(self.__class__)
 
-        language = request.headers.get('Accept-Language', 'de_DE')
-
-        try:
-            locales = translation(domain, LOCALES_DIR, [language])
-        except FileNotFoundError:
-            raise LanguageNotFound(language)
-
         msgid = self.__class__.__name__
-        message = locales.gettext(msgid)
+        message = get_locales(domain).gettext(msgid)
 
         if message == msgid:
             raise MessageNotFound(msgid)

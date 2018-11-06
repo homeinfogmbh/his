@@ -133,6 +133,14 @@ msgstr "Die Seite ist nicht für ReCAPTCHA konfiguriert."
 msgid "InvalidResponse"
 msgstr "Ungültige ReCAPTCHA Antwort."
 
+### Request messages. ###
+
+msgid "RequestError"
+msgstr "Ungültige Anfrage."
+
+msgid "MissingContentType"
+msgstr "Fehlender Content-Typ."
+
 ### Service messages. ###
 
 msgid "NoServiceSpecified"

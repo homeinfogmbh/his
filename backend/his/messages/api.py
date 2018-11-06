@@ -56,7 +56,7 @@ class Message(JSON):
         except AttributeError:
             raise NoDomainSpecified(self.__class__)
 
-        language = request.args.get('lang', 'de_DE')
+        language = request.headers.get('Accept-Language', 'de_DE')
 
         try:
             locales = translation(domain, LOCALES_DIR, [language])

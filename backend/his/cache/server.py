@@ -10,6 +10,7 @@ from timelib import strpdatetime
 from wsgilib import JSON
 
 from his.application import Application
+from his.messages.data import InvalidData
 from his.messages.session import NoSuchSession, SessionExpired
 from his.orm import Session
 from his.session import ServerCachedSession
@@ -27,7 +28,12 @@ def with_uuid(function):
 
     @wraps(function)
     def wrapper(token, *args, **kwargs):
-        return function(UUID(token), *args, **kwargs)
+        try:
+            uuid = UUID(token)
+        except (ValueError, TypeError):
+            raise InvalidData()
+
+        return function(uuid, *args, **kwargs)
 
     return wrapper
 
@@ -43,8 +49,6 @@ class SessionCache:
         """Updates the respective session from the database."""
         try:
             record = Session.get(Session.token == token)
-        except ValueError:
-            raise NoSuchSession()   # Invalid session token format.
         except Session.DoesNotExist:
             raise NoSuchSession()
 

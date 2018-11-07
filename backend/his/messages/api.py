@@ -13,6 +13,7 @@ __all__ = [
 
 
 LOCALES_DIR = '/etc/his.d/locales'
+DEFAULT_LANGS = {'de_DE': 0.1}
 
 
 class NoDomainSpecified(Exception):
@@ -52,16 +53,15 @@ def _key_lang(language):
 def get_locales(domain):
     """Returns the fist best locale."""
 
-    languages = [lang for lang, _ in sorted(LANGUAGES.items(), key=_key_lang)]
-    # Default to German if not language is specified.
-    languages = languages or ['de_DE']
+    languages = dict(DEFAULT_LANGS)
+    languages.update(dict(LANGUAGES))
+    lang_list = [lang for lang, _ in sorted(languages.items(), key=_key_lang)]
 
-    print('LANGUAGES:',
-          [(language, LANGUAGES[language]) for language in languages],
+    print('LANGUAGES:', [(lang, languages[lang]) for lang in lang_list],
           flush=True)
 
     try:
-        return translation(domain, LOCALES_DIR, languages)
+        return translation(domain, LOCALES_DIR, lang_list)
     except FileNotFoundError:
         raise LanguageNotFound(languages)
 

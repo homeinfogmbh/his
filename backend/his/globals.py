@@ -27,8 +27,6 @@ LOGGER = getLogger(__file__)
 def get_session():
     """Returns the session from the cache."""
 
-    print('Cookies:', request.cookies, flush=True)
-
     try:
         session_token = request.cookies['session']
     except KeyError:
@@ -36,8 +34,6 @@ def get_session():
             session_token = request.args['session']
         except KeyError:
             raise NoSessionSpecified()
-
-        LOGGER.warning('Session insecurely specified via request arg.')
 
     return APICachedSession.from_cache(session_token)
 

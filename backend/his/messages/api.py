@@ -47,7 +47,7 @@ def _key_lang(language):
     """Returns a key for the respective language."""
 
     language, quality = language
-    return (quality, language)
+    return (1-quality, language)
 
 
 def get_locales(domain):

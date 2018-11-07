@@ -4,6 +4,7 @@ from gettext import translation
 
 from wsgilib import LANGUAGES, JSON
 
+
 __all__ = [
     'NoDomainSpecified',
     'MessageNotFound',
@@ -13,7 +14,7 @@ __all__ = [
 
 
 LOCALES_DIR = '/etc/his.d/locales'
-DEFAULT_LANGS = {'de_DE': 0.1}
+FALLBACK_LANG = {'de_DE': 0.1}
 
 
 class NoDomainSpecified(Exception):
@@ -53,7 +54,7 @@ def _key_lang(language):
 def get_locales(domain):
     """Returns the fist best locale."""
 
-    languages = dict(DEFAULT_LANGS)
+    languages = dict(FALLBACK_LANG)
     languages.update(dict(LANGUAGES))
     languages = [lang for lang, _ in sorted(languages.items(), key=_key_lang)]
 

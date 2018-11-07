@@ -55,13 +55,10 @@ def get_locales(domain):
 
     languages = dict(DEFAULT_LANGS)
     languages.update(dict(LANGUAGES))
-    lang_list = [lang for lang, _ in sorted(languages.items(), key=_key_lang)]
-
-    print('LANGUAGES:', [(lang, languages[lang]) for lang in lang_list],
-          flush=True)
+    languages = [lang for lang, _ in sorted(languages.items(), key=_key_lang)]
 
     try:
-        return translation(domain, LOCALES_DIR, lang_list)
+        return translation(domain, LOCALES_DIR, languages)
     except FileNotFoundError:
         raise LanguageNotFound(languages)
 

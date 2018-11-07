@@ -45,7 +45,9 @@ class LanguageNotFound(Exception):
 def get_locales(domain):
     """Returns the fist best locale."""
 
-    for language in LANGUAGES.keys():
+    languages = dict(LANGUAGES) or {'de_DE': 1}
+
+    for language in languages.keys():
         language_alt = language.replace('-', '_')
 
         for lang in (language, language_alt):
@@ -54,7 +56,7 @@ def get_locales(domain):
             except FileNotFoundError:
                 continue
 
-    raise LanguageNotFound(list(LANGUAGES))
+    raise LanguageNotFound(languages)
 
 
 class Message(JSON):

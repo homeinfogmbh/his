@@ -56,7 +56,9 @@ def get_locales(domain):
     # Default to German if not language is specified.
     languages = languages or ['de_DE']
 
-    print('LANGUAGES:', languages, flush=True)
+    print('LANGUAGES:',
+          [(language, LANGUAGES[language]) for language in languages],
+          flush=True)
 
     try:
         return translation(domain, LOCALES_DIR, languages)

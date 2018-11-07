@@ -43,6 +43,8 @@ class SessionCache:
         """Updates the respective session from the database."""
         try:
             record = Session.get(Session.token == token)
+        except ValueError:
+            raise NoSuchSession()   # Invalid session token format.
         except Session.DoesNotExist:
             raise NoSuchSession()
 

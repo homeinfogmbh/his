@@ -1,6 +1,7 @@
 """HIS web API messages."""
 
 from gettext import translation
+from operator import itemgetter
 
 from wsgilib import LANGUAGES, JSON
 
@@ -44,19 +45,13 @@ class LanguageNotFound(Exception):
         self.lang = lang
 
 
-def _key_lang(language):
-    """Returns a key for the respective language."""
-
-    language, quality = language
-    return (1-quality, language)
-
-
 def get_locales(domain):
     """Returns the fist best locale."""
 
     languages = dict(FALLBACK_LANG)
     languages.update(dict(LANGUAGES))
-    languages = [lang for lang, _ in sorted(languages.items(), key=_key_lang)]
+    languages = sorted(languages.items(), key=itemgetter(1), reverse=True)
+    languages = [language for language, _ in languages]
 
     try:
         return translation(domain, LOCALES_DIR, languages)

@@ -42,21 +42,24 @@ class LanguageNotFound(Exception):
         self.lang = lang
 
 
+def _key_lang(language):
+    """Returns a key for the respective language."""
+
+    language, quality = language
+    return (quality, language)
+
+
 def get_locales(domain):
     """Returns the fist best locale."""
 
-    languages = dict(LANGUAGES) or {'de_DE': 1}
+    languages = [lang for lang, _ in sorted(LANGUAGES.items(), key=_key_lang)]
+    # Default to German if not language is specified.
+    languages = languages or ['de_DE']
 
-    for language in languages.keys():
-        language_alt = language.replace('-', '_')
-
-        for lang in (language, language_alt):
-            try:
-                return translation(domain, LOCALES_DIR, [lang])
-            except FileNotFoundError:
-                continue
-
-    raise LanguageNotFound(languages)
+    try:
+        return translation(domain, LOCALES_DIR, languages)
+    except FileNotFoundError:
+        raise LanguageNotFound(languages)
 
 
 class Message(JSON):

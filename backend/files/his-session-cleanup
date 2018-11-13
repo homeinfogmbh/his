@@ -13,9 +13,9 @@ def cleanup_sessions():
         print('Clearing session: {}.'.format(session))
 
     if count:
-        print('Deleted {} orphaned sessions.'.format(count))
+        print('Deleted {} orphaned sessions.'.format(count), flush=True)
     else:
-        print('Nothing to do.')
+        print('Nothing to do.', flush=True)
 
 
 if __name__ == '__main__':

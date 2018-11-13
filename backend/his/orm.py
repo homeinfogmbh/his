@@ -489,16 +489,12 @@ class Session(HISModel):
     @classmethod
     def cleanup(cls, before=None):
         """Cleans up orphaned sessions."""
-        cleaned_up = set()
-
         if before is None:
             before = datetime.now()
 
         for session in cls.select().where(cls.end < before):
-            cleaned_up.add(session)
             session.delete_instance()
-
-        return cleaned_up
+            yield session
 
     @property
     def alive(self):

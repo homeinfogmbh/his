@@ -67,7 +67,7 @@ msgid "DataError"
 msgstr "Datenfehler."
 
 msgid "MissingData"
-msgstr "Felende Daten."
+msgstr "Fehlende Daten."
 
 msgid "IncompleteData"
 msgstr "Unvollständiger Datensatz."

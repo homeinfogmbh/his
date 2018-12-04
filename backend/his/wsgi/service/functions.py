@@ -1,4 +1,4 @@
-"""HIS meta services."""
+"""Common functions."""
 
 from his.messages.service import NoSuchService
 from his.orm import Service

@@ -1,4 +1,4 @@
-"""HIS meta services."""
+"""HIS services."""
 
 from wsgilib import JSON
 

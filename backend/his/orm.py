@@ -97,6 +97,9 @@ class AccountServicesProxy:
                 AccountService.account == self.account):
             yield account_service.service
 
+            for dependency in account_service.service.dependencies:
+                yield dependency.dependency
+
     def add(self, service):
         """Maps a service to this account."""
         if service not in self:

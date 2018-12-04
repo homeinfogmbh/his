@@ -4,8 +4,11 @@ from wsgilib import JSON
 
 from his.api import authenticated, admin
 from his.globals import ACCOUNT, JSON_DATA
-from his.messages.account import NotAuthorized, NoAccountSpecified
+from his.messages.account import NoAccountSpecified
+from his.messages.account import NotAuthorized
+from his.messages.service import AccountServiceDeleted
 from his.messages.service import NoServiceSpecified
+from his.messages.service import NoSuchAccountService
 from his.messages.service import ServiceAdded
 from his.orm import AccountService
 from his.orm import InconsistencyError
@@ -52,6 +55,25 @@ def add():
     return ServiceAdded()
 
 
+@authenticated
+@admin
+def delete(name):
+    """Deletes the respective account <> service mapping."""
+
+    service = get_service(name)
+
+    try:
+        account_service = AccountService.get(
+            (AccountService.account == ACCOUNT.id)
+            & (AccountService.service == service))
+    except AccountService.DoesNotExist:
+        return NoSuchAccountService()
+
+    account_service.delete_instance()
+    return AccountServiceDeleted()
+
+
 ROUTES = (
     ('POST', '/service/account', add, 'add_account_service'),
-    ('GET', '/service/account', list_, 'list_account_services'))
+    ('GET', '/service/account', list_, 'list_account_services'),
+    ('DELETE', '/service/account/<name>', delete, 'delete_account_service'))

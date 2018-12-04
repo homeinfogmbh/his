@@ -161,6 +161,18 @@ msgstr "Mehrdeutiges Ziel für Dienst."
 msgid "MissingServiceTarget"
 msgstr "Fehlendes Ziel für Dienst."
 
+msgid "NoSuchAccountService"
+msgstr "Der Dienst ist dem entsprechenden Account nicht zugerodnet."
+
+msgid "AccountServiceDeleted"
+msgstr "Der Zuordnung des Dienstes zum entsprechenden Account wurde gelöscht."
+
+msgid "NoSuchCustomerService"
+msgstr "Der Dienst ist dem entsprechenden Kunden nicht zugerodnet."
+
+msgid "CustomerServiceDeleted"
+msgstr "Der Zuordnung des Dienstes zum entsprechenden Kunden wurde gelöscht."
+
 ### Session messages. ###
 
 msgid "MissingCredentials"

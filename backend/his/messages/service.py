@@ -8,7 +8,11 @@ __all__ = [
     'ServiceAdded',
     'ServiceAlreadyEnabled',
     'AmbiguousServiceTarget',
-    'MissingServiceTarget']
+    'MissingServiceTarget',
+    'NoSuchAccountService',
+    'AccountServiceDeleted',
+    'NoSuchCustomerService',
+    'CustomerServiceDeleted']
 
 
 class NoServiceSpecified(HISMessage):
@@ -45,3 +49,35 @@ class MissingServiceTarget(HISMessage):
     """Indicates that the respective target is missing."""
 
     STATUS = 406
+
+
+class NoSuchAccountService(HISMessage):
+    """Indicates that the respective account
+    <> service mapping does not exist.
+    """
+
+    STATUS = 400
+
+
+class AccountServiceDeleted(HISMessage):
+    """Indicates that the respective account <>
+    service mapping has been successfully deleted.
+    """
+
+    STATUS = 200
+
+
+class NoSuchCustomerService(HISMessage):
+    """Indicates that the respective customer
+    <> service mapping does not exist.
+    """
+
+    STATUS = 400
+
+
+class CustomerServiceDeleted(HISMessage):
+    """Indicates that the respective customer <>
+    service mapping has been successfully deleted.
+    """
+
+    STATUS = 200

@@ -5,7 +5,9 @@ from wsgilib import JSON
 from his.api import authenticated, root, admin
 from his.globals import CUSTOMER, JSON_DATA
 from his.messages.customer import NoCustomerSpecified
+from his.messages.service import CustomerServiceDeleted
 from his.messages.service import NoServiceSpecified
+from his.messages.service import NoSuchCustomerService
 from his.messages.service import ServiceAdded
 from his.messages.service import ServiceAlreadyEnabled
 from his.orm import CustomerService
@@ -67,8 +69,27 @@ def add():
     return ServiceAlreadyEnabled()
 
 
+@authenticated
+@admin
+def delete(name):
+    """Deletes the respective account <> service mapping."""
+
+    service = get_service(name)
+
+    try:
+        customer_service = CustomerService.get(
+            (CustomerService.customer == CUSTOMER.id)
+            & (CustomerService.service == service))
+    except CustomerService.DoesNotExist:
+        return NoSuchCustomerService()
+
+    customer_service.delete_instance()
+    return CustomerServiceDeleted()
+
+
 ROUTES = (
     ('GET', '/service/customer', list_, 'list_customer_services'),
     ('GET', '/service/<name>/customers', list_customers,
      'list_service_customers'),
-    ('POST', '/service/customer', add, 'add_customer_service'))
+    ('POST', '/service/customer', add, 'add_customer_service'),
+    ('DELETE', '/service/customer/<name>', delete, 'delete_customer_service'))

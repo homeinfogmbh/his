@@ -161,6 +161,18 @@ msgstr "Ambiguous service target."
 msgid "MissingServiceTarget"
 msgstr "Missing service target."
 
+msgid "NoSuchAccountService"
+msgstr "The service is not mapped to the respective account."
+
+msgid "AccountServiceDeleted"
+msgstr "The mapping of the service to the resective account has been deleted."
+
+msgid "NoSuchCustomerService"
+msgstr "The service is not mapped to the respective customer."
+
+msgid "CustomerServiceDeleted"
+msgstr "The mapping of the service to the resective customer has been deleted."
+
 ### Session messages. ###
 
 msgid "MissingCredentials"

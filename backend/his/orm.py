@@ -28,6 +28,7 @@ __all__ = [
     'PasswordResetPending',
     'HISModel',
     'Service',
+    'ServiceDependency',
     'ServiceDomain',
     'CustomerService',
     'Account',
@@ -124,7 +125,7 @@ class AccountServicesProxy:
 class HISModel(JSONModel):
     """Generic HOMEINFO Integrated Service database model."""
 
-    class Meta:
+    class Meta:     # pylint: disable=C0111,R0903
         database = DATABASE
         schema = database.database
 
@@ -174,10 +175,23 @@ class Service(HISModel):
         return False
 
 
+class ServiceDependency(HISModel):
+    """Maps service dependencies."""
+
+    class Meta:     # pylint: disable=C0111,R0903
+        table_name = 'service_dependency'
+
+    service = ForeignKeyField(
+        Service, column_name='service', backref='dependencies',
+        on_delete='CASCADE')
+    dependency = ForeignKeyField(
+        Service, column_name='dependency', on_delete='CASCADE')
+
+
 class ServiceDomain(HISModel):
     """Domains for the respective services."""
 
-    class Meta:
+    class Meta:     # pylint: disable=C0111,R0903
         table_name = 'service_domain'
 
     service = ForeignKeyField(
@@ -188,7 +202,7 @@ class ServiceDomain(HISModel):
 class CustomerService(HISModel):
     """Many-to-many Account <-> Services mapping."""
 
-    class Meta:
+    class Meta:     # pylint: disable=C0111,R0903
         table_name = 'customer_service'
 
     customer = ForeignKeyField(
@@ -216,6 +230,9 @@ class CustomerService(HISModel):
         """Yields services for the respective customer."""
         for customer_service in cls.select().where(cls.customer == customer):
             yield customer_service.service
+
+            for dependency in customer_service.service.dependencies:
+                yield dependency.dependency
 
     @property
     def active(self):
@@ -423,7 +440,7 @@ class Account(HISModel):
 class AccountService(HISModel):
     """Many-to-many Account <-> Service mapping."""
 
-    class Meta:
+    class Meta:     # pylint: disable=C0111,R0903
         table_name = 'account_service'
 
     account = ForeignKeyField(
@@ -505,7 +522,7 @@ class Session(HISModel):
 class CustomerSettings(HISModel):
     """Settings for a certain customer."""
 
-    class Meta:
+    class Meta:     # pylint: disable=C0111,R0903
         table_name = 'customer_settings'
 
     customer = ForeignKeyField(
@@ -520,7 +537,7 @@ class PasswordResetToken(HISModel):
 
     VALIDITY = timedelta(hours=1)
 
-    class Meta:
+    class Meta:     # pylint: disable=C0111,R0903
         table_name = 'password_reset_token'
 
     account = ForeignKeyField(

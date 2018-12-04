@@ -6,12 +6,17 @@ from his.api import authenticated, root, admin
 from his.globals import ACCOUNT, CUSTOMER, JSON_DATA
 from his.messages.account import NotAuthorized, NoAccountSpecified
 from his.messages.customer import NoCustomerSpecified
-from his.messages.service import NoServiceSpecified, NoSuchService, \
-    ServiceAdded, ServiceAlreadyEnabled
-from his.orm import InconsistencyError, Service, CustomerService, \
-    AccountService
+from his.messages.service import NoServiceSpecified
+from his.messages.service import NoSuchService
+from his.messages.service import ServiceAdded
+from his.messages.service import ServiceAlreadyEnabled
+from his.orm import AccountService
+from his.orm import CustomerService
+from his.orm import InconsistencyError
+from his.orm import Service
 from his.wsgi.account import get_account
 from his.wsgi.customer import get_customer
+
 
 __all__ = ['ROUTES']
 
@@ -96,18 +101,20 @@ def list_services():
 def list_customer_services():
     """Lists services of the respective customer."""
 
-    return JSON([customer_service.service.to_json() for customer_service
-                 in CustomerService.select().where(
-                     CustomerService.customer == CUSTOMER.id)])
+    return JSON([
+        customer_service.service.to_json() for customer_service
+        in CustomerService.select().where(
+            CustomerService.customer == CUSTOMER.id)])
 
 
 @authenticated
 def list_account_services():
     """Lists services of the respective account."""
 
-    return JSON([account_service.service.to_json() for account_service
-                 in AccountService.select().where(
-                     AccountService.account == ACCOUNT.id)])
+    return JSON([
+        account_service.service.to_json() for account_service
+        in AccountService.select().where(
+            AccountService.account == ACCOUNT.id)])
 
 
 @authenticated

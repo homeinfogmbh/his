@@ -16,7 +16,7 @@ frontend:
 
 restart:
 	@ echo "Restarting web services..."
-	@ fixuwsgi -q
+	@ systemctl restart emperor.uwsgi.service
 
 api-test:
 	@ make -C tests api

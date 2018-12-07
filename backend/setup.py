@@ -15,5 +15,5 @@ setup(
         'his.wsgi',
         'his.wsgi.service'],
     scripts=['files/hisutil', 'files/his-session-cleanup'],
-    data_files=[('/etc/his.d', ['files/pwreset.html'])],
+    data_files=[('/usr/local/etc/his.d', ['files/pwreset.html'])],
     description='HOMEINFO Integrated Services.')

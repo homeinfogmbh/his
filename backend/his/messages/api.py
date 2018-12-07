@@ -14,7 +14,7 @@ __all__ = [
     'HISMessage']
 
 
-LOCALES_DIR = '/etc/his.d/locales'
+LOCALES_DIR = '/usr/local/etc/his.d/locales'
 FALLBACK_LANG = {'de_DE': 0.1}
 
 

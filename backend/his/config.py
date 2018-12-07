@@ -1,10 +1,10 @@
 """HIS configuration."""
 
-from configlib import loadcfg, JSONParser
+from configlib import load_ini, load_json
 
 
 __all__ = ['CONFIG', 'PWRESET']
 
 
-CONFIG = loadcfg('his.d/his.conf')
-PWRESET = JSONParser('/usr/local/etc/his.d/pwreset.json')
+CONFIG = load_ini('his.d/his.conf')
+PWRESET = load_json('his.d/pwreset.json')

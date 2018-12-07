@@ -1,21 +1,21 @@
 """HIS environment proxies, faking globals."""
 
 from logging import getLogger
+from uuid import UUID
 
 from flask import request
 from werkzeug.local import LocalProxy
 
 from mdb import Customer
 
-from his.session import APICachedSession
 from his.messages.account import AccountLocked
 from his.messages.account import NoSuchAccount
 from his.messages.account import NotAuthorized
 from his.messages.customer import NoSuchCustomer
 from his.messages.data import InvalidCustomerID
 from his.messages.data import MissingData
-from his.messages.session import NoSessionSpecified
-from his.orm import Account
+from his.messages.session import NoSessionSpecified, NoSuchSession
+from his.orm import Account, Session
 
 
 __all__ = ['SESSION', 'ACCOUNT', 'CUSTOMER', 'JSON_DATA']
@@ -35,7 +35,12 @@ def get_session():
         except KeyError:
             raise NoSessionSpecified()
 
-    return APICachedSession.from_cache(session_token)
+    try:
+        session_token = UUID(session_token)
+    except ValueError:
+        raise NoSuchSession()
+
+    return Session.get(Session.token == session_token)
 
 
 def get_account():

@@ -1,6 +1,7 @@
 """HIS session service."""
 
 from functools import wraps
+from uuid import UUID
 
 from flask import request
 
@@ -13,7 +14,6 @@ from his.messages.session import InvalidCredentials
 from his.messages.session import MissingCredentials
 from his.messages.session import NoSuchSession
 from his.orm import Account, Session
-from his.session import APICachedSession
 
 
 __all__ = ['ROUTES']
@@ -36,7 +36,12 @@ def _get_session_by_token(session_token):
     if session_token == '!':
         return SESSION
 
-    session = APICachedSession.from_cache(session_token)
+    try:
+        session_token = UUID(session_token)
+    except ValueError:
+        raise NoSuchSession()
+
+    session = Session.get(Session.token == session_token)
     conditions = (
         lambda: SESSION.token == session.token,
         lambda: ACCOUNT.root,

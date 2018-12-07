@@ -10,7 +10,6 @@ setup(
     requires=['mdb'],
     packages=[
         'his',
-        'his.cache',
         'his.messages',
         'his.wsgi',
         'his.wsgi.service'],

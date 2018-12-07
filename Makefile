@@ -1,6 +1,6 @@
 .PHONY: pull backend test frontend restart api-test
 
-default: | pull backend test frontend restart api-test
+default: | pull backend frontend restart api-test
 
 pull:
 	@ git pull

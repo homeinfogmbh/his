@@ -6,6 +6,7 @@ from peeweeplus import PasswordTooShortError
 from recaptcha import VerificationError, ReCaptcha
 
 from his.config import PWRESET
+from his.exceptions import PasswordResetPending as PasswordResetPending_
 from his.globals import JSON_DATA
 from his.messages.account import NoAccountSpecified, PasswordTooShort
 from his.messages.pwreset import InvalidResetToken
@@ -18,9 +19,7 @@ from his.messages.recaptcha import InvalidResponse
 from his.messages.recaptcha import NoResponseProvided
 from his.messages.recaptcha import NoSiteKeyProvided
 from his.messages.recaptcha import SiteNotConfigured
-from his.orm import Account
-from his.orm import PasswordResetPending as PasswordResetPending_
-from his.orm import PasswordResetToken
+from his.orm import Account, PasswordResetToken
 
 
 __all__ = ['ROUTES']

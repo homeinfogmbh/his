@@ -17,15 +17,15 @@ from mdb import Customer
 from peeweeplus import InvalidKeys, MySQLDatabase, JSONModel, Argon2Field
 
 from his.config import CONFIG
+from his.exceptions import AccountExistsError
+from his.exceptions import InconsistencyError
+from his.exceptions import PasswordResetPending
+from his.exceptions import ServiceExistsError
 from his.messages import AccountLocked, InvalidCredentials, DurationOutOfBounds
 from his.pwmail import mail_password_reset_link
 
 
 __all__ = [
-    'ServiceExistsError',
-    'AccountExistsError',
-    'AmbiguousDataError',
-    'PasswordResetPending',
     'HISModel',
     'Service',
     'ServiceDependency',
@@ -40,48 +40,6 @@ __all__ = [
 
 
 DATABASE = MySQLDatabase.from_config(CONFIG['db'])
-
-
-class InconsistencyError(Exception):
-    """Indicates inconsistencies in database configuration."""
-
-    def __init__(self, msg):
-        super().__init__(msg)
-        self.msg = msg
-
-    def __str__(self):
-        return self.msg
-
-
-class ServiceExistsError(Exception):
-    """Indicates that the respective account already exists."""
-
-    pass
-
-
-class AccountExistsError(Exception):
-    """Indicates that the respective account already exists."""
-
-    def __init__(self, field):
-        super().__init__(field)
-        self.field = field
-
-
-class AmbiguousDataError(Exception):
-    """Indicates that the provided data is ambiguous."""
-
-    def __init__(self, field):
-        super().__init__(field)
-        self.field = field
-
-    def __str__(self):
-        return self.field
-
-
-class PasswordResetPending(Exception):
-    """Indicates that a password reset is already pending."""
-
-    pass
 
 
 class AccountServicesProxy:
@@ -520,6 +478,18 @@ class Session(HISModel):
     def alive(self):
         """Determines whether the session is active."""
         return self.start <= datetime.now() < self.end
+
+    def renew(self, duration=15):
+        """Renews the session."""
+        if duration not in type(self).ALLOWED_DURATIONS:
+            raise DurationOutOfBounds()
+
+        if not self.account.can_login:
+            raise AccountLocked()
+
+        self.end = datetime.now() + timedelta(minutes=duration)
+        self.save()
+        return self
 
 
 class CustomerSettings(HISModel):

@@ -3,6 +3,7 @@
 from wsgilib import JSON
 
 from his.api import authenticated, admin
+from his.exceptions import InconsistencyError
 from his.globals import ACCOUNT, JSON_DATA
 from his.messages.account import NoAccountSpecified
 from his.messages.account import NotAuthorized
@@ -11,7 +12,6 @@ from his.messages.service import NoServiceSpecified
 from his.messages.service import NoSuchAccountService
 from his.messages.service import ServiceAdded
 from his.orm import AccountService
-from his.orm import InconsistencyError
 from his.wsgi.account import get_account
 from his.wsgi.service.functions import get_service
 

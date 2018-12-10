@@ -4,6 +4,7 @@ from peeweeplus import PasswordTooShortError
 
 from his.api import authenticated
 from his.crypto import genpw
+from his.exceptions import AccountExistsError, AmbiguousDataError
 from his.globals import ACCOUNT, CUSTOMER, JSON_DATA
 from his.messages.account import AccountCreated
 from his.messages.account import AccountExists
@@ -15,10 +16,7 @@ from his.messages.account import PasswordTooShort
 from his.messages.customer import CustomerUnconfigured
 from his.messages.data import DataError
 from his.messages.data import MissingData
-from his.orm import Account
-from his.orm import AccountExistsError
-from his.orm import AmbiguousDataError
-from his.orm import CustomerSettings
+from his.orm import Account, CustomerSettings
 from wsgilib import JSON
 
 

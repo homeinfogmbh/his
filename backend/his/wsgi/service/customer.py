@@ -10,8 +10,7 @@ from his.messages.service import NoServiceSpecified
 from his.messages.service import NoSuchCustomerService
 from his.messages.service import ServiceAdded
 from his.messages.service import ServiceAlreadyEnabled
-from his.orm import CustomerService
-from his.orm import Service
+from his.orm import Service, CustomerService
 from his.wsgi.customer import get_customer
 from his.wsgi.service.functions import get_service
 

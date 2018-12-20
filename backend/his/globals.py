@@ -40,7 +40,10 @@ def get_session():
     except ValueError:
         raise NoSuchSession()
 
-    return Session.get(Session.token == session_token)
+    try:
+        return Session.get(Session.token == session_token)
+    except Session.DoesNotExist:
+        raise NoSuchSession()
 
 
 def get_account():

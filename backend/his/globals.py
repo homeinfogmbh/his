@@ -72,7 +72,7 @@ def get_account():
     """Gets the verified targeted account."""
 
     try:
-        account = request.args['account']
+        account_name = request.args['account']
     except KeyError:
         account = SESSION.account
 
@@ -81,7 +81,7 @@ def get_account():
 
         raise AccountLocked()
 
-    return _get_substituted_account(account)
+    return _get_substituted_account(account_name)
 
 
 def get_customer():

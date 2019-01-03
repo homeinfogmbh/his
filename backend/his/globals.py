@@ -24,6 +24,28 @@ __all__ = ['SESSION', 'ACCOUNT', 'CUSTOMER', 'JSON_DATA']
 LOGGER = getLogger(__file__)
 
 
+def _get_substituted_account(account_name):
+    """Returns the respective substituted account."""
+
+    session_account = SESSION.account
+
+    if not session_account.usable:
+        raise AccountLocked()
+
+    if session_account.root:
+        try:
+            return Account.find(account_name)
+        except Account.DoesNotExist:
+            raise NoSuchAccount()
+    elif session_account.admin:
+        try:
+            return Account.find(account_name, customer=CUSTOMER.id)
+        except Account.DoesNotExist:
+            raise NoSuchAccount()
+
+    raise NotAuthorized()
+
+
 def get_session():
     """Returns the session from the cache."""
 
@@ -52,25 +74,14 @@ def get_account():
     try:
         account = request.args['account']
     except KeyError:
-        return SESSION.account
-
-    if SESSION.account.root:
-        try:
-            return Account.find(account)
-        except Account.DoesNotExist:
-            raise NoSuchAccount()
-    elif SESSION.account.admin:
-        try:
-            account = Account.find(account, customer=CUSTOMER.id)
-        except Account.DoesNotExist:
-            raise NoSuchAccount()
+        account = SESSION.account
 
         if account.usable:
             return account
 
         raise AccountLocked()
 
-    raise NotAuthorized()
+    return _get_substituted_account(account)
 
 
 def get_customer():

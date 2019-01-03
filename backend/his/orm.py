@@ -40,6 +40,7 @@ __all__ = [
 
 
 DATABASE = MySQLDatabase.from_config(CONFIG['db'])
+MAX_FAILED_LOGINS = 5
 
 
 class AccountServicesProxy:
@@ -325,16 +326,9 @@ class Account(HISModel):
         return not self.deleted and not self.disabled and not self.locked
 
     @property
-    def failed_logins_exceeded(self):
-        """Determines whether the account has exceeded
-        the acceptable amount of failed logins.
-        """
-        return self.failed_logins > 5
-
-    @property
     def can_login(self):
         """Determines whether the account can log in."""
-        return self.usable and not self.failed_logins_exceeded
+        return self.usable and self.failed_logins <= MAX_FAILED_LOGINS
 
     @property
     def active(self):

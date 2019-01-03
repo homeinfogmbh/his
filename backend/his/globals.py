@@ -8,7 +8,6 @@ from werkzeug.local import LocalProxy
 
 from mdb import Customer
 
-from his.messages.account import AccountLocked
 from his.messages.account import NoSuchAccount
 from his.messages.account import NotAuthorized
 from his.messages.customer import NoSuchCustomer
@@ -22,28 +21,6 @@ __all__ = ['SESSION', 'ACCOUNT', 'CUSTOMER', 'JSON_DATA']
 
 
 LOGGER = getLogger(__file__)
-
-
-def _get_substituted_account(account_name):
-    """Returns the respective substituted account."""
-
-    session_account = SESSION.account
-
-    if not session_account.usable:
-        raise AccountLocked()
-
-    if session_account.root:
-        try:
-            return Account.find(account_name)
-        except Account.DoesNotExist:
-            raise NoSuchAccount()
-    elif session_account.admin:
-        try:
-            return Account.find(account_name, customer=CUSTOMER.id)
-        except Account.DoesNotExist:
-            raise NoSuchAccount()
-
-    raise NotAuthorized()
 
 
 def get_session():
@@ -72,16 +49,22 @@ def get_account():
     """Gets the verified targeted account."""
 
     try:
-        account_name = request.args['account']
+        account = request.args['account']
     except KeyError:
-        account = SESSION.account
+        return SESSION.account
 
-        if account.usable:
-            return account
+    if SESSION.account.root:
+        try:
+            return Account.find(account)
+        except Account.DoesNotExist:
+            raise NoSuchAccount()
+    elif SESSION.account.admin:
+        try:
+            return Account.find(account, customer=CUSTOMER.id)
+        except Account.DoesNotExist:
+            raise NoSuchAccount()
 
-        raise AccountLocked()
-
-    return _get_substituted_account(account_name)
+    raise NotAuthorized()
 
 
 def get_customer():

@@ -124,7 +124,10 @@ def close(session):
 
     token = session.token.hex
     session.delete_instance()
-    return JSON({'closed': token})
+    response = JSON({'closed': token})
+    response.delete_cookie('his-session')
+    return response
+
 
 
 ROUTES = (

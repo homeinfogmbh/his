@@ -38,7 +38,9 @@ def _set_session_cookie(response):
     except (NoSessionSpecified, NoSuchSession):
         return response
 
-    response.set_cookie('his-session', session.token.hex)
+    if not 'Set-Cookie' in response.headers:
+        response.set_cookie('his-session', session.token.hex)
+
     return response
 
 

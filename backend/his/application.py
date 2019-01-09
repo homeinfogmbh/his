@@ -2,8 +2,6 @@
 
 from itertools import chain
 
-from flask import request
-
 from peeweeplus import FieldNotNullable
 from peeweeplus import FieldValueError
 from peeweeplus import InvalidEnumerationValue
@@ -32,20 +30,15 @@ ERROR_HANDLERS = (
 def _set_session_cookie(response):
     """Sets the session cookie on the respective response."""
 
-    print('DEBUG: Attempting to set session cookie.', flush=True)
-    print('DEBUG: Got cookies:', request.cookies, flush=True)
+    # Allow CORS credentials for AJAX.
     response.headers['Access-Control-Allow-Credentials'] = 'true'
 
     try:
         session = get_session()
-    except NoSessionSpecified:
-        print('DEBUG: No session specified.')
-    except NoSuchSession:
-        print('DEBUG: No such session.')
-    else:
-        response.set_cookie('his-session', session.token.hex)
-        print('DEBUG: Set session cookie.', flush=True)
+    except (NoSessionSpecified, NoSuchSession):
+        return response
 
+    response.set_cookie('his-session', session.token.hex)
     return response
 
 

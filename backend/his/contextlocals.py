@@ -29,8 +29,6 @@ def get_session():
             session_token = request.args['session']
         except KeyError:
             raise NoSessionSpecified()
-    else:
-        print('DEBUG: Got session via cookie.', flush=True)
 
     try:
         session_token = UUID(session_token)

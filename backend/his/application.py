@@ -2,6 +2,8 @@
 
 from itertools import chain
 
+from flask import request
+
 from peeweeplus import FieldNotNullable
 from peeweeplus import FieldValueError
 from peeweeplus import InvalidEnumerationValue

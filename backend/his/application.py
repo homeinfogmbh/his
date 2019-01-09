@@ -34,11 +34,14 @@ def _set_session_cookie(response):
 
     try:
         session = get_session()
-    except (NoSessionSpecified, NoSuchSession):
-        return response
+    except NoSessionSpecified:
+        print('DEBUG: No session specified.')
+    except NoSuchSession:
+        print('DEBUG: No such session.')
+    else:
+        response.set_cookie('his-session', session.token.hex)
+        print('DEBUG: Set session cookie.', flush=True)
 
-    response.set_cookie('his-session', session.token.hex)
-    print('DEBUG: Set session cookie.', flush=True)
     return response
 
 

@@ -1,6 +1,5 @@
 """HIS request context locals."""
 
-from logging import getLogger
 from uuid import UUID
 
 from flask import request
@@ -20,19 +19,18 @@ from his.orm import Account, Session
 __all__ = ['SESSION', 'ACCOUNT', 'CUSTOMER', 'JSON_DATA']
 
 
-LOGGER = getLogger(__file__)
-
-
 def get_session():
     """Returns the session from the cache."""
 
     try:
-        session_token = request.cookies['session']
+        session_token = request.cookies['his-session']
     except KeyError:
         try:
             session_token = request.args['session']
         except KeyError:
             raise NoSessionSpecified()
+    else:
+        print('DEBUG: Got session via cookie.', flush=True)
 
     try:
         session_token = UUID(session_token)

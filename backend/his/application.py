@@ -31,6 +31,7 @@ def _set_session_cookie(response):
     """Sets the session cookie on the respective response."""
 
     print('DEBUG: Attempting to set session cookie.', flush=True)
+    print('DEBUG: Got cookies:', request.cookies, flush=True)
 
     try:
         session = get_session()

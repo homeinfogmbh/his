@@ -122,8 +122,9 @@ def refresh(session):
 def close(session):
     """Closes the provided session."""
 
-    session.close()
-    return JSON({'closed': session.token})
+    token = session.token.hex
+    session.delete_instance()
+    return JSON({'closed': token})
 
 
 ROUTES = (

@@ -127,6 +127,7 @@ his._AjaxQuery = function (method, url, args, data, contentType) {
     }
 
     this.contentType = contentType;
+    this.xhrFields = {withCredentials: true};
 
     this.toString = function () {
         return JSON.stringify(this);

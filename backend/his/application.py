@@ -10,6 +10,7 @@ from peeweeplus import MissingKeyError
 from peeweeplus import NonUniqueValue
 from wsgilib import Application as _Application
 
+from his.config import DOMAIN
 from his.contextlocals import get_session
 from his.messages import data
 from his.messages.session import NoSessionSpecified, NoSuchSession
@@ -39,7 +40,8 @@ def _set_session_cookie(response):
         return response
 
     if not 'Set-Cookie' in response.headers:
-        response.set_cookie('his-session', session.token.hex)
+        response.set_cookie(
+            'his-session', session.token.hex, domain=DOMAIN, secure=True)
 
     return response
 

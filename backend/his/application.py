@@ -36,6 +36,7 @@ def _set_session_cookie(response):
         return response
 
     response.set_cookie('his-session', session.token.hex)
+    print('DEBUG: Set session cookie.', flush=True)
     return response
 
 

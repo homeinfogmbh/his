@@ -42,9 +42,10 @@ def _set_session_cookie(response):
     except (NoSessionSpecified, NoSuchSession):
         return response
 
-    response.set_cookie(COOKIE, session.token.hex, domain=DOMAIN, secure=True)
+    response.set_cookie(
+        COOKIE, session.token.hex, expires=session.end, domain=DOMAIN,
+        secure=True)
     return response
-
 
 
 class Application(_Application):

@@ -1,9 +1,14 @@
 """Common functions."""
 
 from his.config import COOKIE, DOMAIN
+from his.contextlocals import get_session
+from his.messages.session import NoSessionSpecified, NoSuchSession
 
 
-__all__ = ['set_session_cookie', 'delete_session_cookie']
+__all__ = [
+    'set_session_cookie',
+    'delete_session_cookie',
+    'postprocess_response']
 
 
 def set_session_cookie(response, session):
@@ -20,3 +25,20 @@ def delete_session_cookie(response):
 
     response.delete_cookie(COOKIE, domain=DOMAIN)
     return response
+
+
+def postprocess_response(response):
+    """Sets the session cookie on the respective response."""
+
+    # Allow CORS credentials for AJAX.
+    response.headers['Access-Control-Allow-Credentials'] = 'true'
+
+    if 'Set-Cookie' in response.headers:
+        return response
+
+    try:
+        session = get_session()
+    except (NoSessionSpecified, NoSuchSession):
+        return response
+
+    return set_session_cookie(response, session)

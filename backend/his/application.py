@@ -10,10 +10,8 @@ from peeweeplus import MissingKeyError
 from peeweeplus import NonUniqueValue
 from wsgilib import Application as _Application
 
-from his.contextlocals import get_session
-from his.functions import set_session_cookie
+from his.functions import postprocess_response
 from his.messages import data
-from his.messages.session import NoSessionSpecified, NoSuchSession
 
 
 __all__ = ['Application']
@@ -26,23 +24,6 @@ ERROR_HANDLERS = (
     (InvalidKeys, data.InvalidKeys.from_iks),
     (NonUniqueValue, data.NonUniqueValue.from_nuv),
     (InvalidEnumerationValue, data.InvalidEnumerationValue.from_iev))
-
-
-def postprocess_response(response):
-    """Sets the session cookie on the respective response."""
-
-    # Allow CORS credentials for AJAX.
-    response.headers['Access-Control-Allow-Credentials'] = 'true'
-
-    if 'Set-Cookie' in response.headers:
-        return response
-
-    try:
-        session = get_session()
-    except (NoSessionSpecified, NoSuchSession):
-        return response
-
-    return set_session_cookie(response, session)
 
 
 class Application(_Application):

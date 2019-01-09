@@ -7,7 +7,10 @@ setup(
     name='his',
     version='latest',
     author='Richard Neumann',
-    requires=['mdb'],
+    requires=[
+        'argon2', 'configlib', 'docopt', 'emaillib', 'filedb', 'flask',
+        'functoolsplus', 'mdb', 'peewee', 'peeweeplus', 'recaptcha',
+        'werkzeug', 'wsgilib'],
     packages=[
         'his',
         'his.messages',

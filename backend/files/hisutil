@@ -34,8 +34,12 @@ from docopt import docopt
 
 from mdb import Customer
 
-from his.orm import ServiceExistsError, AccountExistsError, Account, Service, \
-    CustomerService, AccountService
+from his.exceptions import AccountExistsError
+from his.exceptions import ServiceExistsError
+from his.orm import Account
+from his.orm import AccountService
+from his.orm import CustomerService
+from his.orm import Service
 
 
 def read_passwd():

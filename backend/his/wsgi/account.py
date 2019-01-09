@@ -1,6 +1,7 @@
 """Account management."""
 
 from peeweeplus import PasswordTooShortError
+from wsgilib import JSON
 
 from his.api import authenticated
 from his.crypto import genpw
@@ -17,7 +18,6 @@ from his.messages.customer import CustomerUnconfigured
 from his.messages.data import DataError
 from his.messages.data import MissingData
 from his.orm import Account, CustomerSettings
-from wsgilib import JSON
 
 
 __all__ = ['get_account', 'ROUTES']

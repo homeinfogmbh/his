@@ -2,12 +2,12 @@
 
 from his.messages.api import HISMessage
 
+
 __all__ = [
     'NoResponseProvided',
     'NoSiteKeyProvided',
     'SiteNotConfigured',
     'InvalidResponse']
-
 
 
 class NoResponseProvided(HISMessage):

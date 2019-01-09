@@ -4,6 +4,7 @@ from emaillib import EMail, Mailer
 
 from his.config import CONFIG
 
+
 __all__ = ['mail_password_reset_link']
 
 

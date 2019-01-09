@@ -54,7 +54,7 @@ his.account._getUrl = function (accountName) {
 */
 his.account.list = function (args) {
     var url = his.account._getUrl();
-    return his.auth.get(url, args);
+    return his.get(url, args);
 };
 
 
@@ -64,7 +64,7 @@ his.account.list = function (args) {
 his.account.get = function (name, args) {
     name = name || '!';
     var url = his.account._getUrl(name);
-    return his.auth.get(url, args);
+    return his.get(url, args);
 };
 
 
@@ -73,7 +73,7 @@ his.account.get = function (name, args) {
 */
 his.account.add = function (account, args) {
     var url = his.account._getUrl();
-    return his.auth.post(url, args, account);
+    return his.post(url, args, account);
 };
 
 
@@ -83,7 +83,7 @@ his.account.add = function (account, args) {
 his.account.patch = function (name, args, accountPatch) {
     name = name || '!';
     var url = his.account._getUrl(name);
-    return his.auth.patch(url, args, accountPatch);
+    return his.patch(url, args, accountPatch);
 };
 
 

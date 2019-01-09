@@ -54,7 +54,7 @@ his.service._getUrl = function (endpoint) {
 */
 his.service.list = function (service, args) {
     var url = his.service._getUrl();
-    return his.auth.get(url, args);
+    return his.get(url, args);
 };
 
 
@@ -63,7 +63,7 @@ his.service.list = function (service, args) {
 */
 his.service.listAccountServices = function (service, args) {
     var url = his.service._getUrl('customer');
-    return his.auth.get(url, args);
+    return his.get(url, args);
 };
 
 
@@ -72,7 +72,7 @@ his.service.listAccountServices = function (service, args) {
 */
 his.service.listAccountServices = function (service, args) {
     var url = his.service._getUrl('account');
-    return his.auth.get(url, args);
+    return his.get(url, args);
 };
 
 
@@ -88,5 +88,5 @@ his.service.add = function (service, args) {
         url = his.service._getUrl('account');
     }
 
-    return his.auth.post(url, null, args);
+    return his.post(url, null, args);
 };

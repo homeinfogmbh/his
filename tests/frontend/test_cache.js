@@ -3,7 +3,7 @@
 var slot = 'his.session';
 var urlTemplate = 'https://his.homeinfo.de/session/{0}';
 var lifetime = 15;
-var cache = new his.cache.CachedEndPoint(slot, urlTemplate, undefined, lifetime);
+var cache = new his.cache.CachedEndPoint(slot, urlTemplate, lifetime);
 his.DEBUG = true;
 
 function login () {

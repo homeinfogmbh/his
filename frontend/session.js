@@ -98,7 +98,7 @@ his.session.login = function (userName, passwd, args) {
 */
 his.session.list = function (args) {
     var url = his.session._getUrl();
-    return his.auth.get(url, args);
+    return his.get(url, args);
 };
 
 
@@ -108,7 +108,7 @@ his.session.list = function (args) {
 his.session.get = function (token, args) {
     var sessionToken = token || '!';
     var url = his.session._getUrl(sessionToken);
-    return his.auth.get(url, args);
+    return his.get(url, args);
 };
 
 
@@ -118,7 +118,7 @@ his.session.get = function (token, args) {
 his.session.refresh = function (token, args) {
     var sessionToken = token || '!';
     var url = his.session._getUrl(sessionToken);
-    var promise = his.auth.put(url, null, args);
+    var promise = his.put(url, null, args);
     return promise.then(his.session._set);
 };
 
@@ -129,6 +129,6 @@ his.session.refresh = function (token, args) {
 his.session.close = function (token, args) {
     var sessionToken = token || '!';
     var url = his.session._getUrl(sessionToken);
-    var promise = his.auth.delete(url, args);
+    var promise = his.delete(url, args);
     return promise.then(his.session._remove, his.session._handleTerminationError);
 };

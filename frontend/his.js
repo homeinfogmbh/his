@@ -147,23 +147,6 @@ his._query = function (method, url, args, data, contentType) {
 
 
 /*
-    Updates a request's arguments to make the request authorized.
-    I.e. include the session token.
-*/
-his._authorized = function (args) {
-    if (args == null) {
-        return {'session': his.getSessionToken()};
-    }
-
-    if (! args.hasOwnProperty('session')) {
-        args.session = his.getSessionToken();
-    }
-
-    return args;
-};
-
-
-/*
     Makes a GET request to the respective HIS backend.
 */
 his.get = function (url, args) {
@@ -222,50 +205,4 @@ his.getSession = function () {
 */
 his.getSessionToken = function () {
     return his.getSession().token;
-};
-
-
-/*
-    Authorized requests (with session).
-*/
-his.auth = his.auth || {};
-
-
-/*
-    Performs an authorized GET request.
-*/
-his.auth.get = function (url, args) {
-    return his.get(url, his._authorized(args));
-};
-
-
-/*
-    Performs an authorized POST request.
-*/
-his.auth.post = function (url, args, data, contentType) {
-    return his.post(url, his._authorized(args), data, contentType);
-};
-
-
-/*
-    Performs an authorized PATCH request.
-*/
-his.auth.patch = function (url, args, data, contentType) {
-    return his.patch(url, his._authorized(args), data, contentType);
-};
-
-
-/*
-    Performs an authorized PUT request.
-*/
-his.auth.put = function (url, args, data, contentType) {
-    return his.put(url, his._authorized(args), data, contentType);
-};
-
-
-/*
-    Performs an authorized DELETE request.
-*/
-his.auth.delete = function (url, args) {
-    return his.delete(url, his._authorized(args));
 };

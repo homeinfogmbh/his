@@ -58,7 +58,7 @@ his.customer.get = function (customer, args) {
     }
 
     var url = his.customer._getUrl(customer);
-    return his.auth.get(url, args);
+    return his.get(url, args);
 };
 
 
@@ -67,5 +67,5 @@ his.customer.get = function (customer, args) {
 */
 his.customer.logo = function (args) {
     var url = his.BASE_URL + '/customer-logo';
-    return his.auth.get(url, args);
+    return his.get(url, args);
 };

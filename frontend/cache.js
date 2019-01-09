@@ -81,15 +81,9 @@ his.cache.CacheEntry = function (cached, lifetime, value) {
     Takes a local storarge slot key, a URL template
     and an optional cache lifetime in seconds.
 */
-his.cache.CachedEndPoint = function (slot, urlTemplate, authenticated, lifetime) {
+his.cache.CachedEndPoint = function (slot, urlTemplate, lifetime) {
     this._slot = slot;
     this._urlTemplate = urlTemplate;
-
-    if (authenticated == null) {
-        authenticated = true;
-    }
-
-    this._authenticated = authenticated;
 
     if (lifetime == null) {
         lifetime = 30 * 60;     // 30 minutes in seconds.
@@ -152,11 +146,6 @@ his.cache.CachedEndPoint = function (slot, urlTemplate, authenticated, lifetime)
     */
     this._get = function(identifiers, args) {
         var url = this._getUrl(identifiers);
-
-        if (this._authenticated) {
-            return his.auth.get(url, args);
-        }
-
         return his.get(url, args);
     };
 

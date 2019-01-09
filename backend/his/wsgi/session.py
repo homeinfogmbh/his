@@ -8,7 +8,7 @@ from flask import request
 from wsgilib import JSON
 
 from his.api import authenticated
-from his.globals import ACCOUNT, SESSION, JSON_DATA
+from his.contextlocals import ACCOUNT, SESSION, JSON_DATA
 from his.messages.account import NotAuthorized
 from his.messages.session import InvalidCredentials
 from his.messages.session import MissingCredentials

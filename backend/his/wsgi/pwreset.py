@@ -6,8 +6,8 @@ from peeweeplus import PasswordTooShortError
 from recaptcha import VerificationError, ReCaptcha
 
 from his.config import PWRESET
+from his.contextlocals import JSON_DATA
 from his.exceptions import PasswordResetPending as PasswordResetPending_
-from his.globals import JSON_DATA
 from his.messages.account import NoAccountSpecified, PasswordTooShort
 from his.messages.pwreset import InvalidResetToken
 from his.messages.pwreset import NoPasswordSpecified

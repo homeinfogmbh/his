@@ -8,7 +8,7 @@ may be implemented.
 """
 from his.api import authenticated, authorized, admin, root
 from his.application import Application
-from his.globals import ACCOUNT, CUSTOMER, JSON_DATA
+from his.contextlocals import ACCOUNT, CUSTOMER, JSON_DATA
 from his.messages import Message
 from his.orm import Account
 

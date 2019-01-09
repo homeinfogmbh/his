@@ -4,7 +4,7 @@ from functools import wraps
 
 from functoolsplus import coerce
 
-from his.globals import SESSION
+from his.contextlocals import SESSION
 from his.messages.account import AccountLocked
 from his.messages.account import NotAuthorized
 from his.messages.service import NoSuchService

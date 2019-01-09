@@ -3,8 +3,8 @@
 from wsgilib import JSON
 
 from his.api import authenticated, admin
+from his.contextlocals import ACCOUNT, JSON_DATA
 from his.exceptions import InconsistencyError
-from his.globals import ACCOUNT, JSON_DATA
 from his.messages.account import NoAccountSpecified
 from his.messages.account import NotAuthorized
 from his.messages.service import AccountServiceDeleted

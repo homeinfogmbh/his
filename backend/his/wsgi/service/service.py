@@ -3,7 +3,7 @@
 from wsgilib import JSON
 
 from his.api import authenticated
-from his.globals import ACCOUNT
+from his.contextlocals import ACCOUNT
 from his.orm import Service
 
 

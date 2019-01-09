@@ -1,4 +1,4 @@
-"""HIS environment proxies, faking globals."""
+"""HIS request context locals."""
 
 from logging import getLogger
 from uuid import UUID

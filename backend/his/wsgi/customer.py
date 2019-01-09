@@ -4,7 +4,7 @@ from mdb import Customer
 from wsgilib import JSON, Binary
 
 from his.api import authenticated, root
-from his.globals import ACCOUNT, CUSTOMER
+from his.contextlocals import ACCOUNT, CUSTOMER
 from his.messages.customer import CustomerUnconfigured, NoSuchCustomer
 from his.messages.data import InvalidCustomerID
 from his.orm import CustomerSettings

@@ -3,7 +3,7 @@
 from wsgilib import JSON
 
 from his.api import authenticated, root, admin
-from his.globals import CUSTOMER, JSON_DATA
+from his.contextlocals import CUSTOMER, JSON_DATA
 from his.messages.customer import NoCustomerSpecified
 from his.messages.service import CustomerServiceDeleted
 from his.messages.service import NoServiceSpecified

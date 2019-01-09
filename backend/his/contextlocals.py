@@ -7,6 +7,7 @@ from werkzeug.local import LocalProxy
 
 from mdb import Customer
 
+from his.config import COOKIE
 from his.messages.account import NoSuchAccount
 from his.messages.account import NotAuthorized
 from his.messages.customer import NoSuchCustomer
@@ -23,7 +24,7 @@ def get_session():
     """Returns the session from the cache."""
 
     try:
-        session_token = request.cookies['his-session']
+        session_token = request.cookies[COOKIE]
     except KeyError:
         try:
             session_token = request.args['session']

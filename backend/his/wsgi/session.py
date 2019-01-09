@@ -8,7 +8,7 @@ from flask import request
 from wsgilib import JSON
 
 from his.api import authenticated
-from his.config import DOMAIN
+from his.config import COOKIE, DOMAIN
 from his.contextlocals import ACCOUNT, SESSION, JSON_DATA
 from his.messages.account import NotAuthorized
 from his.messages.session import InvalidCredentials
@@ -126,7 +126,7 @@ def close(session):
     token = session.token.hex
     session.delete_instance()
     response = JSON({'closed': token})
-    response.delete_cookie('his-session', domain=DOMAIN)
+    response.delete_cookie(COOKIE, domain=DOMAIN)
     return response
 
 

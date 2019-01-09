@@ -10,7 +10,7 @@ from peeweeplus import MissingKeyError
 from peeweeplus import NonUniqueValue
 from wsgilib import Application as _Application
 
-from his.config import DOMAIN
+from his.config import COOKIE, DOMAIN
 from his.contextlocals import get_session
 from his.messages import data
 from his.messages.session import NoSessionSpecified, NoSuchSession
@@ -34,16 +34,17 @@ def _set_session_cookie(response):
     # Allow CORS credentials for AJAX.
     response.headers['Access-Control-Allow-Credentials'] = 'true'
 
+    if 'Set-Cookie' in response.headers:
+        return response
+
     try:
         session = get_session()
     except (NoSessionSpecified, NoSuchSession):
         return response
 
-    if not 'Set-Cookie' in response.headers:
-        response.set_cookie(
-            'his-session', session.token.hex, domain=DOMAIN, secure=True)
-
+    response.set_cookie(COOKIE, session.token.hex, domain=DOMAIN, secure=True)
     return response
+
 
 
 class Application(_Application):

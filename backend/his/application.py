@@ -30,6 +30,8 @@ ERROR_HANDLERS = (
 def _set_session_cookie(response):
     """Sets the session cookie on the respective response."""
 
+    print('DEBUG: Attempting to set session cookie.', flush=True)
+
     try:
         session = get_session()
     except (NoSessionSpecified, NoSuchSession):

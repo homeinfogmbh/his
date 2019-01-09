@@ -28,7 +28,7 @@ ERROR_HANDLERS = (
     (InvalidEnumerationValue, data.InvalidEnumerationValue.from_iev))
 
 
-def _set_session_cookie(response):
+def postprocess_response(response):
     """Sets the session cookie on the respective response."""
 
     # Allow CORS credentials for AJAX.
@@ -54,4 +54,4 @@ class Application(_Application):
         super().__init__(
             *args, cors=True, debug=debug, errorhandlers=errorhandlers,
             **kwargs)
-        self.after_request(_set_session_cookie)
+        self.after_request(postprocess_response)

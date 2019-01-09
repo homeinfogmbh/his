@@ -42,6 +42,7 @@ def _set_session_cookie(response):
     except NoSuchSession:
         print('DEBUG: No such session.')
     else:
+        response.headers['Access-Control-Allow-Credentials'] = 'true'
         response.set_cookie('his-session', session.token.hex)
         print('DEBUG: Set session cookie.', flush=True)
 

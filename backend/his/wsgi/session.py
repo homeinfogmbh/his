@@ -8,8 +8,9 @@ from flask import request
 from wsgilib import JSON
 
 from his.api import authenticated
-from his.config import COOKIE, DOMAIN
+from his.functions import COOKIE, DOMAIN
 from his.contextlocals import ACCOUNT, SESSION, JSON_DATA
+from his.functions import set_session_cookie
 from his.messages.account import NotAuthorized
 from his.messages.session import InvalidCredentials
 from his.messages.session import MissingCredentials
@@ -81,10 +82,7 @@ def login():
     if account.login(passwd):
         session = Session.open(account, duration=_get_duration())
         response = JSON(session.to_json())
-        response.set_cookie(
-            COOKIE, session.token.hex, expires=session.end, domain=DOMAIN,
-            secure=True)
-        return response
+        return set_session_cookie(response, session)
 
     return InvalidCredentials()
 

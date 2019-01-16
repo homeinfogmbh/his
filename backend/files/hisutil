@@ -26,14 +26,13 @@ Options:
 """
 from datetime import datetime
 from getpass import getpass
-from random import choice
-from string import digits, ascii_letters
 from sys import exit as exit_, stderr
 
 from docopt import docopt
 
 from mdb import Customer
 
+from his.crypto import genpw
 from his.exceptions import AccountExistsError
 from his.exceptions import ServiceExistsError
 from his.orm import Account
@@ -61,19 +60,6 @@ def read_passwd():
 
         print('Passwords do not match.', file=stderr)
         continue
-
-
-def randchars(count, pool=digits + ascii_letters):
-    """Yields random chars from the pool."""
-
-    for _ in range(count):
-        yield choice(pool)
-
-
-def genpw(length=16, pool=digits + ascii_letters):
-    """Generates a safe, radom password."""
-
-    return ''.join(randchars(length, pool=pool))
 
 
 def get_account(name):

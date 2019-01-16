@@ -33,12 +33,13 @@ def postprocess_response(response):
     # Allow CORS credentials for AJAX.
     response.headers['Access-Control-Allow-Credentials'] = 'true'
 
+    # Do not override an already set session cookie i.e. on deletion.
     if 'Set-Cookie' in response.headers:
         return response
 
     try:
         session = get_session()
     except (NoSessionSpecified, NoSuchSession):
-        return response
+        return delete_session_cookie(response)
 
     return set_session_cookie(response, session)

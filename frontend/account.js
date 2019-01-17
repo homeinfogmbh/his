@@ -39,10 +39,10 @@ his.account = his.account || {};
     Returns the respective account URL.
 */
 his.account._getUrl = function (accountName) {
-    var url = his.BASE_URL + '/account';
+    const url = his.BASE_URL + '/account';
 
     if (accountName != null) {
-        url += '/' + accountName;
+        return url + '/' + accountName;
     }
 
     return url;
@@ -53,7 +53,7 @@ his.account._getUrl = function (accountName) {
     Lists available accounts.
 */
 his.account.list = function (args) {
-    var url = his.account._getUrl();
+    const url = his.account._getUrl();
     return his.get(url, args);
 };
 
@@ -63,7 +63,7 @@ his.account.list = function (args) {
 */
 his.account.get = function (name, args) {
     name = name || '!';
-    var url = his.account._getUrl(name);
+    const url = his.account._getUrl(name);
     return his.get(url, args);
 };
 
@@ -72,7 +72,7 @@ his.account.get = function (name, args) {
     Adds an account.
 */
 his.account.add = function (account, args) {
-    var url = his.account._getUrl();
+    const url = his.account._getUrl();
     return his.post(url, args, account);
 };
 
@@ -82,7 +82,7 @@ his.account.add = function (account, args) {
 */
 his.account.patch = function (name, args, accountPatch) {
     name = name || '!';
-    var url = his.account._getUrl(name);
+    const url = his.account._getUrl(name);
     return his.patch(url, args, accountPatch);
 };
 
@@ -90,31 +90,33 @@ his.account.patch = function (name, args, accountPatch) {
 /*
     Constructor for a new account object.
 */
-his.account.Account = function (customer, name, email, passwd=null, user=null) {
-    if (customer == null) {
-        throw 'No customer specified.';
-    } else {
+his.account.Account = class {
+    constructor (customer, name, email, passwd = null, user = null) {
+        if (customer == null) {
+            throw 'No customer specified.';
+        }
+
         this.customer = customer;
-    }
 
-    if (name == null) {
-        throw 'No name specified.';
-    } else {
+        if (name == null) {
+            throw 'No name specified.';
+        }
+
         this.name = name;
-    }
 
-    if (email == null) {
-        throw 'No email address specified.';
-    } else {
+        if (email == null) {
+            throw 'No email address specified.';
+        }
+
         this.email = email;
-    }
 
-    if (passwd != null) {
-        this.passwd = passwd;
-    }
+        if (passwd != null) {
+            this.passwd = passwd;
+        }
 
-    if (user != null) {
-        this.user = user;
+        if (user != null) {
+            this.user = user;
+        }
     }
 };
 
@@ -122,41 +124,43 @@ his.account.Account = function (customer, name, email, passwd=null, user=null) {
 /*
     Constructor for an account patch object.
 */
-his.account.AccountPatch = function (email, passwd, name=null, admin=null, customer=null, user=null, failedLogins=null,
-    lockedUntil=null, disabled=null) {
-    if (email != null) {
-        this.email = email;
-    }
+his.account.AccountPatch = class {
+    constructor (email, passwd, name = null, admin = null, customer = null, user = null, failedLogins = null,
+        lockedUntil = null, disabled = null) {
+        if (email != null) {
+            this.email = email;
+        }
 
-    if (passwd != null) {
-        this.passwd = passwd;
-    }
+        if (passwd != null) {
+            this.passwd = passwd;
+        }
 
-    if (name != null) {
-        this.name = name;
-    }
+        if (name != null) {
+            this.name = name;
+        }
 
-    if (admin != null) {
-        this.admin = admin;
-    }
+        if (admin != null) {
+            this.admin = admin;
+        }
 
-    if (customer != null) {
-        this.customer = customer;
-    }
+        if (customer != null) {
+            this.customer = customer;
+        }
 
-    if (user != null) {
-        this.user = user;
-    }
+        if (user != null) {
+            this.user = user;
+        }
 
-    if (failedLogins != null) {
-        this.failedLogins = failedLogins;
-    }
+        if (failedLogins != null) {
+            this.failedLogins = failedLogins;
+        }
 
-    if (lockedUntil != null) {
-        this.lockedUntil = lockedUntil;
-    }
+        if (lockedUntil != null) {
+            this.lockedUntil = lockedUntil;
+        }
 
-    if (disabled != null) {
-        this.disabled = disabled;
+        if (disabled != null) {
+            this.disabled = disabled;
+        }
     }
 };

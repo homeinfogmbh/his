@@ -39,10 +39,10 @@ his.service = his.service || {};
     Returns the respective service URL.
 */
 his.service._getUrl = function (endpoint) {
-    var url = his.BASE_URL + '/service';
+    const url = his.BASE_URL + '/service';
 
     if (endpoint != null) {
-        url += '/' + endpoint;
+        return url + '/' + endpoint;
     }
 
     return url;
@@ -53,7 +53,7 @@ his.service._getUrl = function (endpoint) {
     Lists available services.
 */
 his.service.list = function (service, args) {
-    var url = his.service._getUrl();
+    const url = his.service._getUrl();
     return his.get(url, args);
 };
 
@@ -62,7 +62,7 @@ his.service.list = function (service, args) {
     Lists customer services.
 */
 his.service.listAccountServices = function (service, args) {
-    var url = his.service._getUrl('customer');
+    const url = his.service._getUrl('customer');
     return his.get(url, args);
 };
 
@@ -71,7 +71,7 @@ his.service.listAccountServices = function (service, args) {
     Lists account services.
 */
 his.service.listAccountServices = function (service, args) {
-    var url = his.service._getUrl('account');
+    const url = his.service._getUrl('account');
     return his.get(url, args);
 };
 
@@ -80,7 +80,7 @@ his.service.listAccountServices = function (service, args) {
     Adds a customer or account services.
 */
 his.service.add = function (service, args) {
-    var url;
+    let url;
 
     if (service.hasOwnProperty('customer')) {
         url = his.service._getUrl('customer');

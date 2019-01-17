@@ -51,7 +51,7 @@ his.debug = function (message) {
 */
 his._RequestArgs = function (object) {
     if (object != null) {
-        for (var attribute in object) {
+        for (let attribute in object) {
             if (object.hasOwnProperty(attribute)) {
                 this[attribute] = object[attribute];
             }
@@ -59,9 +59,9 @@ his._RequestArgs = function (object) {
     }
 
     this.toString = function () {
-        var args = [];
+        const args = [];
 
-        for (var attribute in this) {
+        for (let attribute in this) {
             if (this.hasOwnProperty(attribute)) {
                 if (typeof this[attribute] === 'function') {
                     continue;
@@ -73,7 +73,7 @@ his._RequestArgs = function (object) {
             }
         }
 
-        var string = args.join('&');
+        const string = args.join('&');
 
         if (string) {
             return '?' + string;
@@ -111,7 +111,7 @@ his._getContentType = function (data) {
 */
 his._AjaxQuery = function (method, url, args, data, contentType) {
     this.type = method;
-    var requestArgs = new his._RequestArgs(args);
+    const requestArgs = new his._RequestArgs(args);
     this.url = url + requestArgs;
 
     if (data != null) {
@@ -139,7 +139,7 @@ his._AjaxQuery = function (method, url, args, data, contentType) {
     Makes an AJAX call to the respective HIS backend.
 */
 his._query = function (method, url, args, data, contentType) {
-    var ajaxQuery = new his._AjaxQuery(method, url, args, data, contentType);
+    const ajaxQuery = new his._AjaxQuery(method, url, args, data, contentType);
     his.debug('Performing ajax query.');
     his.debug(JSON.stringify(ajaxQuery, null, 2));
     return jQuery.ajax(ajaxQuery);
@@ -190,7 +190,7 @@ his.delete = function (url, args) {
     Retrieves the session from local storage.
 */
 his.getSession = function () {
-    var sessionString = sessionStorage.getItem(his.SESSION_KEY);
+    const sessionString = sessionStorage.getItem(his.SESSION_KEY);
 
     if (sessionString == null) {
         throw 'Not logged in.';

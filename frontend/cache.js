@@ -60,19 +60,22 @@ his.cache.markDirty = function (cache) {
 /*
     A cache entry.
 */
-his.cache.CacheEntry = function (cached, lifetime, value) {
-    this.cached = cached;       // Timestamp when the entry was cached.
-    this.lifetime = lifetime;   // Lifetime in milliseconds.
-    this.value = value;         // Cached JSON value.
+his.cache.CacheEntry = class {
+    constructor (cached, lifetime, value) {
+        this.cached = cached;       // Timestamp when the entry was cached.
+        this.lifetime = lifetime;   // Lifetime in milliseconds.
+        this.value = value;         // Cached JSON value.
+    }
 
-    this.getExpiration = function () {
+    getExpiration () {
         return this.cached + this.lifetime;
-    };
+    }
 
-    this.isValid = function () {
-        var now = (new Date()).getTime();
+    isValid () {
+        const date = new Date();
+        const now = date.getTime();
         return this.getExpiration() >= now;
-    };
+    }
 };
 
 
@@ -81,91 +84,94 @@ his.cache.CacheEntry = function (cached, lifetime, value) {
     Takes a local storarge slot key, a URL template
     and an optional cache lifetime in seconds.
 */
-his.cache.CachedEndPoint = function (slot, urlTemplate, lifetime) {
-    this._slot = slot;
-    this._urlTemplate = urlTemplate;
+his.cache.CachedEndPoint = class {
+    constructor (slot, urlTemplate, lifetime) {
+        this._slot = slot;
+        this._urlTemplate = urlTemplate;
 
-    if (lifetime == null) {
-        lifetime = 30 * 60;     // 30 minutes in seconds.
+        if (lifetime == null) {
+            lifetime = 30 * 60;     // 30 minutes in seconds.
+        }
+
+        this._lifetime = lifetime * 1000;  // Convert to milliseconds.
+        this._dirty = false;
     }
-
-    this._lifetime = lifetime * 1000;  // Convert to milliseconds.
-    this._dirty = false;
 
     /*
         Returns the cache's content.
     */
-    this._getCache = function () {
-        var raw = localStorage.getItem(this._slot);
+    _getCache () {
+        const raw = localStorage.getItem(this._slot);
 
         if (raw == null) {
             return {};
         }
 
-        var json = JSON.parse(raw);
+        const json = JSON.parse(raw);
 
         if (json == null) {
             return {};
         }
 
         return json;
-    };
+    }
 
     /*
         Returns the cache entry's key.
     */
-    this._getKey = function (identifiers) {
+    _getKey (identifiers) {
         return '[' + identifiers.join(',') + ']';
-    };
+    }
 
     /*
         Returns the cached value for the provided keys.
     */
-    this._getCacheEntry = function (identifiers) {
-        var cache = this._getCache();
+    _getCacheEntry (identifiers) {
+        const cache = this._getCache();
         his.debug('Current cache content:\n' + JSON.stringify(cache, null, 2));
-        var key = this._getKey(identifiers);
-        var rawEntry = cache[key];
+        const key = this._getKey(identifiers);
+        const rawEntry = cache[key];
 
         if (rawEntry == null) {
             return null;
         }
 
         return new his.cache.CacheEntry(rawEntry.cached, rawEntry.lifetime, rawEntry.value);
-    };
+    }
 
     /*
         Returns the formatted URL template.
     */
-    this._getUrl = function (identifiers) {
+    _getUrl (identifiers) {
         return his.cache.strf(this._urlTemplate, identifiers);
-    };
+    }
 
     /*
         Calls the respective HTTP endpoint.
     */
-    this._get = function(identifiers, args) {
-        var url = this._getUrl(identifiers);
+    _get (identifiers, args) {
+        const url = this._getUrl(identifiers);
         return his.get(url, args);
-    };
+    }
 
     /*
         Caches the provided JSON data using the respective keys.
     */
-    this.cache = function (json, ...identifiers) {
-        var cache = this._getCache();
-        var now = (new Date()).getTime();
-        var lifetime = this._lifetime;
-        var key = this._getKey(identifiers);
+    cache (json, ...identifiers) {
+        const cache = this._getCache();
+        const date = new Date();
+        const now = date.getTime();
+        const lifetime = this._lifetime;
+        const key = this._getKey(identifiers);
         cache[key] = {
             cached: now,
             lifetime: lifetime,
             value: json
         };
-        var string = JSON.stringify(cache);
+        const string = JSON.stringify(cache);
         localStorage.setItem(this._slot, string);
         this._dirty = false;
-    };
+    }
 
     /*
         Returns a promise providing the API response for the provided keys.
@@ -174,8 +180,8 @@ his.cache.CachedEndPoint = function (slot, urlTemplate, lifetime) {
         Otherwise it will query the HTTP API and update the cache
         with the value returned by the API.
     */
-    this.get = function (...identifiers) {
-        var cacheEntry = this._getCacheEntry(identifiers);
+    get (...identifiers) {
+        const cacheEntry = this._getCacheEntry(identifiers);
 
         if (cacheEntry != null) {
             if (cacheEntry.isValid() & ! this._dirty) {
@@ -184,19 +190,19 @@ his.cache.CachedEndPoint = function (slot, urlTemplate, lifetime) {
         }
 
         return this._get(identifiers).then(his.cache.cache(this, identifiers));
-    };
+    }
 
     /*
         Marks the cache as dirty.
     */
-    this.markDirty = function () {
+    markDirty () {
         this._dirty = true;
-    };
+    }
 
     /*
         Removes all cached data.
     */
-    this.clear = function () {
+    clear () {
         localStorage.removeItem(this._slot);
-    };
+    }
 };

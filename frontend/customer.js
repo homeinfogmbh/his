@@ -39,10 +39,10 @@ his.customer = his.customer || {};
     Returns the respective customer URL.
 */
 his.customer._getUrl = function (customerName) {
-    var url = his.BASE_URL + '/customer';
+    const url = his.BASE_URL + '/customer';
 
     if (customerName != null) {
-        url += '/' + customerName;
+        return url + '/' + customerName;
     }
 
     return url;
@@ -57,7 +57,7 @@ his.customer.get = function (customer, args) {
         customer = '!';
     }
 
-    var url = his.customer._getUrl(customer);
+    const url = his.customer._getUrl(customer);
     return his.get(url, args);
 };
 
@@ -66,6 +66,6 @@ his.customer.get = function (customer, args) {
     Returns the current customer's logo.
 */
 his.customer.logo = function (args) {
-    var url = his.BASE_URL + '/customer-logo';
+    const url = his.BASE_URL + '/customer-logo';
     return his.get(url, args);
 };

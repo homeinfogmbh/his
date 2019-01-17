@@ -51,7 +51,7 @@ his.locale.set = function (locale) {
     Sets the current locale.
 */
 his.locale.get = function () {
-    var locale = sessionStorage.getItem('his.locale');
+    const locale = sessionStorage.getItem('his.locale');
 
     if (locale == null) {
         return his.locale.DEFAULT;

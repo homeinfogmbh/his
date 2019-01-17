@@ -142,7 +142,8 @@ his._query = function (method, url, args, data, contentType) {
     const ajaxQuery = new his._AjaxQuery(method, url, args, data, contentType);
     his.debug('Performing ajax query.');
     his.debug(JSON.stringify(ajaxQuery, null, 2));
-    return jQuery.ajax(ajaxQuery);
+    const deferred = jQuery.ajax(ajaxQuery);
+    return Promise.resolve(deferred);
 };
 
 

@@ -87,9 +87,14 @@ def get_session_duration():
     """Returns the respective session duration."""
 
     try:
-        return int(request.headers['session-duration'])
+        duration = int(request.headers['session-duration'])
     except (KeyError, TypeError, ValueError):
         return DEFAULT_SESSION_DURATION
+
+    if duration in Session.ALLOWED_DURATIONS:
+        return duration
+
+    return DEFAULT_SESSION_DURATION
 
 
 def get_json_data():

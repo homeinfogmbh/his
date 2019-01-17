@@ -14,7 +14,7 @@ from his.messages.customer import NoSuchCustomer
 from his.messages.data import InvalidCustomerID
 from his.messages.data import MissingData
 from his.messages.session import NoSessionSpecified, SessionExpired
-from his.orm import Account, Session
+from his.orm import DEFAULT_SESSION_DURATION, Account, Session
 
 
 __all__ = ['SESSION', 'ACCOUNT', 'CUSTOMER', 'JSON_DATA']
@@ -81,6 +81,15 @@ def get_customer():
             raise NoSuchCustomer()
 
     raise NotAuthorized()
+
+
+def get_session_duration():
+    """Returns the respective session duration."""
+
+    try:
+        return int(request.headers['session-duration'])
+    except (KeyError, TypeError, ValueError):
+        return DEFAULT_SESSION_DURATION
 
 
 def get_json_data():

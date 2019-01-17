@@ -4,7 +4,7 @@ from functools import wraps
 
 from functoolsplus import coerce
 
-from his.contextlocals import SESSION
+from his.contextlocals import SESSION, get_session_duration
 from his.messages.account import AccountLocked
 from his.messages.account import NotAuthorized
 from his.messages.service import NoSuchService
@@ -45,6 +45,7 @@ def authenticated(function):
         if not SESSION.account.usable:
             raise AccountLocked()
 
+        SESSION.renew(duration=get_session_duration())
         return function(*args, **kwargs)
 
     return wrapper

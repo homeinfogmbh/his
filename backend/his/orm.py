@@ -26,6 +26,8 @@ from his.pwmail import mail_password_reset_link
 
 
 __all__ = [
+    'MODELS',
+    'DEFAULT_SESSION_DURATION',
     'HISModel',
     'Service',
     'ServiceDependency',
@@ -35,12 +37,12 @@ __all__ = [
     'AccountService',
     'Session',
     'CustomerSettings',
-    'PasswordResetToken',
-    'MODELS']
+    'PasswordResetToken']
 
 
 DATABASE = MySQLDatabase.from_config(CONFIG['db'])
 MAX_FAILED_LOGINS = 5
+DEFAULT_SESSION_DURATION = 15
 
 
 class AccountServicesProxy:
@@ -448,7 +450,7 @@ class Session(HISModel):
         return session
 
     @classmethod
-    def open(cls, account, duration=15):
+    def open(cls, account, duration=DEFAULT_SESSION_DURATION):
         """Actually opens a new login session."""
         if duration not in cls.ALLOWED_DURATIONS:
             raise DurationOutOfBounds()
@@ -473,7 +475,7 @@ class Session(HISModel):
         """Determines whether the session is active."""
         return self.start <= datetime.now() < self.end
 
-    def renew(self, duration=15):
+    def renew(self, duration=DEFAULT_SESSION_DURATION):
         """Renews the session."""
         if duration not in type(self).ALLOWED_DURATIONS:
             raise DurationOutOfBounds()

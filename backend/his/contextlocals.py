@@ -113,7 +113,7 @@ class ModelProxy(LocalProxy):
 
     def __int__(self):
         """Returns the primary key value."""
-        return self._get_current_object().get_id()
+        return self.get_id()
 
 
 SESSION = ModelProxy(get_session)

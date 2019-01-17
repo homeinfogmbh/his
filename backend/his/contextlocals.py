@@ -13,7 +13,7 @@ from his.messages.account import NotAuthorized
 from his.messages.customer import NoSuchCustomer
 from his.messages.data import InvalidCustomerID
 from his.messages.data import MissingData
-from his.messages.session import NoSessionSpecified, NoSuchSession
+from his.messages.session import NoSessionSpecified, SessionExpired
 from his.orm import Account, Session
 
 
@@ -34,12 +34,12 @@ def get_session():
     try:
         session_token = UUID(session_token)
     except ValueError:
-        raise NoSuchSession()
+        raise SessionExpired()
 
     try:
         return Session.get(Session.token == session_token)
     except Session.DoesNotExist:
-        raise NoSuchSession()
+        raise SessionExpired()
 
 
 def get_account():

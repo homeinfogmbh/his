@@ -2,7 +2,7 @@
 
 from his.config import COOKIE, DOMAIN
 from his.contextlocals import get_session
-from his.messages.session import NoSessionSpecified, NoSuchSession
+from his.messages.session import NoSessionSpecified, SessionExpired
 
 
 __all__ = [
@@ -39,7 +39,7 @@ def postprocess_response(response):
 
     try:
         session = get_session()
-    except (NoSessionSpecified, NoSuchSession):
+    except (NoSessionSpecified, SessionExpired):
         return delete_session_cookie(response)
 
     return set_session_cookie(response, session)

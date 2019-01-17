@@ -27,19 +27,19 @@ class InvalidCredentials(HISMessage):
 class NoSessionSpecified(HISMessage):
     """Indicates a missing session."""
 
-    STATUS = 420
+    STATUS = 401
 
 
 class NoSuchSession(HISMessage):
     """Indicates that the specified session does not exist."""
 
-    STATUS = 404
+    STATUS = 410
 
 
 class SessionExpired(HISMessage):
     """Indicates that the specified session has expired."""
 
-    STATUS = 410
+    STATUS = 401
 
 
 class DurationOutOfBounds(HISMessage):

@@ -8,15 +8,12 @@ from his.contextlocals import SESSION
 from his.messages.account import AccountLocked
 from his.messages.account import NotAuthorized
 from his.messages.service import NoSuchService
-from his.messages.session import NoSessionSpecified
-from his.messages.session import NoSuchSession
 from his.messages.session import SessionExpired
 from his.orm import Service
 
 
 __all__ = [
     'domains',
-    'set_session_cookie',
     'authenticated',
     'authorized',
     'admin',
@@ -30,21 +27,6 @@ def domains():
     for service in Service:
         for domain in service.domains:
             yield domain.domain
-
-
-def set_session_cookie(response, *, quiet=False):
-    """Adds the session cookie to the response."""
-
-    try:
-        token = SESSION.token.hex
-    except (NoSessionSpecified, NoSuchSession, SessionExpired):
-        if not quiet:
-            raise
-    else:
-        for domain in domains():
-            response.set_cookie('session', token, domain=domain)
-
-    return response
 
 
 def authenticated(function):

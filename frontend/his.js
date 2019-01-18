@@ -49,16 +49,18 @@ his.debug = function (message) {
 /*
     Prototype for request arguments.
 */
-his._RequestArgs = function (object) {
-    if (object != null) {
-        for (let attribute in object) {
-            if (object.hasOwnProperty(attribute)) {
-                this[attribute] = object[attribute];
+his._RequestArgs = class {
+    constructor (object) {
+        if (object != null) {
+            for (let attribute in object) {
+                if (object.hasOwnProperty(attribute)) {
+                    this[attribute] = object[attribute];
+                }
             }
         }
     }
 
-    this.toString = function () {
+    toString () {
         const args = [];
 
         for (let attribute in this) {
@@ -80,7 +82,7 @@ his._RequestArgs = function (object) {
         }
 
         return '';
-    };
+    }
 };
 
 
@@ -109,29 +111,31 @@ his._getContentType = function (data) {
 /*
     Prototype for an AJAX query.
 */
-his._AjaxQuery = function (method, url, args, data, contentType) {
-    this.type = method;
-    const requestArgs = new his._RequestArgs(args);
-    this.url = url + requestArgs;
+his._AjaxQuery = class {
+    constructor (method, url, args, data, contentType) {
+        this.type = method;
+        const requestArgs = new his._RequestArgs(args);
+        this.url = url + requestArgs;
 
-    if (data != null) {
-        this.data = data;
+        if (data != null) {
+            this.data = data;
 
-        if (contentType == null) {
-            contentType = his._getContentType(data);
+            if (contentType == null) {
+                contentType = his._getContentType(data);
+            }
+
+            if (contentType == 'application/json' && data instanceof Object) {
+                this.data = JSON.stringify(data);
+            }
         }
 
-        if (contentType == 'application/json' && data instanceof Object) {
-            this.data = JSON.stringify(data);
-        }
+        this.contentType = contentType;
+        this.xhrFields = {withCredentials: true};
     }
 
-    this.contentType = contentType;
-    this.xhrFields = {withCredentials: true};
-
-    this.toString = function () {
+    toString () {
         return JSON.stringify(this);
-    };
+    }
 };
 
 
@@ -184,26 +188,4 @@ his.put = function (url, args, data, contentType) {
 */
 his.delete = function (url, args) {
     return his._query('DELETE', url, args);
-};
-
-
-/*
-    Retrieves the session from local storage.
-*/
-his.getSession = function () {
-    const sessionString = sessionStorage.getItem(his.SESSION_KEY);
-
-    if (sessionString == null) {
-        throw 'Not logged in.';
-    }
-
-    return JSON.parse(sessionString);
-};
-
-
-/*
-    Safely returns the session token.
-*/
-his.getSessionToken = function () {
-    return his.getSession().token;
 };

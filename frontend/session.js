@@ -36,46 +36,13 @@ his.session = his.session || {};
 
 
 /*
-    Writes the session to local storage.
-*/
-his.session._set = function (session) {
-    sessionStorage.setItem(his.SESSION_KEY, JSON.stringify(session));
-    return session;
-};
-
-
-/*
-    Clears the session from the local storage.
-*/
-his.session._remove = function () {
-    const session = his.getSession();
-    sessionStorage.removeItem(his.SESSION_KEY);
-    return session;
-};
-
-
-/*
-    Removes the session from sessionStorage if the session
-    termination call failed only because the session has gone.
-*/
-his.session._handleTerminationError = function (error) {
-    // Remove session if session does not exist or is gone.
-    if (error.status == 404 || error.status == 410) {
-        return Promise.resolve(his.session._remove());
-    }
-
-    return Promise.reject(error);
-};
-
-
-/*
     Returns a URL for session queries.
 */
-his.session._getUrl = function (sessionToken) {
+his.session._getUrl = function (token) {
     const url = his.BASE_URL + '/session';
 
-    if (sessionToken != null) {
-        return url + '/' + sessionToken;
+    if (token != null) {
+        return url + '/' + token;
     }
 
     return url;
@@ -88,8 +55,7 @@ his.session._getUrl = function (sessionToken) {
 his.session.login = function (userName, passwd, args) {
     const url = his.session._getUrl();
     const data = {'account': userName, 'passwd': passwd};
-    const promise = his.post(url, args, data);
-    return promise.then(his.session._set);
+    return his.post(url, args, data);
 };
 
 
@@ -106,8 +72,8 @@ his.session.list = function (args) {
     Gets session data.
 */
 his.session.get = function (token, args) {
-    const sessionToken = token || '!';
-    const url = his.session._getUrl(sessionToken);
+    token = token || '!';
+    const url = his.session._getUrl(token);
     return his.get(url, args);
 };
 
@@ -116,10 +82,9 @@ his.session.get = function (token, args) {
     Refreshes a session.
 */
 his.session.refresh = function (token, args) {
-    const sessionToken = token || '!';
-    const url = his.session._getUrl(sessionToken);
-    const promise = his.put(url, null, args);
-    return promise.then(his.session._set);
+    token = token || '!';
+    const url = his.session._getUrl(token);
+    return his.put(url, null, args);
 };
 
 
@@ -127,8 +92,7 @@ his.session.refresh = function (token, args) {
     Ends a session.
 */
 his.session.close = function (token, args) {
-    const sessionToken = token || '!';
-    const url = his.session._getUrl(sessionToken);
-    const promise = his.delete(url, args);
-    return promise.then(his.session._remove, his.session._handleTerminationError);
+    token = token || '!';
+    const url = his.session._getUrl(token);
+    return his.delete(url, args);
 };

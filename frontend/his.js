@@ -118,18 +118,21 @@ his._AjaxQuery = class {
         this.url = url + requestArgs;
 
         if (data != null) {
-            this.data = data;
-
             if (contentType == null) {
                 contentType = his._getContentType(data);
             }
 
             if (contentType == 'application/json' && data instanceof Object) {
-                this.data = JSON.stringify(data);
+                data = JSON.stringify(data);
             }
+
+            this.data = data;
         }
 
-        this.contentType = contentType;
+        if (contentType != null) {
+            this.contentType = contentType;
+        }
+
         this.xhrFields = {withCredentials: true};
     }
 

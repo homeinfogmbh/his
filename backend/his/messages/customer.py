@@ -4,26 +4,13 @@ from his.messages.api import HISMessage
 
 
 __all__ = [
-    'NoCustomerSpecified',
-    'NoSuchCustomer',
-    'CustomerUnconfigured']
+    'NO_CUSTOMER_SPECIFIED',
+    'NO_SUCH_CUSTOMER',
+    'CUSTOMER_NOT_CONFIGURED']
 
 
-class NoCustomerSpecified(HISMessage):
-    """Indicates that no customer was specified."""
-
-    STATUS = 420
-
-
-class NoSuchCustomer(HISMessage):
-    """Indicates that the customer does not exist."""
-
-    STATUS = 404
-
-
-class CustomerUnconfigured(HISMessage):
-    """Indicates that there is no configuration
-    available for the respective customer.
-    """
-
-    STATUS = 404
+NO_CUSTOMER_SPECIFIED = HISMessage('No customer specified.', status=420)
+NO_SUCH_CUSTOMER = HISMessage(
+    'The specified customer does not exist.', status=404)
+CUSTOMER_NOT_CONFIGURED = HISMessage(
+    'The specified customer has no configuration.', status=404)

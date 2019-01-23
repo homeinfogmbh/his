@@ -3,16 +3,8 @@
 from his.messages.api import HISMessage
 
 
-__all__ = ['RequestError', 'InvalidContentType']
+__all__ = ['INVALID_CONTENT_TYPE']
 
 
-class RequestError(HISMessage):
-    """Indicates errors in the sent HTTP request."""
-
-    STATUS = 400
-
-
-class InvalidContentType(RequestError):
-    """Indicates an invalid content type."""
-
-    STATUS = 406
+INVALID_CONTENT_TYPE = HISMessage(
+    'The provided content type could not be served.', status=406)

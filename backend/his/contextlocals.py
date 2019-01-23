@@ -8,12 +8,12 @@ from werkzeug.local import LocalProxy
 from mdb import Customer
 
 from his.config import COOKIE
-from his.messages.account import NoSuchAccount
-from his.messages.account import NotAuthorized
-from his.messages.customer import NoSuchCustomer
-from his.messages.data import InvalidCustomerID
-from his.messages.data import MissingData
-from his.messages.session import NoSessionSpecified, SessionExpired
+from his.exceptions import NoSessionSpecified, SessionExpired
+from his.messages.account import NO_SUCH_ACCOUNT
+from his.messages.account import NOT_AUTHORIZED
+from his.messages.customer import NO_SUCH_CUSTOMER
+from his.messages.data import INVALID_CUSTOMER_ID
+from his.messages.data import MISSING_DATA
 from his.orm import DEFAULT_SESSION_DURATION, Account, Session
 
 
@@ -54,14 +54,14 @@ def get_account():
         try:
             return Account.find(account)
         except Account.DoesNotExist:
-            raise NoSuchAccount()
+            raise NO_SUCH_ACCOUNT
     elif SESSION.account.admin:
         try:
             return Account.find(account, customer=CUSTOMER.id)
         except Account.DoesNotExist:
-            raise NoSuchAccount()
+            raise NO_SUCH_ACCOUNT
 
-    raise NotAuthorized()
+    raise NOT_AUTHORIZED
 
 
 def get_customer():
@@ -72,15 +72,15 @@ def get_customer():
     except KeyError:
         return ACCOUNT.customer
     except (TypeError, ValueError):
-        raise InvalidCustomerID()
+        raise INVALID_CUSTOMER_ID
 
     if SESSION.account.root:
         try:
             return Customer.get(Customer.id == cid)
         except Customer.DoesNotExist:
-            raise NoSuchCustomer()
+            raise NO_SUCH_CUSTOMER
 
-    raise NotAuthorized()
+    raise NOT_AUTHORIZED
 
 
 def get_session_duration():
@@ -103,7 +103,7 @@ def get_json_data():
     json = request.json
 
     if json is None:
-        raise MissingData()
+        raise MISSING_DATA
 
     return json
 

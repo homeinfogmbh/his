@@ -7,16 +7,16 @@ from his.api import authenticated
 from his.contextlocals import ACCOUNT, CUSTOMER, JSON_DATA
 from his.crypto import genpw
 from his.exceptions import AccountExistsError, AmbiguousDataError
-from his.messages.account import AccountCreated
-from his.messages.account import AccountExists
-from his.messages.account import AccountPatched
-from his.messages.account import AccountsExhausted
-from his.messages.account import NoSuchAccount
-from his.messages.account import NotAuthorized
-from his.messages.account import PasswordTooShort
-from his.messages.customer import CustomerUnconfigured
-from his.messages.data import DataError
-from his.messages.data import MissingData
+from his.messages.account import ACCOUNT_CREATED
+from his.messages.account import ACCOUNT_EXISTS
+from his.messages.account import ACCOUNT_PATCHED
+from his.messages.account import ACCOUNTS_EXHAUSTED
+from his.messages.account import NO_SUCH_ACCOUNT
+from his.messages.account import NOT_AUTHORIZED
+from his.messages.account import PASSWORD_TOO_SHORT
+from his.messages.customer import CUSTOMER_NOT_CONFIGURED
+from his.messages.data import AMBIGUOUS_DATA
+from his.messages.data import MISSING_DATA
 from his.orm import Account, CustomerSettings
 
 
@@ -37,12 +37,12 @@ def get_account(name):
         try:
             return Account.get(Account.name == name)
         except Account.DoesNotExist:
-            raise NoSuchAccount()
+            raise NO_SUCH_ACCOUNT
 
     try:
         account = Account.get(Account.name == name)
     except Account.DoesNotExist:
-        raise NotAuthorized()   # Prevent account name sniffing.
+        raise NOT_AUTHORIZED    # Prevent account name sniffing.
 
     if ACCOUNT.admin:
         if account.customer == CUSTOMER:
@@ -50,7 +50,7 @@ def get_account(name):
     elif ACCOUNT.name == account.name and ACCOUNT.id == account.id:
         return account
 
-    raise NotAuthorized()
+    raise NOT_AUTHORIZED
 
 
 def _add_account():
@@ -76,21 +76,21 @@ def _add_account():
         password_generated = True
 
     if missing_fields:
-        raise MissingData(missing_fields=missing_fields)
+        raise MISSING_DATA.update(missing_fields=missing_fields)
 
     try:
         account = Account.add(CUSTOMER, name, email, passwd=passwd)
     except AccountExistsError:
-        raise AccountExists()
+        raise ACCOUNT_EXISTS
     except PasswordTooShortError as password_too_short:
-        raise PasswordTooShort(minlen=password_too_short.minlen)
+        raise PASSWORD_TOO_SHORT.update(minlen=password_too_short.minlen)
 
     account.save()
 
     if password_generated:
-        return AccountCreated(passwd=passwd)
+        return ACCOUNT_CREATED.update(passwd=passwd)
 
-    return AccountCreated()
+    return ACCOUNT_CREATED
 
 
 def _patch_account(account, allow=()):
@@ -101,12 +101,12 @@ def _patch_account(account, allow=()):
     try:
         account.patch_json(JSON_DATA, allow=allow)
     except PasswordTooShortError as password_too_short:
-        raise PasswordTooShort(minlen=password_too_short.minlen)
+        raise PASSWORD_TOO_SHORT.update(minlen=password_too_short.minlen)
     except AmbiguousDataError as error:
-        raise DataError(field=str(error))
+        raise AMBIGUOUS_DATA.update(field=str(error))
 
     account.save()
-    return AccountPatched()
+    return ACCOUNT_PATCHED
 
 
 @authenticated
@@ -139,7 +139,7 @@ def add():
             settings = CustomerSettings.get(
                 CustomerSettings.customer == CUSTOMER)
         except CustomerSettings.DoesNotExist:
-            return CustomerUnconfigured()
+            return CUSTOMER_NOT_CONFIGURED
 
         if settings.max_accounts is None:
             return _add_account()
@@ -150,9 +150,9 @@ def add():
         if accounts < settings.max_accounts:
             return _add_account()
 
-        return AccountsExhausted()
+        return ACCOUNTS_EXHAUSTED
 
-    return NotAuthorized()
+    return NOT_AUTHORIZED
 
 
 @authenticated
@@ -170,7 +170,7 @@ def patch(name):
     if ACCOUNT.id == account.id:
         return _patch_account(account, allow=_USER_FIELDS)
 
-    return NotAuthorized()
+    return NOT_AUTHORIZED
 
 
 ROUTES = (

@@ -4,81 +4,31 @@ from his.messages.api import HISMessage
 
 
 __all__ = [
-    'NoServiceSpecified',
-    'NoSuchService',
-    'ServiceAdded',
-    'ServiceAlreadyEnabled',
-    'AmbiguousServiceTarget',
-    'MissingServiceTarget',
-    'NoSuchAccountService',
-    'AccountServiceDeleted',
-    'NoSuchCustomerService',
-    'CustomerServiceDeleted']
+    'NO_SERVICE_SPECIFIED',
+    'NO_SUCH_SERVICE',
+    'SERVICE_ADDED',
+    'SERVICE_ALREADY_ENABLED',
+    'AMBIGUOUS_SERVICE_TARGET',
+    'MISSING_SERVICE_TARGET',
+    'NO_SUCH_ACCOUNT_SERVICE',
+    'ACCOUNT_SERVICE_DELETED',
+    'NO_SUCH_CUSTOMER_SERVICE',
+    'CUSTOMER_SERVICE_DELETED']
 
 
-class NoServiceSpecified(HISMessage):
-    """Indicates that no service has been specified."""
-
-    STATUS = 406
-
-
-class NoSuchService(HISMessage):
-    """Indicates that the requested service does not exist."""
-
-    STATUS = 404
-
-
-class ServiceAdded(HISMessage):
-    """Indicates that the respective service has been added."""
-
-    STATUS = 201
-
-
-class ServiceAlreadyEnabled(HISMessage):
-    """Indicates that the respective service is already enabled."""
-
-    STATUS = 409
-
-
-class AmbiguousServiceTarget(HISMessage):
-    """Indicates that the respective target is ambiguous."""
-
-    STATUS = 406
-
-
-class MissingServiceTarget(HISMessage):
-    """Indicates that the respective target is missing."""
-
-    STATUS = 406
-
-
-class NoSuchAccountService(HISMessage):
-    """Indicates that the respective account
-    <> service mapping does not exist.
-    """
-
-    STATUS = 400
-
-
-class AccountServiceDeleted(HISMessage):
-    """Indicates that the respective account <>
-    service mapping has been successfully deleted.
-    """
-
-    STATUS = 200
-
-
-class NoSuchCustomerService(HISMessage):
-    """Indicates that the respective customer
-    <> service mapping does not exist.
-    """
-
-    STATUS = 400
-
-
-class CustomerServiceDeleted(HISMessage):
-    """Indicates that the respective customer <>
-    service mapping has been successfully deleted.
-    """
-
-    STATUS = 200
+NO_SERVICE_SPECIFIED = HISMessage('No service specified.', status=406)
+NO_SUCH_SERVICE = HISMessage('Specified service does not exist.', status=404)
+SERVICE_ADDED = HISMessage('The service has been added.', status=201)
+SERVICE_ALREADY_ENABLED = HISMessage(
+    'The service is already enabled.', status=409)
+AMBIGUOUS_SERVICE_TARGET = HISMessage(
+    'The specified service target is ambiguous.', status=406)
+MISSING_SERVICE_TARGET = HISMessage('No service target specified.', status=406)
+NO_SUCH_ACCOUNT_SERVICE = HISMessage(
+    'No such service for specified account.', status=404)
+ACCOUNT_SERVICE_DELETED = HISMessage(
+    'The account service has been deleted.', status=200)
+NO_SUCH_CUSTOMER_SERVICE = HISMessage(
+    'No such service for specified customer.', status=404)
+CUSTOMER_SERVICE_DELETED = HISMessage(
+    'The customer service has been deleted.', status=200)

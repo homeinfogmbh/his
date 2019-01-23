@@ -4,45 +4,19 @@ from his.messages.api import HISMessage
 
 
 __all__ = [
-    'NoTokenSpecified',
-    'NoPasswordSpecified',
-    'PasswordResetSent',
-    'PasswordResetPending',
-    'InvalidResetToken',
-    'PasswordSet']
+    'NO_TOKEN_SPECIFIED',
+    'NO_PASSWORD_SPECIFIED',
+    'PASSWORD_RESET_SENT',
+    'PASSWORD_RESET_PENDING',
+    'INVALID_RESET_TOKEN',
+    'PASSWORD_SET']
 
 
-class NoTokenSpecified(HISMessage):
-    """Indicates that no reset token was specified."""
-
-    STATUS = 400
-
-
-class NoPasswordSpecified(HISMessage):
-    """Indicates that no password was specified to set."""
-
-    STATUS = 400
-
-
-class PasswordResetSent(HISMessage):
-    """Indicates that the password reset was sent."""
-
-    STATUS = 200
-
-
-class PasswordResetPending(HISMessage):
-    """Indicates that a password request is already pending."""
-
-    STATUS = 423
-
-
-class InvalidResetToken(HISMessage):
-    """Indicates that the request token is invalid."""
-
-    STATUS = 401
-
-
-class PasswordSet(HISMessage):
-    """Indicates that the password was successfully set."""
-
-    STATUS = 200
+NO_TOKEN_SPECIFIED = HISMessage('Missing password reset token.', status=400)
+NO_PASSWORD_SPECIFIED = HISMessage('No password specified.', status=400)
+PASSWORD_RESET_SENT = HISMessage(
+    'An email with a password reset link has been sent.', status=200)
+PASSWORD_RESET_PENDING = HISMessage(
+    'A password reset is already pending.', status=423)
+INVALID_RESET_TOKEN = HISMessage('Invalid password reset token.', status=401)
+PASSWORD_SET = HISMessage('The new password has been set.', status=200)

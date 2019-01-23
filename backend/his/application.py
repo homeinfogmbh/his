@@ -10,20 +10,29 @@ from peeweeplus import MissingKeyError
 from peeweeplus import NonUniqueValue
 from wsgilib import Application as _Application
 
+from his.exceptions import NoSessionSpecified, SessionExpired
 from his.functions import postprocess_response
-from his.messages import data
+from his.messages.data import field_value_error
+from his.messages.data import field_not_nullable
+from his.messages.data import missing_key_error
+from his.messages.data import invalid_keys
+from his.messages.data import non_unique_value
+from his.messages.data import invalid_enum_value
+from his.messages.session import NO_SESSION_SPECIFIED, SESSION_EXPIRED
 
 
 __all__ = ['Application']
 
 
 ERROR_HANDLERS = (
-    (FieldValueError, data.FieldValueError.from_fve),
-    (FieldNotNullable, data.FieldNotNullable.from_fnn),
-    (MissingKeyError, data.MissingKeyError.from_mke),
-    (InvalidKeys, data.InvalidKeys.from_iks),
-    (NonUniqueValue, data.NonUniqueValue.from_nuv),
-    (InvalidEnumerationValue, data.InvalidEnumerationValue.from_iev))
+    (NoSessionSpecified, lambda _: NO_SESSION_SPECIFIED),
+    (SessionExpired, lambda _: SESSION_EXPIRED),
+    (FieldValueError, field_value_error),
+    (FieldNotNullable, field_not_nullable),
+    (MissingKeyError, missing_key_error),
+    (InvalidKeys, invalid_keys),
+    (NonUniqueValue, non_unique_value),
+    (InvalidEnumerationValue, invalid_enum_value))
 
 
 class Application(_Application):

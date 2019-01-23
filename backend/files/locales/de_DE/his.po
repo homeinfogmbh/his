@@ -16,179 +16,210 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Hand\n"
 
-### Account messages. ###
-
-#: account.py:18
-msgid "NoAccountSpecified"
+#: account.py:19
+msgid "No account specified."
 msgstr "Kein Benutzerkonto angegeben."
 
+#: account.py:20
+msgid "No such account."
+msgstr "Das angegebene Benutzerkonto wurde nicht gefunden."
+
+#: account.py:21
+msgid "Account is locked."
+msgstr "Dieses Benutzerkonto ist gesperrt."
+
+#: account.py:22
+msgid "Account has been created."
+msgstr "Das Benutzerkonto wurde erstellt."
+
+#: account.py:23
+msgid "Account has been deleted."
+msgstr "Das Benutzerkonto wurde gelöscht."
+
 #: account.py:24
-msgid "NoSuchAccount"
-msgstr "Benutzerkonto nicht gefunden."
+msgid "Account has been patched."
+msgstr "Die Änderungen am Benutzerkonto wurden gespeichert."
 
-msgid "AccountLocked"
-msgstr "Benutzerkonto gesperrt."
+#: account.py:25
+msgid "Not authorized."
+msgstr "Keine Berechtigung."
 
-msgid "AccountCreated"
-msgstr "Benutzerkonto erstellt."
+#: account.py:26
+msgid "Account already exists."
+msgstr "Das Benutzerkonto existiert bereits."
 
-msgid "AccountDeleted"
-msgstr "Benutzerkonto gelöscht."
+#: account.py:27
+msgid "Account quota is exhausted."
+msgstr "Sie haben Ihre maximale Anzahl an Benutzerkonten erreicht."
 
-msgid "AccountPatched"
-msgstr "Benutzerkonto geändert."
-
-msgid "NotAuthorized"
-msgstr "Zugriff verweigert."
-
-msgid "AccountExists"
-msgstr "Benutzerkonto existiert bereits."
-
-msgid "AccountsExhausted"
-msgstr "Maximale Anzahl an Benutzerkonten erreicht."
-
-msgid "PasswordTooShort"
+#: account.py:28
+msgid "The specified password is too short."
 msgstr "Das angegebene Passwort ist zu kurz."
 
-### Customer messages. ###
-
-msgid "NoCustomerSpecified"
+#: customer.py:12
+msgid "No customer specified."
 msgstr "Keine Kundennummer angegeben."
 
-msgid "NoSuchCustomer"
-msgstr "Kein solcher Kunde."
+#: customer.py:13
+msgid "The specified customer does not exist."
+msgstr "Der angegebene Kunde existiert nicht."
 
-msgid "CustomerUnconfigured"
-msgstr "Kunde besitzt keine Konfiguration."
+#: customer.py:15
+msgid "The specified customer has no configuration."
+msgstr "Der angegebene Kunde besitzt keine Konfiguration."
 
-### Data messages. ###
+#: data.py:21
+msgid "The request is missing data."
+msgstr "Der Anfrage fehlen benötigte Daten."
 
-msgid "DataError"
-msgstr "Datenfehler."
+#: data.py:22
+msgid "The data sent in the request is incomplete."
+msgstr "Die Anfrage enthält einen unvollständiger Datensatz."
 
-msgid "MissingData"
-msgstr "Fehlende Daten."
+#: data.py:24
+msgid "The data sent in the request is invalid."
+msgstr "Die gesendeten Daten sind Ungültig."
 
-msgid "IncompleteData"
-msgstr "Unvollständiger Datensatz."
+#: data.py:26
+msgid "Data is ambiguous."
+msgstr "Die gesendeten Daten sind mehrdeutig."
 
-msgid "InvalidData"
-msgstr "Ungültige Daten."
+#: data.py:27
+msgid "The provided value is not an integer."
+msgstr "Der gesendete Wert ist keine Ganzzahl."
 
-msgid "FieldValueError"
-msgstr "Ungültiger Datenwert für dieses Feld."
+#: data.py:29
+msgid "The provided value is not a valid customer ID."
+msgstr "Der gesendete Wert ist keine gültige Kundennummer."
 
-msgid "FieldNotNullable"
-msgstr "Feld kann nicht NULL sein."
+#: data.py:31
+msgid "Invalid value for field."
+msgstr "Ungültiger Wert für das Datenfeld."
 
-msgid "MissingKeyError"
-msgstr "Fehlende Schlüsselwerte."
+#: data.py:32
+msgid "Field cannot be NULL."
+msgstr "Das Datenfeld darf nicht leer sein."
 
-msgid "InvalidKeys"
-msgstr "Ungültige Schlüsselwerte."
+#: data.py:33
+msgid "Missing key for field."
+msgstr "Fehlender Schlüssel für das Datenfeld."
 
-msgid "NonUniqueValue"
-msgstr "Nicht-eindeutiger Wert."
+#: data.py:34
+msgid "Invalid keys for model."
+msgstr "Ungültige Schlüssel für das Datenbankmodell."
 
-msgid "InvalidEnumerationValue"
-msgstr "Ungültiger Aufzählungswert."
+#: data.py:35
+msgid "Value for field is not unique."
+msgstr "Der Wert für das Feld ist nicht einzigartig."
 
-msgid "NotAnInteger"
-msgstr "Keine Ganzzahl."
+#: data.py:36
+msgid "Invalid value for enumeration contraint."
+msgstr "Ungültiger Wert für zugrundeliegende Aufzählung."
 
-msgid "InvalidCustomerID"
-msgstr "Ungültige Kundennummer angegeben."
-
-### Pasword reset messages. ###
-
-msgid "NoTokenSpecified"
+#: pwreset.py:15
+msgid "Missing password reset token."
 msgstr "Kein Token angegeben."
 
-msgid "NoPasswordSpecified"
+#: pwreset.py:16
+msgid "No password specified."
 msgstr "Kein Passwort angegeben."
 
-msgid "PasswordResetSent"
+#: pwreset.py:17
+msgid "An email with a password reset link has been sent."
 msgstr "Ein Link zum Zurücksetzen des Passworts wurde per E-Mail gesendet."
 
-msgid "PasswordResetPending"
+#: pwreset.py:19
+msgid "A password reset is already pending."
 msgstr "Es wurde bereits eine Anfrage zum Zurücksetzen des Passworts getätigt."
 
-msgid "InvalidResetToken"
+#: pwreset.py:21
+msgid "Invalid password reset token."
 msgstr "Das angegebende Token ist ungültig."
 
-msgid "PasswordSet"
+#: pwreset.py:22
+msgid "The new password has been set."
 msgstr "Das neue Passwort wurde gesetzt."
 
-### ReCAPTCHA messages. ###
-
-msgid "NoResponseProvided"
+#: recaptcha.py:13
+msgid "No ReCAPTCHA response provided."
 msgstr "Keine ReCAPTCHA Antwort angegeben."
 
-msgid "NoSiteKeyProvided"
+#: recaptcha.py:15
+msgid "No ReCAPTCHA site key provided."
 msgstr "Kein ReCAPTCHA Site-Key angegeben."
 
-msgid "SiteNotConfigured"
+#: recaptcha.py:17
+msgid "Invalid ReCAPTCHA site key."
 msgstr "Die Seite ist nicht für ReCAPTCHA konfiguriert."
 
-msgid "InvalidResponse"
+#: recaptcha.py:18
+msgid "Invalid ReCAPTCHA response."
 msgstr "Ungültige ReCAPTCHA Antwort."
 
-### Request messages. ###
+#: request.py:9
+msgid "The provided content type could not be served."
+msgstr "Der angefragte Content-Typ kann nicht bedient werden."
 
-msgid "RequestError"
-msgstr "Ungültige Anfrage."
-
-msgid "InvalidContentType"
-msgstr "Ungültiger Content-Typ."
-
-### Service messages. ###
-
-msgid "NoServiceSpecified"
+#: service.py:19
+msgid "No service specified."
 msgstr "Kein Dienst angegeben."
 
-msgid "NoSuchService"
-msgstr "Kein solcher Dienst."
+#: service.py:20
+msgid "Specified service does not exist."
+msgstr "Der angegebene Dienst existiert nicht."
 
-msgid "ServiceAdded"
-msgstr "Dienst hinzugefügt."
+#: service.py:21
+msgid "The service has been added."
+msgstr "Der Dienst wurde hinzugefügt."
 
-msgid "ServiceAlreadyEnabled"
+#: service.py:22
+msgid "The service is already enabled."
 msgstr "Dienst bereits freigeschaltet."
 
-msgid "AmbiguousServiceTarget"
-msgstr "Mehrdeutiges Ziel für Dienst."
+#: service.py:24
+msgid "The specified service target is ambiguous."
+msgstr "Das für den Dienst angegebene Ziel ist mehrdeutig."
 
-msgid "MissingServiceTarget"
-msgstr "Fehlendes Ziel für Dienst."
+#: service.py:26
+msgid "No service target specified."
+msgstr "Es wurde kein Ziel für den Dienst angegeben."
 
-msgid "NoSuchAccountService"
-msgstr "Der Dienst ist dem entsprechenden Account nicht zugerodnet."
+#: service.py:27
+msgid "No such service for specified account."
+msgstr "Der Dienst ist dem entsprechenden Benutzerkonto nicht zugerodnet."
 
-msgid "AccountServiceDeleted"
-msgstr "Der Zuordnung des Dienstes zum entsprechenden Account wurde gelöscht."
+#: service.py:29
+msgid "The account service has been deleted."
+msgstr "Der Zuordnung des Dienstes zum entsprechenden Benutzerkonto wurde gelöscht."
 
-msgid "NoSuchCustomerService"
+#: service.py:31
+msgid "No such service for specified customer."
 msgstr "Der Dienst ist dem entsprechenden Kunden nicht zugerodnet."
 
-msgid "CustomerServiceDeleted"
+#: service.py:33
+msgid "The customer service has been deleted."
 msgstr "Der Zuordnung des Dienstes zum entsprechenden Kunden wurde gelöscht."
 
-### Session messages. ###
-
-msgid "MissingCredentials"
+#: session.py:15
+msgid "No user name and / or password specified."
 msgstr "Benutzername und / oder Passwort nicht angegeben."
 
-msgid "InvalidCredentials"
+#: session.py:17
+msgid "Invalid user name and / or password."
 msgstr "Ungültiger Benutzername und / oder Passwort."
 
-msgid "NoSessionSpecified"
+#: session.py:19
+msgid "No session specified."
 msgstr "Keine Sitzung angegeben."
 
-msgid "NoSuchSession"
-msgstr "Keine solche Sitzung."
+#: session.py:20
+msgid "Specified session does not exist."
+msgstr "Die angegebene Sitzung existiert nicht."
 
-msgid "SessionExpired"
+#: session.py:21
+msgid "Session expired."
 msgstr "Sitzung abgelaufen."
 
-msgid "DurationOutOfBounds"
+#: session.py:22
+msgid "Session duration is out of bounds."
 msgstr "Sitzungsdauer außerhalb des zulässigen Bereichs."

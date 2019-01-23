@@ -4,33 +4,15 @@ from his.messages.api import HISMessage
 
 
 __all__ = [
-    'NoResponseProvided',
-    'NoSiteKeyProvided',
-    'SiteNotConfigured',
-    'InvalidResponse']
+    'NO_RESPONSE_PROVIDED',
+    'NO_SITE_KEY_PROVIDED',
+    'SITE_NOT_CONFIGURED',
+    'INVALID_RESPONSE']
 
 
-class NoResponseProvided(HISMessage):
-    """Indicates that no ReCAPTCHA response was provided."""
-
-    STATUS = 400
-
-
-class NoSiteKeyProvided(HISMessage):
-    """Indicates that no ReCAPTCHA site key was provided."""
-
-    STATUS = 400
-
-
-class SiteNotConfigured(HISMessage):
-    """Indicates that no secret key is
-    configured for the provided site key.
-    """
-
-    STATUS = 400
-
-
-class InvalidResponse(HISMessage):
-    """Indicates that the ReCAPTCHA response was invalid."""
-
-    STATUS = 401
+NO_RESPONSE_PROVIDED = HISMessage(
+    'No ReCAPTCHA response provided.', status=400)
+NO_SITE_KEY_PROVIDED = HISMessage(
+    'No ReCAPTCHA site key provided.', status=400)
+SITE_NOT_CONFIGURED = HISMessage('Invalid ReCAPTCHA site key.', status=400)
+INVALID_RESPONSE = HISMessage('Invalid ReCAPTCHA response.', status=401)

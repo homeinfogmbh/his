@@ -5,8 +5,8 @@ from wsgilib import JSON, Binary
 
 from his.api import authenticated, root
 from his.contextlocals import ACCOUNT, CUSTOMER
-from his.messages.customer import CustomerUnconfigured, NoSuchCustomer
-from his.messages.data import InvalidCustomerID
+from his.messages.customer import CUSTOMER_NOT_CONFIGURED, NO_SUCH_CUSTOMER
+from his.messages.data import INVALID_CUSTOMER_ID
 from his.orm import CustomerSettings
 
 
@@ -22,12 +22,12 @@ def get_customer(name):
     try:
         cid = int(name)
     except ValueError:
-        raise InvalidCustomerID()
+        raise INVALID_CUSTOMER_ID
 
     try:
         customer = Customer.get(Customer.id == cid)
     except Customer.DoesNotExist:
-        raise NoSuchCustomer()
+        raise NO_SUCH_CUSTOMER
 
     conditions = (
         lambda: ACCOUNT.root,
@@ -39,7 +39,7 @@ def get_customer(name):
     if customer.id == CUSTOMER.id:
         return CUSTOMER
 
-    raise NoSuchCustomer()
+    raise NO_SUCH_CUSTOMER
 
 
 def _settings():
@@ -48,7 +48,7 @@ def _settings():
     try:
         CustomerSettings.get(CustomerSettings.customer == CUSTOMER)
     except CustomerSettings.DoesNotExist:
-        raise CustomerUnconfigured()
+        raise CUSTOMER_NOT_CONFIGURED
 
 
 @authenticated

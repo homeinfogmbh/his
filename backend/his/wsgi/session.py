@@ -10,10 +10,10 @@ from wsgilib import JSON
 from his.api import authenticated
 from his.contextlocals import ACCOUNT, SESSION, JSON_DATA
 from his.functions import set_session_cookie, delete_session_cookie
-from his.messages.account import NotAuthorized
-from his.messages.session import InvalidCredentials
-from his.messages.session import MissingCredentials
-from his.messages.session import NoSuchSession
+from his.messages.account import NOT_AUTHORIZED
+from his.messages.session import INVALID_CREDENTIALS
+from his.messages.session import MISSING_CREDENTIALS
+from his.messages.session import NO_SUCH_SESSION
 from his.orm import Account, Session
 
 
@@ -40,7 +40,7 @@ def _get_session_by_token(session_token):
     try:
         session_token = UUID(session_token)
     except ValueError:
-        raise NoSuchSession()
+        raise NO_SUCH_SESSION
 
     session = Session.get(Session.token == session_token)
     conditions = (
@@ -51,7 +51,7 @@ def _get_session_by_token(session_token):
     if any(condition() for condition in conditions):
         return session
 
-    raise NoSuchSession()
+    raise NO_SUCH_SESSION
 
 
 def with_session(function):
@@ -71,19 +71,19 @@ def login():
     passwd = JSON_DATA.get('passwd')
 
     if not account or not passwd:
-        return MissingCredentials()
+        return MISSING_CREDENTIALS
 
     try:
         account = Account.get(Account.name == account)
     except Account.DoesNotExist:
-        return InvalidCredentials()
+        return INVALID_CREDENTIALS
 
     if account.login(passwd):
         session = Session.open(account, duration=_get_duration())
         response = JSON(session.to_json())
         return set_session_cookie(response, session)
 
-    return InvalidCredentials()
+    return INVALID_CREDENTIALS
 
 
 @authenticated
@@ -99,7 +99,7 @@ def list_():
             Session.select().join(Account).where(
                 Account.customer == ACCOUNT.customer)})
 
-    return NotAuthorized()
+    return NOT_AUTHORIZED
 
 
 @authenticated

@@ -2,7 +2,7 @@
 
 from his.config import COOKIE, DOMAIN
 from his.contextlocals import get_session
-from his.messages.session import NoSessionSpecified, SessionExpired
+from his.exceptions import NoSessionSpecified, SessionExpired
 
 
 __all__ = [

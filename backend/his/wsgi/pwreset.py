@@ -8,17 +8,17 @@ from recaptcha import VerificationError, ReCaptcha
 from his.config import PWRESET
 from his.contextlocals import JSON_DATA
 from his.exceptions import PasswordResetPending as PasswordResetPending_
-from his.messages.account import NoAccountSpecified, PasswordTooShort
-from his.messages.pwreset import InvalidResetToken
-from his.messages.pwreset import NoPasswordSpecified
-from his.messages.pwreset import NoTokenSpecified
-from his.messages.pwreset import PasswordResetPending
-from his.messages.pwreset import PasswordResetSent
-from his.messages.pwreset import PasswordSet
-from his.messages.recaptcha import InvalidResponse
-from his.messages.recaptcha import NoResponseProvided
-from his.messages.recaptcha import NoSiteKeyProvided
-from his.messages.recaptcha import SiteNotConfigured
+from his.messages.account import NO_ACCOUNT_SPECIFIED, PASSWORD_TOO_SHORT
+from his.messages.pwreset import INVALID_RESET_TOKEN
+from his.messages.pwreset import NO_PASSWORD_SPECIFIED
+from his.messages.pwreset import NO_TOKEN_SPECIFIED
+from his.messages.pwreset import PASSWORD_RESET_PENDING
+from his.messages.pwreset import PASSWORD_RESET_SENT
+from his.messages.pwreset import PASSWORD_SET
+from his.messages.recaptcha import INVALID_RESPONSE
+from his.messages.recaptcha import NO_RESPONSE_PROVIDED
+from his.messages.recaptcha import NO_SITE_KEY_PROVIDED
+from his.messages.recaptcha import SITE_NOT_CONFIGURED
 from his.orm import Account, PasswordResetToken
 
 
@@ -31,7 +31,7 @@ def _get_account(name):
     try:
         return Account.get(Account.name == name)
     except Account.DoesNotExist:
-        raise PasswordResetSent()   # Avoid account sniffing.
+        raise PASSWORD_RESET_SENT   # Avoid account sniffing.
 
 
 def request_reset():
@@ -40,12 +40,12 @@ def request_reset():
     try:
         site_key = JSON_DATA['sitekey']
     except KeyError:
-        return NoSiteKeyProvided()
+        return NO_SITE_KEY_PROVIDED
 
     try:
         options = PWRESET[site_key]
     except KeyError:
-        return SiteNotConfigured()
+        return SITE_NOT_CONFIGURED
 
     secret = options['secret']
     url = options.get('url', 'https://his.homeinfo.de/pwreset.html')
@@ -53,28 +53,28 @@ def request_reset():
     try:
         response = JSON_DATA['response']
     except KeyError:
-        return NoResponseProvided()
+        return NO_RESPONSE_PROVIDED
 
     try:
         ReCaptcha(secret).verify(response)
     except VerificationError:
-        return InvalidResponse()
+        return INVALID_RESPONSE
 
     name = JSON_DATA.get('account')
 
     if not name:
-        return NoAccountSpecified()
+        return NO_ACCOUNT_SPECIFIED
 
     account = _get_account(name)
 
     try:
         password_reset_token = PasswordResetToken.add(account)
     except PasswordResetPending_:
-        return PasswordResetPending()
+        return PASSWORD_RESET_PENDING
 
     password_reset_token.save()
     password_reset_token.email(url)
-    return PasswordResetSent()
+    return PASSWORD_RESET_SENT
 
 
 def reset_password():
@@ -83,32 +83,32 @@ def reset_password():
     token = JSON_DATA.get('token')
 
     if not token:
-        return NoTokenSpecified()
+        return NO_TOKEN_SPECIFIED
 
     token = UUID(token)
     passwd = JSON_DATA.get('passwd')
 
     if not passwd:
-        return NoPasswordSpecified()
+        return NO_PASSWORD_SPECIFIED
 
     try:
         token = PasswordResetToken.get(PasswordResetToken.token == token)
     except PasswordResetToken.DoesNotExist:
-        return InvalidResetToken()
+        return INVALID_RESET_TOKEN
 
     if not token.valid:
-        return InvalidResetToken()
+        return INVALID_RESET_TOKEN
 
     account = token.account
 
     try:
         account.passwd = passwd
     except PasswordTooShortError as password_too_short:
-        return PasswordTooShort(minlen=password_too_short.minlen)
+        return PASSWORD_TOO_SHORT.update(minlen=password_too_short.minlen)
 
     token.delete_instance()
     account.save()
-    return PasswordSet()
+    return PASSWORD_SET
 
 
 ROUTES = (

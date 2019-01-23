@@ -4,114 +4,78 @@ from his.messages.api import HISMessage
 
 
 __all__ = [
-    'DataError',
-    'MissingData',
-    'IncompleteData',
-    'InvalidData',
-    'FieldValueError',
-    'FieldNotNullable',
-    'MissingKeyError',
-    'InvalidKeys',
-    'NonUniqueValue',
-    'InvalidEnumerationValue',
-    'NotAnInteger',
-    'InvalidCustomerID']
+    'MISSING_DATA',
+    'INCOMPLETE_DATA',
+    'INVALID_DATA',
+    'AMBIGUOUS_DATA',
+    'NOT_AN_INTEGER',
+    'INVALID_CUSTOMER_ID',
+    'field_value_error',
+    'field_not_nullable',
+    'missing_key_error',
+    'invalid_keys',
+    'non_unique_value',
+    'invalid_enum_value']
 
 
-class DataError(HISMessage):
-    """Indicates errors in sent data."""
-
-    STATUS = 422
-
-
-class MissingData(DataError):
-    """Indicates missing data."""
-
-    pass
-
-
-class IncompleteData(DataError):
-    """Indicates incomplete data."""
-
-    pass
-
-
-class InvalidData(DataError):
-    """Indicates missing data."""
-
-    pass
+MISSING_DATA = HISMessage('The request is missing data.', status=422)
+INCOMPLETE_DATA = HISMessage(
+    'The data sent in the request is incomplete.', status=422)
+INVALID_DATA = HISMessage(
+    'The data sent in the request is invalid.', status=422)
+AMBIGUOUS_DATA = HISMessage('Data is ambiguous.', status=422)
+NOT_AN_INTEGER = HISMessage(
+    'The provided value is not an integer.', status=422)
+INVALID_CUSTOMER_ID = HISMessage(
+    'The provided value is not a valid customer ID.', status=422)
+_FIELD_VALUE_ERROR = HISMessage('Invalid value for field.', status=422)
+_FIELD_NOT_NULLABLE = HISMessage('Field cannot be NULL.', status=422)
+_MISSING_KEY_ERROR = HISMessage('Missing key for field.', status=422)
+_INVALID_KEYS = HISMessage('Invalid keys for model.', status=422)
+_NON_UNIQUE_VALUE = HISMessage('Value for field is not unique.', status=422)
+_INVALID_ENUM_VALUE = HISMessage(
+    'Invalid value for enumeration contraint.', status=422)
 
 
-class FieldValueError(InvalidData):
-    """Indicates that the value for the field is not valid."""
+def field_value_error(fve):
+    """Creates a messsage from a peeweeplus.FieldValueError."""
 
-    @classmethod
-    def from_fve(cls, fve):
-        """Creates the messsage from a peeweeplus.FieldValueError."""
-        return cls(model=fve.model.__name__, field=type(fve.field).__name__,
-                   attribute=fve.attribute, column=fve.field.column_name,
-                   key=fve.key, value=str(fve.value),
-                   type=type(fve.value).__name__)
+    return _FIELD_VALUE_ERROR.update(
+        model=fve.model.__name__, field=type(fve.field).__name__,
+        attribute=fve.attribute, column=fve.field.column_name, key=fve.key,
+        value=str(fve.value), type=type(fve.value).__name__)
 
 
-class FieldNotNullable(InvalidData):
-    """Indicates that the field is not nullable."""
+def field_not_nullable(fnn):
+    """Creates the message from a peeweeplus.FieldNotNullable error."""
 
-    @classmethod
-    def from_fnn(cls, fnn):
-        """Creates the message from a peeweeplus.FieldNotNullable error."""
-        return cls(model=fnn.model.__name__, field=type(fnn.field).__name__,
-                   attribute=fnn.attribute, column=fnn.field.column_name,
-                   key=fnn.key)
+    return _FIELD_NOT_NULLABLE.update(
+        model=fnn.model.__name__, field=type(fnn.field).__name__,
+        attribute=fnn.attribute, column=fnn.field.column_name, key=fnn.key)
 
 
-class MissingKeyError(InvalidData):
-    """Indicates a missing key for the respective model."""
+def missing_key_error(mke):
+    """Creates the message from the peeweeplus.MissingKeyError."""
 
-    @classmethod
-    def from_mke(cls, mke):
-        """Creates the message from the peeweeplus.MissingKeyError."""
-        return cls(model=mke.model.__name__, field=type(mke.field).__name__,
-                   attribute=mke.attribute, column=mke.field.column_name,
-                   key=mke.key)
+    return _MISSING_KEY_ERROR.update(
+        model=mke.model.__name__, field=type(mke.field).__name__,
+        attribute=mke.attribute, column=mke.field.column_name, key=mke.key)
 
 
-class InvalidKeys(InvalidData):
-    """Indicates that invalid keys were passed."""
+def invalid_keys(iks):
+    """Creates the message from the peeweeplus.InvalidKeys error."""
 
-    @classmethod
-    def from_iks(cls, iks):
-        """Creates the message from the peeweeplus.InvalidKeys error."""
-        return cls(keys=iks.invalid_keys)
+    return _INVALID_KEYS.update(keys=iks.invalid_keys)
 
 
-class NonUniqueValue(InvalidData):
-    """Indicates that a non-unique value was given
-    for a field that requires a unique value.
-    """
+def non_unique_value(nuv):
+    """Creates the message from the peeweeplus.NonUniqueValue error."""
 
-    @classmethod
-    def from_nuv(cls, nuv):
-        """Creates the message from the peeweeplus.NonUniqueValue error."""
-        return cls(key=nuv.key, value=nuv.value)
+    return _NON_UNIQUE_VALUE.update(key=nuv.key, value=nuv.value)
 
 
-class InvalidEnumerationValue(InvalidData):
-    """Indicates that an invalid enumeration value was passed."""
+def invalid_enum_value(iev):
+    """Creates a message from a peeweeplus.InvalidEnumerationValue."""
 
-    @classmethod
-    def from_iev(cls, iev):
-        """Creates a message from a peeweeplus.InvalidEnumerationValue."""
-        return cls(value=iev.value, enum=[value.value for value in iev.enum])
-
-
-class NotAnInteger(InvalidData):
-    """Indicates missing credentials."""
-
-    pass
-
-
-class InvalidCustomerID(InvalidData):
-    """Indicates that an invalid customer ID was specified."""
-
-    pass
+    return _INVALID_ENUM_VALUE.update(
+        value=iev.value, enum=[value.value for value in iev.enum])

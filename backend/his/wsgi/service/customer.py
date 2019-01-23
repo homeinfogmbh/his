@@ -4,12 +4,12 @@ from wsgilib import JSON
 
 from his.api import authenticated, root, admin
 from his.contextlocals import CUSTOMER, JSON_DATA
-from his.messages.customer import NoCustomerSpecified
-from his.messages.service import CustomerServiceDeleted
-from his.messages.service import NoServiceSpecified
-from his.messages.service import NoSuchCustomerService
-from his.messages.service import ServiceAdded
-from his.messages.service import ServiceAlreadyEnabled
+from his.messages.customer import NO_CUSTOMER_SPECIFIED
+from his.messages.service import CUSTOMER_SERVICE_DELETED
+from his.messages.service import NO_SERVICE_SPECIFIED
+from his.messages.service import NO_SUCH_CUSTOMER_SERVICE
+from his.messages.service import SERVICE_ADDED
+from his.messages.service import SERVICE_ALREADY_ENABLED
 from his.orm import Service, CustomerService
 from his.wsgi.customer import get_customer
 from his.wsgi.service.functions import get_service
@@ -47,12 +47,12 @@ def add():
     try:
         customer = get_customer(JSON_DATA['customer'])
     except KeyError:
-        return NoCustomerSpecified()
+        return NO_CUSTOMER_SPECIFIED
 
     try:
         service = get_service(JSON_DATA['service'])
     except KeyError:
-        return NoServiceSpecified()
+        return NO_SERVICE_SPECIFIED
 
     try:
         CustomerService.get(
@@ -63,9 +63,9 @@ def add():
         customer_service.customer = customer
         customer_service.service = service
         customer_service.save()
-        return ServiceAdded()
+        return SERVICE_ADDED
 
-    return ServiceAlreadyEnabled()
+    return SERVICE_ALREADY_ENABLED
 
 
 @authenticated
@@ -80,10 +80,10 @@ def delete(name):
             (CustomerService.customer == CUSTOMER.id)
             & (CustomerService.service == service))
     except CustomerService.DoesNotExist:
-        return NoSuchCustomerService()
+        return NO_SUCH_CUSTOMER_SERVICE
 
     customer_service.delete_instance()
-    return CustomerServiceDeleted()
+    return CUSTOMER_SERVICE_DELETED
 
 
 ROUTES = (

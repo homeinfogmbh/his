@@ -21,7 +21,8 @@ from his.exceptions import AccountExistsError
 from his.exceptions import InconsistencyError
 from his.exceptions import PasswordResetPending
 from his.exceptions import ServiceExistsError
-from his.messages import AccountLocked, InvalidCredentials, DurationOutOfBounds
+from his.messages.account import ACCOUNT_LOCKED
+from his.messages.session import INVALID_CREDENTIALS, DURATION_OUT_OF_BOUNDS
 from his.pwmail import mail_password_reset_link
 
 
@@ -372,7 +373,7 @@ class Account(HISModel):
             except VerifyMismatchError:
                 self.failed_logins += 1
                 self.save()
-                raise InvalidCredentials()
+                raise INVALID_CREDENTIALS
 
             if self.passwd.needs_rehash:
                 self.passwd = passwd
@@ -382,7 +383,7 @@ class Account(HISModel):
             self.save()
             return True
 
-        raise AccountLocked()
+        raise ACCOUNT_LOCKED
 
     def patch_json(self, json, allow=(), **kwargs):
         """Patches the account with fields limited to allow."""
@@ -453,7 +454,7 @@ class Session(HISModel):
     def open(cls, account, duration=DEFAULT_SESSION_DURATION):
         """Actually opens a new login session."""
         if duration not in cls.ALLOWED_DURATIONS:
-            raise DurationOutOfBounds()
+            raise DURATION_OUT_OF_BOUNDS
 
         duration = timedelta(minutes=duration)
         session = cls.add(account, duration)
@@ -478,10 +479,10 @@ class Session(HISModel):
     def renew(self, duration=DEFAULT_SESSION_DURATION):
         """Renews the session."""
         if duration not in type(self).ALLOWED_DURATIONS:
-            raise DurationOutOfBounds()
+            raise DURATION_OUT_OF_BOUNDS
 
         if not self.account.can_login:
-            raise AccountLocked()
+            raise ACCOUNT_LOCKED
 
         self.end = datetime.now() + timedelta(minutes=duration)
         self.save()

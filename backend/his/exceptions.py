@@ -1,11 +1,21 @@
 """Common exceptions."""
 
 __all__ = [
+    'NoSessionSpecified',
+    'SessionExpired',
     'InconsistencyError',
     'ServiceExistsError',
     'AccountExistsError',
     'AmbiguousDataError',
     'PasswordResetPending']
+
+
+class NoSessionSpecified(Exception):
+    """Indicates that no session was specified."""
+
+
+class SessionExpired(Exception):
+    """Indicates that the respective session expired."""
 
 
 class InconsistencyError(Exception):

@@ -5,10 +5,10 @@ from functools import wraps
 from functoolsplus import coerce
 
 from his.contextlocals import SESSION, get_session_duration
-from his.messages.account import AccountLocked
-from his.messages.account import NotAuthorized
-from his.messages.service import NoSuchService
-from his.messages.session import SessionExpired
+from his.messages.account import ACCOUNT_LOCKED
+from his.messages.account import NOT_AUTHORIZED
+from his.messages.service import NO_SUCH_SERVICE
+from his.messages.session import SESSION_EXPIRED
 from his.orm import Service
 
 
@@ -40,10 +40,10 @@ def authenticated(function):
         with preceding authentication.
         """
         if not SESSION.alive:
-            raise SessionExpired()
+            raise SESSION_EXPIRED
 
         if not SESSION.account.usable:
-            raise AccountLocked()
+            raise ACCOUNT_LOCKED
 
         SESSION.renew(duration=get_session_duration())
         return function(*args, **kwargs)
@@ -67,12 +67,12 @@ def authorized(service_name):
             try:
                 service = Service.get(Service.name == service_name)
             except Service.DoesNotExist:
-                raise NoSuchService()
+                raise NO_SUCH_SERVICE
 
             if service.authorized(SESSION.account):
                 return function(*args, **kwargs)
 
-            raise NotAuthorized()
+            raise NOT_AUTHORIZED
 
         return wrapper
 
@@ -88,7 +88,7 @@ def admin(function):
         if SESSION.account.root or SESSION.account.admin:
             return function(*args, **kwargs)
 
-        raise NotAuthorized()
+        raise NOT_AUTHORIZED
 
     return wrapper
 
@@ -102,6 +102,6 @@ def root(function):
         if SESSION.account.root:
             return function(*args, **kwargs)
 
-        raise NotAuthorized()
+        raise NOT_AUTHORIZED
 
     return wrapper

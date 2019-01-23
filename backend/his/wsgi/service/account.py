@@ -5,12 +5,12 @@ from wsgilib import JSON
 from his.api import authenticated, admin
 from his.contextlocals import ACCOUNT, JSON_DATA
 from his.exceptions import InconsistencyError
-from his.messages.account import NoAccountSpecified
-from his.messages.account import NotAuthorized
-from his.messages.service import AccountServiceDeleted
-from his.messages.service import NoServiceSpecified
-from his.messages.service import NoSuchAccountService
-from his.messages.service import ServiceAdded
+from his.messages.account import NO_ACCOUNT_SPECIFIED
+from his.messages.account import NOT_AUTHORIZED
+from his.messages.service import ACCOUNT_SERVICE_DELETED
+from his.messages.service import NO_SERVICE_SPECIFIED
+from his.messages.service import NO_SUCH_ACCOUNT_SERVICE
+from his.messages.service import SERVICE_ADDED
 from his.orm import AccountService
 from his.wsgi.account import get_account
 from his.wsgi.service.functions import get_service
@@ -37,22 +37,22 @@ def add():
     try:
         account = get_account(JSON_DATA['account'])
     except KeyError:
-        return NoAccountSpecified()
+        return NO_ACCOUNT_SPECIFIED
 
     if account not in ACCOUNT.subjects:
-        return NotAuthorized()
+        return NOT_AUTHORIZED
 
     try:
         service = get_service(JSON_DATA['service'])
     except KeyError:
-        return NoServiceSpecified()
+        return NO_SERVICE_SPECIFIED
 
     try:
         account.services.add(service)
     except InconsistencyError:
-        return NotAuthorized()
+        return NOT_AUTHORIZED
 
-    return ServiceAdded()
+    return SERVICE_ADDED
 
 
 @authenticated
@@ -67,10 +67,10 @@ def delete(name):
             (AccountService.account == ACCOUNT.id)
             & (AccountService.service == service))
     except AccountService.DoesNotExist:
-        return NoSuchAccountService()
+        return NO_SUCH_ACCOUNT_SERVICE
 
     account_service.delete_instance()
-    return AccountServiceDeleted()
+    return ACCOUNT_SERVICE_DELETED
 
 
 ROUTES = (

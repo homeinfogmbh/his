@@ -1,6 +1,6 @@
 """Service related messages."""
 
-from his.messages.api import HISMessage
+from his.messages.facility import HIS_MESSAGE
 
 
 __all__ = [
@@ -16,19 +16,20 @@ __all__ = [
     'CUSTOMER_SERVICE_DELETED']
 
 
-NO_SERVICE_SPECIFIED = HISMessage('No service specified.', status=406)
-NO_SUCH_SERVICE = HISMessage('Specified service does not exist.', status=404)
-SERVICE_ADDED = HISMessage('The service has been added.', status=201)
-SERVICE_ALREADY_ENABLED = HISMessage(
+NO_SERVICE_SPECIFIED = HIS_MESSAGE('No service specified.', status=406)
+NO_SUCH_SERVICE = HIS_MESSAGE('Specified service does not exist.', status=404)
+SERVICE_ADDED = HIS_MESSAGE('The service has been added.', status=201)
+SERVICE_ALREADY_ENABLED = HIS_MESSAGE(
     'The service is already enabled.', status=409)
-AMBIGUOUS_SERVICE_TARGET = HISMessage(
+AMBIGUOUS_SERVICE_TARGET = HIS_MESSAGE(
     'The specified service target is ambiguous.', status=406)
-MISSING_SERVICE_TARGET = HISMessage('No service target specified.', status=406)
-NO_SUCH_ACCOUNT_SERVICE = HISMessage(
+MISSING_SERVICE_TARGET = HIS_MESSAGE(
+    'No service target specified.', status=406)
+NO_SUCH_ACCOUNT_SERVICE = HIS_MESSAGE(
     'No such service for specified account.', status=404)
-ACCOUNT_SERVICE_DELETED = HISMessage(
+ACCOUNT_SERVICE_DELETED = HIS_MESSAGE(
     'The account service has been deleted.', status=200)
-NO_SUCH_CUSTOMER_SERVICE = HISMessage(
+NO_SUCH_CUSTOMER_SERVICE = HIS_MESSAGE(
     'No such service for specified customer.', status=404)
-CUSTOMER_SERVICE_DELETED = HISMessage(
+CUSTOMER_SERVICE_DELETED = HIS_MESSAGE(
     'The customer service has been deleted.', status=200)

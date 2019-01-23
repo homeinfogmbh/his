@@ -1,6 +1,6 @@
 """Data errors."""
 
-from his.messages.api import HISMessage
+from his.messages.facility import HIS_MESSAGE
 
 
 __all__ = [
@@ -18,22 +18,22 @@ __all__ = [
     'invalid_enum_value']
 
 
-MISSING_DATA = HISMessage('The request is missing data.', status=422)
-INCOMPLETE_DATA = HISMessage(
+MISSING_DATA = HIS_MESSAGE('The request is missing data.', status=422)
+INCOMPLETE_DATA = HIS_MESSAGE(
     'The data sent in the request is incomplete.', status=422)
-INVALID_DATA = HISMessage(
+INVALID_DATA = HIS_MESSAGE(
     'The data sent in the request is invalid.', status=422)
-AMBIGUOUS_DATA = HISMessage('Data is ambiguous.', status=422)
-NOT_AN_INTEGER = HISMessage(
+AMBIGUOUS_DATA = HIS_MESSAGE('Data is ambiguous.', status=422)
+NOT_AN_INTEGER = HIS_MESSAGE(
     'The provided value is not an integer.', status=422)
-INVALID_CUSTOMER_ID = HISMessage(
+INVALID_CUSTOMER_ID = HIS_MESSAGE(
     'The provided value is not a valid customer ID.', status=422)
-_FIELD_VALUE_ERROR = HISMessage('Invalid value for field.', status=422)
-_FIELD_NOT_NULLABLE = HISMessage('Field cannot be NULL.', status=422)
-_MISSING_KEY_ERROR = HISMessage('Missing key for field.', status=422)
-_INVALID_KEYS = HISMessage('Invalid keys for model.', status=422)
-_NON_UNIQUE_VALUE = HISMessage('Value for field is not unique.', status=422)
-_INVALID_ENUM_VALUE = HISMessage(
+_FIELD_VALUE_ERROR = HIS_MESSAGE('Invalid value for field.', status=422)
+_FIELD_NOT_NULLABLE = HIS_MESSAGE('Field cannot be NULL.', status=422)
+_MISSING_KEY_ERROR = HIS_MESSAGE('Missing key for field.', status=422)
+_INVALID_KEYS = HIS_MESSAGE('Invalid keys for model.', status=422)
+_NON_UNIQUE_VALUE = HIS_MESSAGE('Value for field is not unique.', status=422)
+_INVALID_ENUM_VALUE = HIS_MESSAGE(
     'Invalid value for enumeration contraint.', status=422)
 
 

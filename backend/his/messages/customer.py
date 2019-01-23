@@ -1,6 +1,6 @@
 """Customer related messages."""
 
-from his.messages.api import HISMessage
+from his.messages.facility import HIS_MESSAGE
 
 
 __all__ = [
@@ -9,8 +9,8 @@ __all__ = [
     'CUSTOMER_NOT_CONFIGURED']
 
 
-NO_CUSTOMER_SPECIFIED = HISMessage('No customer specified.', status=420)
-NO_SUCH_CUSTOMER = HISMessage(
+NO_CUSTOMER_SPECIFIED = HIS_MESSAGE('No customer specified.', status=420)
+NO_SUCH_CUSTOMER = HIS_MESSAGE(
     'The specified customer does not exist.', status=404)
-CUSTOMER_NOT_CONFIGURED = HISMessage(
+CUSTOMER_NOT_CONFIGURED = HIS_MESSAGE(
     'The specified customer has no configuration.', status=404)

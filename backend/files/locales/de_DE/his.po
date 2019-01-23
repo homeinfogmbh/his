@@ -184,19 +184,19 @@ msgstr "Das für den Dienst angegebene Ziel ist mehrdeutig."
 msgid "No service target specified."
 msgstr "Es wurde kein Ziel für den Dienst angegeben."
 
-#: service.py:27
+#: service.py:28
 msgid "No such service for specified account."
 msgstr "Der Dienst ist dem entsprechenden Benutzerkonto nicht zugerodnet."
 
-#: service.py:29
+#: service.py:30
 msgid "The account service has been deleted."
 msgstr "Der Zuordnung des Dienstes zum entsprechenden Benutzerkonto wurde gelöscht."
 
-#: service.py:31
+#: service.py:32
 msgid "No such service for specified customer."
 msgstr "Der Dienst ist dem entsprechenden Kunden nicht zugerodnet."
 
-#: service.py:33
+#: service.py:34
 msgid "The customer service has been deleted."
 msgstr "Der Zuordnung des Dienstes zum entsprechenden Kunden wurde gelöscht."
 

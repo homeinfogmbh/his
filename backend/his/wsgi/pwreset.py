@@ -3,7 +3,7 @@
 from uuid import UUID
 
 from peeweeplus import PasswordTooShortError
-from recaptcha import VerificationError, ReCaptcha
+from recaptcha import VerificationError, verify
 
 from his.config import PWRESET
 from his.contextlocals import JSON_DATA
@@ -56,7 +56,7 @@ def request_reset():
         return NO_RESPONSE_PROVIDED
 
     try:
-        ReCaptcha(secret).verify(response)
+        verify(secret, response)
     except VerificationError:
         return INVALID_RESPONSE
 

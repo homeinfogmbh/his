@@ -9,12 +9,14 @@ may be implemented.
 from his.api import authenticated, authorized, admin, root
 from his.application import Application
 from his.contextlocals import ACCOUNT, CUSTOMER, JSON_DATA
+from his.messages.facility import HIS_MESSAGE_FACILITY
 from his.orm import Account
 
 
 __all__ = [
     'ACCOUNT',
     'CUSTOMER',
+    'HIS_MESSAGE_FACILITY',
     'JSON_DATA',
     'authenticated',
     'authorized',

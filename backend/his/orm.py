@@ -121,6 +121,14 @@ class Service(HISModel):
 
         raise ServiceExistsError()
 
+    @property
+    def service_deps(self):
+        """Yields dependencies of this service."""
+        for dependency in self._service_deps:
+            dependency = dependency.dependency
+            yield dependency
+            yield from dependency.service_deps
+
     def authorized(self, account):
         """Determines whether the respective account
         is authorized to use this service.
@@ -147,7 +155,7 @@ class ServiceDependency(HISModel):
         table_name = 'service_dependency'
 
     service = ForeignKeyField(
-        Service, column_name='service', backref='dependencies',
+        Service, column_name='service', backref='_service_deps',
         on_delete='CASCADE')
     dependency = ForeignKeyField(
         Service, column_name='dependency', on_delete='CASCADE')
@@ -194,10 +202,9 @@ class CustomerService(HISModel):
     def services(cls, customer):
         """Yields services for the respective customer."""
         for customer_service in cls.select().where(cls.customer == customer):
-            yield customer_service.service
-
-            for dependency in customer_service.service.dependencies:
-                yield dependency.dependency
+            service = customer_service.service
+            yield service
+            yield from service.service_deps
 
     @property
     def active(self):

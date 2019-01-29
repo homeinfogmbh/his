@@ -57,10 +57,9 @@ class AccountServicesProxy:
         """Yields appropriate services."""
         for account_service in AccountService.select().where(
                 AccountService.account == self.account):
-            yield account_service.service
-
-            for dependency in account_service.service.service_deps:
-                yield dependency.dependency
+            service = account_service.service
+            yield service
+            yield from service.service_deps
 
     def add(self, service):
         """Maps a service to this account."""

@@ -55,15 +55,20 @@ class AccountServicesProxy:
 
     def __iter__(self):
         """Yields appropriate services."""
-        for account_service in AccountService.select().where(
-                AccountService.account == self.account):
-            service = account_service.service
+        for service in self.services:
             yield service
             yield from service.service_deps
 
+    @property
+    def services(self):
+        """Yields directly assigned services."""
+        for account_service in AccountService.select().where(
+                AccountService.account == self.account):
+            yield account_service.service
+
     def add(self, service):
         """Maps a service to this account."""
-        if service not in self:
+        if service not in self.services:
             if service in CustomerService.services(self.account.customer):
                 account_service = AccountService()
                 account_service.account = self.account
@@ -123,8 +128,8 @@ class Service(HISModel):
     @property
     def service_deps(self):
         """Yields dependencies of this service."""
-        for dependency in self._service_deps:
-            dependency = dependency.dependency
+        for service_dependency in self._service_deps:
+            dependency = service_dependency.dependency
             yield dependency
             yield from dependency.service_deps
 

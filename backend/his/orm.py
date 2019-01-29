@@ -59,7 +59,7 @@ class AccountServicesProxy:
                 AccountService.account == self.account):
             yield account_service.service
 
-            for dependency in account_service.service.dependencies:
+            for dependency in account_service.service.service_deps:
                 yield dependency.dependency
 
     def add(self, service):

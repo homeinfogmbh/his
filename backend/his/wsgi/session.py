@@ -3,12 +3,10 @@
 from functools import wraps
 from uuid import UUID
 
-from flask import request
-
 from wsgilib import JSON
 
 from his.api import authenticated
-from his.contextlocals import ACCOUNT, SESSION, JSON_DATA
+from his.contextlocals import ACCOUNT, SESSION, JSON_DATA, get_session_duration
 from his.functions import set_session_cookie, delete_session_cookie
 from his.messages.account import NOT_AUTHORIZED
 from his.messages.session import INVALID_CREDENTIALS
@@ -18,15 +16,6 @@ from his.orm import Account, Session
 
 
 __all__ = ['ROUTES']
-
-
-DURATION = 15
-
-
-def _get_duration():
-    """Returns the repsective session duration in minutes."""
-
-    return int(request.args.get('duration', DURATION))
 
 
 def _get_session_by_token(session_token):
@@ -79,7 +68,7 @@ def login():
         return INVALID_CREDENTIALS
 
     if account.login(passwd):
-        session = Session.open(account, duration=_get_duration())
+        session = Session.open(account, duration=get_session_duration())
         response = JSON(session.to_json())
         return set_session_cookie(response, session)
 
@@ -115,7 +104,7 @@ def get(session):
 def refresh(session):
     """Refreshes an existing session."""
 
-    session = session.renew(duration=_get_duration())
+    # Refresh is done by @authenricated automatically.
     return JSON(session.to_json())
 
 

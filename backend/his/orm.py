@@ -234,7 +234,7 @@ class CustomerService(HISModel):
         self.delete_instance()
 
 
-class Account(HISModel):
+class Account(HISModel):    # pylint: disable=R0902
     """A HIS account."""
 
     customer = ForeignKeyField(
@@ -268,7 +268,8 @@ class Account(HISModel):
         return '{}@{}'.format(repr(self), self.customer.id)
 
     @classmethod
-    def add(cls, customer, name, email, passwd, admin=False, root=False):
+    def add(cls, customer, name, email, passwd, *,
+            admin=False, root=False):   # pylint: disable=R0913
         """Adds a new account."""
         if len(name) < 3:
             raise ValueError('Account name too short.')
@@ -376,25 +377,34 @@ class Account(HISModel):
         """Returns brief account information."""
         return {'id': self.id, 'email': self.email}
 
+    def rehash(self, passwd, *, force=False):
+        """Performs a rehash."""
+        if self.passwd.needs_rehash or force:
+            # Only rehash if the new hash length fits the current field.
+            if type(self).passwd.size_changed:
+                self.passwd = passwd
+                return True
+
+        return False
+
     def login(self, passwd):
         """Performs a login."""
-        if self.can_login:
-            try:
-                self.passwd.verify(passwd)
-            except VerifyMismatchError:
-                self.failed_logins += 1
-                self.save()
-                raise INVALID_CREDENTIALS
+        if not self.can_login:
+            raise ACCOUNT_LOCKED
 
-            if self.passwd.needs_rehash:
-                self.passwd = passwd
-
-            self.failed_logins = 0
-            self.last_login = datetime.now()
+        try:
+            self.passwd.verify(passwd)
+        except VerifyMismatchError:
+            self.failed_logins += 1
             self.save()
-            return True
+            raise INVALID_CREDENTIALS
 
-        raise ACCOUNT_LOCKED
+        self.rehash(passwd)
+        self.failed_logins = 0
+        self.last_login = datetime.now()
+        self.save()
+        return True
+
 
     def patch_json(self, json, allow=(), **kwargs):
         """Patches the account with fields limited to allow."""
@@ -443,13 +453,13 @@ class Session(HISModel):
 
     def __repr__(self):
         """Returns a unique string representation."""
-        return self.token.hex
+        return self.token.hex   # pylint: disable=E1101
 
     def __str__(self):
         """Returns a human-readable representation."""
         return '{} - {}: {} ({})'.format(
-            self.start.isoformat(), self.end.isoformat(), self.token.hex,
-            self.login)
+            self.start.isoformat(), self.end.isoformat(),
+            self.token.hex, self.login) # pylint: disable=E1101
 
     @classmethod
     def add(cls, account, duration):

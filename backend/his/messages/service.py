@@ -1,6 +1,6 @@
 """Service related messages."""
 
-from his.messages.facility import HIS_MESSAGE
+from wsgilib import JSONMessage
 
 
 __all__ = [
@@ -16,20 +16,20 @@ __all__ = [
     'CUSTOMER_SERVICE_DELETED']
 
 
-NO_SERVICE_SPECIFIED = HIS_MESSAGE('No service specified.', status=406)
-NO_SUCH_SERVICE = HIS_MESSAGE('Specified service does not exist.', status=404)
-SERVICE_ADDED = HIS_MESSAGE('The service has been added.', status=201)
-SERVICE_ALREADY_ENABLED = HIS_MESSAGE(
+NO_SERVICE_SPECIFIED = JSONMessage('No service specified.', status=406)
+NO_SUCH_SERVICE = JSONMessage('Specified service does not exist.', status=404)
+SERVICE_ADDED = JSONMessage('The service has been added.', status=201)
+SERVICE_ALREADY_ENABLED = JSONMessage(
     'The service is already enabled.', status=409)
-AMBIGUOUS_SERVICE_TARGET = HIS_MESSAGE(
+AMBIGUOUS_SERVICE_TARGET = JSONMessage(
     'The specified service target is ambiguous.', status=406)
-MISSING_SERVICE_TARGET = HIS_MESSAGE(
+MISSING_SERVICE_TARGET = JSONMessage(
     'No service target specified.', status=406)
-NO_SUCH_ACCOUNT_SERVICE = HIS_MESSAGE(
+NO_SUCH_ACCOUNT_SERVICE = JSONMessage(
     'No such service for specified account.', status=404)
-ACCOUNT_SERVICE_DELETED = HIS_MESSAGE(
+ACCOUNT_SERVICE_DELETED = JSONMessage(
     'The account service has been deleted.', status=200)
-NO_SUCH_CUSTOMER_SERVICE = HIS_MESSAGE(
+NO_SUCH_CUSTOMER_SERVICE = JSONMessage(
     'No such service for specified customer.', status=404)
-CUSTOMER_SERVICE_DELETED = HIS_MESSAGE(
+CUSTOMER_SERVICE_DELETED = JSONMessage(
     'The customer service has been deleted.', status=200)

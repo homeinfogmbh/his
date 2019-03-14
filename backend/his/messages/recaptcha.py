@@ -1,6 +1,6 @@
 """ReCAPTCHA related messages."""
 
-from his.messages.facility import HIS_MESSAGE
+from wsgilib import JSONMessage
 
 
 __all__ = [
@@ -10,9 +10,9 @@ __all__ = [
     'INVALID_RESPONSE']
 
 
-NO_RESPONSE_PROVIDED = HIS_MESSAGE(
+NO_RESPONSE_PROVIDED = JSONMessage(
     'No ReCAPTCHA response provided.', status=400)
-NO_SITE_KEY_PROVIDED = HIS_MESSAGE(
+NO_SITE_KEY_PROVIDED = JSONMessage(
     'No ReCAPTCHA site key provided.', status=400)
-SITE_NOT_CONFIGURED = HIS_MESSAGE('Invalid ReCAPTCHA site key.', status=400)
-INVALID_RESPONSE = HIS_MESSAGE('Invalid ReCAPTCHA response.', status=401)
+SITE_NOT_CONFIGURED = JSONMessage('Invalid ReCAPTCHA site key.', status=400)
+INVALID_RESPONSE = JSONMessage('Invalid ReCAPTCHA response.', status=401)

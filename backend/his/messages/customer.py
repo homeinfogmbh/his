@@ -1,6 +1,6 @@
 """Customer related messages."""
 
-from his.messages.facility import HIS_MESSAGE
+from wsgilib import JSONMessage
 
 
 __all__ = [
@@ -9,8 +9,8 @@ __all__ = [
     'CUSTOMER_NOT_CONFIGURED']
 
 
-NO_CUSTOMER_SPECIFIED = HIS_MESSAGE('No customer specified.', status=420)
-NO_SUCH_CUSTOMER = HIS_MESSAGE(
+NO_CUSTOMER_SPECIFIED = JSONMessage('No customer specified.', status=420)
+NO_SUCH_CUSTOMER = JSONMessage(
     'The specified customer does not exist.', status=404)
-CUSTOMER_NOT_CONFIGURED = HIS_MESSAGE(
+CUSTOMER_NOT_CONFIGURED = JSONMessage(
     'The specified customer has no configuration.', status=404)

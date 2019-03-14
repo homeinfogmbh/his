@@ -1,6 +1,6 @@
 """Account related messages."""
 
-from his.messages.facility import HIS_MESSAGE
+from wsgilib import JSONMessage
 
 
 __all__ = [
@@ -16,14 +16,14 @@ __all__ = [
     'PASSWORD_TOO_SHORT']
 
 
-NO_ACCOUNT_SPECIFIED = HIS_MESSAGE('No account specified.', status=406)
-NO_SUCH_ACCOUNT = HIS_MESSAGE('No such account.', status=404)
-ACCOUNT_LOCKED = HIS_MESSAGE('Account is locked.', status=423)
-ACCOUNT_CREATED = HIS_MESSAGE('Account has been created.', status=201)
-ACCOUNT_DELETED = HIS_MESSAGE('Account has been deleted.', status=200)
-ACCOUNT_PATCHED = HIS_MESSAGE('Account has been patched.', status=200)
-NOT_AUTHORIZED = HIS_MESSAGE('Not authorized.', status=403)
-ACCOUNT_EXISTS = HIS_MESSAGE('Account already exists.', status=409)
-ACCOUNTS_EXHAUSTED = HIS_MESSAGE('Account quota is exhausted.', status=402)
-PASSWORD_TOO_SHORT = HIS_MESSAGE(
+NO_ACCOUNT_SPECIFIED = JSONMessage('No account specified.', status=406)
+NO_SUCH_ACCOUNT = JSONMessage('No such account.', status=404)
+ACCOUNT_LOCKED = JSONMessage('Account is locked.', status=423)
+ACCOUNT_CREATED = JSONMessage('Account has been created.', status=201)
+ACCOUNT_DELETED = JSONMessage('Account has been deleted.', status=200)
+ACCOUNT_PATCHED = JSONMessage('Account has been patched.', status=200)
+NOT_AUTHORIZED = JSONMessage('Not authorized.', status=403)
+ACCOUNT_EXISTS = JSONMessage('Account already exists.', status=409)
+ACCOUNTS_EXHAUSTED = JSONMessage('Account quota is exhausted.', status=402)
+PASSWORD_TOO_SHORT = JSONMessage(
     'The specified password is too short.', status=415)

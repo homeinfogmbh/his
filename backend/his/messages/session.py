@@ -1,6 +1,6 @@
 """Session related messages."""
 
-from his.messages.facility import HIS_MESSAGE
+from wsgilib import JSONMessage
 
 
 __all__ = [
@@ -12,12 +12,12 @@ __all__ = [
     'DURATION_OUT_OF_BOUNDS']
 
 
-MISSING_CREDENTIALS = HIS_MESSAGE(
+MISSING_CREDENTIALS = JSONMessage(
     'No user name and / or password specified.', status=401)
-INVALID_CREDENTIALS = HIS_MESSAGE(
+INVALID_CREDENTIALS = JSONMessage(
     'Invalid user name and / or password.', status=401)
-NO_SESSION_SPECIFIED = HIS_MESSAGE('No session specified.', status=401)
-NO_SUCH_SESSION = HIS_MESSAGE('Specified session does not exist.', status=404)
-SESSION_EXPIRED = HIS_MESSAGE('Session expired.', status=401)
-DURATION_OUT_OF_BOUNDS = HIS_MESSAGE(
+NO_SESSION_SPECIFIED = JSONMessage('No session specified.', status=401)
+NO_SUCH_SESSION = JSONMessage('Specified session does not exist.', status=404)
+SESSION_EXPIRED = JSONMessage('Session expired.', status=401)
+DURATION_OUT_OF_BOUNDS = JSONMessage(
     'Session duration is out of bounds.', status=400)

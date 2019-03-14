@@ -1,6 +1,6 @@
 """Data errors."""
 
-from his.messages.facility import HIS_MESSAGE
+from wsgilib import JSONMessage
 
 
 __all__ = [
@@ -24,22 +24,22 @@ __all__ = [
     'invalid_enum_value']
 
 
-MISSING_DATA = HIS_MESSAGE('The request is missing data.', status=422)
-INCOMPLETE_DATA = HIS_MESSAGE(
+MISSING_DATA = JSONMessage('The request is missing data.', status=422)
+INCOMPLETE_DATA = JSONMessage(
     'The data sent in the request is incomplete.', status=422)
-INVALID_DATA = HIS_MESSAGE(
+INVALID_DATA = JSONMessage(
     'The data sent in the request is invalid.', status=422)
-AMBIGUOUS_DATA = HIS_MESSAGE('Data is ambiguous.', status=422)
-NOT_AN_INTEGER = HIS_MESSAGE(
+AMBIGUOUS_DATA = JSONMessage('Data is ambiguous.', status=422)
+NOT_AN_INTEGER = JSONMessage(
     'The provided value is not an integer.', status=422)
-INVALID_CUSTOMER_ID = HIS_MESSAGE(
+INVALID_CUSTOMER_ID = JSONMessage(
     'The provided value is not a valid customer ID.', status=422)
-FIELD_VALUE_ERROR = HIS_MESSAGE('Invalid value for field.', status=422)
-FIELD_NOT_NULLABLE = HIS_MESSAGE('Field cannot be NULL.', status=422)
-MISSING_KEY_ERROR = HIS_MESSAGE('Missing key for field.', status=422)
-INVALID_KEYS = HIS_MESSAGE('Invalid keys for model.', status=422)
-NON_UNIQUE_VALUE = HIS_MESSAGE('Value for field is not unique.', status=422)
-INVALID_ENUM_VALUE = HIS_MESSAGE(
+FIELD_VALUE_ERROR = JSONMessage('Invalid value for field.', status=422)
+FIELD_NOT_NULLABLE = JSONMessage('Field cannot be NULL.', status=422)
+MISSING_KEY_ERROR = JSONMessage('Missing key for field.', status=422)
+INVALID_KEYS = JSONMessage('Invalid keys for model.', status=422)
+NON_UNIQUE_VALUE = JSONMessage('Value for field is not unique.', status=422)
+INVALID_ENUM_VALUE = JSONMessage(
     'Invalid value for enumeration contraint.', status=422)
 
 

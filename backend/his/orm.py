@@ -106,6 +106,8 @@ class Service(HISModel):
     description = CharField(255, null=True)
     # Flag whether the service shall be promoted.
     promote = BooleanField(default=True)
+    # Flag whether the service is locked for maintenance.
+    locked = BooleanField(default=False)
 
     def __str__(self):
         """Returns the service's name."""
@@ -145,6 +147,9 @@ class Service(HISModel):
         """
         if account.root:
             return True
+
+        if self.locked:
+            return False
 
         if self in CustomerService.services(account.customer):
             return account.admin or self in account.services

@@ -13,7 +13,8 @@ __all__ = [
     'NO_SUCH_ACCOUNT_SERVICE',
     'ACCOUNT_SERVICE_DELETED',
     'NO_SUCH_CUSTOMER_SERVICE',
-    'CUSTOMER_SERVICE_DELETED']
+    'CUSTOMER_SERVICE_DELETED',
+    'SERVICE_LOCKED']
 
 
 NO_SERVICE_SPECIFIED = JSONMessage('No service specified.', status=406)
@@ -33,3 +34,4 @@ NO_SUCH_CUSTOMER_SERVICE = JSONMessage(
     'No such service for specified customer.', status=404)
 CUSTOMER_SERVICE_DELETED = JSONMessage(
     'The customer service has been deleted.', status=200)
+SERVICE_LOCKED = JSONMessage('The service is currently locked.', status=403)

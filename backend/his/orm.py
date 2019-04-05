@@ -22,6 +22,7 @@ from his.exceptions import InconsistencyError
 from his.exceptions import PasswordResetPending
 from his.exceptions import ServiceExistsError
 from his.messages.account import ACCOUNT_LOCKED
+from his.messages.service import SERVICE_LOCKED
 from his.messages.session import INVALID_CREDENTIALS, DURATION_OUT_OF_BOUNDS
 from his.pwmail import mail_password_reset_link
 
@@ -149,7 +150,7 @@ class Service(HISModel):
             return True
 
         if self.locked:
-            return False
+            raise SERVICE_LOCKED
 
         if self in CustomerService.services(account.customer):
             return account.admin or self in account.services

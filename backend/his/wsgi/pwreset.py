@@ -107,6 +107,7 @@ def reset_password():
         return PASSWORD_TOO_SHORT.update(minlen=password_too_short.minlen)
 
     token.delete_instance()
+    account.failed_logins = 0
     account.save()
     return PASSWORD_SET
 

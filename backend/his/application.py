@@ -4,7 +4,6 @@ from itertools import chain
 
 from peeweeplus import FieldNotNullable
 from peeweeplus import FieldValueError
-from peeweeplus import InvalidEnumerationValue
 from peeweeplus import InvalidKeys
 from peeweeplus import MissingKeyError
 from peeweeplus import NonUniqueValue
@@ -17,7 +16,6 @@ from his.messages.data import field_not_nullable
 from his.messages.data import missing_key_error
 from his.messages.data import invalid_keys
 from his.messages.data import non_unique_value
-from his.messages.data import invalid_enum_value
 from his.messages.session import NO_SESSION_SPECIFIED, SESSION_EXPIRED
 
 
@@ -31,8 +29,7 @@ ERROR_HANDLERS = (
     (FieldNotNullable, field_not_nullable),
     (MissingKeyError, missing_key_error),
     (InvalidKeys, invalid_keys),
-    (NonUniqueValue, non_unique_value),
-    (InvalidEnumerationValue, invalid_enum_value))
+    (NonUniqueValue, non_unique_value))
 
 
 class Application(_Application):

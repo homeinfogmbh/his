@@ -20,8 +20,7 @@ __all__ = [
     'field_not_nullable',
     'missing_key_error',
     'invalid_keys',
-    'non_unique_value',
-    'invalid_enum_value']
+    'non_unique_value']
 
 
 MISSING_DATA = JSONMessage('The request is missing data.', status=422)
@@ -78,10 +77,3 @@ def non_unique_value(nuv):
     """Creates the message from the peeweeplus.NonUniqueValue error."""
 
     return NON_UNIQUE_VALUE.update(key=nuv.key, value=nuv.value)
-
-
-def invalid_enum_value(iev):
-    """Creates a message from a peeweeplus.InvalidEnumerationValue."""
-
-    return INVALID_ENUM_VALUE.update(
-        value=iev.value, enum=[value.value for value in iev.enum])

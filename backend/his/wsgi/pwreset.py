@@ -5,7 +5,7 @@ from uuid import UUID
 from peeweeplus import PasswordTooShortError
 from recaptcha import VerificationError, verify
 
-from his.config import PWRESET
+from his.config import CONFIG, RECAPTCHA
 from his.contextlocals import JSON_DATA
 from his.exceptions import PasswordResetPending as PasswordResetPending_
 from his.messages.account import NO_ACCOUNT_SPECIFIED, PASSWORD_TOO_SHORT
@@ -34,7 +34,7 @@ def _get_account(name):
         raise PASSWORD_RESET_SENT   # Avoid account sniffing.
 
 
-def request_reset():
+def request_reset():    # pylint: disable=R0911
     """Attempts a password reset request."""
 
     try:
@@ -43,12 +43,12 @@ def request_reset():
         return NO_SITE_KEY_PROVIDED
 
     try:
-        options = PWRESET[site_key]
+        recaptcha = RECAPTCHA[site_key]
     except KeyError:
         return SITE_NOT_CONFIGURED
 
-    secret = options['secret']
-    url = options.get('url', 'https://his.homeinfo.de/pwreset.html')
+    secret = recaptcha['secret']
+    url = recaptcha.get('url', CONFIG['pwreset']['url'])
 
     try:
         response = JSON_DATA['response']

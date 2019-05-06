@@ -1,8 +1,9 @@
 """Password mailing."""
 
-from emaillib import EMail, Mailer
+from emaillib import EMail
 
 from his.config import CONFIG
+from his.mail import MAIL_CFG, MAILER
 
 
 __all__ = ['mail_password_reset_link']
@@ -10,11 +11,6 @@ __all__ = ['mail_password_reset_link']
 
 HREF = '<a href="{}">{}</a>'
 PWRESET_CFG = CONFIG['pwreset']
-MAIL_CFG = CONFIG['mail']
-
-MAILER = Mailer(
-    MAIL_CFG['host'], int(MAIL_CFG['port']), MAIL_CFG['user'],
-    MAIL_CFG['passwd'])
 
 
 def href(url, caption=None):

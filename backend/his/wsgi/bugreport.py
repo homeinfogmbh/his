@@ -7,7 +7,7 @@ from recaptcha import VerificationError, verify
 
 from his.api import authenticated
 from his.config import CONFIG, RECAPTCHA
-from his.contextlocals import JSON_DATA
+from his.contextlocals import ACCOUNT, JSON_DATA
 from his.mail import MAILER
 from his.messages.bugreport import BUGREPORT_SENT
 from his.messages.recaptcha import INVALID_RESPONSE
@@ -29,7 +29,7 @@ def gen_emails():
         template = file.read()
 
     subject = request.json.pop('subject')
-    html = template.format(**request.json)
+    html = template.format(account=ACCOUNT, **request.json)
 
     for recipient in BUGREPORT_CONFIG['recipients'].split():
         yield EMail(

@@ -21,4 +21,4 @@ def list_():
         Service.promote == 1)])
 
 
-ROUTES = (('GET', '/service', list_, 'list_services'),)
+ROUTES = (('GET', '/service', list_),)

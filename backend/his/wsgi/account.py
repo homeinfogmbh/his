@@ -93,13 +93,13 @@ def _add_account():
     return ACCOUNT_CREATED
 
 
-def _patch_account(account, allow=()):
+def _patch_account(account, only=None):
     """Patches the respective account with the provided
     dictionary and an optional field restriction.
     """
 
     try:
-        account.patch_json(JSON_DATA, allow=allow)
+        account.patch_json(JSON_DATA, only=only)
     except PasswordTooShortError as password_too_short:
         raise PASSWORD_TOO_SHORT.update(minlen=password_too_short.minlen)
     except AmbiguousDataError as error:
@@ -165,10 +165,10 @@ def patch(name):
         return _patch_account(account)
 
     if ACCOUNT.admin and CUSTOMER == account.customer:
-        return _patch_account(account, allow=_ADMIN_FIELDS)
+        return _patch_account(account, only=_ADMIN_FIELDS)
 
     if ACCOUNT.id == account.id:
-        return _patch_account(account, allow=_USER_FIELDS)
+        return _patch_account(account, only=_USER_FIELDS)
 
     return NOT_AUTHORIZED
 

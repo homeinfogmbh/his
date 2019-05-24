@@ -87,8 +87,8 @@ def delete(name):
 
 
 ROUTES = (
-    ('GET', '/service/customer', list_, 'list_customer_services'),
-    ('GET', '/service/<name>/customers', list_customers,
-     'list_service_customers'),
-    ('POST', '/service/customer', add, 'add_customer_service'),
-    ('DELETE', '/service/customer/<name>', delete, 'delete_customer_service'))
+    ('GET', '/service/customer', list_),
+    ('GET', '/service/<name>/customers', list_customers),
+    ('POST', '/service/customer', add),
+    ('DELETE', '/service/customer/<name>', delete)
+)

@@ -74,6 +74,7 @@ def delete(name):
 
 
 ROUTES = (
-    ('POST', '/service/account', add, 'add_account_service'),
-    ('GET', '/service/account', list_, 'list_account_services'),
-    ('DELETE', '/service/account/<name>', delete, 'delete_account_service'))
+    ('POST', '/service/account', add),
+    ('GET', '/service/account', list_),
+    ('DELETE', '/service/account/<name>', delete)
+)

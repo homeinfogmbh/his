@@ -23,8 +23,8 @@ from his.orm import Account, CustomerSettings
 __all__ = ['get_account', 'ROUTES']
 
 
-_USER_FIELDS = ('fullName', 'passwd', 'email')
-_ADMIN_FIELDS = ('name', 'fullName', 'passwd', 'email', 'admin')
+_USER_FIELDS = {'fullName', 'passwd', 'email'}
+_ADMIN_FIELDS = {'name', 'fullName', 'passwd', 'email', 'admin'}
 
 
 def get_account(name):

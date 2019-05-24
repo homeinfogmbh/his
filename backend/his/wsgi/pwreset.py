@@ -113,5 +113,6 @@ def reset_password():
 
 
 ROUTES = (
-    ('POST', '/pwreset/request', request_reset, 'request_reset'),
-    ('POST', '/pwreset/reset', reset_password, 'reset_password'))
+    ('POST', '/pwreset/request', request_reset),
+    ('POST', '/pwreset/reset', reset_password)
+)

@@ -74,6 +74,7 @@ def get_logo():
 
 
 ROUTES = (
-    ('GET', '/customer', list_, 'list_customers'),
-    ('GET', '/customer/<ident>', get, 'get_customer'),
-    ('GET', '/customer-logo', get_logo, 'get_customer_logo'))
+    ('GET', '/customer', list_),
+    ('GET', '/customer/<ident>', get),
+    ('GET', '/customer-logo', get_logo)
+)

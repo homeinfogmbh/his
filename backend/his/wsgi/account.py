@@ -175,7 +175,7 @@ def patch(name):
 
 ROUTES = (
     ('GET', '/account', list_),
-    ('GET', '/account/<name>'),
+    ('GET', '/account/<name>', get),
     ('POST', '/account', add),
     ('PATCH', '/account/<name>', patch)
 )

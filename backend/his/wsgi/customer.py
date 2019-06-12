@@ -63,7 +63,7 @@ def list_():
 def get(ident):
     """Allows services"""
 
-    return JSON(get_customer(ident).to_json())
+    return JSON(get_customer(ident).to_json(company=True))
 
 
 @authenticated

@@ -116,6 +116,8 @@ def get_args():
     """Returns the command line arguments."""
 
     parser = ArgumentParser(description='Manage HIS settings.')
+    parser.add_argument(
+        '-v', '--verbose', action='store_true', help='enable verbose logging')
     subparsers = parser.add_subparsers(dest='target')
     _add_account_parser(subparsers)
     _add_service_parser(subparsers)

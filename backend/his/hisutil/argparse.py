@@ -75,7 +75,7 @@ def _add_account_parser(subparsers):
     add_parser.add_argument('customer', type=customer, help='the customer')
     add_parser.add_argument('-n', '--full-name', help="the user's full name")
     add_parser.add_argument(
-        '-p', '--password', type='store_true',
+        '-p', '--password', action='store_true',
         help='manually specify a password')
     add_parser.add_argument(
         '-a', '--admin', action='store_true',

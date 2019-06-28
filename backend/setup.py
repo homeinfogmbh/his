@@ -13,6 +13,7 @@ setup(
         'werkzeug', 'wsgilib'],
     packages=[
         'his',
+        'his.hisutil',
         'his.messages',
         'his.wsgi',
         'his.wsgi.service'],

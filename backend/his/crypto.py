@@ -1,23 +1,39 @@
 """HIS cryptography library."""
 
-from random import choice
+from getpass import getpass
+from random import choices
 from string import ascii_letters, digits
+from sys import stderr
 
 
-__all__ = ['genpw']
+__all__ = ['genpw', 'read_passwd']
 
 
 POOL = ascii_letters + digits
 
 
-def randchars(count, pool=POOL):
-    """Yields random chars from the pool."""
-
-    for _ in range(count):
-        yield choice(pool)
-
-
 def genpw(length=16, pool=POOL):
     """Generates a safe, radom password."""
 
-    return ''.join(randchars(length, pool=pool))
+    return ''.join(choices(pool, k=length))
+
+
+def read_passwd():
+    """Reads a password."""
+
+    while True:
+        try:
+            passwd = getpass('Password: ')
+        except EOFError:
+            continue
+
+        try:
+            repeat = getpass('Repeat password: ')
+        except EOFError:
+            continue
+
+        if passwd and passwd == repeat:
+            return passwd
+
+        print('Passwords do not match.', file=stderr)
+        continue

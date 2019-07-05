@@ -17,7 +17,7 @@ LOGGER = getLogger('hisutil')
 def add_account(args):
     """Adds the respective account."""
 
-    if args.passwd:
+    if args.password:
         try:
             passwd = read_passwd()
         except KeyboardInterrupt:

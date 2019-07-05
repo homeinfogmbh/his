@@ -2,8 +2,6 @@
 
 from functools import wraps
 
-from functoolsplus import coerce
-
 from his.contextlocals import SESSION, get_session_duration
 from his.messages.account import ACCOUNT_LOCKED
 from his.messages.account import NOT_AUTHORIZED
@@ -20,13 +18,10 @@ __all__ = [
     'root']
 
 
-@coerce(frozenset)
 def domains():
     """Returns a list of domains for the cookie."""
 
-    for service in Service:
-        for domain in service.domains:
-            yield domain.domain
+    return {domain.domain for service in Service for domain in service.domains}
 
 
 def authenticated(function):

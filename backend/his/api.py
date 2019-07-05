@@ -10,18 +10,7 @@ from his.messages.session import SESSION_EXPIRED
 from his.orm import Service
 
 
-__all__ = [
-    'domains',
-    'authenticated',
-    'authorized',
-    'admin',
-    'root']
-
-
-def domains():
-    """Returns a list of domains for the cookie."""
-
-    return {domain.domain for service in Service for domain in service.domains}
+__all__ = ['authenticated', 'authorized', 'admin', 'root']
 
 
 def authenticated(function):

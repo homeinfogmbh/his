@@ -7,7 +7,7 @@ from werkzeug.local import LocalProxy
 
 from mdb import Customer
 
-from his.config import COOKIE
+from his.config import CONFIG
 from his.exceptions import NoSessionSpecified, SessionExpired
 from his.messages.account import NO_SUCH_ACCOUNT
 from his.messages.account import NOT_AUTHORIZED
@@ -23,8 +23,10 @@ __all__ = ['SESSION', 'ACCOUNT', 'CUSTOMER', 'JSON_DATA']
 def get_session():
     """Returns the session from the cache."""
 
+    cookie = CONFIG['auth']['cookie']
+
     try:
-        session_token = request.cookies[COOKIE]
+        session_token = request.cookies[cookie]
     except KeyError:
         try:
             session_token = request.args['session']
@@ -108,7 +110,7 @@ def get_json_data():
     return json
 
 
-class ModelProxy(LocalProxy):
+class ModelProxy(LocalProxy):   # pylint: disable=R0903
     """Proxies ORM models."""
 
     def __int__(self):

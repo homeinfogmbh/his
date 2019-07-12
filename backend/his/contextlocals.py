@@ -59,7 +59,7 @@ def get_account():
             raise NO_SUCH_ACCOUNT
     elif SESSION.account.admin:
         try:
-            return Account.find(account, customer=CUSTOMER.id)
+            return Account.find(account, customer=SESSION.account.customer_id)
         except Account.DoesNotExist:
             raise NO_SUCH_ACCOUNT
 

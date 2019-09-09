@@ -30,7 +30,7 @@ def add_account(args):
     try:
         account = Account.add(
             args.customer, args.name, args.email, passwd=passwd,
-            admin=args.admin, root=args.root)
+            full_name=args.full_name, admin=args.admin, root=args.root)
     except AccountExistsError as account_exists:
         LOGGER.error(
             'Account already exists for field "%s".', account_exists.field)

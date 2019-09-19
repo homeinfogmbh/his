@@ -274,7 +274,7 @@ class Account(HISModel):    # pylint: disable=R0902
         return '{}@{}'.format(repr(self), self.customer.id)
 
     @classmethod
-    def add(cls, customer, name, email, passwd, *,
+    def add(cls, customer, name, email, passwd, *, full_name=None,
             admin=False, root=False):   # pylint: disable=R0913
         """Adds a new account."""
         if len(name) < 3:
@@ -302,9 +302,10 @@ class Account(HISModel):    # pylint: disable=R0902
         account = cls()
         account.customer = customer
         account.name = name
+        account.full_name = full_name
+        account.passwd = passwd
         account.email = email
         account.created = datetime.now()
-        account.passwd = passwd
         account.admin = admin
         account.root = root
         return account

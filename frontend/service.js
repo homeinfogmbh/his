@@ -82,9 +82,9 @@ his.service.listAccountServices = function (service, args) {
 his.service.add = function (service, args) {
     let url;
 
-    if (service.hasOwnProperty('customer')) {
+    if (Object.prototype.hasOwnProperty.call(service, 'customer')) {
         url = his.service._getUrl('customer');
-    } else if (service.hasOwnProperty('account')) {
+    } else if (Object.prototype.hasOwnProperty.call(service, 'account')) {
         url = his.service._getUrl('account');
     }
 

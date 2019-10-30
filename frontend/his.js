@@ -53,7 +53,7 @@ his._RequestArgs = class {
     constructor (object) {
         if (object != null) {
             for (let attribute in object) {
-                if (object.hasOwnProperty(attribute)) {
+                if (Object.prototype.hasOwnProperty.call(object, attribute)) {
                     this[attribute] = object[attribute];
                 }
             }
@@ -64,7 +64,7 @@ his._RequestArgs = class {
         const args = [];
 
         for (let attribute in this) {
-            if (this.hasOwnProperty(attribute)) {
+            if (Object.prototype.hasOwnProperty.call(this, attribute)) {
                 if (typeof this[attribute] === 'function') {
                     continue;
                 } else if (this[attribute] == null) {

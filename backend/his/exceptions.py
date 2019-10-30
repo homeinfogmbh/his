@@ -7,7 +7,8 @@ __all__ = [
     'ServiceExistsError',
     'AccountExistsError',
     'AmbiguousDataError',
-    'PasswordResetPending']
+    'PasswordResetPending'
+]
 
 
 class NoSessionSpecified(Exception):

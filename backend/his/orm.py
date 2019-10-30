@@ -39,7 +39,8 @@ __all__ = [
     'AccountService',
     'Session',
     'CustomerSettings',
-    'PasswordResetToken']
+    'PasswordResetToken'
+]
 
 
 DATABASE = MySQLDatabase.from_config(CONFIG['db'])
@@ -466,7 +467,7 @@ class Session(HISModel):
         """Returns a human-readable representation."""
         return '{} - {}: {} ({})'.format(
             self.start.isoformat(), self.end.isoformat(),
-            self.token.hex, self.login) # pylint: disable=E1101
+            self.token.hex, self.login)  # pylint: disable=E1101
 
     @classmethod
     def add(cls, account, duration):

@@ -6,7 +6,8 @@ from wsgilib import JSONMessage
 __all__ = [
     'NO_CUSTOMER_SPECIFIED',
     'NO_SUCH_CUSTOMER',
-    'CUSTOMER_NOT_CONFIGURED']
+    'CUSTOMER_NOT_CONFIGURED'
+]
 
 
 NO_CUSTOMER_SPECIFIED = JSONMessage('No customer specified.', status=420)

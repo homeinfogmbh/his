@@ -9,7 +9,8 @@ __all__ = [
     'PASSWORD_RESET_SENT',
     'PASSWORD_RESET_PENDING',
     'INVALID_RESET_TOKEN',
-    'PASSWORD_SET']
+    'PASSWORD_SET'
+]
 
 
 NO_TOKEN_SPECIFIED = JSONMessage('Missing password reset token.', status=400)

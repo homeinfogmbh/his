@@ -20,7 +20,8 @@ __all__ = [
     'field_not_nullable',
     'missing_key_error',
     'invalid_keys',
-    'non_unique_value']
+    'non_unique_value'
+]
 
 
 MISSING_DATA = JSONMessage('The request is missing data.', status=422)

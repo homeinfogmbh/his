@@ -13,7 +13,8 @@ __all__ = [
     'NOT_AUTHORIZED',
     'ACCOUNT_EXISTS',
     'ACCOUNTS_EXHAUSTED',
-    'PASSWORD_TOO_SHORT']
+    'PASSWORD_TOO_SHORT'
+]
 
 
 NO_ACCOUNT_SPECIFIED = JSONMessage('No account specified.', status=406)

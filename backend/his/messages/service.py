@@ -14,7 +14,8 @@ __all__ = [
     'ACCOUNT_SERVICE_DELETED',
     'NO_SUCH_CUSTOMER_SERVICE',
     'CUSTOMER_SERVICE_DELETED',
-    'SERVICE_LOCKED']
+    'SERVICE_LOCKED'
+]
 
 
 NO_SERVICE_SPECIFIED = JSONMessage('No service specified.', status=406)

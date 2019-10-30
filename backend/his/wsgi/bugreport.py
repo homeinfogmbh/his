@@ -32,8 +32,7 @@ def gen_emails():
     html = template.format(account=ACCOUNT, **request.json)
 
     for recipient in BUGREPORT_CONFIG['recipients'].split():
-        yield EMail(
-            subject, BUGREPORT_CONFIG['sender'], recipient, html=html)
+        yield EMail(subject, BUGREPORT_CONFIG['sender'], recipient, html=html)
 
 
 @authenticated

@@ -119,7 +119,6 @@ def close(session):
     return delete_session_cookie(response)
 
 
-
 ROUTES = (
     ('POST', '/session', login),
     ('GET', '/session', list_),

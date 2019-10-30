@@ -311,7 +311,6 @@ class Account(HISModel):    # pylint: disable=R0902
         account.root = root
         return account
 
-
     @classmethod
     def admins(cls, customer=None):
         """Yields administrators."""
@@ -412,7 +411,6 @@ class Account(HISModel):    # pylint: disable=R0902
         self.last_login = datetime.now()
         self.save()
         return True
-
 
     def patch_json(self, json, allow=(), **kwargs):
         """Patches the account with fields limited to allow."""

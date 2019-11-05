@@ -53,9 +53,6 @@ def _add_cors_headers(headers, domain):
 def postprocess_response(response):
     """Sets the session cookie on the respective response."""
 
-    # Allow CORS credentials for AJAX.
-    response.headers['Access-Control-Allow-Credentials'] = 'true'
-
     # Set CORS domains.
     referrer = request.referrer[:-1]
 

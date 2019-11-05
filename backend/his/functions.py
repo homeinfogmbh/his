@@ -22,6 +22,13 @@ ALLOWED_DOMAINS = {
     'termgr.homeinfo.de',
     'immobit.de'
 }
+CORS_HEADERS = {
+    'Content-Type',
+    'Cache-Control',
+    'X-Requested-With',
+    'Authorization',
+    'session-duration'
+}
 
 
 def set_session_cookie(response, session):
@@ -45,10 +52,10 @@ def _add_cors_headers(headers, origin):
 
     headers.add('Access-Control-Allow-Origin', origin)
     headers.add('Access-Control-Allow-Credentials', 'true')
-    headers.add('Access-Control-Allow-Headers', 'Content-Type')
-    headers.add('Access-Control-Allow-Headers', 'Cache-Control')
-    headers.add('Access-Control-Allow-Headers', 'X-Requested-With')
-    headers.add('Access-Control-Allow-Headers', 'Authorization')
+
+    for cors_header in CORS_HEADERS:
+        headers.add('Access-Control-Allow-Headers', cors_header)
+
     headers.add('Access-Control-Allow-Methods', METHODS)
 
 

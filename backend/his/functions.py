@@ -40,10 +40,10 @@ def delete_session_cookie(response):
     return response
 
 
-def _add_cors_headers(headers):
+def _add_cors_headers(headers, origin):
     """Adds CORS headers."""
 
-    headers.add('Access-Control-Allow-Origin', '*')
+    headers.add('Access-Control-Allow-Origin', origin)
     headers.add('Access-Control-Allow-Credentials', 'true')
     headers.add('Access-Control-Allow-Headers', 'Content-Type')
     headers.add('Access-Control-Allow-Headers', 'Cache-Control')
@@ -72,7 +72,7 @@ def postprocess_response(response):
     origin = request.headers['origin']
 
     if _check_origin(origin):
-        _add_cors_headers(response.headers)
+        _add_cors_headers(response.headers, origin)
 
     # Do not override an already set session cookie i.e. on deletion.
     if 'Set-Cookie' in response.headers:

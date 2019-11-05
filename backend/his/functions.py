@@ -1,5 +1,7 @@
 """Common functions."""
 
+from urllib.parse import urlparse
+
 from flask import request
 
 from his.config import COOKIE, DOMAIN
@@ -50,16 +52,29 @@ def _add_cors_headers(headers, domain):
     headers.add('Access-Control-Allow-Methods', METHODS)
 
 
+def _get_referrer_domain():
+    """Returns the HTTO referrer domain."""
+
+    netloc = urlparse(request.referrer).netloc
+
+    try:
+        domain, _ = netloc.split(':')
+    except ValueError:
+        return netloc
+
+    return domain
+
+
 def postprocess_response(response):
     """Sets the session cookie on the respective response."""
 
     # Set CORS domains.
-    referrer = request.referrer[:-1]
+    domain = _get_referrer_domain()
 
-    if referrer in ALLOWED_ORIGINS:
-        _add_cors_headers(response.headers, referrer)
+    if domain in ALLOWED_ORIGINS:
+        _add_cors_headers(response.headers, domain)
     else:
-        print('CORS ERROR:', 'Referrer', referrer, 'not in', ALLOWED_ORIGINS,
+        print('CORS ERROR:', 'Referrer', domain, 'not in', ALLOWED_ORIGINS,
               flush=True)
 
     # Do not override an already set session cookie i.e. on deletion.

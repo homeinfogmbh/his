@@ -78,7 +78,7 @@ def postprocess_response(response):
     domain, *_ = url.netloc.split(':', maxsplit=1)
 
     if _check_origin(domain):
-        _add_cors_headers(response.headers, url.scheme + domain)
+        _add_cors_headers(response.headers, url.scheme + '://' + domain)
 
     # Do not override an already set session cookie i.e. on deletion.
     if 'Set-Cookie' in response.headers:

@@ -17,10 +17,10 @@ __all__ = [
 
 
 METHODS = 'GET, POST, OPTIONS, PUT, DELETE'
-ALLOWED_ORIGINS = {
-    'https://cms.homeinfo.de',
-    'https://termgr.homeinfo.de',
-    'https://immobit.de'
+ALLOWED_DOMAINS = {
+    'cms.homeinfo.de',
+    'termgr.homeinfo.de',
+    'immobit.de'
 }
 
 

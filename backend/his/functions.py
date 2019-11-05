@@ -52,30 +52,25 @@ def _add_cors_headers(headers, domain):
     headers.add('Access-Control-Allow-Methods', METHODS)
 
 
-def _get_referrer_domain():
+def _check_referrer():
     """Returns the HTTO referrer domain."""
 
-    netloc = urlparse(request.referrer).netloc
+    domain, *_ = urlparse(request.referrer).netloc.split(':')
 
-    try:
-        domain, _ = netloc.split(':')
-    except ValueError:
-        return netloc
+    if domain in ALLOWED_DOMAINS:
+        return True
 
-    return domain
+    print('CORS ERROR:', 'Referrer', domain, 'not in', ALLOWED_DOMAINS,
+          flush=True)
+    return False
 
 
 def postprocess_response(response):
     """Sets the session cookie on the respective response."""
 
     # Set CORS domains.
-    domain = _get_referrer_domain()
-
-    if domain in ALLOWED_DOMAINS:
-        _add_cors_headers(response.headers, domain)
-    else:
-        print('CORS ERROR:', 'Referrer', domain, 'not in', ALLOWED_DOMAINS,
-              flush=True)
+    if _check_referrer():
+        _add_cors_headers(response.headers, request.referrer)
 
     # Do not override an already set session cookie i.e. on deletion.
     if 'Set-Cookie' in response.headers:

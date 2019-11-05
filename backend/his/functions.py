@@ -72,7 +72,7 @@ def postprocess_response(response):
     origin = request.headers['origin']
 
     if _check_origin(origin):
-        _add_cors_headers(response.headers, request.referrer)
+        _add_cors_headers(response.headers, origin)
 
     # Do not override an already set session cookie i.e. on deletion.
     if 'Set-Cookie' in response.headers:

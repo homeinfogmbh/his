@@ -58,6 +58,9 @@ def postprocess_response(response):
 
     if referrer in ALLOWED_ORIGINS:
         _add_cors_headers(response.headers, referrer)
+    else:
+        print('CORS ERROR:', 'Referrer', referrer, 'not in', ALLOWED_ORIGINS,
+              flush=True)
 
     # Do not override an already set session cookie i.e. on deletion.
     if 'Set-Cookie' in response.headers:

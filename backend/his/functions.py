@@ -71,10 +71,10 @@ def postprocess_response(response):
     # Set CORS domains.
     domain = _get_referrer_domain()
 
-    if domain in ALLOWED_ORIGINS:
+    if domain in ALLOWED_DOMAINS:
         _add_cors_headers(response.headers, domain)
     else:
-        print('CORS ERROR:', 'Referrer', domain, 'not in', ALLOWED_ORIGINS,
+        print('CORS ERROR:', 'Referrer', domain, 'not in', ALLOWED_DOMAINS,
               flush=True)
 
     # Do not override an already set session cookie i.e. on deletion.

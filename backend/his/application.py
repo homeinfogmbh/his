@@ -9,6 +9,7 @@ from peeweeplus import MissingKeyError
 from peeweeplus import NonUniqueValue
 from wsgilib import Application as _Application
 
+from his.config import CORS
 from his.exceptions import NoSessionSpecified, SessionExpired
 from his.functions import postprocess_response
 from his.messages.data import field_value_error
@@ -35,7 +36,7 @@ ERROR_HANDLERS = (
 class Application(_Application):
     """Extends wsgilib's application."""
 
-    def __init__(self, *args, debug=False, cors=None, errorhandlers=(),
+    def __init__(self, *args, debug=False, cors=CORS, errorhandlers=(),
                  **kwargs):
         """Sets default error handlers."""
         errorhandlers = tuple(chain(ERROR_HANDLERS, errorhandlers or ()))

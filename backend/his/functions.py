@@ -1,9 +1,5 @@
 """Common functions."""
 
-from urllib.parse import urlparse
-
-from flask import request
-
 from his.config import COOKIE, DOMAIN
 from his.contextlocals import get_session
 from his.exceptions import NoSessionSpecified, SessionExpired
@@ -14,21 +10,6 @@ __all__ = [
     'delete_session_cookie',
     'postprocess_response'
 ]
-
-
-METHODS = 'GET, POST, OPTIONS, PUT, DELETE'
-ALLOWED_DOMAINS = {
-    'cms.homeinfo.de',
-    'termgr.homeinfo.de',
-    'immobit.de'
-}
-CORS_HEADERS = {
-    'Content-Type',
-    'Cache-Control',
-    'X-Requested-With',
-    'Authorization',
-    'session-duration'
-}
 
 
 def set_session_cookie(response, session):
@@ -47,38 +28,8 @@ def delete_session_cookie(response):
     return response
 
 
-def _add_cors_headers(headers, origin):
-    """Adds CORS headers."""
-
-    headers.add('Access-Control-Allow-Origin', origin)
-    headers.add('Access-Control-Allow-Credentials', 'true')
-
-    for cors_header in CORS_HEADERS:
-        headers.add('Access-Control-Allow-Headers', cors_header)
-
-    headers.add('Access-Control-Allow-Methods', METHODS)
-
-
-def _check_origin(domain):
-    """Returns the HTTO referrer domain."""
-
-    if domain in ALLOWED_DOMAINS:
-        return True
-
-    print('CORS ERROR:', 'Referrer', domain, 'not in', ALLOWED_DOMAINS,
-          flush=True)
-    return False
-
-
 def postprocess_response(response):
     """Sets the session cookie on the respective response."""
-
-    # Set CORS domains.
-    url = urlparse(request.referrer)
-    domain, *_ = url.netloc.split(':', maxsplit=1)
-
-    if _check_origin(domain):
-        _add_cors_headers(response.headers, url.scheme + '://' + domain)
 
     # Do not override an already set session cookie i.e. on deletion.
     if 'Set-Cookie' in response.headers:

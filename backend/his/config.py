@@ -1,12 +1,13 @@
 """HIS configuration."""
 
-from configlib import load_ini, load_json
+from configlib import loadcfg
 
 
-__all__ = ['CONFIG', 'COOKIE', 'DOMAIN', 'RECAPTCHA']
+__all__ = ['CONFIG', 'COOKIE', 'CORS', 'DOMAIN', 'RECAPTCHA']
 
 
-CONFIG = load_ini('his.d/his.conf')
+CONFIG = loadcfg('his.d/his.conf')
 COOKIE = CONFIG['auth']['cookie']
 DOMAIN = CONFIG['auth']['domain']
-RECAPTCHA = load_json('his.d/recaptcha.json')
+CORS = loadcfg('his.d/cors.json')
+RECAPTCHA = loadcfg('his.d/recaptcha.json')

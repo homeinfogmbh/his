@@ -35,8 +35,11 @@ ERROR_HANDLERS = (
 class Application(_Application):
     """Extends wsgilib's application."""
 
-    def __init__(self, *args, debug=False, errorhandlers=None, **kwargs):
+    def __init__(self, *args, debug=False, cors=None, errorhandlers=(),
+                 **kwargs):
         """Sets default error handlers."""
-        ehs = tuple(chain(ERROR_HANDLERS, errorhandlers or ()))
-        super().__init__(*args, debug=debug, errorhandlers=ehs, **kwargs)
+        errorhandlers = tuple(chain(ERROR_HANDLERS, errorhandlers or ()))
+        super().__init__(
+            *args, debug=debug, errorhandlers=errorhandlers, cors=cors,
+            **kwargs)
         self.after_request(postprocess_response)

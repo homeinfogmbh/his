@@ -1,6 +1,6 @@
 """Common functions."""
 
-from his.config import COOKIE, DOMAIN
+from his.config import COOKIE, DOMAINS
 from his.contextlocals import get_session
 from his.exceptions import NoSessionSpecified, SessionExpired
 
@@ -15,16 +15,20 @@ __all__ = [
 def set_session_cookie(response, session):
     """Sets the session cookie."""
 
-    response.set_cookie(
-        COOKIE, session.token.hex, expires=session.end, domain=DOMAIN,
-        secure=True)
+    for domain in DOMAINS:
+        response.set_cookie(
+            COOKIE, session.token.hex, expires=session.end, domain=domain,
+            secure=True)
+
     return response
 
 
 def delete_session_cookie(response):
     """Deletes the session cookie."""
 
-    response.delete_cookie(COOKIE, domain=DOMAIN)
+    for domain in DOMAINS:
+        response.delete_cookie(COOKIE, domain=domain)
+
     return response
 
 

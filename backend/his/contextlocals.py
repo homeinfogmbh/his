@@ -9,6 +9,7 @@ from mdb import Customer
 
 from his.config import COOKIE
 from his.exceptions import NoSessionSpecified, SessionExpired
+from his.messages.account import AMBIGUOUS_ACCOUNT
 from his.messages.account import NO_SUCH_ACCOUNT
 from his.messages.account import NOT_AUTHORIZED
 from his.messages.customer import NO_SUCH_CUSTOMER
@@ -18,6 +19,26 @@ from his.orm import DEFAULT_SESSION_DURATION, Account, Session
 
 
 __all__ = ['SESSION', 'ACCOUNT', 'CUSTOMER', 'JSON_DATA']
+
+
+def _get_account(identifier, customer=None):
+    """Returns the respective customer."""
+
+    condition = Account.name == identifier
+    condition |= Account.id == identifier
+
+    if customer is not None:
+        condition &= Account.customer == customer
+
+    try:
+        account, *ambiguous = Account.select().where(condition)
+    except ValueError:
+        raise NO_SUCH_ACCOUNT
+
+    if ambiguous:
+        raise AMBIGUOUS_ACCOUNT
+
+    return account
 
 
 def get_session():
@@ -48,15 +69,10 @@ def get_account():
         return SESSION.account
 
     if SESSION.account.root:
-        try:
-            return Account.find(account)
-        except Account.DoesNotExist:
-            raise NO_SUCH_ACCOUNT
-    elif SESSION.account.admin:
-        try:
-            return Account.find(account, customer=SESSION.account.customer_id)
-        except Account.DoesNotExist:
-            raise NO_SUCH_ACCOUNT
+        return _get_account(account)
+
+    if SESSION.account.admin:
+        return _get_account(account, customer=SESSION.account.customer_id)
 
     raise NOT_AUTHORIZED
 

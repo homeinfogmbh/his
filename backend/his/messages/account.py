@@ -6,6 +6,7 @@ from wsgilib import JSONMessage
 __all__ = [
     'NO_ACCOUNT_SPECIFIED',
     'NO_SUCH_ACCOUNT',
+    'AMBIGUOUS_ACCOUNT',
     'ACCOUNT_LOCKED',
     'ACCOUNT_CREATED',
     'ACCOUNT_DELETED',
@@ -19,6 +20,7 @@ __all__ = [
 
 NO_ACCOUNT_SPECIFIED = JSONMessage('No account specified.', status=406)
 NO_SUCH_ACCOUNT = JSONMessage('No such account.', status=404)
+AMBIGUOUS_ACCOUNT = JSONMessage('Ambiguous account specified.', status=409)
 ACCOUNT_LOCKED = JSONMessage('Account is locked.', status=423)
 ACCOUNT_CREATED = JSONMessage('Account has been created.', status=201)
 ACCOUNT_DELETED = JSONMessage('Account has been deleted.', status=200)

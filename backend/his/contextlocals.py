@@ -1,5 +1,6 @@
 """HIS request context locals."""
 
+from contextlib import suppress
 from uuid import UUID
 
 from flask import request
@@ -25,7 +26,9 @@ def _get_account(identifier, customer=None):
     """Returns the respective customer."""
 
     condition = Account.name == identifier
-    condition |= Account.id == identifier
+
+    with suppress(ValueError):
+        condition |= Account.id == int(identifier)
 
     if customer is not None:
         condition &= Account.customer == customer

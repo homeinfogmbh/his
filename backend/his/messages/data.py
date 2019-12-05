@@ -10,6 +10,7 @@ __all__ = [
     'AMBIGUOUS_DATA',
     'NOT_AN_INTEGER',
     'INVALID_CUSTOMER_ID',
+    'INVALID_ACCOUNT_ID',
     'FIELD_VALUE_ERROR',
     'FIELD_NOT_NULLABLE',
     'MISSING_KEY_ERROR',
@@ -34,6 +35,8 @@ NOT_AN_INTEGER = JSONMessage(
     'The provided value is not an integer.', status=422)
 INVALID_CUSTOMER_ID = JSONMessage(
     'The provided value is not a valid customer ID.', status=422)
+INVALID_ACCOUNT_ID = JSONMessage(
+    'The provided value is not a valid account ID.', status=422)
 FIELD_VALUE_ERROR = JSONMessage('Invalid value for field.', status=422)
 FIELD_NOT_NULLABLE = JSONMessage('Field cannot be NULL.', status=422)
 MISSING_KEY_ERROR = JSONMessage('Missing key for field.', status=422)

@@ -1,6 +1,5 @@
 """HIS request context locals."""
 
-from contextlib import suppress
 from uuid import UUID
 
 from flask import request
@@ -10,38 +9,16 @@ from mdb import Customer
 
 from his.config import COOKIE
 from his.exceptions import NoSessionSpecified, SessionExpired
-from his.messages.account import AMBIGUOUS_ACCOUNT
 from his.messages.account import NO_SUCH_ACCOUNT
 from his.messages.account import NOT_AUTHORIZED
 from his.messages.customer import NO_SUCH_CUSTOMER
+from his.messages.data import INVALID_ACCOUNT_ID
 from his.messages.data import INVALID_CUSTOMER_ID
 from his.messages.data import MISSING_DATA
 from his.orm import DEFAULT_SESSION_DURATION, Account, Session
 
 
 __all__ = ['SESSION', 'ACCOUNT', 'CUSTOMER', 'JSON_DATA']
-
-
-def _get_account(identifier, customer=None):
-    """Returns the respective customer."""
-
-    condition = Account.name == identifier
-
-    with suppress(ValueError):
-        condition |= Account.id == int(identifier)
-
-    if customer is not None:
-        condition &= Account.customer == customer
-
-    try:
-        account, *ambiguous = Account.select().where(condition)
-    except ValueError:
-        raise NO_SUCH_ACCOUNT
-
-    if ambiguous:
-        raise AMBIGUOUS_ACCOUNT
-
-    return account
 
 
 def get_session():
@@ -67,15 +44,25 @@ def get_account():
     """Gets the verified targeted account."""
 
     try:
-        account = request.args['account']
+        aid = int(request.args['account'])
     except KeyError:
         return SESSION.account
+    except (TypeError, ValueError):
+        raise INVALID_ACCOUNT_ID
 
     if SESSION.account.root:
-        return _get_account(account)
+        try:
+            return Account[aid]
+        except Account.DoesNotExist:
+            raise NO_SUCH_ACCOUNT
 
     if SESSION.account.admin:
-        return _get_account(account, customer=SESSION.account.customer_id)
+        cid = SESSION.account.customer_id
+
+        try:
+            return Account.get((Account.id == aid) & (Account.customer == cid))
+        except Account.DoesNotExist:
+            raise NO_SUCH_ACCOUNT
 
     raise NOT_AUTHORIZED
 

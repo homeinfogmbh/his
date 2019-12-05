@@ -26,7 +26,9 @@ def authenticated(function):
         if not SESSION.alive:
             raise SESSION_EXPIRED
 
-        if not SESSION.account.usable:
+        # Need to explicitely check SESSION.account,
+        # not ACCOUNT since it might be substituted!
+        if SESSION.account.unusable:
             raise ACCOUNT_LOCKED
 
         SESSION.renew(duration=get_session_duration())

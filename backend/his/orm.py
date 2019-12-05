@@ -343,14 +343,14 @@ class Account(HISModel):    # pylint: disable=R0902
         return self.locked_until >= datetime.now()
 
     @property
-    def usable(self):
-        """Determines whether the account is currently usable."""
-        return not self.deleted and not self.disabled and not self.locked
+    def unusable(self):
+        """Determines whether the account is currently unusable."""
+        return self.deleted or self.disabled or self.locked
 
     @property
     def can_login(self):
         """Determines whether the account can log in."""
-        return self.usable and self.failed_logins <= MAX_FAILED_LOGINS
+        return not self.unusable and self.failed_logins <= MAX_FAILED_LOGINS
 
     @property
     def active(self):

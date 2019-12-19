@@ -506,8 +506,11 @@ class Session(HISModel):
         alive = (cls.start <= now) & (cls.end > now)
 
         for session in cls.select().where(alive):
-            if session.token.verify(token):
-                return session
+            try:
+                if session.token.verify(token):
+                    return session
+            except VerifyMismatchError:
+                continue
 
         return None
 

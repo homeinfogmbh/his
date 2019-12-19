@@ -32,7 +32,7 @@ def get_session_token():
 
 @lru_cache()
 def session_token_to_id(token):
-    """Returns a session by the session token."""
+    """Returns a session's ID by a session token."""
 
     session = Session.by_token(token)
 

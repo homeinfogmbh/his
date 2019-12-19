@@ -452,7 +452,6 @@ class Session(HISModel):
 
     account = ForeignKeyField(
         Account, column_name='account', on_delete='CASCADE')
-    #token = UUIDField(default=uuid4)
     token = Argon2Field()
     start = DateTimeField()
     end = DateTimeField()

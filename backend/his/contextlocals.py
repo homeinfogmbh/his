@@ -31,7 +31,7 @@ def get_session_token():
 
 
 @lru_cache()
-def get_session_by_token(token):
+def session_token_to_id(token):
     """Returns a session by the session token."""
 
     session = Session.by_token(token)
@@ -39,13 +39,18 @@ def get_session_by_token(token):
     if session is None:
         raise SessionExpired()
 
-    return session
+    return session.id
 
 
 def get_session():
     """Returns the session from the cache."""
 
-    get_session_by_token(get_session_token())
+    ident = session_token_to_id(get_session_token())
+
+    try:
+        return Session[ident]
+    except Session.DoesNotExist:
+        raise SessionExpired()
 
 
 def get_account():

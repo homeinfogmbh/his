@@ -1,7 +1,7 @@
 """Common functions."""
 
 from his.config import COOKIE, DOMAINS
-from his.contextlocals import get_session
+from his.contextlocals import get_session_token, get_session
 from his.exceptions import NoSessionSpecified, SessionExpired
 
 
@@ -12,13 +12,14 @@ __all__ = [
 ]
 
 
-def set_session_cookie(response, session):
+def set_session_cookie(response, session, token=None):
     """Sets the session cookie."""
+
+    token = get_session_token() if token is None else token
 
     for domain in DOMAINS:
         response.set_cookie(
-            COOKIE, session.token.hex, expires=session.end, domain=domain,
-            secure=True)
+            COOKIE, token, expires=session.end, domain=domain, secure=True)
 
     return response
 

@@ -1,7 +1,6 @@
 """HIS session service."""
 
 from functools import wraps
-from uuid import UUID
 
 from wsgilib import JSON
 
@@ -18,26 +17,26 @@ from his.orm import Account, Session
 __all__ = ['ROUTES']
 
 
-def _get_session_by_token(session_token):
+def _get_session_by_token(token):
     """Returns the respective session by the
     session token with authorization checks.
     """
 
-    if session_token == '!':
+    if token == '!':
         return SESSION
 
-    try:
-        session_token = UUID(session_token)
-    except ValueError:
-        raise NO_SUCH_SESSION
+    session = Session.by_token(token)
 
-    session = Session.get(Session.token == session_token)
-    conditions = (
-        lambda: SESSION.token == session.token,
-        lambda: ACCOUNT.root,
-        lambda: ACCOUNT.admin and session.account.customer == ACCOUNT.customer)
+    if session is None:
+        return NO_SUCH_SESSION
 
-    if any(condition() for condition in conditions):
+    if SESSION.token == session.token:
+        return session
+
+    if ACCOUNT.root:
+        return session
+
+    if ACCOUNT.admin and session.account.customer == ACCOUNT.customer:
         return session
 
     raise NO_SUCH_SESSION
@@ -68,9 +67,11 @@ def login():
         return INVALID_CREDENTIALS
 
     if account.login(passwd):
-        session = Session.open(account, duration=get_session_duration())
-        response = JSON(session.to_json())
-        return set_session_cookie(response, session)
+        session, token = Session.open(account, duration=get_session_duration())
+        json = session.to_json()
+        json['token'] = token
+        response = JSON(json)
+        return set_session_cookie(response, session, token=token)
 
     return INVALID_CREDENTIALS
 

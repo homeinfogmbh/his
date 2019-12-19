@@ -1,7 +1,5 @@
 """HIS request context locals."""
 
-from uuid import UUID
-
 from flask import request
 from werkzeug.local import LocalProxy
 
@@ -21,23 +19,24 @@ from his.orm import DEFAULT_SESSION_DURATION, Account, Session
 __all__ = ['SESSION', 'ACCOUNT', 'CUSTOMER', 'JSON_DATA']
 
 
-def get_session():
+def get_session_token():
     """Returns the session from the cache."""
 
     try:
-        session_token = request.cookies[COOKIE]
+        return request.cookies[COOKIE]
     except KeyError:
         raise NoSessionSpecified()
 
-    try:
-        session_token = UUID(session_token)
-    except ValueError:
+
+def get_session():
+    """Returns the session from the cache."""
+
+    session = Session.by_token(get_session_token())
+
+    if session is None:
         raise SessionExpired()
 
-    try:
-        return Session.get(Session.token == session_token)
-    except Session.DoesNotExist:
-        raise SessionExpired()
+    return session
 
 
 def get_account():

@@ -452,7 +452,8 @@ class Session(HISModel):
 
     account = ForeignKeyField(
         Account, column_name='account', on_delete='CASCADE')
-    token = UUIDField(default=uuid4)
+    #token = UUIDField(default=uuid4)
+    token = Argon2Field()
     start = DateTimeField()
     end = DateTimeField()
     login = BooleanField(default=True)
@@ -473,9 +474,10 @@ class Session(HISModel):
         now = datetime.now()
         session = cls()
         session.account = account
+        session.token = token = uuid4().hex
         session.start = now
         session.end = now + duration
-        return session
+        return (session, token)
 
     @classmethod
     def open(cls, account, duration=DEFAULT_SESSION_DURATION):
@@ -484,9 +486,9 @@ class Session(HISModel):
             raise DURATION_OUT_OF_BOUNDS
 
         duration = timedelta(minutes=duration)
-        session = cls.add(account, duration)
+        session, token = cls.add(account, duration)
         session.save()
-        return session
+        return (session, token)
 
     @classmethod
     def cleanup(cls, before=None):
@@ -497,6 +499,18 @@ class Session(HISModel):
         for session in cls.select().where(cls.end < before):
             session.delete_instance()
             yield session
+
+    @classmethod
+    def by_token(cls, token):
+        """Returns the session by the respective session token."""
+        now = datetime.now()
+        alive = (cls.start <= now) & (cls.end > now)
+
+        for session in cls.select().where(alive):
+            if session.token.verify(token):
+                return session
+
+        return None
 
     @property
     def alive(self):

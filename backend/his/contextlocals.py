@@ -1,5 +1,7 @@
 """HIS request context locals."""
 
+from functools import lru_cache
+
 from flask import request
 from werkzeug.local import LocalProxy
 
@@ -28,15 +30,22 @@ def get_session_token():
         raise NoSessionSpecified()
 
 
-def get_session():
-    """Returns the session from the cache."""
+@lru_cache()
+def get_session_by_token(token):
+    """Returns a session by the session token."""
 
-    session = Session.by_token(get_session_token())
+    session = Session.by_token(token)
 
     if session is None:
         raise SessionExpired()
 
     return session
+
+
+def get_session():
+    """Returns the session from the cache."""
+
+    get_session_by_token(get_session_token())
 
 
 def get_account():

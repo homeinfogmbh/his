@@ -19,7 +19,7 @@ def set_session_cookie(response, session, secret=None):
 
     for domain in DOMAINS:
         response.set_cookie(
-            SESSION_ID, session.id, expires=session.end, domain=domain,
+            SESSION_ID, str(session.id), expires=session.end, domain=domain,
             secure=True)
         response.set_cookie(
             SESSION_SECRET, secret, expires=session.end, domain=domain,

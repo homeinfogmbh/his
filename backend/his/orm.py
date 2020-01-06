@@ -17,6 +17,7 @@ from mdb import Customer
 from peeweeplus import InvalidKeys, MySQLDatabase, JSONModel, Argon2Field
 
 from his.config import CONFIG
+from his.crypto import genpw
 from his.exceptions import AccountExistsError
 from his.exceptions import InconsistencyError
 from his.exceptions import PasswordResetPending
@@ -452,20 +453,15 @@ class Session(HISModel):
 
     account = ForeignKeyField(
         Account, column_name='account', on_delete='CASCADE')
-    token = Argon2Field()
+    secret = Argon2Field()
     start = DateTimeField()
     end = DateTimeField()
     login = BooleanField(default=True)
 
-    def __repr__(self):
-        """Returns a unique string representation."""
-        return self.token.hex   # pylint: disable=E1101
-
     def __str__(self):
         """Returns a human-readable representation."""
         return '{} - {}: {} ({})'.format(
-            self.start.isoformat(), self.end.isoformat(),
-            self.token.hex, self.login)  # pylint: disable=E1101
+            self.start.isoformat(), self.end.isoformat(), self.id, self.login)
 
     @classmethod
     def add(cls, account, duration):
@@ -473,10 +469,10 @@ class Session(HISModel):
         now = datetime.now()
         session = cls()
         session.account = account
-        session.token = token = uuid4().hex
+        session.secret = secret = genpw(length=32)
         session.start = now
         session.end = now + duration
-        return (session, token)
+        return (session, secret)
 
     @classmethod
     def open(cls, account, duration=DEFAULT_SESSION_DURATION):
@@ -485,9 +481,9 @@ class Session(HISModel):
             raise DURATION_OUT_OF_BOUNDS
 
         duration = timedelta(minutes=duration)
-        session, token = cls.add(account, duration)
+        session, secret = cls.add(account, duration)
         session.save()
-        return (session, token)
+        return (session, secret)
 
     @classmethod
     def cleanup(cls, before=None):
@@ -499,25 +495,20 @@ class Session(HISModel):
             session.delete_instance()
             yield session
 
-    @classmethod
-    def by_token(cls, token):
-        """Returns the session by the respective session token."""
-        now = datetime.now()
-        alive = (cls.start <= now) & (cls.end > now)
-
-        for session in cls.select().where(alive):
-            try:
-                if session.token.verify(token):
-                    return session
-            except VerifyMismatchError:
-                continue
-
-        return None
-
     @property
     def alive(self):
         """Determines whether the session is active."""
         return self.start <= datetime.now() < self.end
+
+    def verify(self, secret):
+        """Verifies the session."""
+        try:
+            if self.secret.verify(secret):
+                return True
+        except VerifyMismatchError:
+            return False
+
+        return False
 
     def renew(self, duration=DEFAULT_SESSION_DURATION):
         """Renews the session."""

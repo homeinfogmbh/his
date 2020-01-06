@@ -17,20 +17,20 @@ from his.orm import Account, Session
 __all__ = ['ROUTES']
 
 
-def _get_session_by_token(token):
+def _get_session(session_identifier):
     """Returns the respective session by the
-    session token with authorization checks.
+    resource identifier with authorization checks.
     """
 
-    if token == '!':
+    if session_identifier == '!':
         return SESSION
 
-    session = Session.by_token(token)
+    try:
+        session = Session[session_identifier]
+    except Session.DoesNotExist:
+        raise NO_SUCH_SESSION
 
-    if session is None:
-        return NO_SUCH_SESSION
-
-    if SESSION.token == session.token:
+    if SESSION.id == session.id:
         return session
 
     if ACCOUNT.root:
@@ -46,8 +46,9 @@ def with_session(function):
     """Converts the first argument of function into a sesion."""
 
     @wraps(function)
-    def wrapper(session_token, *args, **kwargs):
-        return function(_get_session_by_token(session_token), *args, **kwargs)
+    def wrapper(session_identifier, *args, **kwargs):
+        session = _get_session(session_identifier)
+        return function(session, *args, **kwargs)
 
     return wrapper
 
@@ -66,12 +67,14 @@ def login():
     except Account.DoesNotExist:
         return INVALID_CREDENTIALS
 
+    duration = get_session_duration()
+
     if account.login(passwd):
-        session, token = Session.open(account, duration=get_session_duration())
+        session, secret = Session.open(account, duration=duration)
         json = session.to_json()
-        json['token'] = token
+        json['secret'] = secret
         response = JSON(json)
-        return set_session_cookie(response, session, token=token)
+        return set_session_cookie(response, session, secret=secret)
 
     return INVALID_CREDENTIALS
 
@@ -81,11 +84,11 @@ def list_():
     """Lists all sessions iff specified session is root."""
 
     if ACCOUNT.root:
-        return JSON({session.token: session.to_json() for session in Session})
+        return JSON({session.id: session.to_json() for session in Session})
 
     if ACCOUNT.admin:
         return JSON({
-            session.token: session.to_json() for session in
+            session.id: session.to_json() for session in
             Session.select().join(Account).where(
                 Account.customer == ACCOUNT.customer)})
 
@@ -114,16 +117,16 @@ def refresh(session):
 def close(session):
     """Closes the provided session."""
 
-    token = session.token.hex
+    ident = session.id
     session.delete_instance()
-    response = JSON({'closed': token})
+    response = JSON({'closed': ident})
     return delete_session_cookie(response)
 
 
 ROUTES = (
     ('POST', '/session', login),
     ('GET', '/session', list_),
-    ('GET', '/session/<session_token>', get),
-    ('PUT', '/session/<session_token>', refresh),
-    ('DELETE', '/session/<session_token>', close)
+    ('GET', '/session/<session_identifier>', get),
+    ('PUT', '/session/<session_identifier>', refresh),
+    ('DELETE', '/session/<session_identifier>', close)
 )

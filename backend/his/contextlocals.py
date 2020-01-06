@@ -1,13 +1,11 @@
 """HIS request context locals."""
 
-from functools import lru_cache
-
 from flask import request
 from werkzeug.local import LocalProxy
 
 from mdb import Customer
 
-from his.config import COOKIE
+from his.config import SESSION_ID, SESSION_SECRET
 from his.exceptions import NoSessionSpecified, SessionExpired
 from his.messages.account import NO_SUCH_ACCOUNT
 from his.messages.account import NOT_AUTHORIZED
@@ -21,36 +19,44 @@ from his.orm import DEFAULT_SESSION_DURATION, Account, Session
 __all__ = ['SESSION', 'ACCOUNT', 'CUSTOMER', 'JSON_DATA']
 
 
-def get_session_token():
-    """Returns the session from the cache."""
+def get_session_id():
+    """Returns the session ID."""
 
     try:
-        return request.cookies[COOKIE]
+        ident = request.cookies[SESSION_ID]
     except KeyError:
         raise NoSessionSpecified()
 
+    try:
+        return int(ident)
+    except ValueError:
+        raise NoSessionSpecified()
 
-@lru_cache()
-def session_token_to_id(token):
-    """Returns a session's ID by a session token."""
 
-    session = Session.by_token(token)
+def get_session_secret():
+    """Returns the session secret."""
 
-    if session is None:
-        raise SessionExpired()
-
-    return session.id
+    try:
+        return request.cookies[SESSION_SECRET]
+    except KeyError:
+        raise NoSessionSpecified()
 
 
 def get_session():
     """Returns the session from the cache."""
 
-    ident = session_token_to_id(get_session_token())
+    ident = get_session_id()
+    secret = get_session_secret()
 
     try:
-        return Session[ident]
+        session = Session[ident]
     except Session.DoesNotExist:
         raise SessionExpired()
+
+    if session.verify(secret):
+        return session
+
+    raise SessionExpired()
 
 
 def get_account():

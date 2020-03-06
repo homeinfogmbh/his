@@ -16,16 +16,15 @@ from his.orm.account import Account
 from his.orm.common import HISModel
 
 
-__all__ = ['Session']
+__all__ = ['ALLOWED_SESSION_DURATIONS', 'DEFAULT_SESSION_DURATION', 'Session']
 
 
+ALLOWED_SESSION_DURATIONS = range(5, 31)
 DEFAULT_SESSION_DURATION = 15
 
 
 class Session(HISModel):
     """A session related to an account."""
-
-    ALLOWED_DURATIONS = range(5, 31)
 
     account = ForeignKeyField(
         Account, column_name='account', backref='sessions',
@@ -54,7 +53,7 @@ class Session(HISModel):
     @classmethod
     def open(cls, account, duration=DEFAULT_SESSION_DURATION):
         """Actually opens a new login session."""
-        if duration not in cls.ALLOWED_DURATIONS:
+        if duration not in ALLOWED_SESSION_DURATIONS:
             raise DURATION_OUT_OF_BOUNDS
 
         duration = timedelta(minutes=duration)
@@ -89,7 +88,7 @@ class Session(HISModel):
 
     def renew(self, duration=DEFAULT_SESSION_DURATION):
         """Renews the session."""
-        if duration not in type(self).ALLOWED_DURATIONS:
+        if duration not in ALLOWED_SESSION_DURATIONS:
             raise DURATION_OUT_OF_BOUNDS
 
         if not self.account.can_login:

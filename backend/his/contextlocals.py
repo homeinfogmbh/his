@@ -13,7 +13,10 @@ from his.messages.customer import NO_SUCH_CUSTOMER
 from his.messages.data import INVALID_ACCOUNT_ID
 from his.messages.data import INVALID_CUSTOMER_ID
 from his.messages.data import MISSING_DATA
-from his.orm import DEFAULT_SESSION_DURATION, Account, Session
+from his.orm import ALLOWED_SESSION_DURATIONS
+from his.orm import DEFAULT_SESSION_DURATION
+from his.orm import Account
+from his.orm import Session
 
 
 __all__ = ['SESSION', 'ACCOUNT', 'CUSTOMER', 'JSON_DATA']
@@ -113,7 +116,7 @@ def get_session_duration():
     except (KeyError, TypeError, ValueError):
         return DEFAULT_SESSION_DURATION
 
-    if duration in Session.ALLOWED_DURATIONS:
+    if duration in ALLOWED_SESSION_DURATIONS:
         return duration
 
     return DEFAULT_SESSION_DURATION

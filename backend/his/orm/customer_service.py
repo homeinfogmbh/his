@@ -31,7 +31,7 @@ class CustomerService(HISModel):
     end = DateTimeField(null=True)
 
     def __str__(self):
-        return '{}@{}'.format(repr(self.customer), str(self.service))
+        return f'{self.customer_id}@{self.service}'
 
     @classmethod
     def add(cls, customer, service, begin=None, end=None):

@@ -28,7 +28,8 @@ class Session(HISModel):
     ALLOWED_DURATIONS = range(5, 31)
 
     account = ForeignKeyField(
-        Account, column_name='account', on_delete='CASCADE')
+        Account, column_name='account', backref='sessions',
+        on_delete='CASCADE')
     secret = Argon2Field()
     start = DateTimeField()
     end = DateTimeField()

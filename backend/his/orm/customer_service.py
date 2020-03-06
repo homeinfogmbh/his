@@ -22,9 +22,11 @@ class CustomerService(HISModel):
         table_name = 'customer_service'
 
     customer = ForeignKeyField(
-        Customer, column_name='customer', on_delete='CASCADE')
+        Customer, column_name='customer', backref='customer_services',
+        on_delete='CASCADE')
     service = ForeignKeyField(
-        Service, column_name='service', on_delete='CASCADE')
+        Service, column_name='service', backref='customer_services',
+        on_delete='CASCADE')
     begin = DateTimeField(null=True)
     end = DateTimeField(null=True)
 

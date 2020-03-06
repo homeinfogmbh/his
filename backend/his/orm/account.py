@@ -17,6 +17,7 @@ from his.exceptions import AccountExistsError
 from his.messages.account import ACCOUNT_LOCKED
 from his.messages.session import INVALID_CREDENTIALS
 from his.orm.common import HISModel
+from his.orm.proxy import AccountServicesProxy
 
 
 __all__ = ['Account']
@@ -29,7 +30,7 @@ class Account(HISModel):    # pylint: disable=R0902
     """A HIS account."""
 
     customer = ForeignKeyField(
-        Customer, column_name='customer', related_name='accounts')
+        Customer, column_name='customer', backref='accounts')
     name = CharField(64, unique=True)   # Login name.
     full_name = CharField(255, null=True)   # Optional full user name.
     passwd = Argon2Field()
@@ -150,9 +151,25 @@ class Account(HISModel):    # pylint: disable=R0902
             yield self
 
     @property
+    def active(self):
+        """Determines whether the account has an open session."""
+        session = self.sessions.model
+
+        for session in session.select().where(session.account == self):
+            if session.alive:
+                return True
+
+        return False
+
+    @property
     def info(self):
         """Returns brief account information."""
         return {'id': self.id, 'email': self.email}
+
+    @property
+    def services(self):
+        """Returns an account <> service mapping proxy."""
+        return AccountServicesProxy(self)
 
     def rehash(self, passwd, *, force=False):
         """Performs a rehash."""

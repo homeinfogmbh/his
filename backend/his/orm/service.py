@@ -5,6 +5,7 @@ from peewee import CharField
 from peewee import ForeignKeyField
 
 from his.exceptions import ServiceExistsError
+from his.messages.service import SERVICE_LOCKED
 from his.orm.common import HISModel
 
 
@@ -46,6 +47,27 @@ class Service(HISModel):
             dependency = service_dependency.dependency
             yield dependency
             yield from dependency.service_deps
+
+    def authorized(self, account):
+        """Determines whether the respective account
+        is authorized to use this service.
+
+        An account is considered authorized if:
+            1) account is root or
+            2) account's customer is enabled for the service and
+                2a) account is admin or
+                2b) account is enabled for the service
+        """
+        if account.root:
+            return True
+
+        if self.locked:
+            raise SERVICE_LOCKED
+
+        if self in self.customer_services.model.services(account.customer):
+            return account.admin or self in account.services
+
+        return False
 
 
 class ServiceDependency(HISModel):

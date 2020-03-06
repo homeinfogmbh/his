@@ -17,9 +17,11 @@ class AccountService(HISModel):
         table_name = 'account_service'
 
     account = ForeignKeyField(
-        Account, column_name='account', on_delete='CASCADE')
+        Account, column_name='account', backref='account_services',
+        on_delete='CASCADE')
     service = ForeignKeyField(
-        Service, column_name='service', on_delete='CASCADE')
+        Service, column_name='service', backref='account_services',
+        on_delete='CASCADE')
 
     def __str__(self):
         return '{}@{}'.format(str(self.account), str(self.service))

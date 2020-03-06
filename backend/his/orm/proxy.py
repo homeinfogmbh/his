@@ -1,8 +1,6 @@
 """ORM model proxies."""
 
 from his.exceptions import InconsistencyError
-from his.orm.account_service import AccountService
-from his.orm.customer_service import CustomerService
 
 
 __all__ = ['AccountServicesProxy']
@@ -22,32 +20,49 @@ class AccountServicesProxy:
             yield from service.service_deps
 
     @property
+    def account_service_model(self):
+        """Returns the AccountService model."""
+        return self.account.account_services.model
+
+    @property
+    def customer_service_model(self):
+        """Returns the CustomerService model."""
+        return self.account.customer.customer_services.model
+
+    @property
     def services(self):
         """Yields directly assigned services."""
-        for account_service in AccountService.select().where(
-                AccountService.account == self.account):
+        account_service_model = self.account_service_model
+
+        for account_service in account_service_model.select().where(
+                account_service_model.account == self.account):
             yield account_service.service
 
     def add(self, service):
         """Maps a service to this account."""
-        if service not in self.services:
-            if service in CustomerService.services(self.account.customer):
-                account_service = AccountService()
-                account_service.account = self.account
-                account_service.service = service
-                account_service.save()
-                return True
+        account_service_model = self.account_service_model
 
-            raise InconsistencyError(
-                'Cannot enable service {} for account {}, because the '
-                'respective customer {} is not enabled for it.'.format(
-                    service, self.account, self.account.customer))
+        if service in self.services:
+            return False
 
-        return False
+        if service in self.customer_service_model.services(
+                self.account.customer):
+            account_service = account_service_model()
+            account_service.account = self.account
+            account_service.service = service
+            account_service.save()
+            return True
+
+        raise InconsistencyError(
+            'Cannot enable service {} for account {}, because the '
+            'respective customer {} is not enabled for it.'.format(
+                service, self.account, self.account.customer))
 
     def remove(self, service):
         """Removes a service from the account's mapping."""
-        for account_service in AccountService.select().where(
-                (AccountService.account == self.account) &
-                (AccountService.service == service)):
+        account_service_model = self.account_service_model
+
+        for account_service in account_service_model.select().where(
+                (account_service_model.account == self.account) &
+                (account_service_model.service == service)):
             account_service.delete_instance()

@@ -15,6 +15,7 @@ setup(
         'his',
         'his.hisutil',
         'his.messages',
+        'his.orm',
         'his.wsgi',
         'his.wsgi.service'],
     scripts=['files/hisutil', 'files/his-session-cleanup'],

@@ -1,4 +1,4 @@
-"""ORM models."""
+"""User accounts."""
 
 from datetime import datetime
 from email.utils import parseaddr

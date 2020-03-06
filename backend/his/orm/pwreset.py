@@ -26,7 +26,8 @@ class PasswordResetToken(HISModel):
         table_name = 'password_reset_token'
 
     account = ForeignKeyField(
-        Account, column_name='account', on_delete='CASCADE')
+        Account, column_name='account', backref='password_reset_tokens',
+        on_delete='CASCADE')
     token = UUIDField(default=uuid4)
     created = DateTimeField(default=datetime.now)
 

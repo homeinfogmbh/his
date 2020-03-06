@@ -1,4 +1,4 @@
-"""A user session."""
+"""User sessions."""
 
 from datetime import datetime, timedelta
 

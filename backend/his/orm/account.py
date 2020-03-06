@@ -57,7 +57,7 @@ class Account(HISModel):    # pylint: disable=R0902
 
     def __str__(self):
         """Returns the login name and appropriate customer."""
-        return '{}@{}'.format(repr(self), self.customer.id)
+        return f'{self.name}@{self.customer_id}'
 
     @classmethod
     def add(cls, customer, name, email, passwd, *, full_name=None,

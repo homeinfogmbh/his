@@ -1,7 +1,8 @@
 """ORM model proxies."""
 
 from his.exceptions import InconsistencyError
-from his.orm.account import AccountService, CustomerService
+from his.orm.account_service import AccountService
+from his.orm.customer_service import CustomerService
 
 
 __all__ = ['AccountServicesProxy']

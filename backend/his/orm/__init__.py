@@ -21,7 +21,8 @@ __all__ = [
     'PasswordResetToken',
     'Service',
     'ServiceDomain',
-    'Session'
+    'Session',
+    'create_tables'
 ]
 
 
@@ -35,3 +36,10 @@ MODELS = (
     CustomerSettings,
     PasswordResetToken
 )
+
+
+def create_tables(*args, **kwargs):
+    """Creates all ORM database tables."""
+
+    for model in MODELS:
+        model.create_table(*args, **kwargs)

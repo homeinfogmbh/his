@@ -24,7 +24,7 @@ class AccountService(HISModel):
         on_delete='CASCADE')
 
     def __str__(self):
-        return '{}@{}'.format(str(self.account), str(self.service))
+        return f'{self.account}@{self.service}'
 
     @classmethod
     def add(cls, account, service):

@@ -17,8 +17,6 @@ from his.exceptions import AccountExistsError
 from his.messages.account import ACCOUNT_LOCKED
 from his.messages.session import INVALID_CREDENTIALS
 from his.orm.common import HISModel
-from his.orm.proxy import AccountServicesProxy
-from his.orm.session import Session
 
 
 __all__ = ['Account']
@@ -137,20 +135,6 @@ class Account(HISModel):    # pylint: disable=R0902
     def can_login(self):
         """Determines whether the account can log in."""
         return not self.unusable and self.failed_logins <= MAX_FAILED_LOGINS
-
-    @property
-    def active(self):
-        """Determines whether the account has an open session."""
-        for session in Session.select().where(Session.account == self):
-            if session.alive:
-                return True
-
-        return False
-
-    @property
-    def services(self):
-        """Returns an account <> service mapping proxy."""
-        return AccountServicesProxy(self)
 
     @property
     def subjects(self):

@@ -1,5 +1,7 @@
 """Common functions."""
 
+from functools import partial
+
 from his.config import DOMAINS, SESSION_ID, SESSION_SECRET
 from his.contextlocals import get_session_secret, get_session
 from his.exceptions import NoSessionSpecified, SessionExpired
@@ -17,7 +19,7 @@ def fix_cookies(headers):
 
     cookies = []
 
-    for cookie in iter(headers.pop('Set-Cookie', None), None):
+    for cookie in iter(partial(headers.pop, 'Set-Cookie', None), None):
         # See: https://stackoverflow.com/a/56906613/3515670
         cookies.append(cookie + '; SameSite=None')
 

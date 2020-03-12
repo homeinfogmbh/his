@@ -17,7 +17,7 @@ def fix_cookies(headers):
 
     cookies = []
 
-    for cookie in headers.popitemlist('Set-Cookie', []):
+    for cookie in headers.poplist('Set-Cookie'):
         # See: https://stackoverflow.com/a/56906613/3515670
         cookies.append(cookie + '; SameSite=None')
 

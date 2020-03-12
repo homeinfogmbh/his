@@ -12,6 +12,19 @@ __all__ = [
 ]
 
 
+def fix_cookies(headers):
+    """Fixes the cookies."""
+
+    cookies = []
+
+    for cookie in iter(headers.pop('Set-Cookie', None), None):
+        # See: https://stackoverflow.com/a/56906613/3515670
+        cookies.append(cookie + '; SameSite=None')
+
+    for cookie in cookies:
+        headers.add('Set-Cookie', cookie)
+
+
 def set_session_cookie(response, session, secret=None):
     """Sets the session cookie."""
 
@@ -25,6 +38,7 @@ def set_session_cookie(response, session, secret=None):
             SESSION_SECRET, secret, expires=session.end, domain=domain,
             secure=True, samesite=None)
 
+    fix_cookies(response.headers)
     return response
 
 

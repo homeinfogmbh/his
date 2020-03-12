@@ -23,7 +23,7 @@ def set_cookie(response, *args, **kwargs):
     cookie = dump_cookie(*args, **kwargs)
 
     if 'samesite' in kwargs and kwargs['samesite'] is None:
-        cookie = '{}; {}'.format(cookie, b'SameSite=None'.decode('latin1'))
+        cookie = f'{cookie}; SameSite=None'
 
     response.headers.add('Set-Cookie', cookie)
 

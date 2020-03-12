@@ -1,5 +1,7 @@
 """Common functions."""
 
+from werkzeug.http import dump_cookie
+
 from his.config import DOMAINS, SESSION_ID, SESSION_SECRET
 from his.contextlocals import get_session_secret, get_session
 from his.exceptions import NoSessionSpecified, SessionExpired
@@ -12,19 +14,18 @@ __all__ = [
 ]
 
 
-def fix_cookies(headers):
-    """Fixes the cookies."""
+def set_cookie(response, *args, **kwargs):
+    """A workaround for explicitly setting SameSite to None
+    Until the following fix is released:
+    https://github.com/pallets/werkzeug/issues/1549
+    """
 
-    cookies = []
+    cookie = dump_cookie(*args, **kwargs)
 
-    for cookie in headers.getlist('Set-Cookie'):
-        # See: https://stackoverflow.com/a/56906613/3515670
-        cookies.append(cookie + '; SameSite=None')
+    if 'samesite' in kwargs and kwargs['samesite'] is None:
+        cookie = '{}; {}'.format(cookie, b'SameSite=None'.decode('latin1'))
 
-    headers.pop('Set-Cookie')
-
-    for cookie in cookies:
-        headers.add('Set-Cookie', cookie)
+    response.headers.add('Set-Cookie', cookie)
 
 
 def set_session_cookie(response, session, secret=None):
@@ -33,14 +34,13 @@ def set_session_cookie(response, session, secret=None):
     secret = get_session_secret() if secret is None else secret
 
     for domain in DOMAINS:
-        response.set_cookie(
-            SESSION_ID, str(session.id), expires=session.end, domain=domain,
-            secure=True)
-        response.set_cookie(
-            SESSION_SECRET, secret, expires=session.end, domain=domain,
-            secure=True)
+        set_cookie(
+            response, SESSION_ID, str(session.id), expires=session.end,
+            domain=domain, secure=True, samesite=None)
+        set_cookie(
+            response, SESSION_SECRET, secret, expires=session.end,
+            domain=domain, secure=True, samesite=None)
 
-    fix_cookies(response.headers)
     return response
 
 

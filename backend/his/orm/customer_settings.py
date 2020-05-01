@@ -2,7 +2,7 @@
 
 from peewee import ForeignKeyField, IntegerField
 
-from filedb import FileProperty
+from filedb import File
 from mdb import Customer
 
 from his.orm.common import HISModel
@@ -20,5 +20,4 @@ class CustomerSettings(HISModel):
     customer = ForeignKeyField(
         Customer, column_name='customer', on_delete='CASCADE')
     max_accounts = IntegerField(null=True, default=10)
-    _logo = IntegerField(column_name='logo', null=True)
-    logo = FileProperty(_logo)
+    logo = ForeignKeyField(File, column_name='logo', null=True)

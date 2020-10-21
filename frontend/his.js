@@ -32,9 +32,9 @@ export const BASE_URL = 'https://his.homeinfo.de';
 /*
     Converts an object representing key / value pairs into an URL parameter string.
 */
-function urlparms (args) {
+function urljoin (url, args) {
     if (args == null)
-        return '';
+        return url;
 
     const parsedArgs = [];
 
@@ -52,35 +52,9 @@ function urlparms (args) {
     const string = parsedArgs.join('&');
 
     if (string)
-        return '?' + string;
+        return url + '?' + string;
 
-    return '';
-}
-
-
-/*
-    Determines the content type from the given data.
-*/
-function getContentType (data) {
-    if (data instanceof FormData)
-        return 'multipart/form-data';
-
-    if (data instanceof File)
-        return 'multipart/form-data';
-
-    if (data instanceof Blob)
-        return 'application/octet-stream';
-
-    if (typeof data === 'string' || data instanceof String)
-        return 'text/plain';
-
-    if (data instanceof Element)
-        return 'text/html';
-
-    if (data instanceof Object)
-        return 'application/json';
-
-    return null;
+    return url;
 }
 
 
@@ -89,23 +63,18 @@ function getContentType (data) {
 */
 export const request = {
     get: function (url, args, headers = {}) {
-        url += urlparms(args);
-        return json.get(url, headers);
+        return json.get(urljoin(url, args), headers);
     },
     post: function (url, data, args, headers = {}) {
-        url += urlparms(args);
-        return json.post(url, data, headers);
+        return json.post(urljoin(url, args), data, headers);
     },
     put: function (url, data, args, headers = {}) {
-        url += urlparms(args);
-        return json.put(url, data, headers);
+        return json.put(urljoin(url, args), data, headers);
     },
     patch: function (url, data, args, headers = {}) {
-        url += urlparms(args);
-        return json.patch(url, headers);
+        return json.patch(urljoin(url, args), headers);
     },
     delete: function (url, args, headers = {}) {
-        url += urlparms(args);
-        return json.delete(url, headers);
+        return json.delete(urljoin(url, args), headers);
     }
 };

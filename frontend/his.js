@@ -30,7 +30,7 @@ export const BASE_URL = 'https://his.homeinfo.de';
 
 
 /*
-    Converts an object representing key / value pairs into an URL parameter string.
+    Extends a URL with args from an object representing key / value pairs.
 */
 function urljoin (url, args) {
     if (args == null)

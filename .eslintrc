@@ -1,6 +1,0 @@
-{
-    "extends": "/home/neumann/.eslintrc.json",
-    "env": {
-        jquery: true
-    }
-}

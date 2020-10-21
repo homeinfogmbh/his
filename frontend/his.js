@@ -33,29 +33,28 @@ export const BASE_URL = 'https://his.homeinfo.de';
     Converts an object representing key / value pairs into an URL parameter string.
 */
 function urlparms (args) {
-        if (args == null)
-            return '';
-
-        const parsedArgs = [];
-
-        for (let attribute in args) {
-            if (Object.prototype.hasOwnProperty.call(args, attribute)) {
-                if (typeof args[attribute] === 'function')
-                    continue;
-                else if (args[attribute] == null)
-                    parsedArgs.push(attribute);
-                else
-                    parsedArgs.push(attribute + '=' + args[attribute]);
-            }
-        }
-
-        const string = parsedArgs.join('&');
-
-        if (string)
-            return '?' + string;
-
+    if (args == null)
         return '';
+
+    const parsedArgs = [];
+
+    for (let attribute in args) {
+        if (Object.prototype.hasOwnProperty.call(args, attribute)) {
+            if (typeof args[attribute] === 'function')
+                continue;
+            else if (args[attribute] == null)
+                parsedArgs.push(attribute);
+            else
+                parsedArgs.push(attribute + '=' + args[attribute]);
+        }
     }
+
+    const string = parsedArgs.join('&');
+
+    if (string)
+        return '?' + string;
+
+    return '';
 }
 
 

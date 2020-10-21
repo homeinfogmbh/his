@@ -1,7 +1,7 @@
 /*
-    his.js - HOMEINFO Integrated Services API library.
+    his.mjs - HOMEINFO Integrated Services API library.
 
-    (C) 2017 HOMEINFO - Digitale Informationssysteme GmbH
+    (C) 2017-2020 HOMEINFO - Digitale Informationssysteme GmbH
 
     This library is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -23,172 +23,90 @@
 */
 'use strict';
 
-/*
-    HIS core namespace.
-*/
-var his = his || {};
+import { json } from 'https://javascript.homeinfo.de/requests.js';
 
 
-his.BASE_URL = 'https://his.homeinfo.de';
-his.SESSION_KEY = 'his.session';
-his.DEBUG = false;
+export const BASE_URL = 'https://his.homeinfo.de';
 
 
 /*
-    Logs debug messages.
+    Converts an object representing key / value pairs into an URL parameter string.
 */
-his.debug = function (message) {
-    if (his.DEBUG) {
-        /* eslint-disable no-console */
-        console.log('[DEBUG] his: ' + message);
-        /* eslint-enable no-console */
-    }
-};
+function urlparms (args) {
+        if (args == null)
+            return '';
 
+        const parsedArgs = [];
 
-/*
-    Prototype for request arguments.
-*/
-his._RequestArgs = class {
-    constructor (object) {
-        if (object != null) {
-            for (let attribute in object) {
-                if (Object.prototype.hasOwnProperty.call(object, attribute)) {
-                    this[attribute] = object[attribute];
-                }
-            }
-        }
-    }
-
-    toString () {
-        const args = [];
-
-        for (let attribute in this) {
-            if (Object.prototype.hasOwnProperty.call(this, attribute)) {
-                if (typeof this[attribute] === 'function') {
+        for (let attribute in args) {
+            if (Object.prototype.hasOwnProperty.call(args, attribute)) {
+                if (typeof args[attribute] === 'function')
                     continue;
-                } else if (this[attribute] == null) {
-                    args.push(attribute);
-                } else {
-                    args.push(attribute + '=' + this[attribute]);
-                }
+                else if (args[attribute] == null)
+                    parsedArgs.push(attribute);
+                else
+                    parsedArgs.push(attribute + '=' + args[attribute]);
             }
         }
 
-        const string = args.join('&');
+        const string = parsedArgs.join('&');
 
-        if (string) {
+        if (string)
             return '?' + string;
-        }
 
         return '';
     }
-};
+}
 
 
 /*
     Determines the content type from the given data.
 */
-his._getContentType = function (data) {
-    if (data instanceof FormData) {
+function getContentType (data) {
+    if (data instanceof FormData)
         return 'multipart/form-data';
-    } else if (data instanceof File) {
+
+    if (data instanceof File)
         return 'multipart/form-data';
-    } else if (data instanceof Blob) {
+
+    if (data instanceof Blob)
         return 'application/octet-stream';
-    } else if (typeof data === 'string' || data instanceof String) {
+
+    if (typeof data === 'string' || data instanceof String)
         return 'text/plain';
-    } else if (data instanceof Element) {
+
+    if (data instanceof Element)
         return 'text/html';
-    } else if (data instanceof Object) {
+
+    if (data instanceof Object)
         return 'application/json';
-    }
 
     return null;
-};
-
-
-/*
-    Prototype for an AJAX query.
-*/
-his._AjaxQuery = class {
-    constructor (method, url, args, data, contentType) {
-        this.type = method;
-        const requestArgs = new his._RequestArgs(args);
-        this.url = url + requestArgs;
-
-        if (data != null) {
-            if (contentType == null) {
-                contentType = his._getContentType(data);
-            }
-
-            if (contentType == 'application/json' && data instanceof Object) {
-                data = JSON.stringify(data);
-            }
-
-            this.data = data;
-        }
-
-        if (contentType != null) {
-            this.contentType = contentType;
-        }
-
-        this.xhrFields = {withCredentials: true};
-    }
-
-    toString () {
-        return JSON.stringify(this);
-    }
-};
+}
 
 
 /*
     Makes an AJAX call to the respective HIS backend.
 */
-his._query = function (method, url, args, data, contentType) {
-    const ajaxQuery = new his._AjaxQuery(method, url, args, data, contentType);
-    his.debug('Performing ajax query.');
-    his.debug(JSON.stringify(ajaxQuery, null, 2));
-    const deferred = jQuery.ajax(ajaxQuery);
-    return Promise.resolve(deferred);
-};
-
-
-/*
-    Makes a GET request to the respective HIS backend.
-*/
-his.get = function (url, args) {
-    return his._query('GET', url, args);
-};
-
-
-/*
-    Makes a POST request to the respective HIS backend.
-*/
-his.post = function (url, args, data, contentType) {
-    return his._query('POST', url, args, data, contentType);
-};
-
-
-/*
-    Makes a PATCH request to the respective HIS backend.
-*/
-his.patch = function (url, args, data, contentType) {
-    return his._query('PATCH', url, args, data, contentType);
-};
-
-
-/*
-    Makes a PUT request to the respective HIS backend.
-*/
-his.put = function (url, args, data, contentType) {
-    return his._query('PUT', url, args, data, contentType);
-};
-
-
-/*
-    Makes an DELETE request to the respective HIS backend.
-*/
-his.delete = function (url, args) {
-    return his._query('DELETE', url, args);
+export const request = {
+    get: function (url, args, headers = {}) {
+        url += urlparms(args);
+        return json.get(url, headers);
+    },
+    post: function (url, data, args, headers) {
+        url += urlparms(args);
+        return json.post(url, data, headers);
+    },
+    put: function (url, data, args) {
+        url += urlparms(args);
+        return json.put(url, data, headers);
+    },
+    patch: function (url, data, args) {
+        url += urlparms(args);
+        return json.patch(url, headers);
+    },
+    delete: function (url, args) {
+        url += urlparms(args);
+        return json.delete(url, headers);
+    }
 };

@@ -1,7 +1,7 @@
 /*
     session.js - HOMEINFO Integrated Services session library.
 
-    (C) 2017 HOMEINFO - Digitale Informationssysteme GmbH
+    (C) 2017-2020 HOMEINFO - Digitale Informationssysteme GmbH
 
     This library is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -23,76 +23,57 @@
 */
 'use strict';
 
-/*
-    HIS core namespace.
-*/
-var his = his || {};
+
+import { BASE_URL, request } from 'his.js';
 
 
-/*
-    HIS session API.
-*/
-his.session = his.session || {};
+function getURL (token) {
+    const url = BASE_URL + '/session';
+
+    if (token == null)
+        return url;
+
+    return url + '/' + token;
+}
 
 
-/*
-    Returns a URL for session queries.
-*/
-his.session._getUrl = function (token) {
-    const url = his.BASE_URL + '/session';
-
-    if (token != null) {
-        return url + '/' + token;
-    }
-
-    return url;
-};
-
-
-/*
-    Opens a session.
-*/
-his.session.login = function (userName, passwd, args) {
-    const url = his.session._getUrl();
+export function login (userName, passwd, args) {
+    const url = getURL();
     const data = {'account': userName, 'passwd': passwd};
-    return his.post(url, args, data);
-};
-
+    return request.post(url, args, data);
+}
 
 /*
     Lists active sessions.
 */
-his.session.list = function (args) {
-    const url = his.session._getUrl();
-    return his.get(url, args);
-};
-
+export function list (args) {
+    const url = getURL();
+    return request.get(url, args);
+}
 
 /*
     Gets session data.
 */
-his.session.get = function (token, args) {
+export function get (token, args) {
     token = token || '!';
-    const url = his.session._getUrl(token);
-    return his.get(url, args);
-};
-
+    const url = getURL(token);
+    return request.get(url, args);
+}
 
 /*
     Refreshes a session.
 */
-his.session.refresh = function (token, args) {
+export function refresh (token, args) {
     token = token || '!';
-    const url = his.session._getUrl(token);
-    return his.put(url, null, args);
-};
-
+    const url = getURL(token);
+    return request.put(url, null, args);
+}
 
 /*
     Ends a session.
 */
-his.session.close = function (token, args) {
+export function close (token, args) {
     token = token || '!';
-    const url = his.session._getUrl(token);
-    return his.delete(url, args);
-};
+    const url = getURL(token);
+    return request.delete(url, args);
+}

@@ -1,7 +1,7 @@
 /*
     account.js - HOMEINFO Integrated Services account library.
 
-    (C) 2017 HOMEINFO - Digitale Informationssysteme GmbH
+    (C) 2017-2020 HOMEINFO - Digitale Informationssysteme GmbH
 
     This library is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -23,144 +23,113 @@
 */
 'use strict';
 
-/*
-    HIS core namespace.
-*/
-var his = his || {};
+import { BASE_URL, request } from 'his.js';
 
 
-/*
-    HIS account API.
-*/
-his.account = his.account || {};
+function getURL (accountName) {
+    const url = BASE_URL + '/account';
 
+    if (accountName == null)
+        return url;
 
-/*
-    Returns the respective account URL.
-*/
-his.account._getUrl = function (accountName) {
-    const url = his.BASE_URL + '/account';
-
-    if (accountName != null) {
-        return url + '/' + accountName;
-    }
-
-    return url;
-};
-
-
-/*
-    Lists available accounts.
-*/
-his.account.list = function (args) {
-    const url = his.account._getUrl();
-    return his.get(url, args);
-};
-
-
-/*
-    Gets the specified account.
-*/
-his.account.get = function (name, args) {
-    name = name || '!';
-    const url = his.account._getUrl(name);
-    return his.get(url, args);
-};
-
-
-/*
-    Adds an account.
-*/
-his.account.add = function (account, args) {
-    const url = his.account._getUrl();
-    return his.post(url, args, account);
-};
-
-
-/*
-    Adds an account.
-*/
-his.account.patch = function (name, args, accountPatch) {
-    name = name || '!';
-    const url = his.account._getUrl(name);
-    return his.patch(url, args, accountPatch);
-};
+    return url + '/' + accountName;
+}
 
 
 /*
     Constructor for a new account object.
 */
-his.account.Account = class {
+export class Account {
     constructor (customer, name, email, passwd = null, user = null) {
-        if (customer == null) {
+        if (customer == null)
             throw 'No customer specified.';
-        }
 
         this.customer = customer;
 
-        if (name == null) {
+        if (name == null)
             throw 'No name specified.';
-        }
 
         this.name = name;
 
-        if (email == null) {
+        if (email == null)
             throw 'No email address specified.';
-        }
 
         this.email = email;
 
-        if (passwd != null) {
+        if (passwd != null)
             this.passwd = passwd;
-        }
 
-        if (user != null) {
+        if (user != null)
             this.user = user;
-        }
     }
-};
+}
 
 
 /*
     Constructor for an account patch object.
 */
-his.account.AccountPatch = class {
+export class AccountPatch {
     constructor (email, passwd, name = null, admin = null, customer = null, user = null, failedLogins = null,
         lockedUntil = null, disabled = null) {
-        if (email != null) {
+        if (email != null)
             this.email = email;
-        }
 
-        if (passwd != null) {
+        if (passwd != null)
             this.passwd = passwd;
-        }
 
-        if (name != null) {
+        if (name != null)
             this.name = name;
-        }
 
-        if (admin != null) {
+        if (admin != null)
             this.admin = admin;
-        }
 
-        if (customer != null) {
+        if (customer != null)
             this.customer = customer;
-        }
 
-        if (user != null) {
+        if (user != null)
             this.user = user;
-        }
 
-        if (failedLogins != null) {
+        if (failedLogins != null)
             this.failedLogins = failedLogins;
-        }
 
-        if (lockedUntil != null) {
+        if (lockedUntil != null)
             this.lockedUntil = lockedUntil;
-        }
 
-        if (disabled != null) {
+        if (disabled != null)
             this.disabled = disabled;
-        }
     }
+}
+
+
+/*
+    Lists available accounts.
+*/
+export function list (args) {
+    return request.get(getURL(), args);
+}
+
+
+/*
+    Gets the specified account.
+*/
+export function get (name, args) {
+    name = name || '!';
+    return request.get(getURL(name), args);
+};
+
+
+/*
+    Adds an account.
+*/
+export function add (account, args) {
+    return request.post(getURL(), args, account);
+};
+
+
+/*
+    Adds an account.
+*/
+export function patch (name, args, accountPatch) {
+    name = name || '!';
+    return request.patch(getURL(name), args, accountPatch);
 };

@@ -1,7 +1,7 @@
 /*
     customer.js - HOMEINFO Integrated Services customer library.
 
-    (C) 2017 HOMEINFO - Digitale Informationssysteme GmbH
+    (C) 2017-2020 HOMEINFO - Digitale Informationssysteme GmbH
 
     This library is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -23,49 +23,35 @@
 */
 'use strict';
 
-/*
-    HIS core namespace.
-*/
-var his = his || {};
 
-
-/*
-    HIS customer API.
-*/
-his.customer = his.customer || {};
+import { BASE_URL, request } from 'his.js';
 
 
 /*
     Returns the respective customer URL.
 */
-his.customer._getUrl = function (customerName) {
-    const url = his.BASE_URL + '/customer';
+function getURL (customerName) {
+    const url = BASE_URL + '/customer';
 
-    if (customerName != null) {
-        return url + '/' + customerName;
-    }
+    if (customerName == null)
+        return url;
 
-    return url;
-};
+    return url + '/' + customerName;
+}
 
 
 /*
     Returns the respective customer.
 */
-his.customer.get = function (customer, args) {
-    if (customer == null) {
-        customer = '!';
-    }
-
-    const url = his.customer._getUrl(customer);
-    return his.get(url, args);
-};
+export function get (customer, args) {
+    customer = customer || '!';
+    return request.get(getURL(customer), args);
+}
 
 
 /*
     Returns the current customer's logo.
 */
-his.customer.logo = function (args) {
-    const url = his.BASE_URL + '/customer-logo';
-    return his.get(url, args);
-};
+export function logo (args) {
+    return request.get(BASE_URL + '/customer-logo', args);
+}

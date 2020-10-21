@@ -5,8 +5,7 @@ FILE_LIST = ./.installed_files.txt
 default: | install
 
 install:
-	@ mkdir -p /srv/http/de/homeinfo/javascript/his
-	@ chmod 755 /srv/http/de/homeinfo/javascript/his
+	@ install -dm 755 /srv/http/de/homeinfo/javascript/his
 	@ install -m 644 *.js /srv/http/de/homeinfo/javascript/his/
 
 uninstall:

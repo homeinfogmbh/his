@@ -40,7 +40,7 @@ function getURL (token) {
 export function login (userName, passwd, args) {
     const url = getURL();
     const data = {'account': userName, 'passwd': passwd};
-    return request.post(url, args, data);
+    return request.post(url, data, args);
 }
 
 /*

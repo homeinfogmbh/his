@@ -33,3 +33,25 @@ class AuthorizationCode(HISModel, OAuth2AuthorizationCodeMixin):
     user = ForeignKeyField(
         User, column_name='user', backref='authorization_codes',
         on_delete='CASCADE')
+
+
+class RedirectURI(HISModel, RedirectURIMixin):
+    """A redirect URI."""
+
+    client = ForeignKeyField(
+        Client, column_name='client', backref='redirect_uris',
+        on_delete='CASCADE')
+
+
+class GrantType(HISModel, GrantTypeMixin):
+    """A grant type."""
+
+    client = ForeignKeyField(
+        Client, column_name='client', backref='grant_types',
+        on_delete='CASCADE')
+
+
+class ResponseType(HISModel, ResponseTypeMixin):
+    """A response type."""
+
+    

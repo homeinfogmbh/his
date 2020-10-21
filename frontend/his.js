@@ -92,19 +92,19 @@ export const request = {
         url += urlparms(args);
         return json.get(url, headers);
     },
-    post: function (url, data, args, headers) {
+    post: function (url, data, args, headers = {}) {
         url += urlparms(args);
         return json.post(url, data, headers);
     },
-    put: function (url, data, args) {
+    put: function (url, data, args, headers = {}) {
         url += urlparms(args);
         return json.put(url, data, headers);
     },
-    patch: function (url, data, args) {
+    patch: function (url, data, args, headers = {}) {
         url += urlparms(args);
         return json.patch(url, headers);
     },
-    delete: function (url, args) {
+    delete: function (url, args, headers = {}) {
         url += urlparms(args);
         return json.delete(url, headers);
     }

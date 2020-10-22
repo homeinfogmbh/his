@@ -24,7 +24,7 @@
 'use strict';
 
 
-import { BASE_URL, request } from './his.js';
+import { BASE_URL, request } from './his.mjs';
 
 
 /*

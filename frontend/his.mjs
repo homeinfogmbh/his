@@ -102,7 +102,7 @@ export const request = {
     },
     patch: function (url, data, args, headers = {}) {
         url += urlparms(args);
-        return json.patch(url,, data, headers);
+        return json.patch(url, data, headers);
     },
     delete: function (url, args, headers = {}) {
         url += urlparms(args);

@@ -17,11 +17,9 @@
     along with this library.  If not, see <http://www.gnu.org/licenses/>.
 
     Maintainer: Richard Neumann <r dot neumann at homeinfo period de>
-
-    Requires:
-        * his.js
 */
 'use strict';
+
 
 import { BASE_URL, request } from './his.mjs';
 

@@ -17,11 +17,9 @@
     along with this library.  If not, see <http://www.gnu.org/licenses/>.
 
     Maintainer: Richard Neumann <r dot neumann at homeinfo period de>
-
-    Requires:
-        * jquery.js
 */
 'use strict';
+
 
 import { json } from 'https://javascript.homeinfo.de/requests.mjs';
 

@@ -22,7 +22,7 @@
 
 
 import { loadJSON } from 'https://javascript.homeinfo.de/lib.mjs';
-import { json } from 'https://javascript.homeinfo.de/requests.mjs';
+import { request as _request } from 'https://javascript.homeinfo.de/requests.mjs';
 
 
 export const BASE_URL = 'https://his.homeinfo.de';
@@ -63,19 +63,19 @@ function getParamString (args) {
 */
 export const request = {
     get: function (url, args, headers = {}) {
-        return request.get(url + getParamString(args), headers);
+        return _request.get(url + getParamString(args), headers);
     },
     post: function (url, data, args, headers = {}) {
-        return request.post(url + getParamString(args), data, headers);
+        return _request.post(url + getParamString(args), data, headers);
     },
     put: function (url, data, args, headers = {}) {
-        return request.put(url + getParamString(args), data, headers);
+        return _request.put(url + getParamString(args), data, headers);
     },
     patch: function (url, data, args, headers = {}) {
-        return request.patch(url + getParamString(args), data, headers);
+        return _request.patch(url + getParamString(args), data, headers);
     },
     delete: function (url, args, headers = {}) {
-        return request.delete(url + getParamString(args), headers);
+        return _request.delete(url + getParamString(args), headers);
     }
 };
 

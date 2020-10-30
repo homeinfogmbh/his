@@ -56,6 +56,16 @@ function urlparms (args) {
 }
 
 
+function getJSONKey (key) {
+    const string = localStorage.getItem(key);
+
+    if (string == null)
+        return null;
+
+    return JSON.parse(string);
+}
+
+
 /*
     Determines the content type from the given data.
 */
@@ -107,3 +117,19 @@ export const request = {
         return json.delete(url, headers);
     }
 };
+
+
+/*
+    Returns the set customer.
+*/
+export function getCustomer(key = 'homeinfo.his.customer') {
+   return getJSONKey(key);
+}
+
+
+/*
+    Returns the set user.
+*/
+export function getUser(key = 'homeinfo.his.user') {
+    return getJSONKey(key);
+}

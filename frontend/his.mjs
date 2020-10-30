@@ -97,24 +97,19 @@ function getContentType (data) {
 */
 export const request = {
     get: function (url, args, headers = {}) {
-        url += urlparms(args);
-        return json.get(url, headers);
+        return json.get(url + urlparms(args), headers);
     },
     post: function (url, data, args, headers = {}) {
-        url += urlparms(args);
-        return json.post(url, data, headers);
+        return json.post(url + urlparms(args), data, headers);
     },
     put: function (url, data, args, headers = {}) {
-        url += urlparms(args);
-        return json.put(url, data, headers);
+        return json.put(url + urlparms(args), data, headers);
     },
     patch: function (url, data, args, headers = {}) {
-        url += urlparms(args);
-        return json.patch(url, data, headers);
+        return json.patch(url + urlparms(args), data, headers);
     },
     delete: function (url, args, headers = {}) {
-        url += urlparms(args);
-        return json.delete(url, headers);
+        return json.delete(url + urlparms(args), headers);
     }
 };
 

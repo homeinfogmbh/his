@@ -21,49 +21,11 @@
 'use strict';
 
 
+import { loadJSON } from 'https://javascript.homeinfo.de/lib.mjs';
 import { json } from 'https://javascript.homeinfo.de/requests.mjs';
 
 
 export const BASE_URL = 'https://his.homeinfo.de';
-
-
-/*
-    Converts an object representing key / value pairs into an URL parameter string.
-*/
-function urlparms (args) {
-    if (args == null)
-        return '';
-
-    const parsedArgs = [];
-
-    for (let attribute in args) {
-        if (Object.prototype.hasOwnProperty.call(args, attribute)) {
-            if (typeof args[attribute] === 'function')
-                continue;
-            else if (args[attribute] == null)
-                parsedArgs.push(attribute);
-            else
-                parsedArgs.push(attribute + '=' + args[attribute]);
-        }
-    }
-
-    const string = parsedArgs.join('&');
-
-    if (string)
-        return '?' + string;
-
-    return '';
-}
-
-
-function getJSONKey (key) {
-    const string = localStorage.getItem(key);
-
-    if (string == null)
-        return null;
-
-    return JSON.parse(string);
-}
 
 
 /*
@@ -93,23 +55,52 @@ function getContentType (data) {
 
 
 /*
+    Converts an object representing key / value pairs into an URL parameter string.
+*/
+function getParamString (args) {
+    if (args == null)
+        return '';
+
+    const parsedArgs = [];
+
+    for (let attribute in args) {
+        if (Object.prototype.hasOwnProperty.call(args, attribute)) {
+            if (typeof args[attribute] === 'function')
+                continue;
+            else if (args[attribute] == null)
+                parsedArgs.push(attribute);
+            else
+                parsedArgs.push(attribute + '=' + args[attribute]);
+        }
+    }
+
+    const string = parsedArgs.join('&');
+
+    if (string)
+        return '?' + string;
+
+    return '';
+}
+
+
+/*
     Makes an AJAX call to the respective HIS backend.
 */
 export const request = {
     get: function (url, args, headers = {}) {
-        return json.get(url + urlparms(args), headers);
+        return json.get(url + getParamString(args), headers);
     },
     post: function (url, data, args, headers = {}) {
-        return json.post(url + urlparms(args), data, headers);
+        return json.post(url + getParamString(args), data, headers);
     },
     put: function (url, data, args, headers = {}) {
-        return json.put(url + urlparms(args), data, headers);
+        return json.put(url + getParamString(args), data, headers);
     },
     patch: function (url, data, args, headers = {}) {
-        return json.patch(url + urlparms(args), data, headers);
+        return json.patch(url + getParamString(args), data, headers);
     },
     delete: function (url, args, headers = {}) {
-        return json.delete(url + urlparms(args), headers);
+        return json.delete(url + getParamString(args), headers);
     }
 };
 
@@ -118,7 +109,7 @@ export const request = {
     Returns the set customer.
 */
 export function getCustomer(key = 'homeinfo.his.customer') {
-   return getJSONKey(key);
+   return loadJSON(key);
 }
 
 
@@ -126,5 +117,5 @@ export function getCustomer(key = 'homeinfo.his.customer') {
     Returns the set user.
 */
 export function getUser(key = 'homeinfo.his.user') {
-    return getJSONKey(key);
+    return loadJSON(key);
 }

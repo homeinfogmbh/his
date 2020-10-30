@@ -29,32 +29,6 @@ export const BASE_URL = 'https://his.homeinfo.de';
 
 
 /*
-    Determines the content type from the given data.
-*/
-function getContentType (data) {
-    if (data instanceof FormData)
-        return 'multipart/form-data';
-
-    if (data instanceof File)
-        return 'multipart/form-data';
-
-    if (data instanceof Blob)
-        return 'application/octet-stream';
-
-    if (typeof data === 'string' || data instanceof String)
-        return 'text/plain';
-
-    if (data instanceof Element)
-        return 'text/html';
-
-    if (data instanceof Object)
-        return 'application/json';
-
-    return null;
-}
-
-
-/*
     Converts an object representing key / value pairs into an URL parameter string.
 */
 function getParamString (args) {
@@ -67,7 +41,8 @@ function getParamString (args) {
         if (Object.prototype.hasOwnProperty.call(args, attribute)) {
             if (typeof args[attribute] === 'function')
                 continue;
-            else if (args[attribute] == null)
+
+            if (args[attribute] == null)
                 parsedArgs.push(attribute);
             else
                 parsedArgs.push(attribute + '=' + args[attribute]);

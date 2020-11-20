@@ -171,16 +171,6 @@ class Account(HISModel):    # pylint: disable=R0902
         """Returns an account <> service mapping proxy."""
         return AccountServicesProxy(self)
 
-    def rehash(self, passwd, *, force=False):
-        """Performs a rehash."""
-        if self.passwd.needs_rehash or force:
-            # Only rehash if the new hash length fits the current field.
-            if type(self).passwd.size_changed:
-                self.passwd = passwd
-                return True
-
-        return False
-
     def login(self, passwd):
         """Performs a login."""
         if not self.can_login:
@@ -191,9 +181,9 @@ class Account(HISModel):    # pylint: disable=R0902
         except VerifyMismatchError:
             self.failed_logins += 1
             self.save()
-            raise INVALID_CREDENTIALS
+            raise INVALID_CREDENTIALS from None
 
-        self.rehash(passwd)
+        self.passwd.rehash(passwd)
         self.failed_logins = 0
         self.last_login = datetime.now()
         self.save()

@@ -183,7 +183,9 @@ class Account(HISModel):    # pylint: disable=R0902
             self.save()
             raise INVALID_CREDENTIALS from None
 
-        self.passwd.rehash(passwd)
+        if self.passwd.needs_rehash:
+            self.passwd = passwd
+
         self.failed_logins = 0
         self.last_login = datetime.now()
         self.save()

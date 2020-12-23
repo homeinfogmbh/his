@@ -8,6 +8,9 @@ __all__ = ['APPLICATION']
 
 
 APPLICATION = Application('his', debug=True)
-APPLICATION.add_routes(
-    account.ROUTES + bugreport.ROUTES + customer.ROUTES + pwreset.ROUTES
-    + service.ROUTES + session.ROUTES)
+APPLICATION.add_routes(account.ROUTES)
+APPLICATION.add_routes(bugreport.ROUTES)
+APPLICATION.add_routes(customer.ROUTES)
+APPLICATION.add_routes(pwreset.ROUTES)
+APPLICATION.add_routes(service.ROUTES)
+APPLICATION.add_routes(session.ROUTES)

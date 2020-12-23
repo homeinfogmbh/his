@@ -12,7 +12,7 @@ __all__ = ['REQUIRE_OAUTH']
 class BearerTokenValidator(rfc6750.BearerTokenValidator):
     """Validates bearer tokens."""
 
-    def authenticate_token(self, token_string):
+    def authenticate_token(self, token_string: str) -> Token:
         """Authenticates a token."""
         try:
             return Token.get(Token.access_token == token_string)

@@ -1,5 +1,6 @@
 """Account actions."""
 
+from argparse import Namespace
 from logging import getLogger
 from sys import exit    # pylint: disable=W0622
 
@@ -14,7 +15,7 @@ __all__ = ['add_account']
 LOGGER = getLogger('hisutil')
 
 
-def add_account(args):
+def add_account(args: Namespace):
     """Adds the respective account."""
 
     if args.password:

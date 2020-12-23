@@ -1,6 +1,6 @@
 """CLI arguments parsing."""
 
-from argparse import ArgumentParser
+from argparse import ArgumentParser, Namespace
 from datetime import datetime
 
 from mdb import Customer
@@ -11,13 +11,13 @@ from his.orm import Account, Service
 __all__ = ['get_args']
 
 
-def customer(string):
+def customer(string: str) -> Customer:
     """Returns the respective customer."""
 
     try:
         match, *excess = Customer.find(string)
     except ValueError:
-        raise ValueError('No such customer.')
+        raise ValueError('No such customer.') from None
 
     if excess:
         raise ValueError('Ambiguous customer selection.')
@@ -25,16 +25,16 @@ def customer(string):
     return match
 
 
-def service(string):
+def service(string: str) -> Service:
     """Returns the respective service."""
 
     try:
         return Service.get(Service.name == string)
     except Service.DoesNotExist:
-        raise ValueError('No such service.')
+        raise ValueError('No such service.') from None
 
 
-def account(string):
+def account(string: str) -> Account:
     """Returns the account."""
 
     try:
@@ -50,18 +50,12 @@ def account(string):
     try:
         match, *excess = Account.select().where(select)
     except ValueError:
-        raise ValueError('No such account.')
+        raise ValueError('No such account.') from None
 
     if excess:
         raise ValueError('Ambiguous account selection.')
 
     return match
-
-
-def dtime(string):
-    """Parses a datetime."""
-
-    return datetime.strptime(string, '%Y-%m-%dT%H:%M:%S')
 
 
 def _add_account_parser(subparsers):
@@ -101,9 +95,11 @@ def _add_service_parser(subparsers):
     add_customer_parser.add_argument(
         'customer', type=customer, help='the customer ID or name')
     add_customer_parser.add_argument(
-        '-b', '--begin', type=dtime, help='the beginning of the usage period')
+        '-b', '--begin', type=datetime.fromisoformat,
+        help='the beginning of the usage period')
     add_customer_parser.add_argument(
-        '-e', '--end', type=dtime, help='the end of the usage period')
+        '-e', '--end', type=datetime.fromisoformat,
+        help='the end of the usage period')
     add_account_parser = subparsers_.add_parser(
         'account', help='add an account to the service')
     add_account_parser.add_argument(
@@ -112,7 +108,7 @@ def _add_service_parser(subparsers):
         'account', type=account, help='the account ID, name or email')
 
 
-def get_args():
+def get_args() -> Namespace:
     """Returns the command line arguments."""
 
     parser = ArgumentParser(description='Manage HIS settings.')

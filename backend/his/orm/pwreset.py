@@ -48,10 +48,10 @@ class PasswordResetToken(HISModel):
         return cls.add(account)
 
     @property
-    def valid(self):
+    def valid(self) -> bool:
         """Determines whether the token is still valid."""
         return self.created + VALIDITY > datetime.now()
 
-    def email(self, url):
+    def email(self, url: str):
         """Emails the reset link to the respective account."""
         return mail_password_reset_link(self, url)

@@ -1,6 +1,8 @@
 """User sessions."""
 
+from __future__ import annotations
 from datetime import datetime, timedelta
+from typing import Iterator
 
 from argon2.exceptions import VerifyMismatchError
 from peewee import BooleanField
@@ -16,11 +18,11 @@ from his.orm.account import Account
 from his.orm.common import HISModel
 
 
-__all__ = ['ALLOWED_SESSION_DURATIONS', 'DEFAULT_SESSION_DURATION', 'Session']
+__all__ = ['DURATION', 'DURATION_RANGE', 'Session']
 
 
-ALLOWED_SESSION_DURATIONS = range(5, 31)
-DEFAULT_SESSION_DURATION = 15
+DURATION = 15
+DURATION_RANGE = range(5, 31)
 
 
 class Session(HISModel):
@@ -34,13 +36,8 @@ class Session(HISModel):
     end = DateTimeField()
     login = BooleanField(default=True)
 
-    def __str__(self):
-        """Returns a human-readable representation."""
-        return '{} - {}: {} ({})'.format(
-            self.start.isoformat(), self.end.isoformat(), self.id, self.login)
-
     @classmethod
-    def add(cls, account, duration):
+    def add(cls, account: Account, duration: timedelta) -> Session:
         """Actually opens a new login session."""
         now = datetime.now()
         session = cls()
@@ -51,9 +48,9 @@ class Session(HISModel):
         return (session, secret)
 
     @classmethod
-    def open(cls, account, duration=DEFAULT_SESSION_DURATION):
+    def open(cls, account: Account, duration: int = DURATION) -> Session:
         """Actually opens a new login session."""
-        if duration not in ALLOWED_SESSION_DURATIONS:
+        if duration not in DURATION_RANGE:
             raise DURATION_OUT_OF_BOUNDS
 
         duration = timedelta(minutes=duration)
@@ -62,7 +59,7 @@ class Session(HISModel):
         return (session, secret)
 
     @classmethod
-    def cleanup(cls, before=None):
+    def cleanup(cls, before: datetime = None) -> Iterator[Session]:
         """Cleans up orphaned sessions."""
         if before is None:
             before = datetime.now()
@@ -72,11 +69,11 @@ class Session(HISModel):
             yield session
 
     @property
-    def alive(self):
+    def alive(self) -> bool:
         """Determines whether the session is active."""
         return self.start <= datetime.now() < self.end
 
-    def verify(self, secret):
+    def verify(self, secret: str) -> bool:
         """Verifies the session."""
         try:
             if self.secret.verify(secret):  # pylint: disable=E1101
@@ -86,9 +83,9 @@ class Session(HISModel):
 
         return False
 
-    def renew(self, duration=DEFAULT_SESSION_DURATION):
+    def renew(self, duration: int = DURATION) -> Session:
         """Renews the session."""
-        if duration not in ALLOWED_SESSION_DURATIONS:
+        if duration not in DURATION_RANGE:
             raise DURATION_OUT_OF_BOUNDS
 
         if not self.account.can_login:

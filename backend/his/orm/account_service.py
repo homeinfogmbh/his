@@ -1,5 +1,7 @@
 """Account <> Service mapping."""
 
+from __future__ import annotations
+
 from peewee import ForeignKeyField
 
 from his.orm.account import Account
@@ -27,6 +29,6 @@ class AccountService(HISModel):
         return f'{self.account}@{self.service}'
 
     @classmethod
-    def add(cls, account, service):
+    def add(cls, account: Account, service: Service) -> AccountService:
         """Adds a new account service."""
         return cls(account=account, service=service)

@@ -1,6 +1,7 @@
 """Customer <> Service mappings."""
 
 from datetime import datetime
+from typing import Generator, Union
 
 from peewee import DateTimeField
 from peewee import ForeignKeyField
@@ -34,7 +35,8 @@ class CustomerService(HISModel):
         return f'{self.customer_id}@{self.service}'
 
     @classmethod
-    def add(cls, customer, service, begin=None, end=None):
+    def add(cls, customer: Union[Customer, int], service: Union[Service, int],
+            begin: datetime = None, end: datetime = None):
         """Adds a new customer service."""
         customer_service = cls()
         customer_service.customer = customer
@@ -44,15 +46,16 @@ class CustomerService(HISModel):
         return customer_service
 
     @classmethod
-    def services(cls, customer):
+    def services(cls, customer: Customer) -> Generator[Service, None, None]:
         """Yields services for the respective customer."""
         for customer_service in cls.select().where(cls.customer == customer):
-            service = customer_service.service
-            yield service
-            yield from service.service_deps
+            yield customer_service.service
+
+            for service in customer_service.service.service_deps:
+                yield service
 
     @property
-    def active(self):
+    def active(self) -> bool:
         """Determines whether the service mapping is active."""
         if self.begin is None:
             if self.end is None:

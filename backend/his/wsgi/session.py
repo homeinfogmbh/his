@@ -1,8 +1,9 @@
 """HIS session service."""
 
 from functools import wraps
+from typing import Callable, Union
 
-from wsgilib import JSON
+from wsgilib import JSON, JSONMessage
 
 from his.api import authenticated
 from his.contextlocals import ACCOUNT, SESSION, JSON_DATA, get_session_duration
@@ -17,7 +18,7 @@ from his.orm import Account, Session
 __all__ = ['ROUTES']
 
 
-def _get_session(session_identifier):
+def _get_session(session_identifier: str) -> Session:
     """Returns the respective session by the
     resource identifier with authorization checks.
     """
@@ -28,7 +29,7 @@ def _get_session(session_identifier):
     try:
         session = Session[session_identifier]
     except Session.DoesNotExist:
-        raise NO_SUCH_SESSION
+        raise NO_SUCH_SESSION from None
 
     if SESSION.id == session.id:
         return session
@@ -42,18 +43,18 @@ def _get_session(session_identifier):
     raise NO_SUCH_SESSION
 
 
-def with_session(function):
+def with_session(function: Callable) -> Callable:
     """Converts the first argument of function into a sesion."""
 
     @wraps(function)
-    def wrapper(session_identifier, *args, **kwargs):
+    def wrapper(session_identifier: str, *args, **kwargs):
         session = _get_session(session_identifier)
         return function(session, *args, **kwargs)
 
     return wrapper
 
 
-def login():
+def login() -> Union[JSON, JSONMessage]:
     """Opens a new session for the respective account."""
 
     account = JSON_DATA.get('account')
@@ -80,7 +81,7 @@ def login():
 
 
 @authenticated
-def list_():
+def list_() -> Union[JSON, JSONMessage]:
     """Lists all sessions iff specified session is root."""
 
     if ACCOUNT.root:
@@ -97,7 +98,7 @@ def list_():
 
 @authenticated
 @with_session
-def get(session):
+def get(session) -> JSON:
     """Lists the respective session."""
 
     return JSON(session.to_json())
@@ -105,7 +106,7 @@ def get(session):
 
 @authenticated
 @with_session
-def refresh(session):
+def refresh(session: Session) -> JSON:
     """Refreshes an existing session."""
 
     # Refresh is done by @authenricated automatically.
@@ -114,7 +115,7 @@ def refresh(session):
 
 @authenticated
 @with_session
-def close(session):
+def close(session: Session) -> JSON:
     """Closes the provided session."""
 
     ident = session.id

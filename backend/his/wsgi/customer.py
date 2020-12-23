@@ -13,7 +13,7 @@ from his.orm import CustomerSettings
 __all__ = ['get_customer', 'ROUTES']
 
 
-def get_customer(name):
+def get_customer(name: str) -> Customer:
     """Returns the customer by the respective customer ID."""
 
     if name == '!':
@@ -22,12 +22,12 @@ def get_customer(name):
     try:
         cid = int(name)
     except ValueError:
-        raise INVALID_CUSTOMER_ID
+        raise INVALID_CUSTOMER_ID from None
 
     try:
         customer = Customer.get(Customer.id == cid)
     except Customer.DoesNotExist:
-        raise NO_SUCH_CUSTOMER
+        raise NO_SUCH_CUSTOMER from None
 
     conditions = (
         lambda: ACCOUNT.root,
@@ -42,32 +42,32 @@ def get_customer(name):
     raise NO_SUCH_CUSTOMER
 
 
-def _settings():
+def _settings() -> CustomerSettings:
     """Returns the respective customer settings."""
 
     try:
         CustomerSettings.get(CustomerSettings.customer == CUSTOMER)
     except CustomerSettings.DoesNotExist:
-        raise CUSTOMER_NOT_CONFIGURED
+        raise CUSTOMER_NOT_CONFIGURED from None
 
 
 @authenticated
 @root
-def list_():
+def list_() -> JSON:
     """Lists available customers."""
 
     return JSON([customer.to_json(company=True) for customer in Customer])
 
 
 @authenticated
-def get(ident):
+def get(ident: int) -> JSON:
     """Allows services"""
 
     return JSON(get_customer(ident).to_json(company=True))
 
 
 @authenticated
-def get_logo():
+def get_logo() -> Binary:
     """Allows services"""
 
     return Binary(_settings().logo)

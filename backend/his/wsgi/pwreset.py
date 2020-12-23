@@ -4,6 +4,7 @@ from uuid import UUID
 
 from peeweeplus import PasswordTooShortError
 from recaptcha import VerificationError, verify
+from wsgilib import JSONMessage
 
 from his.config import CONFIG, RECAPTCHA
 from his.contextlocals import JSON_DATA
@@ -25,13 +26,13 @@ from his.orm import Account, PasswordResetToken
 __all__ = ['ROUTES']
 
 
-def _get_account(name):
+def _get_account(name: str) -> Account:
     """Returns the account by its name."""
 
     try:
         return Account.get(Account.name == name)
     except Account.DoesNotExist:
-        raise PASSWORD_RESET_SENT   # Avoid account sniffing.
+        raise PASSWORD_RESET_SENT from None     # Avoid account sniffing.
 
 
 def request_reset():    # pylint: disable=R0911
@@ -77,7 +78,7 @@ def request_reset():    # pylint: disable=R0911
     return PASSWORD_RESET_SENT
 
 
-def reset_password():
+def reset_password() -> JSONMessage:
     """Actually performs a password reset."""
 
     token = JSON_DATA.get('token')

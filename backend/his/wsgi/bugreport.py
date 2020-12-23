@@ -1,9 +1,12 @@
 """Endpoint for reporting bugs."""
 
+from typing import Iterator
+
 from flask import request
 
 from emaillib import EMail
 from recaptcha import VerificationError, verify
+from wsgilib import JSONMessage
 
 from his.api import authenticated
 from his.config import CONFIG, RECAPTCHA
@@ -22,7 +25,7 @@ __all__ = ['ROUTES']
 BUGREPORT_CONFIG = CONFIG['bugreport']
 
 
-def gen_emails():
+def gen_emails() -> Iterator[EMail]:
     """Yields bug report emails."""
 
     with open(BUGREPORT_CONFIG['template'], 'r') as file:
@@ -36,7 +39,7 @@ def gen_emails():
 
 
 @authenticated
-def report():
+def report() -> JSONMessage:
     """Reports a bug."""
 
     try:
@@ -66,4 +69,4 @@ def report():
     return BUGREPORT_SENT
 
 
-ROUTES = (('POST', '/bugreport', report),)
+ROUTES = [('POST', '/bugreport', report)]

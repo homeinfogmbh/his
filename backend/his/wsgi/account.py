@@ -1,7 +1,7 @@
 """Account management."""
 
 from peeweeplus import PasswordTooShortError
-from wsgilib import JSON
+from wsgilib import JSON, JSONMessage
 
 from his.api import authenticated
 from his.contextlocals import ACCOUNT, CUSTOMER, JSON_DATA
@@ -27,7 +27,7 @@ _USER_FIELDS = {'fullName', 'passwd', 'email'}
 _ADMIN_FIELDS = {'name', 'fullName', 'passwd', 'email', 'admin'}
 
 
-def get_account(name):
+def get_account(name: str) -> Account:
     """Safely returns the respective account."""
 
     if name == '!':
@@ -37,12 +37,12 @@ def get_account(name):
         try:
             return Account.get(Account.name == name)
         except Account.DoesNotExist:
-            raise NO_SUCH_ACCOUNT
+            raise NO_SUCH_ACCOUNT from None
 
     try:
         account = Account.get(Account.name == name)
     except Account.DoesNotExist:
-        raise NOT_AUTHORIZED    # Prevent account name sniffing.
+        raise NOT_AUTHORIZED from None  # Prevent account name sniffing.
 
     if ACCOUNT.admin:
         if account.customer == CUSTOMER:
@@ -53,7 +53,7 @@ def get_account(name):
     raise NOT_AUTHORIZED
 
 
-def _add_account():
+def _add_account() -> JSONMessage:
     """Adds an account for the current customer."""
 
     missing_fields = []
@@ -81,9 +81,9 @@ def _add_account():
     try:
         account = Account.add(CUSTOMER, name, email, passwd=passwd)
     except AccountExistsError:
-        raise ACCOUNT_EXISTS
-    except PasswordTooShortError as password_too_short:
-        raise PASSWORD_TOO_SHORT.update(minlen=password_too_short.minlen)
+        raise ACCOUNT_EXISTS from None
+    except PasswordTooShortError as error:
+        raise PASSWORD_TOO_SHORT.update(minlen=error.minlen) from None
 
     account.save()
 
@@ -93,7 +93,7 @@ def _add_account():
     return ACCOUNT_CREATED
 
 
-def _patch_account(account, only=None):
+def _patch_account(account: Account, only: set = None) -> JSONMessage:
     """Patches the respective account with the provided
     dictionary and an optional field restriction.
     """
@@ -110,14 +110,14 @@ def _patch_account(account, only=None):
 
 
 @authenticated
-def list_():
+def list_() -> JSON:
     """List one or many accounts."""
 
     return JSON([account.to_json() for account in ACCOUNT.subjects])
 
 
 @authenticated
-def get(name):
+def get(name: str) -> JSON:
     """Gets an account by name."""
 
     if name == '!':
@@ -128,7 +128,7 @@ def get(name):
 
 
 @authenticated
-def add():
+def add() -> JSONMessage:
     """Create a new account."""
 
     if ACCOUNT.root:
@@ -156,7 +156,7 @@ def add():
 
 
 @authenticated
-def patch(name):
+def patch(name: str) -> JSONMessage:
     """Modifies an account."""
 
     account = get_account(name)

@@ -22,7 +22,7 @@ class SessionExpired(Exception):
 class InconsistencyError(Exception):
     """Indicates inconsistencies in database configuration."""
 
-    def __init__(self, msg):
+    def __init__(self, msg: str):
         super().__init__(msg)
         self.msg = msg
 
@@ -37,7 +37,7 @@ class ServiceExistsError(Exception):
 class AccountExistsError(Exception):
     """Indicates that the respective account already exists."""
 
-    def __init__(self, field):
+    def __init__(self, field: str):
         super().__init__(field)
         self.field = field
 
@@ -45,7 +45,7 @@ class AccountExistsError(Exception):
 class AmbiguousDataError(Exception):
     """Indicates that the provided data is ambiguous."""
 
-    def __init__(self, field):
+    def __init__(self, field: str):
         super().__init__(field)
         self.field = field
 

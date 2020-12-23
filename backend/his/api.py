@@ -1,6 +1,7 @@
 """HIS main API."""
 
 from functools import wraps
+from typing import Callable
 
 from his.contextlocals import SESSION, get_session_duration
 from his.messages.account import ACCOUNT_LOCKED
@@ -13,7 +14,7 @@ from his.orm import Service
 __all__ = ['authenticated', 'authorized', 'admin', 'root']
 
 
-def authenticated(function):
+def authenticated(function: Callable) -> Callable:
     """Decorator to add authentication
     checks to the respective function.
     """
@@ -37,12 +38,12 @@ def authenticated(function):
     return wrapper
 
 
-def authorized(service_name):
+def authorized(service_name: str) -> Callable:
     """Decorator to add authorization
     checks to the respective function.
     """
 
-    def decorator(function):
+    def decorator(function: Callable) -> Callable:
         """Wraps the respective function."""
 
         @wraps(function)
@@ -53,7 +54,7 @@ def authorized(service_name):
             try:
                 service = Service.get(Service.name == service_name)
             except Service.DoesNotExist:
-                raise NO_SUCH_SERVICE
+                raise NO_SUCH_SERVICE from None
 
             if service.authorized(SESSION.account):
                 return function(*args, **kwargs)
@@ -65,7 +66,7 @@ def authorized(service_name):
     return decorator
 
 
-def admin(function):
+def admin(function: Callable) -> Callable:
     """Decorator to check for administrative services."""
 
     @wraps(function)
@@ -79,7 +80,7 @@ def admin(function):
     return wrapper
 
 
-def root(function):
+def root(function: Callable) -> Callable:
     """Decorator to check for root services."""
 
     @wraps(function)

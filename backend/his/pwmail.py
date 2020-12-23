@@ -1,39 +1,43 @@
 """Password mailing."""
 
+from xml.etree.ElementTree import Element, tostring
+
 from emaillib import EMail
 
 from his.config import CONFIG
-from his.mail import MAIL_CFG, MAILER
+from his.mail import MAILER, SENDER
+from his.orm import PasswordResetToken
 
 
 __all__ = ['mail_password_reset_link']
 
 
 HREF = '<a href="{}">{}</a>'
-PWRESET_CFG = CONFIG['pwreset']
+TEMPLATE = CONFIG.get('pwreset', 'template')
+SUBJECT = CONFIG.get('pwreset', 'subject')
+REPLY_TO = CONFIG.get('pwreset', 'reply_to')
 
 
-def href(url, caption=None):
+def href(url: str, caption: str = None) -> str:
     """Makes a link."""
 
-    if caption is None:
-        caption = url
+    link = Element('a', attrib={'href': url})
 
-    return HREF.format(url, caption)
+    if caption is not None:
+        link.text = caption
+
+    return link
 
 
-def mail_password_reset_link(password_reset_token, url):
+def mail_password_reset_link(token: PasswordResetToken, url: str):
     """Mails the respective password reset link."""
 
-    with open(PWRESET_CFG['template']) as file:
+    with open(TEMPLATE) as file:
         template = file.read()
 
-    account = password_reset_token.account
-    link = url + '?token={}'.format(password_reset_token.token.hex)
-    html = template.format(account=account.name, link=href(link))
-    email = EMail(
-        PWRESET_CFG['subject'], MAIL_CFG['sender'], account.email,
-        html=html)
-    email.add_header('reply-to', PWRESET_CFG['reply_to'])
+    account = token.account
+    link = url + '?token={}'.format(token.token.hex)
+    html = template.format(account=account.name, link=tostring(href(link)))
+    email = EMail(SUBJECT, SENDER, account.email, html=html)
+    email.add_header('reply-to', REPLY_TO)
     MAILER.send([email])
-    return True

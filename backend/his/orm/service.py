@@ -1,6 +1,7 @@
 """HIS services."""
 
 from __future__ import annotations
+from typing import Iterator
 
 from peewee import BooleanField
 from peewee import CharField
@@ -44,7 +45,7 @@ class Service(HISModel):
         raise ServiceExistsError()
 
     @property
-    def service_deps(self) -> Generator[Service, None, None]:
+    def service_deps(self) -> Iterator[Service]:
         """Yields dependencies of this service."""
         for service_dependency in self._service_deps:
             yield service_dependency.dependency

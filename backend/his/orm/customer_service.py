@@ -1,7 +1,7 @@
 """Customer <> Service mappings."""
 
 from datetime import datetime
-from typing import Generator, Union
+from typing import Iterator, Union
 
 from peewee import DateTimeField
 from peewee import ForeignKeyField
@@ -46,7 +46,7 @@ class CustomerService(HISModel):
         return customer_service
 
     @classmethod
-    def services(cls, customer: Customer) -> Generator[Service, None, None]:
+    def services(cls, customer: Customer) -> Iterator[Service]:
         """Yields services for the respective customer."""
         for customer_service in cls.select().where(cls.customer == customer):
             yield customer_service.service

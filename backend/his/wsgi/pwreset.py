@@ -21,6 +21,7 @@ from his.messages.recaptcha import NO_RESPONSE_PROVIDED
 from his.messages.recaptcha import NO_SITE_KEY_PROVIDED
 from his.messages.recaptcha import SITE_NOT_CONFIGURED
 from his.orm import Account, PasswordResetToken
+from his.pwmail import mail_password_reset_link
 
 
 __all__ = ['ROUTES']
@@ -74,7 +75,7 @@ def request_reset():    # pylint: disable=R0911
         return PASSWORD_RESET_PENDING
 
     password_reset_token.save()
-    password_reset_token.email(url)
+    mail_password_reset_link(password_reset_token.email, url)
     return PASSWORD_RESET_SENT
 
 

@@ -3,7 +3,7 @@
 from __future__ import annotations
 from datetime import datetime
 from email.utils import parseaddr
-from typing import Generator, Iterable, Union
+from typing import Iterable, Iterator, Union
 
 from argon2.exceptions import VerifyMismatchError
 from peewee import BooleanField
@@ -137,7 +137,7 @@ class Account(HISModel):    # pylint: disable=R0902
         return not self.unusable and self.failed_logins <= MAX_FAILED_LOGINS
 
     @property
-    def subjects(self) -> Generator[Account, None, None]:
+    def subjects(self) -> Iterator[Account]:
         """Yields accounts this account can manage."""
         cls = type(self)
 

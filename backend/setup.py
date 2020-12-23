@@ -9,7 +9,7 @@ setup(
     version_format='{tag}',
     setup_requires=['setuptools-git-version'],
     install_requires=[
-        'argon2',
+        'argon2_cffi',
         'configlib',
         'emaillib',
         'filedb',

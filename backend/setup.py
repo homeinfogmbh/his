@@ -1,17 +1,31 @@
 #! /usr/bin/env python3
+"""Install scipt."""
 
-from distutils.core import setup
+from setuptools import setup
 
 
 setup(
     name='his',
-    version='latest',
-    author='Richard Neumann',
-    requires=[
-        'argon2', 'configlib', 'docopt', 'emaillib', 'filedb', 'flask',
-        'functoolsplus', 'mdb', 'peewee', 'peeweeplus', 'recaptcha',
-        'werkzeug', 'wsgilib'
+    version_format='{tag}',
+    setup_requires=['setuptools-git-version'],
+    install_requires=[
+        'argon2',
+        'configlib',
+        'emaillib',
+        'filedb',
+        'flask',
+        'functoolsplus',
+        'mdb',
+        'peewee',
+        'peeweeplus',
+        'recaptcha',
+        'werkzeug',
+        'wsgilib'
     ],
+    author='HOMEINFO - Digitale Informationssysteme GmbH',
+    author_email='<info@homeinfo.de>',
+    maintainer='Richard Neumann',
+    maintainer_email='<r.neumann@homeinfo.de>',
     packages=[
         'his',
         'his.hisutil',
@@ -24,4 +38,5 @@ setup(
     scripts=['files/hisutil', 'files/his-session-cleanup'],
     data_files=[('/usr/local/etc/his.d', [
         'files/pwreset.html', 'files/bugreport.html'])],
-    description='HOMEINFO Integrated Services.')
+    description='HOMEINFO Integrated Services.'
+)

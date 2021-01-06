@@ -11,7 +11,7 @@ __all__ = ['ROUTES']
 
 
 @authenticated
-def list_():
+def list_() -> JSON:
     """Lists promoted services."""
 
     if ACCOUNT.root:
@@ -21,4 +21,4 @@ def list_():
         Service.promote == 1)])
 
 
-ROUTES = (('GET', '/service', list_),)
+ROUTES = [('GET', '/service', list_)]

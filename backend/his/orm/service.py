@@ -1,5 +1,8 @@
 """HIS services."""
 
+from __future__ import annotations
+from typing import Iterator
+
 from peewee import BooleanField
 from peewee import CharField
 from peewee import ForeignKeyField
@@ -27,7 +30,8 @@ class Service(HISModel):
         return self.name
 
     @classmethod
-    def add(cls, name, description=None, promote=True):
+    def add(cls, name: str, description: str = None,
+            promote: bool = True) -> Service:
         """Adds a new service."""
         try:
             cls.get(cls.name == name)
@@ -41,14 +45,15 @@ class Service(HISModel):
         raise ServiceExistsError()
 
     @property
-    def service_deps(self):
+    def service_deps(self) -> Iterator[Service]:
         """Yields dependencies of this service."""
         for service_dependency in self._service_deps:
-            dependency = service_dependency.dependency
-            yield dependency
-            yield from dependency.service_deps
+            yield service_dependency.dependency
 
-    def authorized(self, account):
+            for dependency in service_dependency.dependency.service_deps:
+                yield dependency
+
+    def authorized(self, account) -> bool:
         """Determines whether the respective account
         is authorized to use this service.
 

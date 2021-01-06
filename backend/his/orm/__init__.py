@@ -6,8 +6,8 @@ from his.orm.customer_service import CustomerService
 from his.orm.customer_settings import CustomerSettings
 from his.orm.pwreset import PasswordResetToken
 from his.orm.service import Service, ServiceDomain
-from his.orm.session import ALLOWED_SESSION_DURATIONS
-from his.orm.session import DEFAULT_SESSION_DURATION
+from his.orm.session import DURATION_RANGE as ALLOWED_SESSION_DURATIONS
+from his.orm.session import DURATION as DEFAULT_SESSION_DURATION
 from his.orm.session import Session
 
 

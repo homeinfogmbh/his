@@ -10,7 +10,14 @@ from his.orm.common import HISModel
 from his.orm.account import Account as User
 
 
-__all__ = ['Client', 'Token', 'AuthorizationCode']
+__all__ = [
+    'Client',
+    'Token',
+    'AuthorizationCode',
+    'RedirectURI',
+    'GrantType',
+    'ResponseType'
+]
 
 
 class Client(HISModel, OAuth2ClientMixin):   # pylint: disable=R0901
@@ -54,4 +61,4 @@ class GrantType(HISModel, GrantTypeMixin):
 class ResponseType(HISModel, ResponseTypeMixin):
     """A response type."""
 
-    
+    # TODO: Implement.

@@ -12,13 +12,13 @@ __all__ = ['genpw', 'read_passwd']
 POOL = ascii_letters + digits
 
 
-def genpw(length=16, pool=POOL):
+def genpw(length: int = 16, *, pool: str = POOL) -> str:
     """Generates a safe, radom password."""
 
     return ''.join(choices(pool, k=length))
 
 
-def read_passwd():
+def read_passwd() -> str:
     """Reads a password."""
 
     while True:

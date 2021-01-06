@@ -9,4 +9,4 @@ from his.wsgi.service.functions import get_service
 __all__ = ['ROUTES', 'get_service']
 
 
-ROUTES = ACCOUNT_ROUTES + CUSTOMER_ROUTES + SERVICE_ROUTES
+ROUTES = (*ACCOUNT_ROUTES, *CUSTOMER_ROUTES, *SERVICE_ROUTES)

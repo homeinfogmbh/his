@@ -1,7 +1,5 @@
 """Basic HIS application."""
 
-from itertools import chain
-
 from peeweeplus import FieldNotNullable
 from peeweeplus import FieldValueError
 from peeweeplus import InvalidKeys
@@ -23,24 +21,25 @@ from his.messages.session import NO_SESSION_SPECIFIED, SESSION_EXPIRED
 __all__ = ['Application']
 
 
-ERROR_HANDLERS = (
-    (NoSessionSpecified, lambda _: NO_SESSION_SPECIFIED),
-    (SessionExpired, lambda _: SESSION_EXPIRED),
-    (FieldValueError, field_value_error),
-    (FieldNotNullable, field_not_nullable),
-    (MissingKeyError, missing_key_error),
-    (InvalidKeys, invalid_keys),
-    (NonUniqueValue, non_unique_value))
+ERROR_HANDLERS = {
+    NoSessionSpecified: lambda _: NO_SESSION_SPECIFIED,
+    SessionExpired: lambda _: SESSION_EXPIRED,
+    FieldValueError: field_value_error,
+    FieldNotNullable: field_not_nullable,
+    MissingKeyError: missing_key_error,
+    InvalidKeys: invalid_keys,
+    NonUniqueValue: non_unique_value
+}
 
 
 class Application(_Application):
     """Extends wsgilib's application."""
 
-    def __init__(self, *args, debug=False, cors=CORS, errorhandlers=(),
+    def __init__(self, *args, cors: dict = CORS, debug: bool = False,
                  **kwargs):
         """Sets default error handlers."""
-        errorhandlers = tuple(chain(ERROR_HANDLERS, errorhandlers or ()))
-        super().__init__(
-            *args, debug=debug, errorhandlers=errorhandlers, cors=cors,
-            **kwargs)
+        super().__init__(*args, cors=cors, debug=debug, **kwargs)
         self.after_request(postprocess_response)
+
+        for exception, function in ERROR_HANDLERS.items():
+            self.register_error_handler(exception, function)

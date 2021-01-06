@@ -2,7 +2,7 @@
 
 from authlib.oauth2.rfc7009 import RevocationEndpoint
 
-from comcatlib.orm.oauth import Token
+from his.orm.oauth2 import Client, Token
 
 
 __all__ = ['TokenRevocationEndpoint']
@@ -11,7 +11,8 @@ __all__ = ['TokenRevocationEndpoint']
 class TokenRevocationEndpoint(RevocationEndpoint):
     """A Token revocation endpoint."""
 
-    def query_token(self, token, token_type_hint, client):
+    def query_token(self, token: str, token_type_hint: str,
+                    client: Client) -> Token:
         """Queries a token from the database."""
         match_client = Token.client_id == client.client_id
         access_token = Token.access_token == token
@@ -29,7 +30,7 @@ class TokenRevocationEndpoint(RevocationEndpoint):
         except Token.DoesNotExist:
             return None
 
-    def revoke_token(self, token):
+    def revoke_token(self, token: Token):
         """Revokes the respective token."""
         token.revoked = True
         token.save()

@@ -10,7 +10,6 @@ from peewee import UUIDField
 from his.exceptions import PasswordResetPending
 from his.orm.account import Account
 from his.orm.common import HISModel
-from his.pwmail import mail_password_reset_link
 
 
 __all__ = ['VALIDITY', 'PasswordResetToken']
@@ -48,10 +47,6 @@ class PasswordResetToken(HISModel):
         return cls.add(account)
 
     @property
-    def valid(self):
+    def valid(self) -> bool:
         """Determines whether the token is still valid."""
         return self.created + VALIDITY > datetime.now()
-
-    def email(self, url):
-        """Emails the reset link to the respective account."""
-        return mail_password_reset_link(self, url)

@@ -1,6 +1,6 @@
 """Customer <> Service mappings."""
 
-from wsgilib import JSON
+from wsgilib import JSON, JSONMessage
 
 from his.api import authenticated, root, admin
 from his.contextlocals import CUSTOMER, JSON_DATA
@@ -20,7 +20,7 @@ __all__ = ['ROUTES']
 
 @authenticated
 @admin
-def list_():
+def list_() -> JSON:
     """Lists services of the respective customer."""
 
     return JSON([
@@ -31,7 +31,7 @@ def list_():
 
 @authenticated
 @root
-def list_customers(name):
+def list_customers(name: str) -> JSON:
     """Lists the customers that may use the current service."""
 
     return JSON([
@@ -41,7 +41,7 @@ def list_customers(name):
 
 @authenticated
 @root
-def add():
+def add() -> JSONMessage:
     """Allows the respective customer to use the given service."""
 
     try:
@@ -70,7 +70,7 @@ def add():
 
 @authenticated
 @admin
-def delete(name):
+def delete(name: str) -> JSONMessage:
     """Deletes the respective account <> service mapping."""
 
     service = get_service(name)

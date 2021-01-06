@@ -1,10 +1,12 @@
 """Common functions."""
 
+from flask import Response
 from werkzeug.http import dump_cookie
 
 from his.config import DOMAINS, SESSION_ID, SESSION_SECRET
 from his.contextlocals import get_session_secret, get_session
 from his.exceptions import NoSessionSpecified, SessionExpired
+from his.orm import Session
 
 
 __all__ = [
@@ -14,7 +16,7 @@ __all__ = [
 ]
 
 
-def set_cookie(response, *args, **kwargs):
+def set_cookie(response: Response, *args, **kwargs):
     """A workaround for explicitly setting SameSite to None
     Until the following fix is released:
     https://github.com/pallets/werkzeug/issues/1549
@@ -28,7 +30,8 @@ def set_cookie(response, *args, **kwargs):
     response.headers.add('Set-Cookie', cookie)
 
 
-def set_session_cookie(response, session, secret=None):
+def set_session_cookie(response: Response, session: Session,
+                       secret: str = None) -> Response:
     """Sets the session cookie."""
 
     secret = get_session_secret() if secret is None else secret
@@ -44,7 +47,7 @@ def set_session_cookie(response, session, secret=None):
     return response
 
 
-def delete_session_cookie(response):
+def delete_session_cookie(response: Response) -> Response:
     """Deletes the session cookie."""
 
     for domain in DOMAINS:
@@ -54,7 +57,7 @@ def delete_session_cookie(response):
     return response
 
 
-def postprocess_response(response):
+def postprocess_response(response: Response) -> Response:
     """Sets the session cookie on the respective response."""
 
     # Do not override an already set session cookie i.e. on deletion.

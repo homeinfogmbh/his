@@ -1,5 +1,6 @@
 """Handles services."""
 
+from argparse import Namespace
 from logging import getLogger
 from sys import exit    # pylint: disable=W0622
 
@@ -13,7 +14,7 @@ __all__ = ['add_service', 'add_customer_service', 'add_account_service']
 LOGGER = getLogger('hisutil')
 
 
-def add_service(args):
+def add_service(args: Namespace):
     """Adds a new service."""
 
     try:
@@ -27,7 +28,7 @@ def add_service(args):
     LOGGER.info('Service added.')
 
 
-def add_customer_service(args):
+def add_customer_service(args: Namespace):
     """Adds a new customer-service mapping."""
 
     try:
@@ -42,7 +43,7 @@ def add_customer_service(args):
     LOGGER.info('Added: %s', customer_service)
 
 
-def add_account_service(args):
+def add_account_service(args: Namespace):
     """Adds a new account-service mapping."""
 
     try:

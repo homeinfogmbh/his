@@ -7,6 +7,7 @@ from his.hisutil.argparse import get_args
 from his.hisutil.service import add_account_service
 from his.hisutil.service import add_customer_service
 from his.hisutil.service import add_service
+from his.hisutil.session import cleanup
 
 
 __all__ = ['main']
@@ -31,3 +32,5 @@ def main():
             add_customer_service(args)
         elif args.action == 'account':
             add_account_service(args)
+    elif args.target == 'session-cleanup':
+        cleanup()

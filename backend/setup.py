@@ -6,8 +6,8 @@ from setuptools import setup
 
 setup(
     name='his',
-    version_format='{tag}',
-    setup_requires=['setuptools-scm'],
+    use_scm_version=True,
+    setup_requires=['setuptools_scm'],
     install_requires=[
         'argon2_cffi',
         'configlib',

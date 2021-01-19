@@ -34,43 +34,43 @@ function getURL (token) {
 }
 
 
-export function login (userName, passwd, args) {
+export function login (userName, passwd, args, headers = {}) {
     const url = getURL();
     const data = {'account': userName, 'passwd': passwd};
-    return request.post(url, data, args);
+    return request.post(url, data, args, headers);
 }
 
 /*
     Lists active sessions.
 */
-export function list (args) {
+export function list (args, headers = {}) {
     const url = getURL();
-    return request.get(url, args);
+    return request.get(url, args, headers);
 }
 
 /*
     Gets session data.
 */
-export function get (token, args) {
+export function get (token, args, headers = {}) {
     token = token || '!';
     const url = getURL(token);
-    return request.get(url, args);
+    return request.get(url, args, headers);
 }
 
 /*
     Refreshes a session.
 */
-export function refresh (token, args) {
+export function refresh (token, args, headers = {}) {
     token = token || '!';
     const url = getURL(token);
-    return request.put(url, null, args);
+    return request.put(url, null, args, headers);
 }
 
 /*
     Ends a session.
 */
-export function close (token, args) {
+export function close (token, args, headers = {}) {
     token = token || '!';
     const url = getURL(token);
-    return request.delete(url, args);
+    return request.delete(url, args, headers);
 }

@@ -7,7 +7,7 @@ from setuptools import setup
 setup(
     name='his',
     version_format='{tag}',
-    setup_requires=['setuptools-git-version'],
+    setup_requires=['setuptools-scm'],
     install_requires=[
         'argon2_cffi',
         'configlib',

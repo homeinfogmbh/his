@@ -1,10 +1,12 @@
 """Password reset."""
 
+from __future__ import annotations
 from datetime import datetime, timedelta
 from uuid import uuid4
 
 from peewee import DateTimeField
 from peewee import ForeignKeyField
+from peewee import ModelSelect
 from peewee import UUIDField
 
 from his.exceptions import PasswordResetPending
@@ -31,7 +33,7 @@ class PasswordResetToken(HISModel):
     created = DateTimeField(default=datetime.now)
 
     @classmethod
-    def add(cls, account):
+    def add(cls, account: Account) -> PasswordResetToken:
         """Adds a new password reset token."""
         try:
             record = cls.get(cls.account == account)
@@ -46,7 +48,9 @@ class PasswordResetToken(HISModel):
         record.delete_instance()
         return cls.add(account)
 
-    @property
-    def valid(self) -> bool:
-        """Determines whether the token is still valid."""
-        return self.created + VALIDITY > datetime.now()
+    @classmethod
+    def active(cls) -> ModelSelect:
+        """Selects active tokens."""
+        select = cls.select(cls, Account).join(Account)
+        condition = cls.created > (datetime.now() - VALIDITY)
+        return select.where(condition)

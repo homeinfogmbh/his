@@ -1,6 +1,7 @@
 """Account <> Service mapping."""
 
 from __future__ import annotations
+from typing import Union
 
 from peewee import ForeignKeyField
 
@@ -29,7 +30,8 @@ class AccountService(HISModel):
         return f'{self.account}@{self.service}'
 
     @classmethod
-    def add(cls, account: Account, service: Service) -> AccountService:
+    def add(cls, account: Union[Account, int],
+            service: [Service, int]) -> AccountService:
         """Adds a new account service."""
         try:
             return cls.get(account=account, service=service)

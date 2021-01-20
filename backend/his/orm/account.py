@@ -60,7 +60,7 @@ class Account(HISModel):    # pylint: disable=R0902
     @classmethod
     def add(cls, customer: Union[Customer, int], name: str, email: str,
             passwd: str, *, full_name: str = None, admin: bool = False,
-            root: bool = False):   # pylint: disable=R0913
+            root: bool = False) -> Account:
         """Adds a new account."""
         if len(name) < 3:
             raise ValueError('Account name too short.')
@@ -183,7 +183,7 @@ class Account(HISModel):    # pylint: disable=R0902
         self.save()
         return True
 
-    def patch_json(self, json: dict, allow: set = (), **kwargs):
+    def patch_json(self, json: dict, allow: set = (), **kwargs) -> None:
         """Patches the account with fields limited to allow."""
         invalid = {key for key in json if key not in allow} if allow else None
 

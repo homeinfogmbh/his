@@ -14,6 +14,7 @@ setup(
     setup_requires=['setuptools_scm'],
     install_requires=[
         'argon2_cffi',
+        'configlib',
         'emaillib',
         'filedb',
         'flask',

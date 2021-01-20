@@ -4,9 +4,10 @@ from argparse import Namespace
 from logging import getLogger
 from sys import exit    # pylint: disable=W0622
 
+from peewee import IntegrityError
+
 from his.crypto import genpw, read_passwd
-from his.exceptions import AccountExistsError
-from his.orm import Account
+from his.orm.account import Account
 
 
 __all__ = ['add_account']
@@ -32,9 +33,8 @@ def add_account(args: Namespace):
         account = Account.add(
             args.customer, args.name, args.email, passwd=passwd,
             full_name=args.full_name, admin=args.admin, root=args.root)
-    except AccountExistsError as account_exists:
-        LOGGER.error(
-            'Account already exists for field "%s".', account_exists.field)
+    except IntegrityError as error:
+        LOGGER.error('%i: %s', *error.args)
         exit(2)
 
     account.save()  # Account.add() does not perform save().

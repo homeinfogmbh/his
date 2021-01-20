@@ -1,27 +1,20 @@
 """HIS request context locals."""
 
-from typing import Union
-
 from flask import request
 from werkzeug.local import LocalProxy
 
 from mdb import Company, Customer
 
 from his.config import SESSION_ID, SESSION_SECRET
-from his.exceptions import NoSessionSpecified, SessionExpired
-from his.messages.account import NO_SUCH_ACCOUNT
-from his.messages.account import NOT_AUTHORIZED
-from his.messages.customer import NO_SUCH_CUSTOMER
-from his.messages.data import INVALID_ACCOUNT_ID
-from his.messages.data import INVALID_CUSTOMER_ID
-from his.messages.data import MISSING_DATA
-from his.orm import ALLOWED_SESSION_DURATIONS
-from his.orm import DEFAULT_SESSION_DURATION
-from his.orm import Account
-from his.orm import Session
+from his.exceptions import InvalidData
+from his.exceptions import NotAuthorized
+from his.exceptions import NoSessionSpecified
+from his.exceptions import SessionExpired
+from his.orm.account import Account
+from his.orm.session import DURATION, DURATION_RANGE, Session
 
 
-__all__ = ['SESSION', 'ACCOUNT', 'CUSTOMER', 'JSON_DATA']
+__all__ = ['SESSION', 'ACCOUNT', 'CUSTOMER']
 
 
 def get_session_id() -> int:
@@ -69,51 +62,49 @@ def get_account() -> Account:
     """Gets the verified targeted account."""
 
     try:
-        condition = Account.id == int(request.args['account'])
+        account_id = request.args['account']
     except KeyError:
         return SESSION.account
+
+    try:
+        account_id == int(account_id)
     except (TypeError, ValueError):
-        raise INVALID_ACCOUNT_ID from None
+        raise InvalidData(int, type(account_id)) from None
 
     select = Account.select(Account, Customer, Company)
     select = select.join(Customer).join(Company)
+    condition = Account.id == account_id
 
     if SESSION.account.root:
-        try:
-            return select.where(condition).get()
-        except Account.DoesNotExist:
-            raise NO_SUCH_ACCOUNT from None
+        return select.where(condition).get()
 
     if SESSION.account.admin:
         condition &= Account.customer == SESSION.account.customer
+        return select.where(condition).get()
 
-        try:
-            return select.where(condition).get()
-        except Account.DoesNotExist:
-            raise NO_SUCH_ACCOUNT from None
-
-    raise NOT_AUTHORIZED
+    raise NotAuthorized()
 
 
 def get_customer() -> Customer:
     """Gets the verified targeted customer."""
 
     try:
-        condition = Customer.id == int(request.args['customer'])
+        customer_id = request.args['customer']
     except KeyError:
         return ACCOUNT.customer
+
+    try:
+        customer_id = int(customer_id)
     except (TypeError, ValueError):
-        raise INVALID_CUSTOMER_ID from None
+        raise InvalidData(int, type(customer_id)) from None
 
     select = Customer.select(Customer, Company).join(Company)
+    condition = Customer.id == customer_id
 
     if SESSION.account.root:
-        try:
-            return select.where(condition).get()
-        except Customer.DoesNotExist:
-            raise NO_SUCH_CUSTOMER from None
+        return select.where(condition).get()
 
-    raise NOT_AUTHORIZED
+    raise NotAuthorized()
 
 
 def get_session_duration() -> int:
@@ -122,23 +113,12 @@ def get_session_duration() -> int:
     try:
         duration = int(request.headers['session-duration'])
     except (KeyError, TypeError, ValueError):
-        return DEFAULT_SESSION_DURATION
+        return DURATION
 
-    if duration in ALLOWED_SESSION_DURATIONS:
+    if duration in DURATION_RANGE:
         return duration
 
-    return DEFAULT_SESSION_DURATION
-
-
-def get_json_data() -> Union[dict, list, int, float, str]:
-    """Returns posted JSON data."""
-
-    json = request.json
-
-    if json is None:
-        raise MISSING_DATA
-
-    return json
+    return DURATION
 
 
 class ModelProxy(LocalProxy):   # pylint: disable=R0903
@@ -152,4 +132,3 @@ class ModelProxy(LocalProxy):   # pylint: disable=R0903
 SESSION = ModelProxy(get_session)
 ACCOUNT = ModelProxy(get_account)
 CUSTOMER = ModelProxy(get_customer)
-JSON_DATA = LocalProxy(get_json_data)

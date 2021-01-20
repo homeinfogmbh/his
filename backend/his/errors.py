@@ -1,16 +1,22 @@
 """Exception / error handlers."""
 
+from peewee import IntegrityError
+
 from peeweeplus import FieldNotNullable
 from peeweeplus import FieldValueError
 from peeweeplus import InvalidKeys
 from peeweeplus import MissingKeyError
 from peeweeplus import NonUniqueValue
+from peeweeplus import PasswordTooShortError
 from wsgilib import JSONMessage
 
+from his.exceptions import AccountExists
 from his.exceptions import AuthenticationError
 from his.exceptions import AuthorizationError
 from his.exceptions import InconsistencyError
+from his.exceptions import InvalidData
 from his.exceptions import NoSessionSpecified
+from his.exceptions import NotAuthorized
 from his.exceptions import SessionExpired
 from his.orm.account import Account
 from his.orm.account_service import AccountService
@@ -25,6 +31,7 @@ from his.orm.session import Session
 __all__ = ['ERRORS']
 
 
+ACCOUNT_EXISTS = JSONMessage('Account already exists.', status=409)
 CUSTOMER_NOT_CONFIGURED = JSONMessage(
     'No configuration for customer.', status=404)
 DURATION_OUT_OF_BOUNDS = JSONMessage('Duration out of bounds.', status=400)
@@ -47,76 +54,53 @@ NO_SUCH_TOKEN = JSONMessage('No such token.', status=404)
 NON_UNIQUE_VALUE = JSONMessage('Value for field is not unique.', status=422)
 NOT_AUTHENTICATED = JSONMessage('Not authenticated.', status=401)
 NOT_AUTHORIZED = JSONMessage('Not authorized.', status=403)
+PASSWORD_TOO_SHORT = JSONMessage('Password too short.', status=415)
 SESSION_EXPIRED = JSONMessage('Session expired.', status=401)
-
-
-
-def field_value_error(fve):
-    """Creates a messsage from a peeweeplus.FieldValueError."""
-
-    return FIELD_VALUE_ERROR.update(
-        model=fve.model.__name__,
-        field=type(fve.field).__name__,
-        attribute=fve.attribute,
-        column=fve.field.column_name,
-        key=fve.key,
-        value=str(fve.value),
-        type=type(fve.value).__name__
-    )
-
-
-def field_not_nullable(fnn):
-    """Creates the message from a peeweeplus.FieldNotNullable error."""
-
-    return FIELD_NOT_NULLABLE.update(
-        model=fnn.model.__name__,
-        field=type(fnn.field).__name__,
-        attribute=fnn.attribute,
-        column=fnn.field.column_name,
-        key=fnn.key
-    )
-
-
-def missing_key_error(mke):
-    """Creates the message from the peeweeplus.MissingKeyError."""
-
-    return MISSING_KEY_ERROR.update(
-        model=mke.model.__name__,
-        field=type(mke.field).__name__,
-        attribute=mke.attribute,
-        column=mke.field.column_name,
-        key=mke.key
-    )
-
-
-def invalid_keys(iks):
-    """Creates the message from the peeweeplus.InvalidKeys error."""
-
-    return INVALID_KEYS.update(keys=iks.invalid_keys)
-
-
-def non_unique_value(nuv):
-    """Creates the message from the peeweeplus.NonUniqueValue error."""
-
-    return NON_UNIQUE_VALUE.update(key=nuv.key, value=nuv.value)
 
 
 ERRORS = {
     KeyError: lambda error: KEY_ERROR.update(key=str(error)),
     Account.DoesNotExist: lambda _: NO_SUCH_ACCOUNT,
+    AccountExists: lambda _: ACCOUNT_EXISTS,
     AccountService.DoesNotExist: lambda _: NO_SUCH_ACCOUNT_SERVICE,
     AuthenticationError: lambda _: NOT_AUTHENTICATED,
     AuthorizationError: lambda _: NOT_AUTHORIZED,
     CustomerService.DoesNotExist: lambda _: NO_SUCH_CUSTOMER_SERVICE,
     CustomerSettings.DoesNotExist: lambda _: CUSTOMER_NOT_CONFIGURED,
-    FieldNotNullable: field_not_nullable,
-    FieldValueError: field_value_error,
+    FieldNotNullable: lambda error: FIELD_NOT_NULLABLE.update(
+        model=error.model.__name__,
+        field=type(error.field).__name__,
+        attribute=error.attribute,
+        column=error.field.column_name,
+        key=error.key
+    ),
+    FieldValueError: lambda error: FIELD_VALUE_ERROR.update(
+        model=error.model.__name__,
+        field=type(error.field).__name__,
+        attribute=error.attribute,
+        column=error.field.column_name,
+        key=error.key,
+        value=str(error.value),
+        type=type(error.value).__name__
+    ),
     InconsistencyError: lambda _: NOT_AUTHORIZED,
-    InvalidKeys: invalid_keys,
-    MissingKeyError: missing_key_error,
-    NonUniqueValue: non_unique_value,
+    IntegrityError: lambda error: JSONMessage(str(error), status=400),
+    InvalidData: lambda error: JSONMessage(str(error), status=400),
+    InvalidKeys: lambda error: INVALID_KEYS.update(keys=error.invalid_keys),
+    MissingKeyError: lambda error: MISSING_KEY_ERROR.update(
+        model=error.model.__name__,
+        field=type(error.field).__name__,
+        attribute=error.attribute,
+        column=error.field.column_name,
+        key=error.key
+    ),
+    NonUniqueValue: lambda error: NON_UNIQUE_VALUE.update(
+        key=error.key, value=error.value),
     NoSessionSpecified: lambda _: NO_SESSION_SPECIFIED,
+    NotAuthorized: lambda _: NOT_AUTHORIZED,
     PasswordResetToken.DoesNotExist: lambda _: NO_SUCH_TOKEN,
+    PasswordTooShortError: lambda error: PASSWORD_TOO_SHORT.update(
+        minlen=error.minlen),
     Service.DoesNotExist: lambda _: NO_SUCH_SERVICE,
     ServiceDependency.DoesNotExist: lambda _: NO_SUCH_SERVICE_DEPENDENCY,
     Session.DoesNotExist: lambda _: NO_SUCH_SESSION,

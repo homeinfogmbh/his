@@ -7,18 +7,48 @@ from peewee import ModelSelect
 from mdb import Company, Customer
 
 from his.contextlocals import ACCOUNT, CUSTOMER
+from his.exceptions import NotAuthorized
 from his.orm.account import Account
 from his.orm.account_service import AccountService
 from his.orm.customer_service import CustomerService
+from his.orm.customer_settings import CustomerSettings
 from his.orm.service import Service
 
 
 __all__ = [
+    'get_account',
     'get_account_services',
     'get_account_service',
+    'get_customer',
     'get_customer_services',
     'get_service'
 ]
+
+
+def get_account(name: str) -> Account:
+    """Safely returns the respective account."""
+
+    select = Account.select(
+        Account, Customer, Company).join(Customer).join(Company)
+
+    if name == '!':
+        return select.where(Account.id == ACCOUNT.id).get()
+
+    if ACCOUNT.root:
+        return select.where(Account.name == name).get()
+
+    try:
+        account = select.where(Account.name == name).get()
+    except Account.DoesNotExist:
+        raise NotAuthorized() from None     # Prevent account name sniffing.
+
+    if ACCOUNT.admin and account.customer == CUSTOMER:
+        return account
+
+    if ACCOUNT.name == account.name and ACCOUNT.id == account.id:
+        return account
+
+    raise NotAuthorized()
 
 
 def get_account_services(account: Union[Account, int]) -> ModelSelect:
@@ -77,3 +107,10 @@ def get_service(name: str) -> Service:
     """Returns the respective service."""
 
     return Service.select().where(Service.name == name).get()
+
+
+def get_settings() -> CustomerSettings:
+    """Returns the respective customer settings."""
+
+    return CustomerSettings.select().where(
+        CustomerSettings.customer == CUSTOMER).get()

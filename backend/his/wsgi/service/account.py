@@ -1,9 +1,12 @@
 """Account <> Service mappings."""
 
+from flask import request
+
 from wsgilib import JSON, JSONMessage
 
 from his.api import authenticated, admin
-from his.contextlocals import ACCOUNT, JSON_DATA
+from his.contextlocals import ACCOUNT
+from his.decorators import require_json
 from his.errors import NOT_AUTHORIZED
 from his.orm.account_service import AccountService
 from his.wsgi.account import get_account
@@ -24,15 +27,16 @@ def list_() -> JSON:
 
 @authenticated
 @admin
+@require_json(dict)
 def add() -> JSONMessage:
     """Allows the respective account to use the given service."""
 
-    account = get_account(JSON_DATA['account'])
+    account = get_account(request.json['account'])
 
     if account not in ACCOUNT.subjects:
         return NOT_AUTHORIZED
 
-    service = get_service(JSON_DATA['service'])
+    service = get_service(request.json['service'])
     account_service = AccountService.add(account, service)
     return JSONMessage('Account service added.', id=account_service.id,
                        status=200)

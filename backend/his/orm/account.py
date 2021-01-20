@@ -93,6 +93,7 @@ class Account(HISModel):    # pylint: disable=R0902
         account.created = datetime.now()
         account.admin = admin
         account.root = root
+        account.save()
         return account
 
     @classmethod

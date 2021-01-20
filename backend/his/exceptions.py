@@ -1,11 +1,12 @@
 """HIS exceptions."""
 
 __all__ = [
-    'AccountExistsError',
+    'AccountExists',
     'AmbiguousDataError',
     'AuthenticationError',
     'AuthorizationError',
     'InconsistencyError',
+    'InvalidData',
     'NoSessionSpecified',
     'NotAuthorized',
     'PasswordResetPending',
@@ -14,7 +15,7 @@ __all__ = [
 ]
 
 
-class AccountExistsError(Exception):
+class AccountExists(Exception):
     """Indicates that the respective account already exists."""
 
 
@@ -32,6 +33,14 @@ class AuthorizationError(Exception):
 
 class InconsistencyError(Exception):
     """Indicates inconsistencies in database configuration."""
+
+
+class InvalidData(Exception):
+    """Indicates invalid data."""
+
+    def __str__(self):
+        """Returns an error message."""
+        return 'Expected data of type "%s", but got "%s".' % self.args
 
 
 class NoSessionSpecified(Exception):

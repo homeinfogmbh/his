@@ -3,59 +3,12 @@
 from argparse import ArgumentParser, Namespace
 from datetime import datetime
 
-from mdb import Customer
+from mdb import customer
 
-from his.orm import Account, Service
+from his.parsers import account, service
 
 
 __all__ = ['get_args']
-
-
-def customer(string: str) -> Customer:
-    """Returns the respective customer."""
-
-    try:
-        match, *excess = Customer.find(string)
-    except ValueError:
-        raise ValueError('No such customer.') from None
-
-    if excess:
-        raise ValueError('Ambiguous customer selection.')
-
-    return match
-
-
-def service(string: str) -> Service:
-    """Returns the respective service."""
-
-    try:
-        return Service.get(Service.name == string)
-    except Service.DoesNotExist:
-        raise ValueError('No such service.') from None
-
-
-def account(string: str) -> Account:
-    """Returns the account."""
-
-    try:
-        ident = int(string)
-    except ValueError:
-        select = False
-    else:
-        select = Account.id == ident
-
-    select |= Account.name == string
-    select |= Account.email == string
-
-    try:
-        match, *excess = Account.select().where(select)
-    except ValueError:
-        raise ValueError('No such account.') from None
-
-    if excess:
-        raise ValueError('Ambiguous account selection.')
-
-    return match
 
 
 def _add_account_parser(subparsers):

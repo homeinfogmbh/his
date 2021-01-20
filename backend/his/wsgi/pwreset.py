@@ -39,7 +39,6 @@ def _request_reset() -> JSONMessage:
     except PasswordResetPending:
         return JSONMessage('Password request pending.', status=200)
 
-    password_reset_token.save()
     url = RECAPTCHA.get('url', CONFIG.get('pwreset', 'url'))
     mail_password_reset_link(password_reset_token.email, url)
     return PASSWORD_RESET_SENT

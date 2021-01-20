@@ -41,12 +41,11 @@ class Session(HISModel):
     def add(cls, account: Union[Account, int],
             duration: timedelta) -> NewSession:
         """Actually opens a new login session."""
-        now = datetime.now()
-        session = cls()
-        session.account = account
-        session.secret = secret = genpw(length=32)
-        session.start = now
-        session.end = now + duration
+        start = datetime.now()
+        end = start + duration
+        secret = genpw(length=32)
+        session = cls(account=account, secret=secret, start=start, end=end)
+        session.save()
         return NewSession(session=session, secret=secret)
 
     @classmethod

@@ -37,6 +37,7 @@ class Service(HISModel):
             service.name = name
             service.description = description
             service.promote = promote
+            service.save()
             return service
 
         raise ServiceExistsError()

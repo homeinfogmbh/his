@@ -39,8 +39,8 @@ class PasswordResetToken(HISModel):
         try:
             record = cls.get(cls.account == account)
         except cls.DoesNotExist:
-            record = cls()
-            record.account = account
+            record = cls(account=account)
+            record.save()
             return record
 
         if record.valid:

@@ -68,15 +68,9 @@ class Account(HISModel):    # pylint: disable=R0902
         if len(email) < 6 or '@' not in email:
             raise ValueError('Invalid email address.')
 
-        account = cls()
-        account.customer = customer
-        account.name = name
-        account.full_name = full_name
-        account.passwd = passwd
-        account.email = email
-        account.created = datetime.now()
-        account.admin = admin
-        account.root = root
+        account = cls(
+            customer=customer, name=name, full_name=full_name, passwd=passwd,
+            email=email, created=datetime.now(), admin=admin, root=root)
         account.save()
         return account
 

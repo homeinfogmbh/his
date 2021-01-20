@@ -1,21 +1,30 @@
 """HIS configuration."""
 
-from configlib import loadcfg
+from configparser import ConfigParser
+from json import load
 
 
-__all__ = [
-    'CONFIG',
-    'SESSION_ID',
-    'SESSION_SECRET',
-    'CORS',
-    'DOMAINS',
-    'RECAPTCHA'
-]
+__all__ = ['CONFIG', 'CORS', 'RECAPTCHA', 'read']
 
 
-CONFIG = loadcfg('his.d/his.conf')
-SESSION_ID = CONFIG['auth']['session-id']
-SESSION_SECRET = CONFIG['auth']['session-secret']
-DOMAINS = CONFIG['auth']['domains'].split()
-CORS = loadcfg('his.d/cors.json')
-RECAPTCHA = loadcfg('his.d/recaptcha.json')
+CONFIG = ConfigParser()
+CORS = {}
+RECAPTCHA = {}
+
+
+def read():
+    """Loads the configuration from the config files."""
+
+    CONFIG.read('his.d/his.conf')
+
+    with open('his.d/cors.json', 'r') as file:
+        cors = load(file)
+
+    CORS.clear()
+    CORS.update(cors)
+
+    with open('his.d/recaptcha.json', 'r') as file:
+        recaptcha = load(file)
+
+    RECAPTCHA.clear()
+    RECAPTCHA.update(recaptcha)

@@ -5,7 +5,7 @@ from werkzeug.local import LocalProxy
 
 from mdb import Company, Customer
 
-from his.config import SESSION_ID, SESSION_SECRET
+from his.config import CONFIG
 from his.exceptions import InvalidData
 from his.exceptions import NotAuthorized
 from his.exceptions import NoSessionSpecified
@@ -21,7 +21,7 @@ def get_session_id() -> int:
     """Returns the session ID."""
 
     try:
-        ident = request.cookies[SESSION_ID]
+        ident = request.cookies[CONFIG.get('auth', 'session-id')]
     except KeyError:
         raise NoSessionSpecified() from None
 
@@ -35,7 +35,7 @@ def get_session_secret() -> str:
     """Returns the session secret."""
 
     try:
-        return request.cookies[SESSION_SECRET]
+        return request.cookies[CONFIG.get('auth', 'session-secret')]
     except KeyError:
         raise NoSessionSpecified() from None
 

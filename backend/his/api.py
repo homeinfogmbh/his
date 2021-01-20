@@ -3,6 +3,7 @@
 from functools import wraps
 from typing import Callable
 
+from his.authorization import check
 from his.contextlocals import SESSION, get_session_duration
 from his.exceptions import AccountLocked, NotAuthorized, SessionExpired
 from his.orm import Service
@@ -50,7 +51,7 @@ def authorized(service_name: str) -> Callable:
             """
             service = Service.get(Service.name == service_name)
 
-            if service.authorized(SESSION.account):
+            if check(SESSION.account, service):
                 return function(*args, **kwargs)
 
             raise NotAuthorized()

@@ -3,7 +3,7 @@
 from __future__ import annotations
 from datetime import datetime
 from email.utils import parseaddr
-from typing import Iterable, Iterator, Union
+from typing import Union
 
 from argon2.exceptions import VerifyMismatchError
 from peewee import BooleanField
@@ -11,11 +11,12 @@ from peewee import CharField
 from peewee import DateTimeField
 from peewee import ForeignKeyField
 from peewee import IntegerField
+from peewee import ModelSelect
 
-from mdb import Customer
+from mdb import Company, Customer
 from peeweeplus import InvalidKeys, Argon2Field
 
-from his.exceptions import AccountExistsError, InconsistencyError
+from his.exceptions import AccountExistsError
 from his.messages.account import ACCOUNT_LOCKED
 from his.messages.session import INVALID_CREDENTIALS
 from his.orm.common import HISModel
@@ -31,7 +32,7 @@ class Account(HISModel):    # pylint: disable=R0902
     """A HIS account."""
 
     customer = ForeignKeyField(
-        Customer, column_name='customer', backref='accounts')
+        Customer, column_name='customer', backref='accounts', lazy_load=False)
     name = CharField(64, unique=True)   # Login name.
     full_name = CharField(255, null=True)   # Optional full user name.
     passwd = Argon2Field()
@@ -95,28 +96,33 @@ class Account(HISModel):    # pylint: disable=R0902
         return account
 
     @classmethod
-    def admins(cls, customer: Union[Customer, int] = None) -> Iterable[Account]:
+    def admins(cls, customer: Union[Customer, int] = None) -> ModelSelect:
         """Yields administrators."""
-        if customer is None:
-            return cls.select().where(cls.admin == 1)
+        condition = cls.admin == 1
 
-        return cls.select().where(
-            (cls.customer == customer) & (cls.admin == 1))
+        if customer is not None:
+            condition &= cls.customer == customer
+
+        select = cls.select(cls, Customer, Company)
+        select = select.join(Customer).join(Company)
+        return select.where(condition)
 
     @classmethod
     def find(cls, id_or_name: Union[int, str],
-             customer: Union[Customer, int] = None) -> Account:
+             customer: Union[Customer, int, None] = None) -> Account:
         """Find account by primary key or login name."""
-        customer_expr = True if customer is None else cls.customer == customer
+        condition = True if customer is None else cls.customer == customer
 
         try:
             ident = int(id_or_name)
         except ValueError:
-            sel_expr = cls.name == id_or_name
+            condition &= cls.name == id_or_name
         else:
-            sel_expr = cls.id == ident
+            condition &= cls.id == ident
 
-        return cls.get(customer_expr & sel_expr)
+        select = cls.select(cls, Customer, Company)
+        select = select.join(Customer).join(Company)
+        return select.where(condition).get()
 
     @property
     def locked(self) -> bool:
@@ -137,38 +143,25 @@ class Account(HISModel):    # pylint: disable=R0902
         return not self.unusable and self.failed_logins <= MAX_FAILED_LOGINS
 
     @property
-    def subjects(self) -> Iterator[Account]:
+    def subjects(self) -> ModelSelect:
         """Yields accounts this account can manage."""
         cls = type(self)
+        condition = cls.customer == self.customer
+        select = cls.select(cls, Customer, Company)
+        select = select.join(Customer).join(Company)
 
         if self.root:
-            yield from cls
-        elif self.admin:
-            for account in cls.select().where(cls.customer == self.customer):
-                yield account
-        else:
-            yield self
+            return select.where(True)
 
-    @property
-    def active(self) -> bool:
-        """Determines whether the account has an open session."""
-        session = self.sessions.model
+        if not self.admin:
+            condition &= cls.id == self.id
 
-        for session in session.select().where(session.account == self):
-            if session.alive:
-                return True
-
-        return False
+        return select.where(condition)
 
     @property
     def info(self) -> dict:
         """Returns brief account information."""
         return {'id': self.id, 'email': self.email}
-
-    @property
-    def services(self) -> AccountServicesProxy:
-        """Returns an account <> service mapping proxy."""
-        return AccountServicesProxy(self)
 
     def login(self, passwd: str) -> bool:
         """Performs a login."""
@@ -198,67 +191,3 @@ class Account(HISModel):    # pylint: disable=R0902
             raise InvalidKeys(invalid)
 
         return super().patch_json(json, **kwargs)
-
-
-class AccountServicesProxy:
-    """Proxy to transparently handle an account's services."""
-
-    def __init__(self, account: Account):
-        """Sets the respective account."""
-        self.account = account
-
-    def __iter__(self):
-        """Yields appropriate services."""
-        for service in self.services:
-            yield service
-
-            for dependency in service.service_deps:
-                yield dependency
-
-    @property
-    def account_service_model(self):
-        """Returns the AccountService model."""
-        return self.account.account_services.model
-
-    @property
-    def customer_service_model(self):
-        """Returns the CustomerService model."""
-        return self.account.customer.customer_services.model
-
-    @property
-    def services(self):
-        """Yields directly assigned services."""
-        account_service_model = self.account_service_model
-
-        for account_service in account_service_model.select().where(
-                account_service_model.account == self.account):
-            yield account_service.service
-
-    def add(self, service) -> bool:
-        """Maps a service to this account."""
-        account_service_model = self.account_service_model
-
-        if service in self.services:
-            return False
-
-        if service in self.customer_service_model.services(
-                self.account.customer):
-            account_service = account_service_model()
-            account_service.account = self.account
-            account_service.service = service
-            account_service.save()
-            return True
-
-        raise InconsistencyError(
-            'Cannot enable service {} for account {}, because the '
-            'respective customer {} is not enabled for it.'.format(
-                service, self.account, self.account.customer))
-
-    def remove(self, service):
-        """Removes a service from the account's mapping."""
-        account_service_model = self.account_service_model
-
-        for account_service in account_service_model.select().where(
-                (account_service_model.account == self.account) &
-                (account_service_model.service == service)):
-            account_service.delete_instance()

@@ -9,10 +9,10 @@ from wsgilib import JSON, JSONMessage
 from his.api import authenticated
 from his.contextlocals import ACCOUNT, CUSTOMER
 from his.crypto import genpw
-from his.decorators import require_json
 from his.exceptions import AccountLimitReached, NotAuthorized
 from his.orm.account import Account
 from his.orm.customer_settings import CustomerSettings
+from his.wsgi.decorators import require_json
 from his.wsgi.functions import get_account
 
 

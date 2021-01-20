@@ -2,12 +2,15 @@
 
 from typing import Union
 
+from flask import request
 from peewee import ModelSelect
 
 from mdb import Company, Customer
+from recaptcha import verify
 
+from his.config import RECAPTCHA
 from his.contextlocals import ACCOUNT, CUSTOMER, SESSION
-from his.exceptions import NotAuthorized
+from his.exceptions import NotAuthorized, RecaptchaNotConfigured
 from his.orm.account import Account
 from his.orm.account_service import AccountService
 from his.orm.customer_service import CustomerService
@@ -17,6 +20,7 @@ from his.orm.session import Session
 
 
 __all__ = [
+    'check_recaptcha',
     'get_account',
     'get_account_service',
     'get_account_services',
@@ -27,6 +31,19 @@ __all__ = [
     'get_service',
     'get_session'
 ]
+
+
+def check_recaptcha() -> bool:
+    """Checks ReCAPTCHA."""
+
+    site_key = request.json['sitekey']
+
+    try:
+        recaptcha = RECAPTCHA[site_key]
+    except KeyError:
+        raise RecaptchaNotConfigured() from None
+
+    return verify(recaptcha['secret'], request.json['response'])
 
 
 def get_account(name: str) -> Account:

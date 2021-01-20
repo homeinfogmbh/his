@@ -4,16 +4,16 @@ from uuid import UUID
 
 from flask import request
 
-from recaptcha import verify
 from wsgilib import JSONMessage
 
 from his.config import CONFIG, RECAPTCHA
-from his.decorators import require_json
 from his.errors import INVALID_RESET_TOKEN
-from his.exceptions import PasswordResetPending, RecaptchaNotConfigured
+from his.exceptions import PasswordResetPending
 from his.orm.account import Account
 from his.orm.pwreset import PasswordResetToken
 from his.pwmail import mail_password_reset_link
+from his.wsgi.decorators import require_json
+from his.wsgi.functions import check_recaptcha
 
 
 __all__ = ['ROUTES']
@@ -21,19 +21,9 @@ __all__ = ['ROUTES']
 
 PASSWORD_RESET_SENT = JSONMessage('Password request sent.', status=200)
 
+def _request_reset() -> JSONMessage:
+    """Requests a reset token."""
 
-@require_json(dict)
-def request_reset():    # pylint: disable=R0911
-    """Attempts a password reset request."""
-
-    site_key = request.json['sitekey']
-
-    try:
-        recaptcha = RECAPTCHA[site_key]
-    except KeyError:
-        raise RecaptchaNotConfigured() from None
-
-    verify(recaptcha['secret'], request.json['response'])
     name = request.json.get('account')
 
     if not name:
@@ -50,8 +40,18 @@ def request_reset():    # pylint: disable=R0911
         return JSONMessage('Password request pending.', status=200)
 
     password_reset_token.save()
-    url = recaptcha.get('url', CONFIG.get('pwreset', 'url'))
+    url = RECAPTCHA.get('url', CONFIG.get('pwreset', 'url'))
     mail_password_reset_link(password_reset_token.email, url)
+    return PASSWORD_RESET_SENT
+
+
+@require_json(dict)
+def request_reset() -> JSONMessage:
+    """Attempts a password reset request."""
+
+    if check_recaptcha():
+        return _request_reset()
+
     return PASSWORD_RESET_SENT
 
 

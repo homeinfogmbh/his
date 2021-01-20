@@ -1,72 +1,60 @@
 """HIS session service."""
 
-from functools import wraps
-from typing import Callable, Union
+from typing import Union
+
+from flask import request
 
 from wsgilib import JSON, JSONMessage
 
 from his.api import authenticated
-from his.contextlocals import ACCOUNT, SESSION, get_session_duration
-from his.decorators import require_json
+from his.contextlocals import ACCOUNT, get_session_duration
+from his.exceptions import InvalidCredentials, NotAuthorized
 from his.functions import set_session_cookie, delete_session_cookie
 from his.orm import Account, Session
-from his.wsgi.functions import get_session
+from his.wsgi.decorators import require_json, with_session
 
 
 __all__ = ['ROUTES']
-
-
-def with_session(function: Callable) -> Callable:
-    """Converts the first argument of function into a sesion."""
-
-    @wraps(function)
-    def wrapper(ident: str, *args, **kwargs):
-        return function(get_session(ident), *args, **kwargs)
-
-    return wrapper
 
 
 @require_json(dict)
 def login() -> Union[JSON, JSONMessage]:
     """Opens a new session for the respective account."""
 
-    account = JSON_DATA.get('account')
-    passwd = JSON_DATA.get('passwd')
-
-    if not account or not passwd:
-        return MISSING_CREDENTIALS
+    account = request.json['account']
+    passwd = request.json['passwd']
 
     try:
         account = Account.get(Account.name == account)
     except Account.DoesNotExist:
-        return INVALID_CREDENTIALS
-
-    duration = get_session_duration()
+        raise InvalidCredentials() from None
 
     if account.login(passwd):
-        session, secret = Session.open(account, duration=duration)
+        session, secret = Session.open(
+            account, duration=get_session_duration())
         json = session.to_json()
         json['secret'] = secret
         response = JSON(json)
         return set_session_cookie(response, session, secret=secret)
 
-    return INVALID_CREDENTIALS
+    raise InvalidCredentials()
 
 
 @authenticated
 def list_() -> Union[JSON, JSONMessage]:
     """Lists all sessions iff specified session is root."""
 
+    select = Session.select().join(Account)
+
     if ACCOUNT.root:
-        return JSON({session.id: session.to_json() for session in Session})
+        return JSON([session.to_json() for session in select.where(True)])
+
+    condition = Account.customer == ACCOUNT.customer
 
     if ACCOUNT.admin:
-        return JSON({
-            session.id: session.to_json() for session in
-            Session.select().join(Account).where(
-                Account.customer == ACCOUNT.customer)})
+        return JSON([session.to_json() for session in select.where(condition)])
 
-    return NOT_AUTHORIZED
+    raise NotAuthorized()
 
 
 @authenticated

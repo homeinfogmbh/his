@@ -6,8 +6,8 @@ from wsgilib import JSON, JSONMessage
 
 from his.api import authenticated, root, admin
 from his.contextlocals import CUSTOMER
-from his.decorators import require_json
 from his.orm.customer_service import CustomerService
+from his.wsgi.decorators import require_json
 from his.wsgi.functions import get_customer
 from his.wsgi.functions import get_customer_service
 from his.wsgi.functions import get_customer_services

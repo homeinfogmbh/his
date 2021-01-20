@@ -5,15 +5,14 @@ from typing import Iterator
 from flask import request
 
 from emaillib import EMail
-from recaptcha import verify
 from wsgilib import JSONMessage
 
 from his.api import authenticated
-from his.config import CONFIG, RECAPTCHA
+from his.config import CONFIG
 from his.contextlocals import ACCOUNT
-from his.decorators import require_json
-from his.exceptions import RecaptchaNotConfigured
 from his.mail import MAILER
+from his.wsgi.decorators import require_json
+from his.wsgi.functions import check_recaptcha
 
 
 __all__ = ['ROUTES']
@@ -26,15 +25,15 @@ BUGREPORT_CONFIG = CONFIG['bugreport']
 def gen_emails() -> Iterator[EMail]:
     """Yields bug report emails."""
 
+    recipients = CONFIG.get('bugreport', 'recipients').split()
+    sender = CONFIG.get('bugreport', 'sender')
     template = CONFIG.get('bugreport', 'template')
 
     with open(template, 'r') as file:
         template = file.read()
 
     subject = request.json.pop('subject')
-    sender = CONFIG.get('bugreport', 'sender')
     html = template.format(account=ACCOUNT, **request.json)
-    recipients = CONFIG.get('bugreport', 'recipients').split()
 
     for recipient in recipients:
         yield EMail(subject, sender, recipient, html=html)
@@ -45,15 +44,9 @@ def gen_emails() -> Iterator[EMail]:
 def report() -> JSONMessage:
     """Reports a bug."""
 
-    site_key = request.json['sitekey']
+    if check_recaptcha():
+        MAILER.send(gen_emails())
 
-    try:
-        recaptcha = RECAPTCHA[site_key]
-    except KeyError:
-        raise RecaptchaNotConfigured() from None
-
-    verify(recaptcha['secret'], request.json['response'])
-    MAILER.send(gen_emails())
     return JSONMessage('Bug report submitted.', status=200)
 
 

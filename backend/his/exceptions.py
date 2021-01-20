@@ -11,6 +11,7 @@ __all__ = [
     'NoSessionSpecified',
     'NotAuthorized',
     'PasswordResetPending',
+    'RecaptchaNotConfigured',
     'ServiceExistsError',
     'SessionExpired',
 ]
@@ -58,6 +59,10 @@ class NotAuthorized(Exception):
 
 class PasswordResetPending(Exception):
     """Indicates that a password reset is already pending."""
+
+
+class RecaptchaNotConfigured(Exception):
+    """Indicates that ReCAPTCHA was not configured for this site."""
 
 
 class ServiceExistsError(Exception):

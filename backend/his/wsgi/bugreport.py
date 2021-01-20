@@ -10,7 +10,7 @@ from wsgilib import JSONMessage
 from his.api import authenticated
 from his.config import CONFIG
 from his.contextlocals import ACCOUNT
-from his.mail import MAILER
+from his.mail import get_mailer
 from his.wsgi.decorators import require_json
 from his.wsgi.functions import check_recaptcha
 
@@ -45,7 +45,7 @@ def report() -> JSONMessage:
     """Reports a bug."""
 
     if check_recaptcha():
-        MAILER.send(gen_emails())
+        get_mailer().send(gen_emails())
 
     return JSONMessage('Bug report submitted.', status=200)
 

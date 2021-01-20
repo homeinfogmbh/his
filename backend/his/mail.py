@@ -5,12 +5,12 @@ from emaillib import Mailer
 from his.config import CONFIG
 
 
-__all__ = ['MAILER', 'SENDER']
+__all__ = ['get_mailer']
 
 
-HOST = CONFIG.get('mail', 'host')
-PORT = CONFIG.getint('mail', 'port')
-USER = CONFIG.get('mail', 'user')
-PASSWD = CONFIG.get('mail', 'passwd')
-SENDER = CONFIG.get('mail', 'sender')
-MAILER = Mailer(HOST, PORT, USER, PASSWD)
+def get_mailer():
+    """Returns the HIS mailer."""
+
+    return Mailer(
+        CONFIG.get('mail', 'host'), CONFIG.getint('mail', 'port'),
+        CONFIG.get('mail', 'user'), CONFIG.get('mail', 'passwd'))

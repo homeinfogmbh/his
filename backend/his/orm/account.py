@@ -16,9 +16,7 @@ from peewee import ModelSelect
 from mdb import Company, Customer
 from peeweeplus import InvalidKeys, Argon2Field
 
-from his.exceptions import AccountExistsError
-from his.messages.account import ACCOUNT_LOCKED
-from his.messages.session import INVALID_CREDENTIALS
+from his.exceptions import NotAuthorized
 from his.orm.common import HISModel
 
 
@@ -69,20 +67,6 @@ class Account(HISModel):    # pylint: disable=R0902
 
         if len(email) < 6 or '@' not in email:
             raise ValueError('Invalid email address.')
-
-        try:
-            cls.get(cls.email == email)
-        except cls.DoesNotExist:
-            pass
-        else:
-            raise AccountExistsError('email')
-
-        try:
-            cls.get(cls.name == name)
-        except cls.DoesNotExist:
-            pass
-        else:
-            raise AccountExistsError('name')
 
         account = cls()
         account.customer = customer
@@ -167,14 +151,14 @@ class Account(HISModel):    # pylint: disable=R0902
     def login(self, passwd: str) -> bool:
         """Performs a login."""
         if not self.can_login:
-            raise ACCOUNT_LOCKED
+            raise NotAuthorized()
 
         try:
             self.passwd.verify(passwd)
         except VerifyMismatchError:
             self.failed_logins += 1
             self.save()
-            raise INVALID_CREDENTIALS from None
+            raise
 
         if self.passwd.needs_rehash:
             self.passwd = passwd

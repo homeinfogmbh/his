@@ -12,7 +12,7 @@ from his.messages.service import SERVICE_LOCKED
 from his.orm.common import HISModel
 
 
-__all__ = ['Service', 'ServiceDependency', 'ServiceDomain']
+__all__ = ['Service', 'ServiceDomain']
 
 
 class Service(HISModel):
@@ -47,7 +47,7 @@ class Service(HISModel):
     @property
     def dependencies(self) -> Iterator[Service]:
         """Yields dependencies of this service."""
-        for service_dependency in self._service_deps:
+        for service_dependency in self.service_dependencies:
             yield service_dependency.dependency
             yield from service_dependency.dependency.dependencies
 
@@ -71,19 +71,6 @@ class Service(HISModel):
             return account.admin or self in account.services
 
         return False
-
-
-class ServiceDependency(HISModel):
-    """Maps service dependencies."""
-
-    class Meta:     # pylint: disable=C0111,R0903
-        table_name = 'service_dependency'
-
-    service = ForeignKeyField(
-        Service, column_name='service', backref='_service_deps',
-        on_delete='CASCADE')
-    dependency = ForeignKeyField(
-        Service, column_name='dependency', on_delete='CASCADE')
 
 
 class ServiceDomain(HISModel):

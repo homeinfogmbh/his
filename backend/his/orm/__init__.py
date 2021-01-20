@@ -2,6 +2,7 @@
 
 from his.orm.account import Account
 from his.orm.account_service import AccountService
+from his.orm.common import init
 from his.orm.customer_service import CustomerService
 from his.orm.customer_settings import CustomerSettings
 from his.orm.pwreset import PasswordResetToken
@@ -25,7 +26,8 @@ __all__ = [
     'ServiceDependency',
     'ServiceDomain',
     'Session',
-    'create_tables'
+    'create_tables',
+    'init'
 ]
 
 

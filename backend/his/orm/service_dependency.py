@@ -24,11 +24,13 @@ class ServiceDependency(HISModel):
         Service, column_name='dependency', on_delete='CASCADE')
 
     @classmethod
-    def tree(cls, service: Union[Service, int]) -> Iterator[int]:
+    def tree(cls, service: Union[Service, int]) -> Iterator[Service]:
         """Yields all dependencies of a service recursively."""
         yield service
+        dependency = Service.alias()
         condition = cls.service == service
-        select = cls.select(cls, Service).join(Service)
+        select = cls.select(cls, Service).join(Service).join_from(
+            Service, dependency, on=Service.dependency == dependency.id)
 
         for service_dependency in select.where(condition):
             yield service_dependency.service

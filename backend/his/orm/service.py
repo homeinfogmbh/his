@@ -5,14 +5,13 @@ from typing import Iterator
 
 from peewee import BooleanField
 from peewee import CharField
-from peewee import ForeignKeyField
 
 from his.exceptions import ServiceExistsError
 from his.messages.service import SERVICE_LOCKED
 from his.orm.common import HISModel
 
 
-__all__ = ['Service', 'ServiceDomain']
+__all__ = ['Service']
 
 
 class Service(HISModel):
@@ -71,14 +70,3 @@ class Service(HISModel):
             return account.admin or self in account.services
 
         return False
-
-
-class ServiceDomain(HISModel):
-    """Domains for the respective services."""
-
-    class Meta:     # pylint: disable=C0111,R0903
-        table_name = 'service_domain'
-
-    service = ForeignKeyField(
-        Service, column_name='service', backref='domains', on_delete='CASCADE')
-    domain = CharField(255)

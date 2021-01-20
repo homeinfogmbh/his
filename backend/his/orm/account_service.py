@@ -6,7 +6,6 @@ from peewee import ForeignKeyField
 
 from his.orm.account import Account
 from his.orm.common import HISModel
-from his.orm.customer_service import CustomerService
 from his.orm.service import Service
 
 
@@ -38,14 +37,3 @@ class AccountService(HISModel):
             record = cls(account=account, service=service)
             record.save()
             return record
-
-    @classmethod
-    def validate(cls, account: Account, service: Service) -> bool:
-        """Checks whether the given account may use the given service."""
-        if not CustomerService.validate(account.customer, service):
-            return False
-
-        try:
-            return cls.get(account=account, service=service)
-        except cls.DoesNotExist:
-            return False

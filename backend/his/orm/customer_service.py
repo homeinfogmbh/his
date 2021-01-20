@@ -1,14 +1,14 @@
 """Customer <> Service mappings."""
 
+from __future__ import annotations
 from datetime import datetime
-from typing import Iterator, Union
+from typing import Optional, Union
 
 from peewee import DateTimeField
 from peewee import ForeignKeyField
 
 from mdb import Customer
 
-from his.orm.account_service import AccountService
 from his.orm.common import HISModel
 from his.orm.service import Service
 
@@ -36,23 +36,27 @@ class CustomerService(HISModel):
 
     @classmethod
     def add(cls, customer: Union[Customer, int], service: Union[Service, int],
-            begin: datetime = None, end: datetime = None):
+            begin: Optional[datetime] = None,
+            end: Optional[datetime] = None) -> CustomerService:
         """Adds a new customer service."""
-        customer_service = cls()
-        customer_service.customer = customer
-        customer_service.service = service
-        customer_service.begin = begin
-        customer_service.end = end
-        return customer_service
+        try:
+            record = cls.get(customer=customer, service=service)
+        except cls.DoesNotExist:
+            record = cls(customer=customer, service=service)
+
+        record.begin = begin
+        record.end = end
+        record.save()
+        return record
 
     @classmethod
-    def services(cls, customer: Customer) -> Iterator[Service]:
-        """Yields services for the respective customer."""
-        for customer_service in cls.select().where(cls.customer == customer):
-            yield customer_service.service
-
-            for service in customer_service.service.service_deps:
-                yield service
+    def validate(cls, customer: Union[Customer, int],
+                 service: Union[Service, int]) -> bool:
+        """Checks whether the given customer may use the given service."""
+        try:
+            return cls.get(customer=customer, service=service).active
+        except cls.DoesNotExist:
+            return False
 
     @property
     def active(self) -> bool:
@@ -67,12 +71,3 @@ class CustomerService(HISModel):
             return datetime.now() >= self.begin
 
         return self.begin <= datetime.now() < self.end
-
-    def remove(self):
-        """Safely removes a customer service and its dependencies."""
-        for account_service in AccountService.select().where(
-                (AccountService.account.customer == self.customer) &
-                (AccountService.service == self.service)):
-            account_service.delete_instance()
-
-        self.delete_instance()

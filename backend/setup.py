@@ -40,7 +40,10 @@ setup(
         'his.wsgi.service'
     ],
     entry_points={'console_scripts': ['hisutil = his.hisutil:main']},
-    data_files=[('/usr/local/etc/his.d', [
-        'files/pwreset.html', 'files/bugreport.html'])],
+    data_files=[
+        ('/usr/local/etc/his.d', [
+            'files/pwreset.html', 'files/bugreport.html'
+        ])
+    ],
     description='HOMEINFO Integrated Services.'
 )

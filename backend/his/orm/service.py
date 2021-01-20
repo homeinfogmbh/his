@@ -45,13 +45,11 @@ class Service(HISModel):
         raise ServiceExistsError()
 
     @property
-    def service_deps(self) -> Iterator[Service]:
+    def dependencies(self) -> Iterator[Service]:
         """Yields dependencies of this service."""
         for service_dependency in self._service_deps:
             yield service_dependency.dependency
-
-            for dependency in service_dependency.dependency.service_deps:
-                yield dependency
+            yield from service_dependency.dependency.dependencies
 
     def authorized(self, account) -> bool:
         """Determines whether the respective account

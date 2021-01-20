@@ -2,7 +2,8 @@
 
 from __future__ import annotations
 from datetime import datetime, timedelta
-from typing import Iterator
+from logging import getLogger
+from typing import NamedTuple, Optional, Union
 
 from argon2.exceptions import VerifyMismatchError
 from peewee import BooleanField
@@ -23,6 +24,7 @@ __all__ = ['DURATION', 'DURATION_RANGE', 'Session']
 
 DURATION = 15
 DURATION_RANGE = range(120)
+LOGGER = getLogger('his.session')
 
 
 class Session(HISModel):
@@ -37,7 +39,8 @@ class Session(HISModel):
     login = BooleanField(default=True)
 
     @classmethod
-    def add(cls, account: Account, duration: timedelta) -> Session:
+    def add(cls, account: Union[Account, int],
+            duration: timedelta) -> NewSession:
         """Actually opens a new login session."""
         now = datetime.now()
         session = cls()
@@ -45,10 +48,11 @@ class Session(HISModel):
         session.secret = secret = genpw(length=32)
         session.start = now
         session.end = now + duration
-        return (session, secret)
+        return NewSession(session=session, secret=secret)
 
     @classmethod
-    def open(cls, account: Account, duration: int = DURATION) -> Session:
+    def open(cls, account: Union[Account, int],
+             duration: int = DURATION) -> NewSession:
         """Actually opens a new login session."""
         if duration not in DURATION_RANGE:
             raise DURATION_OUT_OF_BOUNDS
@@ -56,32 +60,24 @@ class Session(HISModel):
         duration = timedelta(minutes=duration)
         session, secret = cls.add(account, duration)
         session.save()
-        return (session, secret)
+        return NewSession(session=session, secret=secret)
 
     @classmethod
-    def cleanup(cls, before: datetime = None) -> Iterator[Session]:
+    def cleanup(cls, before: Optional[datetime] = None) -> None:
         """Cleans up orphaned sessions."""
         if before is None:
             before = datetime.now()
 
         for session in cls.select().where(cls.end < before):
             session.delete_instance()
-            yield session
-
-    @property
-    def alive(self) -> bool:
-        """Determines whether the session is active."""
-        return self.start <= datetime.now() < self.end
+            LOGGER.info('Cleaned up session: %s', session)
 
     def verify(self, secret: str) -> bool:
         """Verifies the session."""
         try:
-            if self.secret.verify(secret):  # pylint: disable=E1101
-                return True
+            return self.secret.verify(secret)   # pylint: disable=E1101
         except VerifyMismatchError:
             return False
-
-        return False
 
     def renew(self, duration: int = DURATION) -> Session:
         """Renews the session."""
@@ -94,3 +90,13 @@ class Session(HISModel):
         self.end = datetime.now() + timedelta(minutes=duration)
         self.save()
         return self
+
+
+class NewSession(NamedTuple):
+    """A new session, containing the the
+    session object and plain text secret.
+    Discard this as soon as possible.
+    """
+
+    session: Session
+    secret: str

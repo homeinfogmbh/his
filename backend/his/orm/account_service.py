@@ -21,10 +21,10 @@ class AccountService(HISModel):
 
     account = ForeignKeyField(
         Account, column_name='account', backref='account_services',
-        on_delete='CASCADE')
+        on_delete='CASCADE', lazy_load=False)
     service = ForeignKeyField(
         Service, column_name='service', backref='account_services',
-        on_delete='CASCADE')
+        on_delete='CASCADE', lazy_load=False)
 
     def __str__(self):
         return f'{self.account}@{self.service}'

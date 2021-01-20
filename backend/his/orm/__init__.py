@@ -5,7 +5,9 @@ from his.orm.account_service import AccountService
 from his.orm.customer_service import CustomerService
 from his.orm.customer_settings import CustomerSettings
 from his.orm.pwreset import PasswordResetToken
-from his.orm.service import Service, ServiceDomain
+from his.orm.service import Service
+from his.orm.service_dependency import ServiceDependency
+from his.orm.service_domain import ServiceDomain
 from his.orm.session import DURATION_RANGE as ALLOWED_SESSION_DURATIONS
 from his.orm.session import DURATION as DEFAULT_SESSION_DURATION
 from his.orm.session import Session
@@ -20,6 +22,7 @@ __all__ = [
     'CustomerSettings',
     'PasswordResetToken',
     'Service',
+    'ServiceDependency',
     'ServiceDomain',
     'Session',
     'create_tables'
@@ -28,6 +31,7 @@ __all__ = [
 
 MODELS = (
     Service,
+    ServiceDependency,
     ServiceDomain,
     CustomerService,
     Account,

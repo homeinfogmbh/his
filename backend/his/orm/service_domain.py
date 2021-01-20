@@ -16,5 +16,6 @@ class ServiceDomain(HISModel):
         table_name = 'service_domain'
 
     service = ForeignKeyField(
-        Service, column_name='service', backref='domains', on_delete='CASCADE')
+        Service, column_name='service', backref='domains', on_delete='CASCADE',
+        lazy_load=False)
     domain = CharField(255)

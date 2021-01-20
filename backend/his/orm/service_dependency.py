@@ -19,9 +19,10 @@ class ServiceDependency(HISModel):
 
     service = ForeignKeyField(
         Service, column_name='service', backref='service_dependencies',
-        on_delete='CASCADE')
+        on_delete='CASCADE', lazy_load=False)
     dependency = ForeignKeyField(
-        Service, column_name='dependency', on_delete='CASCADE')
+        Service, column_name='dependency', on_delete='CASCADE',
+        lazy_load=False)
 
     @classmethod
     def tree(cls, service: Union[Service, int]) -> Iterator[Service]:

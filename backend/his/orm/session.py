@@ -32,7 +32,7 @@ class Session(HISModel):
 
     account = ForeignKeyField(
         Account, column_name='account', backref='sessions',
-        on_delete='CASCADE')
+        on_delete='CASCADE', lazy_load=False)
     secret = Argon2Field()
     start = DateTimeField()
     end = DateTimeField()

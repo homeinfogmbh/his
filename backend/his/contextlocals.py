@@ -5,7 +5,7 @@ from typing import Union
 from flask import request
 from werkzeug.local import LocalProxy
 
-from mdb import Customer
+from mdb import Company, Customer
 
 from his.config import SESSION_ID, SESSION_SECRET
 from his.exceptions import NoSessionSpecified, SessionExpired
@@ -50,15 +50,16 @@ def get_session_secret() -> str:
 def get_session() -> Session:
     """Returns the session from the cache."""
 
-    ident = get_session_id()
-    secret = get_session_secret()
+    condition = Session.id == get_session_id()
+    select = Session.select(Session, Account, Customer, Company)
+    select = select.join(Account).join(Customer).join(Company)
 
     try:
-        session = Session[ident]
+        session = Session.where(condition).get()
     except Session.DoesNotExist:
         raise SessionExpired() from None
 
-    if session.verify(secret):
+    if session.verify(get_session_secret()):
         return session
 
     raise SessionExpired()
@@ -68,23 +69,26 @@ def get_account() -> Account:
     """Gets the verified targeted account."""
 
     try:
-        aid = int(request.args['account'])
+        condition = Account.id == int(request.args['account'])
     except KeyError:
         return SESSION.account
     except (TypeError, ValueError):
         raise INVALID_ACCOUNT_ID from None
 
+    select = Account.select(Account, Customer, Company)
+    select = select.join(Customer).join(Company)
+
     if SESSION.account.root:
         try:
-            return Account[aid]
+            return select.where(condition).get()
         except Account.DoesNotExist:
             raise NO_SUCH_ACCOUNT from None
 
     if SESSION.account.admin:
-        cid = SESSION.account.customer_id
+        condition &= Account.customer == SESSION.account.customer
 
         try:
-            return Account.get((Account.id == aid) & (Account.customer == cid))
+            return select.where(condition).get()
         except Account.DoesNotExist:
             raise NO_SUCH_ACCOUNT from None
 
@@ -95,15 +99,17 @@ def get_customer() -> Customer:
     """Gets the verified targeted customer."""
 
     try:
-        cid = int(request.args['customer'])
+        condition = Customer.id == int(request.args['customer'])
     except KeyError:
         return ACCOUNT.customer
     except (TypeError, ValueError):
         raise INVALID_CUSTOMER_ID from None
 
+    select = Customer.select(Customer, Company).join(Company)
+
     if SESSION.account.root:
         try:
-            return Customer.get(Customer.id == cid)
+            return select.where(condition).get()
         except Customer.DoesNotExist:
             raise NO_SUCH_CUSTOMER from None
 

@@ -1,7 +1,8 @@
 """HIS exceptions."""
 
 __all__ = [
-    'AccountExists',
+    'AccountLimitReached',
+    'AccountLocked',
     'AmbiguousDataError',
     'AuthenticationError',
     'AuthorizationError',
@@ -15,8 +16,12 @@ __all__ = [
 ]
 
 
-class AccountExists(Exception):
-    """Indicates that the respective account already exists."""
+class AccountLimitReached(Exception):
+    """Indicates that the customer is not allowed to add more accounts."""
+
+
+class AccountLocked(Exception):
+    """Indicates that the account is currently locked."""
 
 
 class AmbiguousDataError(Exception):

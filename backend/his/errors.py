@@ -10,7 +10,8 @@ from peeweeplus import NonUniqueValue
 from peeweeplus import PasswordTooShortError
 from wsgilib import JSONMessage
 
-from his.exceptions import AccountExists
+from his.exceptions import AccountLimitReached
+from his.exceptions import AccountLocked
 from his.exceptions import AuthenticationError
 from his.exceptions import AuthorizationError
 from his.exceptions import InconsistencyError
@@ -31,7 +32,8 @@ from his.orm.session import Session
 __all__ = ['ERRORS']
 
 
-ACCOUNT_EXISTS = JSONMessage('Account already exists.', status=409)
+ACCOUNT_LIMIT_REACHED = JSONMessage('Account limit reached.', status=403)
+ACCOUNT_LOCKED = JSONMessage('Account locked.', status=423)
 CUSTOMER_NOT_CONFIGURED = JSONMessage(
     'No configuration for customer.', status=404)
 DURATION_OUT_OF_BOUNDS = JSONMessage('Duration out of bounds.', status=400)
@@ -61,7 +63,8 @@ SESSION_EXPIRED = JSONMessage('Session expired.', status=401)
 ERRORS = {
     KeyError: lambda error: KEY_ERROR.update(key=str(error)),
     Account.DoesNotExist: lambda _: NO_SUCH_ACCOUNT,
-    AccountExists: lambda _: ACCOUNT_EXISTS,
+    AccountLimitReached: lambda _: ACCOUNT_LIMIT_REACHED,
+    AccountLocked: lambda _: ACCOUNT_LOCKED,
     AccountService.DoesNotExist: lambda _: NO_SUCH_ACCOUNT_SERVICE,
     AuthenticationError: lambda _: NOT_AUTHENTICATED,
     AuthorizationError: lambda _: NOT_AUTHORIZED,
@@ -84,7 +87,7 @@ ERRORS = {
         type=type(error.value).__name__
     ),
     InconsistencyError: lambda _: NOT_AUTHORIZED,
-    IntegrityError: lambda error: JSONMessage(str(error), status=400),
+    IntegrityError: lambda error: JSONMessage(str(error), status=409),
     InvalidData: lambda error: JSONMessage(str(error), status=400),
     InvalidKeys: lambda error: INVALID_KEYS.update(keys=error.invalid_keys),
     MissingKeyError: lambda error: MISSING_KEY_ERROR.update(

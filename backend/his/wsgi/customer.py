@@ -4,51 +4,10 @@ from mdb import Customer
 from wsgilib import JSON, Binary
 
 from his.api import authenticated, root
-from his.contextlocals import ACCOUNT, CUSTOMER
-from his.messages.customer import CUSTOMER_NOT_CONFIGURED, NO_SUCH_CUSTOMER
-from his.messages.data import INVALID_CUSTOMER_ID
-from his.orm import CustomerSettings
+from his.wsgi.functions import get_customer, get_customer_settings
 
 
-__all__ = ['get_customer', 'ROUTES']
-
-
-def get_customer(name: str) -> Customer:
-    """Returns the customer by the respective customer ID."""
-
-    if name == '!':
-        return CUSTOMER
-
-    try:
-        cid = int(name)
-    except ValueError:
-        raise INVALID_CUSTOMER_ID from None
-
-    try:
-        customer = Customer.get(Customer.id == cid)
-    except Customer.DoesNotExist:
-        raise NO_SUCH_CUSTOMER from None
-
-    conditions = (
-        lambda: ACCOUNT.root,
-        lambda: ACCOUNT.admin and customer == ACCOUNT.customer)
-
-    if any(condition() for condition in conditions):
-        return customer
-
-    if customer.id == CUSTOMER.id:
-        return CUSTOMER
-
-    raise NO_SUCH_CUSTOMER
-
-
-def _settings() -> CustomerSettings:
-    """Returns the respective customer settings."""
-
-    try:
-        CustomerSettings.get(CustomerSettings.customer == CUSTOMER)
-    except CustomerSettings.DoesNotExist:
-        raise CUSTOMER_NOT_CONFIGURED from None
+__all__ = ['ROUTES']
 
 
 @authenticated
@@ -70,7 +29,7 @@ def get(ident: int) -> JSON:
 def get_logo() -> Binary:
     """Allows services"""
 
-    return Binary(_settings().logo)
+    return Binary(get_customer_settings().logo)
 
 
 ROUTES = (

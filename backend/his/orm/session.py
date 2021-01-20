@@ -13,8 +13,7 @@ from peewee import ForeignKeyField
 from peeweeplus import Argon2Field
 
 from his.crypto import genpw
-from his.messages.account import ACCOUNT_LOCKED
-from his.messages.session import DURATION_OUT_OF_BOUNDS
+from his.exceptions import AccountLocked
 from his.orm.account import Account
 from his.orm.common import HISModel
 
@@ -54,9 +53,6 @@ class Session(HISModel):
     def open(cls, account: Union[Account, int],
              duration: int = DURATION) -> NewSession:
         """Actually opens a new login session."""
-        if duration not in DURATION_RANGE:
-            raise DURATION_OUT_OF_BOUNDS
-
         duration = timedelta(minutes=duration)
         session, secret = cls.add(account, duration)
         session.save()
@@ -81,11 +77,8 @@ class Session(HISModel):
 
     def renew(self, duration: int = DURATION) -> Session:
         """Renews the session."""
-        if duration not in DURATION_RANGE:
-            raise DURATION_OUT_OF_BOUNDS
-
         if not self.account.can_login:
-            raise ACCOUNT_LOCKED
+            raise AccountLocked()
 
         self.end = datetime.now() + timedelta(minutes=duration)
         self.save()

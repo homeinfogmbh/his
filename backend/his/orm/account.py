@@ -16,7 +16,7 @@ from peewee import ModelSelect
 from mdb import Company, Customer
 from peeweeplus import InvalidKeys, Argon2Field
 
-from his.exceptions import NotAuthorized
+from his.exceptions import AccountLocked
 from his.orm.common import HISModel
 
 
@@ -151,7 +151,7 @@ class Account(HISModel):    # pylint: disable=R0902
     def login(self, passwd: str) -> bool:
         """Performs a login."""
         if not self.can_login:
-            raise NotAuthorized()
+            raise AccountLocked()
 
         try:
             self.passwd.verify(passwd)

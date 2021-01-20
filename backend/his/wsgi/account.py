@@ -1,112 +1,65 @@
 """Account management."""
 
-from peeweeplus import PasswordTooShortError
+from typing import Optional
+
+from flask import request
+
 from wsgilib import JSON, JSONMessage
 
 from his.api import authenticated
-from his.contextlocals import ACCOUNT, CUSTOMER, JSON_DATA
+from his.contextlocals import ACCOUNT, CUSTOMER
 from his.crypto import genpw
-from his.exceptions import AccountExistsError, AmbiguousDataError
-from his.messages.account import ACCOUNT_CREATED
-from his.messages.account import ACCOUNT_EXISTS
-from his.messages.account import ACCOUNT_PATCHED
-from his.messages.account import ACCOUNTS_EXHAUSTED
-from his.messages.account import NO_SUCH_ACCOUNT
-from his.messages.account import NOT_AUTHORIZED
-from his.messages.account import PASSWORD_TOO_SHORT
-from his.messages.customer import CUSTOMER_NOT_CONFIGURED
-from his.messages.data import AMBIGUOUS_DATA
-from his.messages.data import MISSING_DATA
-from his.orm import Account, CustomerSettings
+from his.decorators import require_json
+from his.exceptions import AccountLimitReached, NotAuthorized
+from his.orm.account import Account
+from his.orm.customer_settings import CustomerSettings
+from his.wsgi.functions import get_account
 
 
-__all__ = ['get_account', 'ROUTES']
+__all__ = ['ROUTES']
 
 
-_USER_FIELDS = {'fullName', 'passwd', 'email'}
-_ADMIN_FIELDS = {'name', 'fullName', 'passwd', 'email', 'admin'}
+USER_FIELDS = {'fullName', 'passwd', 'email'}
+ADMIN_FIELDS = {'name', 'fullName', 'passwd', 'email', 'admin'}
 
 
-def get_account(name: str) -> Account:
-    """Safely returns the respective account."""
-
-    if name == '!':
-        return Account.get(Account.name == ACCOUNT.name)
-
-    if ACCOUNT.root:
-        try:
-            return Account.get(Account.name == name)
-        except Account.DoesNotExist:
-            raise NO_SUCH_ACCOUNT from None
-
-    try:
-        account = Account.get(Account.name == name)
-    except Account.DoesNotExist:
-        raise NOT_AUTHORIZED from None  # Prevent account name sniffing.
-
-    if ACCOUNT.admin:
-        if account.customer == CUSTOMER:
-            return account
-    elif ACCOUNT.name == account.name and ACCOUNT.id == account.id:
-        return account
-
-    raise NOT_AUTHORIZED
-
-
-def _add_account() -> JSONMessage:
+@require_json(dict)
+def add_account() -> JSONMessage:
     """Adds an account for the current customer."""
 
-    missing_fields = []
-    password_generated = False
+    name = request.json['name']
+    email = request.json['email']
+    passwd = request.json.get('passwd')
+    full_name = request.json.get('fullName')
 
-    try:
-        name = JSON_DATA['name']
-    except KeyError:
-        missing_fields.append('name')
-
-    try:
-        email = JSON_DATA['email']
-    except KeyError:
-        missing_fields.append('email')
-
-    try:
-        passwd = JSON_DATA['passwd']
-    except KeyError:
+    if not passwd:
         passwd = genpw()
-        password_generated = True
 
-    if missing_fields:
-        raise MISSING_DATA.update(missing_fields=missing_fields)
+    if ACCOUNT.root:
+        root = request.json.get('root', False)
+    else:
+        root = False
 
-    try:
-        account = Account.add(CUSTOMER, name, email, passwd=passwd)
-    except AccountExistsError:
-        raise ACCOUNT_EXISTS from None
-    except PasswordTooShortError as error:
-        raise PASSWORD_TOO_SHORT.update(minlen=error.minlen) from None
+    if ACCOUNT.admin:
+        admin = request.json.get('admin', False)
+    else:
+        admin = False
 
-    account.save()
-
-    if password_generated:
-        return ACCOUNT_CREATED.update(passwd=passwd)
-
-    return ACCOUNT_CREATED
+    account = Account.add(CUSTOMER.id, name, email, passwd,
+                          full_name=full_name, admin=admin, root=root)
+    return JSONMessage('Account created.', id=account.id, passwd=passwd,
+                       status=201)
 
 
-def _patch_account(account: Account, only: set = None) -> JSONMessage:
+@require_json(dict)
+def patch_account(account: Account, only: Optional[set] = None) -> JSONMessage:
     """Patches the respective account with the provided
     dictionary and an optional field restriction.
     """
 
-    try:
-        account.patch_json(JSON_DATA, only=only)
-    except PasswordTooShortError as password_too_short:
-        raise PASSWORD_TOO_SHORT.update(minlen=password_too_short.minlen)
-    except AmbiguousDataError as error:
-        raise AMBIGUOUS_DATA.update(field=str(error))
-
+    account.patch_json(request.json, only=only)
     account.save()
-    return ACCOUNT_PATCHED
+    return JSONMessage('Account patched.', status=200)
 
 
 @authenticated
@@ -132,27 +85,22 @@ def add() -> JSONMessage:
     """Create a new account."""
 
     if ACCOUNT.root:
-        return _add_account()
+        return add_account()
 
     if ACCOUNT.admin:
-        try:
-            settings = CustomerSettings.get(
-                CustomerSettings.customer == CUSTOMER)
-        except CustomerSettings.DoesNotExist:
-            return CUSTOMER_NOT_CONFIGURED
+        settings = CustomerSettings.get(CustomerSettings.customer == CUSTOMER)
 
         if settings.max_accounts is None:
-            return _add_account()
+            return add_account()
 
-        accounts = sum(1 for _ in Account.select().where(
-            Account.customer == CUSTOMER))
+        accounts = Account.select().where(Account.customer == CUSTOMER).count()
 
         if accounts < settings.max_accounts:
-            return _add_account()
+            return add_account()
 
-        return ACCOUNTS_EXHAUSTED
+        raise AccountLimitReached()
 
-    return NOT_AUTHORIZED
+    raise NotAuthorized()
 
 
 @authenticated
@@ -162,20 +110,20 @@ def patch(name: str) -> JSONMessage:
     account = get_account(name)
 
     if ACCOUNT.root:
-        return _patch_account(account)
+        return patch_account(account)
 
     if ACCOUNT.admin and CUSTOMER == account.customer:
-        return _patch_account(account, only=_ADMIN_FIELDS)
+        return patch_account(account, only=ADMIN_FIELDS)
 
     if ACCOUNT.id == account.id:
-        return _patch_account(account, only=_USER_FIELDS)
+        return patch_account(account, only=USER_FIELDS)
 
-    return NOT_AUTHORIZED
+    raise NotAuthorized()
 
 
-ROUTES = (
+ROUTES = [
     ('GET', '/account', list_),
     ('GET', '/account/<name>', get),
     ('POST', '/account', add),
     ('PATCH', '/account/<name>', patch)
-)
+]

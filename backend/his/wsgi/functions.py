@@ -21,7 +21,7 @@ __all__ = [
     'get_account_service',
     'get_customer',
     'get_customer_services',
-    'get_service'
+    'get_customer_settings'
 ]
 
 
@@ -103,14 +103,14 @@ def get_customer_service(customer: Union[Customer, int],
         CustomerService.service == service).get()
 
 
-def get_service(name: str) -> Service:
-    """Returns the respective service."""
-
-    return Service.select().where(Service.name == name).get()
-
-
-def get_settings() -> CustomerSettings:
+def get_customer_settings() -> CustomerSettings:
     """Returns the respective customer settings."""
 
     return CustomerSettings.select().where(
         CustomerSettings.customer == CUSTOMER).get()
+
+
+def get_service(name: str) -> Service:
+    """Returns the respective service."""
+
+    return Service.select().where(Service.name == name).get()

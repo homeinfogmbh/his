@@ -5,18 +5,10 @@ from peeweeplus import JSONModel, MySQLDatabase
 from his.config import CONFIG
 
 
-__all__ = ['DATABASE', 'HISModel', 'init']
+__all__ = ['DATABASE', 'HISModel']
 
 
-DATABASE = MySQLDatabase(None)
-
-
-def init():
-    """Initializes the database."""
-
-    DATABASE.init(
-        CONFIG.get('db', 'db'), host=CONFIG.get('db', 'host'),
-        user=CONFIG.get('db', 'user'), password=CONFIG.get('db', 'passwd'))
+DATABASE = MySQLDatabase.from_config(CONFIG['db'])
 
 
 class HISModel(JSONModel):

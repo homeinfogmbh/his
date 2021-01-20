@@ -14,9 +14,6 @@ from wsgilib import JSONMessage
 
 from his.exceptions import AccountLimitReached
 from his.exceptions import AccountLocked
-from his.exceptions import AuthenticationError
-from his.exceptions import AuthorizationError
-from his.exceptions import InconsistencyError
 from his.exceptions import InvalidCredentials
 from his.exceptions import InvalidData
 from his.exceptions import NoSessionSpecified
@@ -57,9 +54,6 @@ ERRORS = {
     AccountLocked: lambda _: JSONMessage('Account locked.', status=423),
     AccountService.DoesNotExist: lambda _: JSONMessage(
         'No such account service.', status=404),
-    AuthenticationError: lambda _: JSONMessage(
-        'Not authenticated.', status=401),
-    AuthorizationError: lambda _: NOT_AUTHORIZED,
     CustomerService.DoesNotExist: lambda _: JSONMessage(
         'No such customer service.', status=404),
     CustomerSettings.DoesNotExist: lambda _: JSONMessage(
@@ -80,7 +74,6 @@ ERRORS = {
         value=str(error.value),
         type=type(error.value).__name__
     ),
-    InconsistencyError: lambda _: NOT_AUTHORIZED,
     IntegrityError: lambda error: JSONMessage(str(error), status=409),
     InvalidCredentials: lambda _: INVALID_CREDENTIALS,
     InvalidData: lambda error: JSONMessage(str(error), status=400),

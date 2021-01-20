@@ -3,10 +3,6 @@
 __all__ = [
     'AccountLimitReached',
     'AccountLocked',
-    'AmbiguousDataError',
-    'AuthenticationError',
-    'AuthorizationError',
-    'InconsistencyError',
     'InvalidCredentials',
     'InvalidData',
     'NoSessionSpecified',
@@ -24,22 +20,6 @@ class AccountLimitReached(Exception):
 
 class AccountLocked(Exception):
     """Indicates that the account is currently locked."""
-
-
-class AmbiguousDataError(Exception):
-    """Indicates that the provided data is ambiguous."""
-
-
-class AuthenticationError(Exception):
-    """Indicates an error during authentication."""
-
-
-class AuthorizationError(Exception):
-    """Indicates an error during authorization."""
-
-
-class InconsistencyError(Exception):
-    """Indicates inconsistencies in database configuration."""
 
 
 class InvalidCredentials(Exception):

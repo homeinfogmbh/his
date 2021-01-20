@@ -7,6 +7,7 @@ __all__ = [
     'AuthenticationError',
     'AuthorizationError',
     'InconsistencyError',
+    'InvalidCredentials',
     'InvalidData',
     'NoSessionSpecified',
     'NotAuthorized',
@@ -39,6 +40,10 @@ class AuthorizationError(Exception):
 
 class InconsistencyError(Exception):
     """Indicates inconsistencies in database configuration."""
+
+
+class InvalidCredentials(Exception):
+    """Indicates invalid credentials such as user name or password."""
 
 
 class InvalidData(Exception):

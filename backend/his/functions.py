@@ -6,7 +6,7 @@ from werkzeug.http import dump_cookie
 from his.config import DOMAINS, SESSION_ID, SESSION_SECRET
 from his.contextlocals import get_session_secret, get_session
 from his.exceptions import NoSessionSpecified, SessionExpired
-from his.orm import Session
+from his.orm.session import Session
 
 
 __all__ = [

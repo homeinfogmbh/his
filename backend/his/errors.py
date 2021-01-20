@@ -1,5 +1,6 @@
 """Error messages and error handlers."""
 
+from argon2.exceptions import VerifyMismatchError
 from peewee import IntegrityError
 
 from peeweeplus import FieldNotNullable
@@ -16,6 +17,7 @@ from his.exceptions import AccountLocked
 from his.exceptions import AuthenticationError
 from his.exceptions import AuthorizationError
 from his.exceptions import InconsistencyError
+from his.exceptions import InvalidCredentials
 from his.exceptions import InvalidData
 from his.exceptions import NoSessionSpecified
 from his.exceptions import NotAuthorized
@@ -36,6 +38,7 @@ __all__ = ['ERRORS', 'INVALID_RESET_TOKEN']
 
 FIELD_NOT_NULLABLE = JSONMessage('Field cannot be NULL.', status=422)
 FIELD_VALUE_ERROR = JSONMessage('Invalid value for field.', status=422)
+INVALID_CREDENTIALS = JSONMessage('Invalid credentials.', 400)
 INVALID_KEYS = JSONMessage('Invalid keys for model.', status=422)
 INVALID_RESET_TOKEN = JSONMessage('Invalid token.', 400)
 KEY_ERROR = JSONMessage('Missing JSON key.', status=400)
@@ -79,6 +82,7 @@ ERRORS = {
     ),
     InconsistencyError: lambda _: NOT_AUTHORIZED,
     IntegrityError: lambda error: JSONMessage(str(error), status=409),
+    InvalidCredentials: lambda _: INVALID_CREDENTIALS,
     InvalidData: lambda error: JSONMessage(str(error), status=400),
     InvalidKeys: lambda error: INVALID_KEYS.update(keys=error.invalid_keys),
     MissingKeyError: lambda error: MISSING_KEY_ERROR.update(
@@ -106,5 +110,6 @@ ERRORS = {
         'No such session.', status=404),
     SessionExpired: lambda _: JSONMessage('Session expired.', status=401),
     VerificationError: lambda _: JSONMessage(
-        'ReCAPTCHA challenge failed.', status=400)
+        'ReCAPTCHA challenge failed.', status=400),
+    VerifyMismatchError: lambda _: INVALID_CREDENTIALS
 }

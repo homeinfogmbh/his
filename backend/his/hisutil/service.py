@@ -4,7 +4,8 @@ from argparse import Namespace
 from logging import getLogger
 from sys import exit    # pylint: disable=W0622
 
-from his.exceptions import ServiceExistsError
+from peewee import IntegrityError
+
 from his.orm import AccountService, CustomerService, Service
 
 
@@ -18,13 +19,12 @@ def add_service(args: Namespace):
     """Adds a new service."""
 
     try:
-        service = Service.add(
-            args.name, description=args.description, promote=args.promote)
-    except ServiceExistsError:
+        Service.add(
+            args.name, args.description, promote=args.promote)
+    except IntegrityError:
         LOGGER.error('Service already exists.')
         exit(1)
 
-    service.save()
     LOGGER.info('Service added.')
 
 

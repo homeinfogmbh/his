@@ -6,6 +6,7 @@ from typing import Optional, Union
 
 from peewee import DateTimeField
 from peewee import ForeignKeyField
+from peewee import ModelSelect
 
 from mdb import Customer
 
@@ -50,24 +51,12 @@ class CustomerService(HISModel):
         return record
 
     @classmethod
-    def validate(cls, customer: Union[Customer, int],
-                 service: Union[Service, int]) -> bool:
-        """Checks whether the given customer may use the given service."""
-        try:
-            return cls.get(customer=customer, service=service).active
-        except cls.DoesNotExist:
-            return False
-
-    @property
-    def active(self) -> bool:
-        """Determines whether the service mapping is active."""
-        if self.begin is None:
-            if self.end is None:
-                return True
-
-            return datetime.now() < self.end
-
-        if self.end is None:
-            return datetime.now() >= self.begin
-
-        return self.begin <= datetime.now() < self.end
+    def active(cls, customer: Union[Customer, int],
+               service: Union[Service, int]) -> ModelSelect:
+        """Returns active customer services."""
+        now = datetime.now()
+        condition = cls.customer == customer
+        condition &= cls.service == service
+        condition &= (cls.start >> None) | (now >= cls.end)
+        condition &= (cls.end >> None) | (now <= cls.end)
+        return cls.select().where(condition)

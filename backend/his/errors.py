@@ -1,4 +1,4 @@
-"""Exception error handlers."""
+"""Exception / error handlers."""
 
 from peeweeplus import FieldNotNullable
 from peeweeplus import FieldValueError
@@ -15,20 +15,26 @@ from his.exceptions import SessionExpired
 from his.orm.account import Account
 from his.orm.account_service import AccountService
 from his.orm.customer_service import CustomerService
+from his.orm.customer_settings import CustomerSettings
 from his.orm.pwreset import PasswordResetToken
 from his.orm.service import Service
 from his.orm.service_dependency import ServiceDependency
-from his.orm.service_domain import ServiceDomain
 from his.orm.session import Session
 
 
 __all__ = ['ERRORS']
 
 
+CUSTOMER_NOT_CONFIGURED = JSONMessage(
+    'No configuration for customer.', status=404)
 DURATION_OUT_OF_BOUNDS = JSONMessage('Duration out of bounds.', status=400)
+FIELD_NOT_NULLABLE = JSONMessage('Field cannot be NULL.', status=422)
+FIELD_VALUE_ERROR = JSONMessage('Invalid value for field.', status=422)
 INVALID_CREDENTIALS = JSONMessage('Invalid credentials.', status=401)
+INVALID_KEYS = JSONMessage('Invalid keys for model.', status=422)
 KEY_ERROR = JSONMessage('Missing JSON key.', status=400)
 MISSING_CREDENTIALS = JSONMessage('Missing credentials.', status=401)
+MISSING_KEY_ERROR = JSONMessage('Missing key for field.', status=422)
 NO_SESSION_SPECIFIED = JSONMessage('No session specified.', status=401)
 NO_SUCH_ACCOUNT = JSONMessage('No such account.', status=404)
 NO_SUCH_ACCOUNT_SERVICE = JSONMessage('No such account service.', status=404)
@@ -38,9 +44,11 @@ NO_SUCH_SERVICE_DEPENDENCY = JSONMessage(
     'No such service dependency.', status=404)
 NO_SUCH_SESSION = JSONMessage('No such session.', status=404)
 NO_SUCH_TOKEN = JSONMessage('No such token.', status=404)
+NON_UNIQUE_VALUE = JSONMessage('Value for field is not unique.', status=422)
 NOT_AUTHENTICATED = JSONMessage('Not authenticated.', status=401)
 NOT_AUTHORIZED = JSONMessage('Not authorized.', status=403)
 SESSION_EXPIRED = JSONMessage('Session expired.', status=401)
+
 
 
 def field_value_error(fve):
@@ -100,6 +108,7 @@ ERRORS = {
     AuthenticationError: lambda _: NOT_AUTHENTICATED,
     AuthorizationError: lambda _: NOT_AUTHORIZED,
     CustomerService.DoesNotExist: lambda _: NO_SUCH_CUSTOMER_SERVICE,
+    CustomerSettings.DoesNotExist: lambda _: CUSTOMER_NOT_CONFIGURED,
     FieldNotNullable: field_not_nullable,
     FieldValueError: field_value_error,
     InconsistencyError: lambda _: NOT_AUTHORIZED,
@@ -110,5 +119,6 @@ ERRORS = {
     PasswordResetToken.DoesNotExist: lambda _: NO_SUCH_TOKEN,
     Service.DoesNotExist: lambda _: NO_SUCH_SERVICE,
     ServiceDependency.DoesNotExist: lambda _: NO_SUCH_SERVICE_DEPENDENCY,
+    Session.DoesNotExist: lambda _: NO_SUCH_SESSION,
     SessionExpired: lambda _: SESSION_EXPIRED,
 }

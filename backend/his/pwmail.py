@@ -6,7 +6,7 @@ from emaillib import EMail
 
 from his.config import CONFIG
 from his.mail import get_mailer
-from his.orm import PasswordResetToken
+from his.orm.pwreset import PasswordResetToken
 
 
 __all__ = ['mail_password_reset_link']

@@ -1,10 +1,10 @@
 """Type-like parser functions."""
 
-from mdb import Address, Company, Customer
-
 from peewee import JOIN
 
-from his.orm import Account
+from mdb import Address, Company, Customer
+
+from his.orm.account import Account
 
 
 __all__ = ['account']

@@ -2,116 +2,86 @@
 
 from uuid import UUID
 
-from peeweeplus import PasswordTooShortError
-from recaptcha import VerificationError, verify
+from flask import request
+
+from recaptcha import verify
 from wsgilib import JSONMessage
 
 from his.config import CONFIG, RECAPTCHA
-from his.contextlocals import JSON_DATA
-from his.exceptions import PasswordResetPending as PasswordResetPending_
-from his.messages.account import NO_ACCOUNT_SPECIFIED, PASSWORD_TOO_SHORT
-from his.messages.pwreset import INVALID_RESET_TOKEN
-from his.messages.pwreset import NO_PASSWORD_SPECIFIED
-from his.messages.pwreset import NO_TOKEN_SPECIFIED
-from his.messages.pwreset import PASSWORD_RESET_PENDING
-from his.messages.pwreset import PASSWORD_RESET_SENT
-from his.messages.pwreset import PASSWORD_SET
-from his.messages.recaptcha import INVALID_RESPONSE
-from his.messages.recaptcha import NO_RESPONSE_PROVIDED
-from his.messages.recaptcha import NO_SITE_KEY_PROVIDED
-from his.messages.recaptcha import SITE_NOT_CONFIGURED
-from his.orm import Account, PasswordResetToken
+from his.decorators import require_json
+from his.errors import INVALID_RESET_TOKEN
+from his.exceptions import PasswordResetPending, RecaptchaNotConfigured
+from his.orm.account import Account
+from his.orm.pwreset import PasswordResetToken
 from his.pwmail import mail_password_reset_link
 
 
 __all__ = ['ROUTES']
 
 
-def _get_account(name: str) -> Account:
-    """Returns the account by its name."""
-
-    try:
-        return Account.get(Account.name == name)
-    except Account.DoesNotExist:
-        raise PASSWORD_RESET_SENT from None     # Avoid account sniffing.
+PASSWORD_RESET_SENT = JSONMessage('Password request sent.', status=200)
 
 
+@require_json(dict)
 def request_reset():    # pylint: disable=R0911
     """Attempts a password reset request."""
 
-    try:
-        site_key = JSON_DATA['sitekey']
-    except KeyError:
-        return NO_SITE_KEY_PROVIDED
+    site_key = request.json['sitekey']
 
     try:
         recaptcha = RECAPTCHA[site_key]
     except KeyError:
-        return SITE_NOT_CONFIGURED
+        raise RecaptchaNotConfigured() from None
 
-    secret = recaptcha['secret']
-    url = recaptcha.get('url', CONFIG['pwreset']['url'])
-
-    try:
-        response = JSON_DATA['response']
-    except KeyError:
-        return NO_RESPONSE_PROVIDED
-
-    try:
-        verify(secret, response)
-    except VerificationError:
-        return INVALID_RESPONSE
-
-    name = JSON_DATA.get('account')
+    verify(recaptcha['secret'], request.json['response'])
+    name = request.json.get('account')
 
     if not name:
-        return NO_ACCOUNT_SPECIFIED
+        return JSONMessage('No account specified.', status=400)
 
-    account = _get_account(name)
+    try:
+        account = Account.get(Account.name == name)
+    except Account.DoesNotExist:
+        return PASSWORD_RESET_SENT  # Avoid account sniffing.
 
     try:
         password_reset_token = PasswordResetToken.add(account)
-    except PasswordResetPending_:
-        return PASSWORD_RESET_PENDING
+    except PasswordResetPending:
+        return JSONMessage('Password request pending.', status=200)
 
     password_reset_token.save()
+    url = recaptcha.get('url', CONFIG.get('pwreset', 'url'))
     mail_password_reset_link(password_reset_token.email, url)
     return PASSWORD_RESET_SENT
 
 
+@require_json(dict)
 def reset_password() -> JSONMessage:
     """Actually performs a password reset."""
 
-    token = JSON_DATA.get('token')
+    token = request.json.get('token')
 
     if not token:
-        return NO_TOKEN_SPECIFIED
+        return JSONMessage('No token specified.', status=400)
 
     token = UUID(token)
-    passwd = JSON_DATA.get('passwd')
+    passwd = request.json.get('passwd')
 
     if not passwd:
-        return NO_PASSWORD_SPECIFIED
+        return JSONMessage('No password specified.', status=400)
 
-    try:
-        token = PasswordResetToken.get(PasswordResetToken.token == token)
-    except PasswordResetToken.DoesNotExist:
-        return INVALID_RESET_TOKEN
+    token = PasswordResetToken.select(
+        PasswordResetToken, Account).join(Account).where(
+        PasswordResetToken.token == token).get()
 
     if not token.valid:
         return INVALID_RESET_TOKEN
 
-    account = token.account
-
-    try:
-        account.passwd = passwd
-    except PasswordTooShortError as password_too_short:
-        return PASSWORD_TOO_SHORT.update(minlen=password_too_short.minlen)
-
     token.delete_instance()
-    account.failed_logins = 0
-    account.save()
-    return PASSWORD_SET
+    token.account.passwd = passwd
+    token.account.failed_logins = 0
+    token.account.save()
+    return JSONMessage('Password set.', status=200)
 
 
 ROUTES = (

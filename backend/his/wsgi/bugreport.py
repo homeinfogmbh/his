@@ -5,13 +5,14 @@ from typing import Iterator
 from flask import request
 
 from emaillib import EMail
-from recaptcha import VerificationError, verify
+from recaptcha import verify
 from wsgilib import JSONMessage
 
 from his.api import authenticated
 from his.config import CONFIG, RECAPTCHA
 from his.contextlocals import ACCOUNT
 from his.decorators import require_json
+from his.exceptions import RecaptchaNotConfigured
 from his.mail import MAILER
 
 
@@ -49,22 +50,11 @@ def report() -> JSONMessage:
     try:
         recaptcha = RECAPTCHA[site_key]
     except KeyError:
-        return JSONMessage('No ReCAPTCHA configured.', status=500)
+        raise RecaptchaNotConfigured() from None
 
-    secret = recaptcha['secret']
-
-    try:
-        response = request.json['response']
-    except KeyError:
-        return JSONMessage('No ReCAPTCHA response provided.', status=400)
-
-    try:
-        verify(secret, response)
-    except VerificationError:
-        return JSONMessage('Invalid ReCAPTCHA response.', status=400)
-
+    verify(recaptcha['secret'], request.json['response'])
     MAILER.send(gen_emails())
-    return JSONMessage('Bug report submitted.', status=400)
+    return JSONMessage('Bug report submitted.', status=200)
 
 
 ROUTES = [('POST', '/bugreport', report)]

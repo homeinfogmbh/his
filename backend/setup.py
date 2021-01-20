@@ -33,8 +33,6 @@ setup(
     packages=[
         'his',
         'his.hisutil',
-        'his.messages',
-        'his.oauth2',
         'his.orm',
         'his.wsgi',
         'his.wsgi.service'

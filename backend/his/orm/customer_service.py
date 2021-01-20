@@ -51,12 +51,9 @@ class CustomerService(HISModel):
         return record
 
     @classmethod
-    def active(cls, customer: Union[Customer, int],
-               service: Union[Service, int]) -> ModelSelect:
-        """Returns active customer services."""
+    def active(cls) -> ModelSelect:
+        """Selects active customer services."""
         now = datetime.now()
-        condition = cls.customer == customer
-        condition &= cls.service == service
-        condition &= (cls.start >> None) | (now >= cls.end)
+        condition = (cls.start >> None) | (now >= cls.end)
         condition &= (cls.end >> None) | (now <= cls.end)
         return cls.select().where(condition)

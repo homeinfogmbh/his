@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 from datetime import datetime, timedelta
+from typing import Union
 from uuid import uuid4
 
 from peewee import DateTimeField
@@ -33,7 +34,7 @@ class PasswordResetToken(HISModel):
     created = DateTimeField(default=datetime.now)
 
     @classmethod
-    def add(cls, account: Account) -> PasswordResetToken:
+    def add(cls, account: Union[Account, int]) -> PasswordResetToken:
         """Adds a new password reset token."""
         try:
             record = cls.get(cls.account == account)

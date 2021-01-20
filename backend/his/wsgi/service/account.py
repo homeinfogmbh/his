@@ -48,11 +48,11 @@ def add() -> JSONMessage:
         return NO_SERVICE_SPECIFIED
 
     try:
-        account.services.add(service)
+        account_service = AccountService.add(account, service)
     except InconsistencyError:
         return NOT_AUTHORIZED
 
-    return SERVICE_ADDED
+    return SERVICE_ADDED.update(id=account_service.id)
 
 
 @authenticated

@@ -6,54 +6,27 @@ from typing import Callable, Union
 from wsgilib import JSON, JSONMessage
 
 from his.api import authenticated
-from his.contextlocals import ACCOUNT, SESSION, JSON_DATA, get_session_duration
+from his.contextlocals import ACCOUNT, SESSION, get_session_duration
+from his.decorators import require_json
 from his.functions import set_session_cookie, delete_session_cookie
-from his.messages.account import NOT_AUTHORIZED
-from his.messages.session import INVALID_CREDENTIALS
-from his.messages.session import MISSING_CREDENTIALS
-from his.messages.session import NO_SUCH_SESSION
 from his.orm import Account, Session
+from his.wsgi.functions import get_session
 
 
 __all__ = ['ROUTES']
-
-
-def _get_session(session_identifier: str) -> Session:
-    """Returns the respective session by the
-    resource identifier with authorization checks.
-    """
-
-    if session_identifier == '!':
-        return SESSION
-
-    try:
-        session = Session[session_identifier]
-    except Session.DoesNotExist:
-        raise NO_SUCH_SESSION from None
-
-    if SESSION.id == session.id:
-        return session
-
-    if ACCOUNT.root:
-        return session
-
-    if ACCOUNT.admin and session.account.customer == ACCOUNT.customer:
-        return session
-
-    raise NO_SUCH_SESSION
 
 
 def with_session(function: Callable) -> Callable:
     """Converts the first argument of function into a sesion."""
 
     @wraps(function)
-    def wrapper(session_identifier: str, *args, **kwargs):
-        session = _get_session(session_identifier)
-        return function(session, *args, **kwargs)
+    def wrapper(ident: str, *args, **kwargs):
+        return function(get_session(ident), *args, **kwargs)
 
     return wrapper
 
 
+@require_json(dict)
 def login() -> Union[JSON, JSONMessage]:
     """Opens a new session for the respective account."""
 
@@ -127,7 +100,7 @@ def close(session: Session) -> JSON:
 ROUTES = (
     ('POST', '/session', login),
     ('GET', '/session', list_),
-    ('GET', '/session/<session_identifier>', get),
-    ('PUT', '/session/<session_identifier>', refresh),
-    ('DELETE', '/session/<session_identifier>', close)
+    ('GET', '/session/<ident>', get),
+    ('PUT', '/session/<ident>', refresh),
+    ('DELETE', '/session/<ident>', close)
 )

@@ -4,7 +4,7 @@ from wsgilib import JSON
 
 from his.api import authenticated
 from his.contextlocals import ACCOUNT
-from his.orm import Service
+from his.orm.service import Service
 
 
 __all__ = ['ROUTES']
@@ -14,11 +14,13 @@ __all__ = ['ROUTES']
 def list_() -> JSON:
     """Lists promoted services."""
 
-    if ACCOUNT.root:
-        return JSON([service.to_json() for service in Service])
+    select = Service.select()
+    condition = True
 
-    return JSON([service.to_json() for service in Service.select().where(
-        Service.promote == 1)])
+    if not ACCOUNT.root:
+        condition &= Service.promote != 0
+
+    return JSON([service.to_json() for service in select.where(condition)])
 
 
 ROUTES = [('GET', '/service', list_)]

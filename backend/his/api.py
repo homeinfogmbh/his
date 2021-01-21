@@ -5,7 +5,7 @@ from typing import Callable
 
 from his.authorization import check
 from his.contextlocals import SESSION, get_session_duration
-from his.exceptions import AccountLocked, NotAuthorized, SessionExpired
+from his.exceptions import AccountLocked, NotAuthorized
 from his.orm import Service
 
 
@@ -22,9 +22,6 @@ def authenticated(function: Callable) -> Callable:
         """Wraps the respective function
         with preceding authentication.
         """
-        if not SESSION.alive:
-            raise SessionExpired()
-
         # Need to explicitely check SESSION.account,
         # not ACCOUNT since it might be substituted!
         if SESSION.account.unusable:

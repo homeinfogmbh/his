@@ -1,5 +1,7 @@
 """HIS request context locals."""
 
+from datetime import datetime
+
 from flask import request
 from werkzeug.local import LocalProxy
 
@@ -43,7 +45,10 @@ def get_session_secret() -> str:
 def get_session() -> Session:
     """Returns the session from the cache."""
 
+    now = datetime.now()
     condition = Session.id == get_session_id()
+    condition &= Session.start < now
+    condition &= Session.end > now
     select = Session.select(Session, Account, Customer, Company)
     select = select.join(Account).join(Customer).join(Company)
 

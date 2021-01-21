@@ -2,6 +2,7 @@
 
 from typing import Union
 
+from his.contextlocals import ACCOUNT
 from his.orm.account import Account
 from his.orm.account_service import AccountService
 from his.orm.customer_service import CustomerService
@@ -14,6 +15,9 @@ __all__ = ['check']
 
 def check(account: Union[Account, int], service: Service) -> bool:
     """Checks whether the account may use the given service."""
+
+    if ACCOUNT.root:
+        return True
 
     condition = AccountService.account == account
     condition &= AccountService.service == service

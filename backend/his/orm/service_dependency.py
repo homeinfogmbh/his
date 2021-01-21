@@ -29,10 +29,9 @@ class ServiceDependency(HISModel):
         """Yields all dependencies of a service recursively."""
         yield service
         dependency = Service.alias()
-        condition = cls.service == service
-        select = cls.select(cls, Service).join(Service).join_from(
-            Service, dependency, on=Service.dependency == dependency.id)
+        select = cls.select(cls, Service, dependency).join(Service).join_from(
+            Service, dependency, on=cls.dependency == dependency.id)
 
-        for service_dependency in select.where(condition):
-            yield service_dependency.service
-            yield from cls.tree(service_dependency.service)
+        for service_dependency in select.where(cls.service == service):
+            yield service_dependency.dependency
+            yield from cls.tree(service_dependency.dependency)

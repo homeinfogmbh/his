@@ -23,7 +23,7 @@ def check(account: Union[Account, int], service: Service) -> bool:
     condition &= AccountService.service == service
 
     for account_service in AccountService.select().where(condition):
-        if service in ServiceDependency.tree(account_service.service):
+        if service in set(ServiceDependency.tree(account_service.service)):
             break
     else:
         return False
@@ -32,7 +32,7 @@ def check(account: Union[Account, int], service: Service) -> bool:
     condition &= CustomerService.service == service
 
     for customer_service in CustomerService.active().where(condition):
-        if service in ServiceDependency.tree(customer_service.service):
+        if service in set(ServiceDependency.tree(customer_service.service)):
             break
     else:
         return False

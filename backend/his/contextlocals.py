@@ -48,7 +48,7 @@ def get_session() -> Session:
     select = select.join(Account).join(Customer).join(Company)
 
     try:
-        session = Session.where(condition).get()
+        session = select.where(condition).get()
     except Session.DoesNotExist:
         raise SessionExpired() from None
 

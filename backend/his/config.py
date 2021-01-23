@@ -19,7 +19,7 @@ def read():
     """Reads the configuration file."""
 
     CONFIG.read('/usr/local/etc/his.d/his.conf')
-    DATABASE.load_config(CONFIG.get('db', {}))
+    DATABASE.load_config(CONFIG['db'])
     CORS.clear()
 
     with open('/usr/local/etc/his.d/cors.json', 'r') as file:

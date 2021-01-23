@@ -4,13 +4,14 @@ from configparser import ConfigParser
 from json import load
 
 from peeweeplus import MySQLDatabase
+from wsgilib import CORS as Cors
 
 
 __all__ = ['CONFIG', 'CORS', 'RECAPTCHA', 'read']
 
 
 CONFIG = ConfigParser()
-CORS = {}
+CORS = Cors()
 DATABASE = MySQLDatabase(None)
 RECAPTCHA = {}
 

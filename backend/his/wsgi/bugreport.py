@@ -18,9 +18,6 @@ from his.wsgi.functions import check_recaptcha
 __all__ = ['ROUTES']
 
 
-BUGREPORT_CONFIG = CONFIG['bugreport']
-
-
 @require_json(dict)
 def gen_emails() -> Iterator[EMail]:
     """Yields bug report emails."""

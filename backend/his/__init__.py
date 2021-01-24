@@ -4,7 +4,7 @@ HOMEINFO's SSO web service framework.
 """
 from his.api import authenticated, authorized, admin, root
 from his.application import Application
-from his.config import CORS, read
+from his.config import CORS
 from his.contextlocals import ACCOUNT, CUSTOMER, SESSION
 from his.crypto import genpw
 from his.mail import get_mailer
@@ -26,7 +26,6 @@ __all__ = [
     'admin',
     'genpw',
     'get_mailer',
-    'read',
     'require_json',
     'root',
     'service'

@@ -1,11 +1,14 @@
 """Common ORM constants, functions and models."""
 
-from peeweeplus import JSONModel
+from peeweeplus import JSONModel, MySQLDatabase
 
-from his.config import DATABASE
+from his.config import CONFIG
 
 
 __all__ = ['DATABASE', 'HISModel']
+
+
+DATABASE = MySQLDatabase.from_config(CONFIG['db'])
 
 
 class HISModel(JSONModel):

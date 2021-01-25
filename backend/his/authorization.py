@@ -20,17 +20,19 @@ def check(account: Union[Account, int], service: Service) -> bool:
 
     condition = AccountService.account == account
     condition &= AccountService.service == service
+    select = AccountService.select(AccountService, Service).join(Service)
 
-    for account_service in AccountService.select().where(condition):
+    for account_service in select.where(condition):
         if service in set(ServiceDependency.tree(account_service.service)):
             break
     else:
-        return False
+        raise NotAuthorized('')
 
     condition = CustomerService.customer == account.customer
     condition &= CustomerService.service == service
+    select = CustomerService.select(CustomerService, Service).join(Service)
 
-    for customer_service in CustomerService.active().where(condition):
+    for customer_service in select.where(condition):
         if service in set(ServiceDependency.tree(customer_service.service)):
             break
     else:

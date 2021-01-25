@@ -18,12 +18,12 @@ def check(account: Union[Account, int], service: Service) -> bool:
     if account.root:
         return True
 
-    condition = AccountService.account == account
-    condition &= AccountService.service == service
-    select = AccountService.select(AccountService, Service).join(Service)
+    condition = CustomerService.customer == account.customer
+    condition &= CustomerService.service == service
+    select = CustomerService.select(CustomerService, Service).join(Service)
 
-    for account_service in select.where(condition):
-        if service in set(ServiceDependency.tree(account_service.service)):
+    for customer_service in select.where(condition):
+        if service in set(ServiceDependency.tree(customer_service.service)):
             break
     else:
         return False
@@ -31,12 +31,12 @@ def check(account: Union[Account, int], service: Service) -> bool:
     if account.admin:
         return True
 
-    condition = CustomerService.customer == account.customer
-    condition &= CustomerService.service == service
-    select = CustomerService.select(CustomerService, Service).join(Service)
+    condition = AccountService.account == account
+    condition &= AccountService.service == service
+    select = AccountService.select(AccountService, Service).join(Service)
 
-    for customer_service in select.where(condition):
-        if service in set(ServiceDependency.tree(customer_service.service)):
+    for account_service in select.where(condition):
+        if service in set(ServiceDependency.tree(account_service.service)):
             break
     else:
         return False

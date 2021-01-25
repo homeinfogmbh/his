@@ -26,7 +26,10 @@ def check(account: Union[Account, int], service: Service) -> bool:
         if service in set(ServiceDependency.tree(account_service.service)):
             break
     else:
-        raise NotAuthorized('')
+        return False
+
+    if account.admin:
+        return True
 
     condition = CustomerService.customer == account.customer
     condition &= CustomerService.service == service

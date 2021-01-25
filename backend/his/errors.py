@@ -89,7 +89,7 @@ ERRORS = {
         key=error.key, value=error.value),
     NoSessionSpecified: lambda _: JSONMessage(
         'No session specified.', status=401),
-    NotAuthorized: lambda _: NOT_AUTHORIZED,
+    NotAuthorized: lambda error: NOT_AUTHORIZED.update(reasons=error.args),
     PasswordResetToken.DoesNotExist: lambda _: INVALID_RESET_TOKEN,
     PasswordTooShortError: lambda error: PASSWORD_TOO_SHORT.update(
         minlen=error.minlen),

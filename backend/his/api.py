@@ -51,7 +51,7 @@ def authorized(service_name: str) -> Callable:
             if check(SESSION.account, service):
                 return function(*args, **kwargs)
 
-            raise NotAuthorized()
+            raise NotAuthorized(str(SESSION.account), str(service))
 
         return wrapper
 

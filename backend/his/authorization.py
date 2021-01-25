@@ -30,7 +30,7 @@ def check_customer_services(customer: Union[Customer, int],
                             service: Service) -> bool:
     """Checks the customer services."""
 
-    select = CustomerService.select(CustomerService, Service).join(
+    select = CustomerService.select().where(
         CustomerService.customer == customer)
     return check_dependency_tree(select, service)
 
@@ -39,8 +39,7 @@ def check_account_services(account: Union[Account, int],
                            service: Service) -> bool:
     """Checks the account services."""
 
-    select = AccountService.select(AccountService, Service).join(
-        AccountService.account == account)
+    select = AccountService.select().where(AccountService.account == account)
     return check_dependency_tree(select, service)
 
 

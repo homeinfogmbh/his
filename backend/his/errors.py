@@ -46,7 +46,7 @@ PASSWORD_TOO_SHORT = JSONMessage('Password too short.', status=415)
 
 
 ERRORS = {
-    KeyError: lambda error: KEY_ERROR.update(key=str(error)),
+    #KeyError: lambda error: KEY_ERROR.update(key=str(error)),
     Account.DoesNotExist: lambda _: JSONMessage(
         'No such account.', status=404),
     AccountLimitReached: lambda _: JSONMessage(

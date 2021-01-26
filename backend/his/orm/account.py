@@ -111,8 +111,8 @@ class Account(HISModel):    # pylint: disable=R0902
             return super().select(*args, **kwargs)
 
         args = {cls, Customer, Company, Address, *args}
-        return super().select(*args).join(Customer).join(Company).join(
-            Address, join_type=JOIN.LEFT_OUTER)
+        return super().select(*args, **kwargs).join(Customer).join(
+            Company).join(Address, join_type=JOIN.LEFT_OUTER)
 
     @property
     def locked(self) -> bool:

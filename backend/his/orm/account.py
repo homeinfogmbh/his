@@ -6,6 +6,7 @@ from email.utils import parseaddr
 from typing import Union
 
 from argon2.exceptions import VerifyMismatchError
+from peewee import JOIN
 from peewee import BooleanField
 from peewee import CharField
 from peewee import DateTimeField
@@ -13,7 +14,7 @@ from peewee import ForeignKeyField
 from peewee import IntegerField
 from peewee import ModelSelect
 
-from mdb import Company, Customer
+from mdb import Company, Customer, Address
 from peeweeplus import InvalidKeys, Argon2Field
 
 from his.exceptions import AccountLocked
@@ -102,6 +103,16 @@ class Account(HISModel):    # pylint: disable=R0902
         select = cls.select(cls, Customer, Company)
         select = select.join(Customer).join(Company)
         return select.where(condition).get()
+
+    @classmethod
+    def select(cls, *args, cascade: bool = False, **kwargs) -> ModelSelect:
+        """Selects accounts."""
+        if not cascade:
+            return super().select(*args, **kwargs)
+
+        args = {cls, Customer, Company, Address, *args}
+        return super().select(*args).join(Customer).join(Company).join(
+            Address, join_type=JOIN.LEFT_OUTER)
 
     @property
     def locked(self) -> bool:

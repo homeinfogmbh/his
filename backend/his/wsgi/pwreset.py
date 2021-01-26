@@ -30,7 +30,8 @@ def _request_reset() -> JSONMessage:
         return JSONMessage('No account specified.', status=400)
 
     try:
-        account = Account.get(Account.name == name)
+        account = Account.select(cascade=True).where(
+            Account.name == name).get()
     except Account.DoesNotExist:
         return PASSWORD_RESET_SENT  # Avoid account sniffing.
 

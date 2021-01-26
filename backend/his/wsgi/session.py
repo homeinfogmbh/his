@@ -26,7 +26,8 @@ def login() -> Union[JSON, JSONMessage]:
     passwd = request.json['passwd']
 
     try:
-        account = Account.get(Account.name == account)
+        account = Account.select(cascade=True).where(
+            Account.name == account).get()
     except Account.DoesNotExist:
         raise InvalidCredentials() from None
 

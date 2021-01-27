@@ -8,7 +8,7 @@ from peewee import DateTimeField
 from peewee import ForeignKeyField
 from peewee import ModelSelect
 
-from mdb import Account, Company, Customer
+from mdb import Company, Customer
 
 from his.orm.common import HISModel
 from his.orm.service import Service
@@ -64,6 +64,6 @@ class CustomerService(HISModel):
         if not cascade:
             return super().select(*args, **kwargs)
 
-        args = {cls, Account, Customer, Company, Service}
-        return super().select(*args, **kwargs).join(Account).join(
-            Customer).join(Company).join_from(cls, Service)
+        args = {cls, Customer, Company, Service}
+        return super().select(*args, **kwargs).join(Customer).join(
+            Company).join_from(cls, Service)

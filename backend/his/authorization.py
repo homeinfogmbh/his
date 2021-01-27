@@ -1,8 +1,6 @@
 """Authorization functions."""
 
-from typing import Iterator, Union
-
-from peewee import ModelSelect
+from typing import Iterable, Iterator, Union
 
 from mdb import Customer
 
@@ -16,37 +14,41 @@ from his.orm.service_dependency import ServiceDependency
 __all__ = ['check']
 
 
+Mapping = Union[AccountService, CustomerService]
+
+
 def get_dependencies(service: Service) -> Iterator[Service]:
     """Returns the dependencies of a service."""
 
     return ServiceDependency.dependencies(service)
 
 
-def check_dependency_tree(select: ModelSelect, service: Service) -> bool:
+def check_dependency_tree(mapping: Mapping, service: Service) -> bool:
     """Cheks the dependency tree."""
 
-    for mapping in select:
-        if service in {mapping.service, *get_dependencies(mapping.service)}:
-            return True
-
-    return False
+    return service in {mapping.service, *get_dependencies(mapping.service)}
 
 
-def check_customer_services(customer: Union[Customer, int],
-                            service: Service) -> bool:
+def check_mappings(mappings: Iterable[Mapping], service: Service) -> bool:
+    """Checks the services mappings."""
+
+    return any(check_dependency_tree(mapping, service) for mapping in mappings)
+
+
+def check_customer(customer: Union[Customer, int], service: Service) -> bool:
     """Checks the customer services."""
 
-    select = CustomerService.select().where(
+    select = CustomerService.select(cascade=True).where(
         CustomerService.customer == customer)
-    return check_dependency_tree(select, service)
+    return check_mappings(select, service)
 
 
-def check_account_services(account: Union[Account, int],
-                           service: Service) -> bool:
+def check_account(account: Union[Account, int], service: Service) -> bool:
     """Checks the account services."""
 
-    select = AccountService.select().where(AccountService.account == account)
-    return check_dependency_tree(select, service)
+    select = AccountService.select(cascade=True).where(
+        AccountService.account == account)
+    return check_mappings(select, service)
 
 
 def check(account: Union[Account, int], service: Service) -> bool:
@@ -55,10 +57,10 @@ def check(account: Union[Account, int], service: Service) -> bool:
     if account.root:
         return True
 
-    if not check_customer_services(account.customer, service):
+    if not check_customer(account.customer, service):
         return False
 
     if account.admin:
         return True
 
-    return check_account_services(account, service)
+    return check_account(account, service)

@@ -67,7 +67,7 @@ class Session(HISModel):
 
         sessions = cls.select().where(cls.end < before)
 
-        for count, session in enumerate(sessions, start = 1):
+        for count, session in enumerate(sessions, start=1):
             session.delete_instance()
             LOGGER.info('Cleaned up session: %s', session)
 

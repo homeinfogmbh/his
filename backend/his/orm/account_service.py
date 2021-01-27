@@ -3,7 +3,9 @@
 from __future__ import annotations
 from typing import Union
 
-from peewee import ForeignKeyField
+from peewee import ForeignKeyField, ModelSelect
+
+from mdb import Company, Customer
 
 from his.orm.account import Account
 from his.orm.common import HISModel
@@ -39,3 +41,13 @@ class AccountService(HISModel):
             record = cls(account=account, service=service)
             record.save()
             return record
+
+    @classmethod
+    def select(cls, *args, cascade: bool = False, **kwargs) -> ModelSelect:
+        """Selects account services."""
+        if not cascade:
+            return super().select(*args, **kwargs)
+
+        args = {cls, Account, Customer, Company, Service}
+        return super().select(*args, **kwargs).join(Account).join(
+            Customer).join(Company).join_from(cls, Service)

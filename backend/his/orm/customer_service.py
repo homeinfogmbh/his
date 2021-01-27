@@ -8,7 +8,7 @@ from peewee import DateTimeField
 from peewee import ForeignKeyField
 from peewee import ModelSelect
 
-from mdb import Customer
+from mdb import Account, Company, Customer
 
 from his.orm.common import HISModel
 from his.orm.service import Service
@@ -57,3 +57,13 @@ class CustomerService(HISModel):
         condition = (cls.start >> None) | (now >= cls.end)
         condition &= (cls.end >> None) | (now <= cls.end)
         return cls.select().where(condition)
+
+    @classmethod
+    def select(cls, *args, cascade: bool = False, **kwargs) -> ModelSelect:
+        """Selects customer services."""
+        if not cascade:
+            return super().select(*args, **kwargs)
+
+        args = {cls, Account, Customer, Company, Service}
+        return super().select(*args, **kwargs).join(Account).join(
+            Customer).join(Company).join_from(cls, Service)

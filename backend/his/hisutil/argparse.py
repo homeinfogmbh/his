@@ -70,4 +70,5 @@ def get_args() -> Namespace:
     subparsers = parser.add_subparsers(dest='target')
     _add_account_parser(subparsers)
     _add_service_parser(subparsers)
+    subparsers.add_parser('session-cleanup', help='cleanup dead sessions')
     return parser.parse_args()

@@ -25,7 +25,7 @@ class ServiceDependency(HISModel):
         lazy_load=False)
 
     @classmethod
-    def tree(cls, service: Union[Service, int]) -> Iterator[Service]:
+    def dependencies(cls, service: Union[Service, int]) -> Iterator[Service]:
         """Yields all dependencies of a service recursively."""
         dependency = Service.alias()
         select = cls.select(cls, Service, dependency).join(
@@ -33,6 +33,5 @@ class ServiceDependency(HISModel):
             cls, dependency, on=cls.dependency == dependency.id)
 
         for service_dependency in select.where(cls.service == service):
-            yield service_dependency.service
             yield service_dependency.dependency
-            yield from cls.tree(service_dependency.dependency)
+            yield from cls.dependencies(service_dependency.dependency)

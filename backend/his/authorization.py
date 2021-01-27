@@ -1,6 +1,6 @@
 """Authorization functions."""
 
-from typing import Union
+from typing import Iterator, Union
 
 from peewee import ModelSelect
 
@@ -16,11 +16,17 @@ from his.orm.service_dependency import ServiceDependency
 __all__ = ['check']
 
 
+def get_dependencies(service: Service) -> Iterator[Service]:
+    """Returns the dependencies of a service."""
+
+    return ServiceDependency.dependencies(service)
+
+
 def check_dependency_tree(select: ModelSelect, service: Service) -> bool:
     """Cheks the dependency tree."""
 
     for mapping in select:
-        if service in set(ServiceDependency.tree(mapping.service)):
+        if service in {mapping.service, *get_dependencies(mapping.service)}:
             return True
 
     return False

@@ -14,10 +14,7 @@ LOGGER = getLogger('hisutil')
 def cleanup():
     """Cleans up orphaned sessions."""
 
-    count = 0
-
-    for count, session in enumerate(Session.cleanup(), start=1):
-        LOGGER.info('Removing session: %s', session)
+    count = Session.cleanup()
 
     if count:
         LOGGER.info('Deleted %i orphaned sessions.', count)

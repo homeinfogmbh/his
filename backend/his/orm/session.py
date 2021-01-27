@@ -58,14 +58,20 @@ class Session(HISModel):
         return NewSession(session=session, secret=secret)
 
     @classmethod
-    def cleanup(cls, before: Optional[datetime] = None) -> None:
+    def cleanup(cls, before: Optional[datetime] = None) -> int:
         """Cleans up orphaned sessions."""
+        count = 0
+
         if before is None:
             before = datetime.now()
 
-        for session in cls.select().where(cls.end < before):
+        sessions = cls.select().where(cls.end < before)
+
+        for count, session in enumerate(sessions, start = 1):
             session.delete_instance()
             LOGGER.info('Cleaned up session: %s', session)
+
+        return count
 
     def verify(self, secret: str) -> bool:
         """Verifies the session."""

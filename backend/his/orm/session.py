@@ -9,7 +9,9 @@ from argon2.exceptions import VerifyMismatchError
 from peewee import BooleanField
 from peewee import DateTimeField
 from peewee import ForeignKeyField
+from peewee import ModelSelect
 
+from mdb import Company, Customer
 from peeweeplus import Argon2Field
 
 from his.crypto import genpw
@@ -72,6 +74,16 @@ class Session(HISModel):
             LOGGER.info('Cleaned up session: %s', session)
 
         return count
+
+    @classmethod
+    def select(cls, *args, cascade: bool = False, **kwargs) -> ModelSelect:
+        """Selects sessions."""
+        if not cascade:
+            return super().select(*args, **kwargs)
+
+        args = {cls, Account, Customer, Company, *args}
+        return super().select(*args, **kwargs).join(Account).join(
+            Customer).join(Company)
 
     def verify(self, secret: str) -> bool:
         """Verifies the session."""

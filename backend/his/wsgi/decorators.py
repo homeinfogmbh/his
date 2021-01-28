@@ -1,7 +1,7 @@
 """Decorators for WSGI functions."""
 
 from functools import wraps
-from typing import Any, Callable
+from typing import Any, Callable, Optional
 
 from flask import request
 
@@ -37,7 +37,7 @@ def with_session(function: AnyFunc) -> AnyFunc:
     """Converts the first argument of function into a sesion."""
 
     @wraps(function)
-    def wrapper(ident: str, *args, **kwargs) -> Any:
+    def wrapper(ident: Optional[int], *args, **kwargs) -> Any:
         return function(get_session(ident), *args, **kwargs)
 
     return wrapper

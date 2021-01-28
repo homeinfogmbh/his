@@ -122,5 +122,6 @@ ROUTES = [
     ('GET', '/account/<int:ident>', get),
     ('GET', '/account/!', get),
     ('POST', '/account', add),
-    ('PATCH', '/account/!', get)
+    ('PATCH', '/account/<int:ident>', patch),
+    ('PATCH', '/account/!', patch)
 ]

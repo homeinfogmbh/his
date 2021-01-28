@@ -90,7 +90,10 @@ def close(session: Session) -> JSON:
 ROUTES = (
     ('POST', '/session', login),
     ('GET', '/session', list_),
-    ('GET', '/session/<ident>', get),
-    ('PUT', '/session/<ident>', refresh),
-    ('DELETE', '/session/<ident>', close)
+    ('GET', '/session/<int:ident>', get),
+    ('GET', '/session/!', get),
+    ('PUT', '/session/<int:ident>', refresh),
+    ('PUT', '/session/!', refresh),
+    ('DELETE', '/session/<int:ident>', close),
+    ('DELETE', '/session/!', close)
 )

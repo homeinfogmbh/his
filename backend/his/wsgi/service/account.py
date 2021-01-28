@@ -31,12 +31,12 @@ def list_() -> JSON:
 def add() -> JSONMessage:
     """Allows the respective account to use the given service."""
 
-    account = get_account(request.json['account'])
+    account = get_account(request.json.pop('account'))
 
     if account not in ACCOUNT.subjects:
         return NOT_AUTHORIZED
 
-    service = get_service(request.json['service'])
+    service = get_service(request.json.pop('service'))
     account_service = AccountService.add(account, service)
     return JSONMessage('Account service added.', id=account_service.id,
                        status=200)

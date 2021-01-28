@@ -1,6 +1,6 @@
 """Common functions for WSGI."""
 
-from typing import Union
+from typing import Optional
 
 from flask import request
 from peewee import ModelSelect
@@ -63,7 +63,7 @@ def get_account(name: str) -> Account:
     except Account.DoesNotExist:
         raise NotAuthorized() from None     # Prevent account name sniffing.
 
-    if ACCOUNT.admin and account.customer == CUSTOMER:
+    if ACCOUNT.admin and account.customer == CUSTOMER.id:
         return account
 
     if ACCOUNT.name == account.name and ACCOUNT.id == account.id:
@@ -72,30 +72,31 @@ def get_account(name: str) -> Account:
     raise NotAuthorized()
 
 
-def get_account_service(account: Union[Account, int],
-                        name: str) -> AccountService:
+def get_account_service(ident: int) -> AccountService:
     """Selects the account services of the give account."""
 
-    return get_account_services(account).where(Service.name == name).get()
+    return get_account_services().where(AccountService.id == ident).get()
 
 
-def get_account_services(account: Union[Account, int]) -> ModelSelect:
+def get_account_services() -> ModelSelect:
     """Selects the account services of the give account."""
 
-    return AccountService.select(AccountService, Service).join(Service).where(
-        AccountService.account == account)
+    return AccountService.select(cascade=True).join(Service).where(
+        AccountService.account == ACCOUNT.id)
 
 
-def get_customer(name: str) -> Customer:
+def get_customer(ident: Optional[int]) -> Customer:
     """Returns the customer by the respective customer ID."""
 
-    if name == '!':
+    if ident is None:
         return CUSTOMER._get_current_object()   # pylint: disable=W0212
 
-    customer = Customer.select(Customer, Company).join(Company).where(
-        Customer.id == int(name)).get()
+    customer = Customer.select(cascade=True).where(Customer.id == ident).get()
 
-    if ACCOUNT.root or (ACCOUNT.admin and customer == ACCOUNT.customer):
+    if ACCOUNT.root:
+        return customer
+
+    if ACCOUNT.admin and customer == ACCOUNT.customer:
         return customer
 
     if customer.id == CUSTOMER.id:
@@ -104,42 +105,40 @@ def get_customer(name: str) -> Customer:
     raise Customer.DoesNotExist()
 
 
-def get_customer_service(customer: Union[Customer, int],
-                         service: Union[Service, int]) -> CustomerService:
+def get_customer_service(ident: int) -> CustomerService:
     """Returns the customer service mapping
     of the given customer and service.
     """
 
-    return get_customer_services(customer).where(
-        CustomerService.service == service).get()
+    return get_customer_services().where(CustomerService.id == ident).get()
 
 
-def get_customer_services(customer: Union[Customer, int]) -> ModelSelect:
+def get_customer_services() -> ModelSelect:
     """Selects customer service mappings for the given customer."""
 
     return CustomerService.select(cascade=True).where(
-        CustomerService.customer == customer)
+        CustomerService.customer == CUSTOMER.id)
 
 
 def get_customer_settings() -> CustomerSettings:
     """Returns the respective customer settings."""
 
     return CustomerSettings.select().where(
-        CustomerSettings.customer == CUSTOMER).get()
+        CustomerSettings.customer == CUSTOMER.id).get()
 
 
-def get_service(name: str) -> Service:
+def get_service(ident: int) -> Service:
     """Returns the respective service."""
 
-    return Service.select().where(Service.name == name).get()
+    return Service.select().where(Service.id == ident).get()
 
 
-def get_session(ident: str) -> Session:
+def get_session(ident: Optional[int]) -> Session:
     """Returns the respective session by the
     resource identifier with authorization checks.
     """
 
-    if ident == '!':
+    if ident is None:
         return SESSION._get_current_object()    # pylint: disable=W0212
 
     session = Session.select(

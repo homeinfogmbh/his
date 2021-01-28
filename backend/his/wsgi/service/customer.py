@@ -31,8 +31,8 @@ def list_() -> JSON:
 def add() -> JSONMessage:
     """Allows the respective customer to use the given service."""
 
-    customer = get_customer(request.json['customer'])
-    service = get_service(request.json['service'])
+    customer = get_customer(request.json.pop('customer'))
+    service = get_service(request.json.pop('service'))
     customer_service = CustomerService.add(customer, service)
     return JSONMessage('Customer service added.', id=customer_service.id,
                        status=201)

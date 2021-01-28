@@ -8,8 +8,8 @@ from his.api import authenticated, admin
 from his.contextlocals import ACCOUNT
 from his.errors import NOT_AUTHORIZED
 from his.orm.account_service import AccountService
-from his.wsgi.account import get_account
 from his.wsgi.decorators import require_json
+from his.wsgi.functions import get_account
 from his.wsgi.functions import get_account_service
 from his.wsgi.functions import get_account_services
 from his.wsgi.functions import get_service

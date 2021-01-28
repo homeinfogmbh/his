@@ -117,11 +117,8 @@ def get_customer_service(customer: Union[Customer, int],
 def get_customer_services(customer: Union[Customer, int]) -> ModelSelect:
     """Selects customer service mappings for the given customer."""
 
-    return CustomerService.select(
-        CustomerService, Customer, Company, Service
-    ).join(Customer).join(Company).join_from(CustomerService, Service).where(
-        CustomerService.customer == customer
-    )
+    return CustomerService.select(cascade=True).where(
+        CustomerService.customer == customer)
 
 
 def get_customer_settings() -> CustomerSettings:

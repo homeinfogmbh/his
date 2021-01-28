@@ -1,15 +1,14 @@
 """Decorators for WSGI functions."""
 
 from functools import wraps
-from typing import Any, Callable, Optional
+from typing import Any, Callable
 
 from flask import request
 
 from his.exceptions import InvalidData
-from his.wsgi.functions import get_session
 
 
-__all__ = ['require_json', 'with_session']
+__all__ = ['require_json']
 
 
 AnyFunc = Callable[..., Any]
@@ -31,13 +30,3 @@ def require_json(typ: type) -> Callable[[AnyFunc], AnyFunc]:
         return wrapper
 
     return decorator
-
-
-def with_session(function: AnyFunc) -> AnyFunc:
-    """Converts the first argument of function into a sesion."""
-
-    @wraps(function)
-    def wrapper(*args, ident: Optional[int], **kwargs) -> Any:
-        return function(*argsget_session(ident), **kwargs)
-
-    return wrapper

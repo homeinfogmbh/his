@@ -45,6 +45,6 @@ def get_logo() -> Binary:
 ROUTES = (
     ('GET', '/customer', list_),
     ('GET', '/customer/<int:ident>', get),
-    ('GET', '/customer/!', get),
+    ('GET', '/customer/!', lambda: get()),  # pylint: disable=W0108
     ('GET', '/customer-logo', get_logo)
 )

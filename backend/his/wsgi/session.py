@@ -1,6 +1,6 @@
 """HIS session service."""
 
-from typing import Union
+from typing import Optional, Union
 
 from flask import request
 
@@ -12,7 +12,8 @@ from his.exceptions import InvalidCredentials, NotAuthorized
 from his.functions import set_session_cookie, delete_session_cookie
 from his.orm.account import Account
 from his.orm.session import Session
-from his.wsgi.decorators import require_json, with_session
+from his.wsgi.decorators import require_json
+from his.wsgi.functions import get_session
 
 
 __all__ = ['ROUTES']
@@ -60,29 +61,25 @@ def list_() -> Union[JSON, JSONMessage]:
 
 
 @authenticated
-@with_session
-def get(session) -> JSON:
+def get(ident: Optional[int] = None) -> JSON:
     """Lists the respective session."""
 
-    return JSON(session.to_json())
+    return JSON(get_session(ident).to_json())
 
 
 @authenticated
-@with_session
-def refresh(session: Session) -> JSON:
+def refresh(ident: Optional[int] = None) -> JSON:
     """Refreshes an existing session."""
 
     # Refresh is done by @authenricated automatically.
-    return JSON(session.to_json())
+    return JSON(get_session(ident).to_json())
 
 
 @authenticated
-@with_session
-def close(session: Session) -> JSON:
+def close(ident: Optional[int] = None) -> JSON:
     """Closes the provided session."""
 
-    ident = session.id
-    session.delete_instance()
+    get_session(ident).delete_instance()
     response = JSON({'closed': ident})
     return delete_session_cookie(response)
 
@@ -91,9 +88,9 @@ ROUTES = (
     ('POST', '/session', login),
     ('GET', '/session', list_),
     ('GET', '/session/<int:ident>', get),
-    ('GET', '/session/!', get),
+    ('GET', '/session/!', lambda: get()),   # pylint: disable=W0108
     ('PUT', '/session/<int:ident>', refresh),
-    ('PUT', '/session/!', refresh),
+    ('PUT', '/session/!', lambda: refresh()),   # pylint: disable=W0108
     ('DELETE', '/session/<int:ident>', close),
-    ('DELETE', '/session/!', close)
+    ('DELETE', '/session/!', lambda: close())   # pylint: disable=W0108
 )

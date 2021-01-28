@@ -70,7 +70,7 @@ def list_() -> JSON:
 
 
 @authenticated
-def get(*, ident: Optional[int] = None) -> JSON:
+def get(ident: Optional[int] = None) -> JSON:
     """Gets an account by name."""
 
     return JSON(get_account(ident).to_json())
@@ -100,7 +100,7 @@ def add() -> JSONMessage:
 
 
 @authenticated
-def patch(*, ident: Optional[str] = None) -> JSONMessage:
+def patch(ident: Optional[str] = None) -> JSONMessage:
     """Modifies an account."""
 
     account = get_account(ident)
@@ -120,8 +120,8 @@ def patch(*, ident: Optional[str] = None) -> JSONMessage:
 ROUTES = [
     ('GET', '/account', list_),
     ('GET', '/account/<int:ident>', get),
-    ('GET', '/account/!', get),
+    ('GET', '/account/!', lambda: get()),   # pylint: disable=W0108
     ('POST', '/account', add),
     ('PATCH', '/account/<int:ident>', patch),
-    ('PATCH', '/account/!', patch)
+    ('PATCH', '/account/!', lambda: patch())    # pylint: disable=W0108
 ]

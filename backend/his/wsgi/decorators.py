@@ -37,7 +37,7 @@ def with_session(function: AnyFunc) -> AnyFunc:
     """Converts the first argument of function into a sesion."""
 
     @wraps(function)
-    def wrapper(ident: Optional[int], *args, **kwargs) -> Any:
-        return function(get_session(ident), *args, **kwargs)
+    def wrapper(*args, ident: Optional[int], **kwargs) -> Any:
+        return function(*argsget_session(ident), **kwargs)
 
     return wrapper

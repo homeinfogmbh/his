@@ -70,7 +70,7 @@ def list_() -> JSON:
 
 
 @authenticated
-def get(ident: Optional[int] = None) -> JSON:
+def get(*, ident: Optional[int] = None) -> JSON:
     """Gets an account by name."""
 
     return JSON(get_account(ident).to_json())
@@ -100,7 +100,7 @@ def add() -> JSONMessage:
 
 
 @authenticated
-def patch(ident: Optional[str] = None) -> JSONMessage:
+def patch(*, ident: Optional[str] = None) -> JSONMessage:
     """Modifies an account."""
 
     account = get_account(ident)

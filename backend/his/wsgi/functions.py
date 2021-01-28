@@ -5,7 +5,7 @@ from typing import Optional
 from flask import request
 from peewee import ModelSelect
 
-from mdb import Company, Customer
+from mdb import Customer
 from recaptcha import verify
 
 from his.config import RECAPTCHA
@@ -80,7 +80,7 @@ def get_account_service(ident: int) -> AccountService:
 def get_account_services() -> ModelSelect:
     """Selects the account services of the give account."""
 
-    return AccountService.select(cascade=True).join(Service).where(
+    return AccountService.select(cascade=True).where(
         AccountService.account == ACCOUNT.id)
 
 
@@ -140,9 +140,7 @@ def get_session(ident: Optional[int]) -> Session:
     if ident is None:
         return SESSION._get_current_object()    # pylint: disable=W0212
 
-    session = Session.select(
-        Session, Customer, Company).join(Customer).join(Company).where(
-        Session.id == ident).get()
+    session = Session.select(cascade=True).get()
 
     if SESSION.id == session.id:
         return session

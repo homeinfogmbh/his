@@ -5,7 +5,6 @@ from flask import request
 from wsgilib import JSON, JSONMessage
 
 from his.api import authenticated, root, admin
-from his.contextlocals import CUSTOMER
 from his.orm.customer_service import CustomerService
 from his.wsgi.decorators import require_json
 from his.wsgi.functions import get_customer
@@ -22,7 +21,7 @@ __all__ = ['ROUTES']
 def list_() -> JSON:
     """Lists services of the respective customer."""
 
-    return JSON([cs.to_json() for cs in get_customer_services(CUSTOMER.id)])
+    return JSON([cs.to_json() for cs in get_customer_services()])
 
 
 @authenticated
@@ -40,11 +39,10 @@ def add() -> JSONMessage:
 
 @authenticated
 @admin
-def delete(name: str) -> JSONMessage:
+def delete(ident: int) -> JSONMessage:
     """Deletes the respective account <> service mapping."""
 
-    service = get_service(name)
-    customer_service = get_customer_service(CUSTOMER.id, service)
+    customer_service = get_customer_service(ident)
     customer_service.delete_instance()
     return JSONMessage('Customer service deleted.', status=200)
 
@@ -52,5 +50,5 @@ def delete(name: str) -> JSONMessage:
 ROUTES = [
     ('GET', '/service/customer', list_),
     ('POST', '/service/customer', add),
-    ('DELETE', '/service/customer/<name>', delete)
+    ('DELETE', '/service/customer/<int:ident>', delete)
 ]

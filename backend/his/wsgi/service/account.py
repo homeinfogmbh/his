@@ -22,7 +22,7 @@ __all__ = ['ROUTES']
 def list_() -> JSON:
     """Lists account services of the current account."""
 
-    return JSON([acs.to_json() for acs in get_account_services(ACCOUNT.id)])
+    return JSON([acs.to_json() for acs in get_account_services()])
 
 
 @authenticated
@@ -44,17 +44,15 @@ def add() -> JSONMessage:
 
 @authenticated
 @admin
-def delete(name: str) -> JSONMessage:
+def delete(ident: int) -> JSONMessage:
     """Deletes the respective account <> service mapping."""
 
-    account_service = get_account_service(ACCOUNT.id, name)
-    account_service.delete_instance()
-    return JSONMessage('Account service deleted.', id=account_service.id,
-                       status=200)
+    get_account_service(ident).delete_instance()
+    return JSONMessage('Account service deleted.', status=200)
 
 
 ROUTES = [
     ('POST', '/service/account', add),
     ('GET', '/service/account', list_),
-    ('DELETE', '/service/account/<name>', delete)
+    ('DELETE', '/service/account/<int:ident>', delete)
 ]

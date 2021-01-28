@@ -70,14 +70,10 @@ def list_() -> JSON:
 
 
 @authenticated
-def get(name: str) -> JSON:
+def get(ident: Optional[int] = None) -> JSON:
     """Gets an account by name."""
 
-    if name == '!':
-        # Return the account of the current session.
-        return JSON(ACCOUNT.to_json())
-
-    return JSON(get_account(name).to_json())
+    return JSON(get_account(ident).to_json())
 
 
 @authenticated
@@ -104,10 +100,10 @@ def add() -> JSONMessage:
 
 
 @authenticated
-def patch(name: str) -> JSONMessage:
+def patch(ident: Optional[str] = None) -> JSONMessage:
     """Modifies an account."""
 
-    account = get_account(name)
+    account = get_account(ident)
 
     if ACCOUNT.root:
         return patch_account(account)
@@ -123,7 +119,8 @@ def patch(name: str) -> JSONMessage:
 
 ROUTES = [
     ('GET', '/account', list_),
-    ('GET', '/account/<name>', get),
+    ('GET', '/account/<int:ident>', get),
+    ('GET', '/account/!', get),
     ('POST', '/account', add),
-    ('PATCH', '/account/<name>', patch)
+    ('PATCH', '/account/!', get)
 ]

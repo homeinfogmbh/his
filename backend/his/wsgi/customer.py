@@ -1,5 +1,7 @@
 """Customer-level meta services."""
 
+from typing import Optional
+
 from peewee import ModelSelect
 
 from mdb import Company, Customer
@@ -27,7 +29,7 @@ def list_() -> JSON:
 
 
 @authenticated
-def get(ident: int) -> JSON:
+def get(ident: Optional[int] = None) -> JSON:
     """Allows services"""
 
     return JSON(get_customer(ident).to_json(company=True))
@@ -42,6 +44,7 @@ def get_logo() -> Binary:
 
 ROUTES = (
     ('GET', '/customer', list_),
-    ('GET', '/customer/<ident>', get),
+    ('GET', '/customer/<int:ident>', get),
+    ('GET', '/customer/!', get),
     ('GET', '/customer-logo', get_logo)
 )

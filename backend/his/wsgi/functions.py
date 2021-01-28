@@ -46,20 +46,19 @@ def check_recaptcha() -> bool:
     return verify(recaptcha['secret'], request.json['response'])
 
 
-def get_account(name: str) -> Account:
+def get_account(ident: Optional[int]) -> Account:
     """Safely returns the respective account."""
 
-    select = Account.select(
-        Account, Customer, Company).join(Customer).join(Company)
+    if ident is None:
+        return ACCOUNT._get_current_object()    # pylint: disable=W0212
 
-    if name == '!':
-        return select.where(Account.id == ACCOUNT.id).get()
+    select = Account.select(cascade=True).where(Account.id == ident)
 
     if ACCOUNT.root:
-        return select.where(Account.name == name).get()
+        return select.get()
 
     try:
-        account = select.where(Account.name == name).get()
+        account = select.get()
     except Account.DoesNotExist:
         raise NotAuthorized() from None     # Prevent account name sniffing.
 

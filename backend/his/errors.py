@@ -1,7 +1,5 @@
 """Error messages and error handlers."""
 
-from tracebock import print_exc
-
 from argon2.exceptions import VerifyMismatchError
 from peewee import IntegrityError
 
@@ -47,18 +45,7 @@ NOT_AUTHORIZED = JSONMessage('Not authorized.', status=403)
 PASSWORD_TOO_SHORT = JSONMessage('Password too short.', status=415)
 
 
-def dump_stracktrace(_: Exception) -> JSONMessage:
-    """Dumps a stracktrace of an unexpected exception."""
-
-    print('############################ cut here ############################')
-    print_exc()
-    print('######################## end of traceback ########################',
-          flush=True)
-    return JSONMessage('Internal server error.', status=500)
-
-
 ERRORS = {
-    Exception: lambda _: dump_stracktrace,
     Account.DoesNotExist: lambda _: JSONMessage(
         'No such account.', status=404),
     AccountLimitReached: lambda _: JSONMessage(

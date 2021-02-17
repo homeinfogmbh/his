@@ -5,7 +5,7 @@ from datetime import datetime
 from flask import request
 from werkzeug.local import LocalProxy
 
-from mdb import Company, Customer
+from mdb import Customer   # pylint: disable=E0401
 
 from his.config import CONFIG
 from his.exceptions import InvalidData
@@ -49,11 +49,9 @@ def get_session() -> Session:
     condition = Session.id == get_session_id()
     condition &= Session.start < now
     condition &= Session.end > now
-    select = Session.select(Session, Account, Customer, Company)
-    select = select.join(Account).join(Customer).join(Company)
 
     try:
-        session = select.where(condition).get()
+        session = Session.select(cascade=True).where(condition).get()
     except Session.DoesNotExist:
         raise SessionExpired() from None
 
@@ -76,8 +74,7 @@ def get_account() -> Account:
     except (TypeError, ValueError):
         raise InvalidData(int, type(account_id)) from None
 
-    select = Account.select(Account, Customer, Company)
-    select = select.join(Customer).join(Company)
+    select = Account.select(cascade=True)
     condition = Account.id == account_id
 
     if SESSION.account.root:
@@ -103,11 +100,10 @@ def get_customer() -> Customer:
     except (TypeError, ValueError):
         raise InvalidData(int, type(customer_id)) from None
 
-    select = Customer.select(Customer, Company).join(Company)
     condition = Customer.id == customer_id
 
     if SESSION.account.root:
-        return select.where(condition).get()
+        return Customer.select(cascade=True).where(condition).get()
 
     raise NotAuthorized()
 

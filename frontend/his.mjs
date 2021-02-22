@@ -63,19 +63,19 @@ function getParamString (args) {
 */
 export const request = {
     get: function (url, args, headers = {}) {
-        return _request.get(url + getParamString(args), headers);
+        return _request.get(url + getParamString(args), headers, true);
     },
     post: function (url, data, args, headers = {}) {
-        return _request.post(url + getParamString(args), data, headers);
+        return _request.post(url + getParamString(args), data, headers, true);
     },
     put: function (url, data, args, headers = {}) {
-        return _request.put(url + getParamString(args), data, headers);
+        return _request.put(url + getParamString(args), data, headers, true);
     },
     patch: function (url, data, args, headers = {}) {
-        return _request.patch(url + getParamString(args), data, headers);
+        return _request.patch(url + getParamString(args), data, headers, true);
     },
     delete: function (url, args, headers = {}) {
-        return _request.delete(url + getParamString(args), headers);
+        return _request.delete(url + getParamString(args), headers, true);
     }
 };
 

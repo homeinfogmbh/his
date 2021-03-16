@@ -33,9 +33,9 @@ def _request_reset() -> JSONMessage:
     except Account.DoesNotExist:
         return PASSWORD_RESET_SENT  # Avoid account sniffing.
 
-    PasswordResetToken.add(account)
+    token = PasswordResetToken.add(account)
     url = RECAPTCHA.get('url', CONFIG.get('pwreset', 'url'))
-    mail_password_reset_link(account.email, url)
+    mail_password_reset_link(token, url)
     return PASSWORD_RESET_SENT
 
 

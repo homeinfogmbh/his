@@ -7,7 +7,6 @@ from flask import request
 from wsgilib import JSONMessage
 
 from his.config import CONFIG, RECAPTCHA
-from his.errors import INVALID_RESET_TOKEN
 from his.exceptions import PasswordResetPending
 from his.orm.account import Account
 from his.orm.pwreset import PasswordResetToken
@@ -36,12 +35,12 @@ def _request_reset() -> JSONMessage:
         return PASSWORD_RESET_SENT  # Avoid account sniffing.
 
     try:
-        password_reset_token = PasswordResetToken.add(account)
+        PasswordResetToken.add(account)
     except PasswordResetPending:
         return JSONMessage('Password request pending.', status=200)
 
     url = RECAPTCHA.get('url', CONFIG.get('pwreset', 'url'))
-    mail_password_reset_link(password_reset_token.email, url)
+    mail_password_reset_link(account.email, url)
     return PASSWORD_RESET_SENT
 
 
@@ -70,17 +69,12 @@ def reset_password() -> JSONMessage:
     if not passwd:
         return JSONMessage('No password specified.', status=400)
 
-    token = PasswordResetToken.select(
-        PasswordResetToken, Account).join(Account).where(
+    token = PasswordResetToken.active().where(
         PasswordResetToken.token == token).get()
-
-    if not token.valid:
-        return INVALID_RESET_TOKEN
-
-    token.delete_instance()
     token.account.passwd = passwd
     token.account.failed_logins = 0
     token.account.save()
+    token.delete_instance()
     return JSONMessage('Password set.', status=200)
 
 

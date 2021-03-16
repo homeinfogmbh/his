@@ -30,14 +30,13 @@ from his.orm.service_dependency import ServiceDependency
 from his.orm.session import Session
 
 
-__all__ = ['ERRORS', 'INVALID_RESET_TOKEN']
+__all__ = ['ERRORS']
 
 
 FIELD_NOT_NULLABLE = JSONMessage('Field cannot be NULL.', status=422)
 FIELD_VALUE_ERROR = JSONMessage('Invalid value for field.', status=422)
 INVALID_CREDENTIALS = JSONMessage('Invalid credentials.', 400)
 INVALID_KEYS = JSONMessage('Invalid keys for model.', status=422)
-INVALID_RESET_TOKEN = JSONMessage('Invalid token.', 400)
 KEY_ERROR = JSONMessage('Missing JSON key.', status=400)
 MISSING_KEY_ERROR = JSONMessage('Missing key for field.', status=422)
 NON_UNIQUE_VALUE = JSONMessage('Value for field is not unique.', status=422)
@@ -89,7 +88,8 @@ ERRORS = {
     NoSessionSpecified: lambda _: JSONMessage(
         'No session specified.', status=401),
     NotAuthorized: lambda error: NOT_AUTHORIZED.update(reasons=error.args),
-    PasswordResetToken.DoesNotExist: lambda _: INVALID_RESET_TOKEN,
+    PasswordResetToken.DoesNotExist: lambda _: JSONMessage(
+        'Invalid token.', 400),
     PasswordTooShortError: lambda error: PASSWORD_TOO_SHORT.update(
         minlen=error.minlen),
     RecaptchaNotConfigured: lambda _: JSONMessage(

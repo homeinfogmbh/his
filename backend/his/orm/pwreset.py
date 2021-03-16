@@ -5,10 +5,13 @@ from datetime import datetime, timedelta
 from typing import Union
 from uuid import uuid4
 
+from peewee import JOIN
 from peewee import DateTimeField
 from peewee import ForeignKeyField
 from peewee import ModelSelect
 from peewee import UUIDField
+
+from mdb import Address, Company, Customer
 
 from his.exceptions import PasswordResetPending
 from his.orm.account import Account
@@ -37,7 +40,8 @@ class PasswordResetToken(HISModel):
     def add(cls, account: Union[Account, int]) -> PasswordResetToken:
         """Adds a new password reset token."""
         try:
-            record = cls.get(cls.account == account)
+            record = cls.select(cascade=True).where(
+                cls.account == account).get()
         except cls.DoesNotExist:
             record = cls(account=account)
             record.save()
@@ -52,11 +56,15 @@ class PasswordResetToken(HISModel):
     @classmethod
     def active(cls) -> ModelSelect:
         """Selects active tokens."""
-        select = cls.select(cls, Account).join(Account)
         condition = cls.created > (datetime.now() - VALIDITY)
-        return select.where(condition)
+        return cls.select(cascade=True).where(condition)
 
-    @property
-    def valid(self) -> bool:
-        """Checks whether the token is valid."""
-        return datetime.now() - self.created < VALIDITY
+    @classmethod
+    def select(cls, *args, cascade: bool = False, **kwargs) -> ModelSelect:
+        """Selects records."""
+        if not cascade:
+            return super().select(*args, **kwargs)
+
+        args = {cls, Account, Customer, Company, Address, *args}
+        return super().select(*args, **kwargs).join(Account).join(
+            Customer).join(Company).join(Address, join_type=JOIN.LEFT_OUTER)

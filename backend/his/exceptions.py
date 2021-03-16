@@ -7,7 +7,6 @@ __all__ = [
     'InvalidData',
     'NoSessionSpecified',
     'NotAuthorized',
-    'PasswordResetPending',
     'RecaptchaNotConfigured',
     'ServiceExistsError',
     'SessionExpired',
@@ -40,10 +39,6 @@ class NoSessionSpecified(Exception):
 
 class NotAuthorized(Exception):
     """Indicates an error due to insufficient permissions."""
-
-
-class PasswordResetPending(Exception):
-    """Indicates that a password reset is already pending."""
 
 
 class RecaptchaNotConfigured(Exception):

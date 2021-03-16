@@ -13,7 +13,6 @@ from peewee import UUIDField
 
 from mdb import Address, Company, Customer
 
-from his.exceptions import PasswordResetPending
 from his.orm.account import Account
 from his.orm.common import HISModel
 
@@ -40,18 +39,11 @@ class PasswordResetToken(HISModel):
     def add(cls, account: Union[Account, int]) -> PasswordResetToken:
         """Adds a new password reset token."""
         try:
-            record = cls.select(cascade=True).where(
-                cls.account == account).get()
+            return cls.active().where(cls.account == account).get()
         except cls.DoesNotExist:
             record = cls(account=account)
             record.save()
             return record
-
-        if record.valid:
-            raise PasswordResetPending()
-
-        record.delete_instance()
-        return cls.add(account)
 
     @classmethod
     def active(cls) -> ModelSelect:

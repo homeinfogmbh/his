@@ -55,3 +55,8 @@ class PasswordResetToken(HISModel):
         select = cls.select(cls, Account).join(Account)
         condition = cls.created > (datetime.now() - VALIDITY)
         return select.where(condition)
+
+    @property
+    def valid(self) -> bool:
+        """Checks whether the token is valid."""
+        return datetime.now() - self.created < VALIDITY

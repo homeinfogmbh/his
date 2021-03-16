@@ -27,10 +27,7 @@ def href(url: str, caption: str = None) -> str:
     """Makes a link."""
 
     link = Element('a', attrib={'href': url})
-
-    if caption is not None:
-        link.text = caption
-
+    link.text = caption or url
     return link
 
 

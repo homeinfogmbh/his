@@ -45,7 +45,8 @@ def mail_password_reset_link(token: PasswordResetToken, url: str):
     with open(template) as file:
         template = file.read()
 
-    link = tostring(href(add_token(url, token.token.hex)))
+    url = add_token(url, token.token.hex)
+    link = tostring(href(url), encoding='utf8', method='html')
     html = template.format(account=token.account.name, link=link)
     email = EMail(subject, sender, token.account.email, html=html)
     email.add_header('reply-to', reply_to)

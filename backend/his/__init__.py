@@ -10,7 +10,6 @@ from his.crypto import genpw
 from his.mail import get_mailer
 from his.orm import Account
 from his.parsers import account, service
-from his.wsgi.decorators import require_json
 
 
 __all__ = [
@@ -26,7 +25,6 @@ __all__ = [
     'admin',
     'genpw',
     'get_mailer',
-    'require_json',
     'root',
     'service'
 ]

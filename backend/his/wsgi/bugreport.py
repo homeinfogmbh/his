@@ -5,13 +5,12 @@ from typing import Iterator
 from flask import request
 
 from emaillib import EMail
-from wsgilib import JSONMessage
+from wsgilib import JSONMessage, require_json
 
 from his.api import authenticated
 from his.config import CONFIG
 from his.contextlocals import ACCOUNT
 from his.mail import get_mailer
-from his.wsgi.decorators import require_json
 from his.wsgi.functions import check_recaptcha
 
 

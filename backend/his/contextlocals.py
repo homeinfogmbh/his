@@ -6,9 +6,9 @@ from flask import request
 from werkzeug.local import LocalProxy
 
 from mdb import Customer   # pylint: disable=E0401
+from wsgilib import InvalidData
 
 from his.config import CONFIG
-from his.exceptions import InvalidData
 from his.exceptions import NotAuthorized
 from his.exceptions import NoSessionSpecified
 from his.exceptions import SessionExpired

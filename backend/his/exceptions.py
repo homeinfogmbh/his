@@ -4,7 +4,6 @@ __all__ = [
     'AccountLimitReached',
     'AccountLocked',
     'InvalidCredentials',
-    'InvalidData',
     'NoSessionSpecified',
     'NotAuthorized',
     'RecaptchaNotConfigured',
@@ -23,14 +22,6 @@ class AccountLocked(Exception):
 
 class InvalidCredentials(Exception):
     """Indicates invalid credentials such as user name or password."""
-
-
-class InvalidData(Exception):
-    """Indicates invalid data."""
-
-    def __str__(self):
-        """Returns an error message."""
-        return 'Expected data of type "%s", but got "%s".' % self.args
 
 
 class NoSessionSpecified(Exception):

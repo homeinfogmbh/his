@@ -2,13 +2,12 @@
 
 from flask import request
 
-from wsgilib import JSON, JSONMessage
+from wsgilib import JSON, JSONMessage, require_json
 
 from his.api import authenticated, admin
 from his.contextlocals import ACCOUNT
 from his.errors import NOT_AUTHORIZED
 from his.orm.account_service import AccountService
-from his.wsgi.decorators import require_json
 from his.wsgi.functions import get_account
 from his.wsgi.functions import get_account_service
 from his.wsgi.functions import get_account_services

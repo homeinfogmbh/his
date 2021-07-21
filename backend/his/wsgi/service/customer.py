@@ -2,11 +2,10 @@
 
 from flask import request
 
-from wsgilib import JSON, JSONMessage
+from wsgilib import JSON, JSONMessage, require_json
 
 from his.api import authenticated, root, admin
 from his.orm.customer_service import CustomerService
-from his.wsgi.decorators import require_json
 from his.wsgi.functions import get_customer
 from his.wsgi.functions import get_customer_service
 from his.wsgi.functions import get_customer_services

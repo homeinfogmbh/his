@@ -4,13 +4,12 @@ from uuid import UUID
 
 from flask import request
 
-from wsgilib import JSONMessage
+from wsgilib import JSONMessage, require_json
 
 from his.config import CONFIG, RECAPTCHA
 from his.orm.account import Account
 from his.orm.pwreset import PasswordResetToken
 from his.pwmail import mail_password_reset_link
-from his.wsgi.decorators import require_json
 from his.wsgi.functions import check_recaptcha
 
 

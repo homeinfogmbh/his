@@ -10,12 +10,11 @@ from peeweeplus import MissingKeyError
 from peeweeplus import NonUniqueValue
 from peeweeplus import PasswordTooShortError
 from recaptcha import VerificationError
-from wsgilib import JSONMessage
+from wsgilib import InvalidData, JSONMessage
 
 from his.exceptions import AccountLimitReached
 from his.exceptions import AccountLocked
 from his.exceptions import InvalidCredentials
-from his.exceptions import InvalidData
 from his.exceptions import NoSessionSpecified
 from his.exceptions import NotAuthorized
 from his.exceptions import RecaptchaNotConfigured

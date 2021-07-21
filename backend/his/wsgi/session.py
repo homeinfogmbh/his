@@ -4,7 +4,7 @@ from typing import Optional, Union
 
 from flask import request
 
-from wsgilib import JSON, JSONMessage
+from wsgilib import JSON, JSONMessage, require_json
 
 from his.api import authenticated
 from his.contextlocals import ACCOUNT, get_session_duration
@@ -12,7 +12,6 @@ from his.exceptions import InvalidCredentials, NotAuthorized
 from his.functions import set_session_cookie, delete_session_cookie
 from his.orm.account import Account
 from his.orm.session import Session
-from his.wsgi.decorators import require_json
 from his.wsgi.functions import get_session
 
 

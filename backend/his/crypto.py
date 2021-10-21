@@ -1,7 +1,7 @@
 """HIS cryptography library."""
 
 from getpass import getpass
-from random import choices
+from secrets import choice
 from string import ascii_letters, digits
 from sys import stderr
 
@@ -15,7 +15,7 @@ POOL = ascii_letters + digits
 def genpw(length: int = 16, *, pool: str = POOL) -> str:
     """Generates a safe, radom password."""
 
-    return ''.join(choices(pool, k=length))
+    return ''.join(choice(pool) for _ in range(length))
 
 
 def read_passwd() -> str:

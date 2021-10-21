@@ -9,10 +9,7 @@ from sys import stderr
 __all__ = ['genpw', 'read_passwd']
 
 
-POOL = ascii_letters + digits
-
-
-def genpw(length: int = 16, *, pool: str = POOL) -> str:
+def genpw(length: int = 16, *, pool: str = ascii_letters + digits) -> str:
     """Generates a safe, radom password."""
 
     return ''.join(choice(pool) for _ in range(length))

@@ -31,7 +31,8 @@ class Account(HISModel):    # pylint: disable=R0902
     """A HIS account."""
 
     customer = ForeignKeyField(
-        Customer, column_name='customer', backref='accounts', lazy_load=False)
+        Customer, column_name='customer', backref='accounts',
+        on_delete='CASCADE', lazy_load=False)
     name = CharField(64, unique=True)   # Login name.
     full_name = CharField(255, null=True)   # Optional full user name.
     passwd = Argon2Field()

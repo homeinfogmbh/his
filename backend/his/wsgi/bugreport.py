@@ -25,7 +25,7 @@ def gen_emails() -> Iterator[EMail]:
     recipients = config.get('bugreport', 'recipients').split()
     template = config.get('bugreport', 'template')
 
-    with open(template, 'r') as file:
+    with open(template, 'r', encoding='utf-8') as file:
         template = file.read()
 
     subject = request.json.pop('subject')

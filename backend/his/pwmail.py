@@ -39,7 +39,7 @@ def mail_password_reset_link(token: PasswordResetToken, url: str):
     subject = config.get('pwreset', 'subject')
     template = config.get('pwreset', 'template')
 
-    with open(template) as file:
+    with open(template, 'r', encoding='utf-8') as file:
         template = file.read()
 
     url = add_token(url, token.token.hex)

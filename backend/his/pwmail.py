@@ -5,7 +5,7 @@ from xml.etree.ElementTree import Element, tostring
 
 from emaillib import EMail
 
-from his.config import CONFIG
+from his.config import get_config
 from his.mail import get_mailer
 from his.orm.pwreset import PasswordResetToken
 
@@ -34,10 +34,10 @@ def href(url: str, caption: str = None) -> str:
 def mail_password_reset_link(token: PasswordResetToken, url: str):
     """Mails the respective password reset link."""
 
-    reply_to = CONFIG.get('pwreset', 'reply_to')
-    sender = CONFIG.get('mail', 'sender')
-    subject = CONFIG.get('pwreset', 'subject')
-    template = CONFIG.get('pwreset', 'template')
+    reply_to = (config := get_config()).get('pwreset', 'reply_to')
+    sender = config.get('mail', 'sender')
+    subject = config.get('pwreset', 'subject')
+    template = config.get('pwreset', 'template')
 
     with open(template) as file:
         template = file.read()

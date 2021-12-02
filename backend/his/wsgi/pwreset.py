@@ -6,7 +6,7 @@ from flask import request
 
 from wsgilib import JSONMessage, require_json
 
-from his.config import CONFIG, RECAPTCHA
+from his.config import get_recaptcha, get_config
 from his.orm.account import Account
 from his.orm.pwreset import PasswordResetToken
 from his.pwmail import mail_password_reset_link
@@ -33,7 +33,7 @@ def _request_reset() -> JSONMessage:
         return PASSWORD_RESET_SENT  # Avoid account sniffing.
 
     token = PasswordResetToken.add(account)
-    url = RECAPTCHA.get('url', CONFIG.get('pwreset', 'url'))
+    url = get_recaptcha().get('url', get_config().get('pwreset', 'url'))
     mail_password_reset_link(token, url)
     return PASSWORD_RESET_SENT
 

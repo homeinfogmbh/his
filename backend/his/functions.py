@@ -3,7 +3,7 @@
 from flask import Response
 from werkzeug.http import dump_cookie
 
-from his.config import CONFIG
+from his.config import get_config
 from his.contextlocals import get_session_secret, get_session
 from his.exceptions import NoSessionSpecified, SessionExpired
 from his.orm.session import Session
@@ -36,12 +36,12 @@ def set_session_cookie(response: Response, session: Session,
 
     secret = get_session_secret() if secret is None else secret
 
-    for domain in CONFIG.get('auth', 'domains').split():
+    for domain in (config := get_config()).get('auth', 'domains').split():
         set_cookie(
-            response, CONFIG.get('auth', 'session-id'), str(session.id),
+            response, config.get('auth', 'session-id'), str(session.id),
             expires=session.end, domain=domain, secure=True, samesite=None)
         set_cookie(
-            response, CONFIG.get('auth', 'session-secret'), secret,
+            response, config.get('auth', 'session-secret'), secret,
             expires=session.end, domain=domain, secure=True, samesite=None)
 
     return response
@@ -50,9 +50,9 @@ def set_session_cookie(response: Response, session: Session,
 def delete_session_cookie(response: Response) -> Response:
     """Deletes the session cookie."""
 
-    for domain in CONFIG.get('auth', 'domains').split():
-        response.delete_cookie(CONFIG.get('auth', 'session-id'), domain=domain)
-        response.delete_cookie(CONFIG.get('auth', 'session-secret'),
+    for domain in (config := get_config()).get('auth', 'domains').split():
+        response.delete_cookie(config.get('auth', 'session-id'), domain=domain)
+        response.delete_cookie(config.get('auth', 'session-secret'),
                                domain=domain)
 
     return response

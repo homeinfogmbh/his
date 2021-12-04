@@ -8,7 +8,7 @@ from peewee import ModelSelect
 from mdb import Customer
 from recaptcha import verify
 
-from his.config import RECAPTCHA
+from his.config import get_recaptcha
 from his.contextlocals import ACCOUNT, CUSTOMER, SESSION
 from his.exceptions import NotAuthorized, RecaptchaNotConfigured
 from his.orm.account import Account
@@ -39,7 +39,7 @@ def check_recaptcha() -> bool:
     site_key = request.json['sitekey']
 
     try:
-        recaptcha = RECAPTCHA[site_key]
+        recaptcha = get_recaptcha()[site_key]
     except KeyError:
         raise RecaptchaNotConfigured() from None
 

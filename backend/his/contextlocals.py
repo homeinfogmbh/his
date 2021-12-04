@@ -8,7 +8,7 @@ from werkzeug.local import LocalProxy
 from mdb import Customer   # pylint: disable=E0401
 from wsgilib import InvalidData
 
-from his.config import CONFIG
+from his.config import get_config
 from his.exceptions import NotAuthorized
 from his.exceptions import NoSessionSpecified
 from his.exceptions import SessionExpired
@@ -23,7 +23,7 @@ def get_session_id() -> int:
     """Returns the session ID."""
 
     try:
-        ident = request.cookies[CONFIG.get('auth', 'session-id')]
+        ident = request.cookies[get_config().get('auth', 'session-id')]
     except KeyError:
         raise NoSessionSpecified() from None
 
@@ -37,7 +37,7 @@ def get_session_secret() -> str:
     """Returns the session secret."""
 
     try:
-        return request.cookies[CONFIG.get('auth', 'session-secret')]
+        return request.cookies[get_config().get('auth', 'session-secret')]
     except KeyError:
         raise NoSessionSpecified() from None
 

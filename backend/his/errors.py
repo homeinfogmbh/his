@@ -8,7 +8,7 @@ from peeweeplus import FieldValueError
 from peeweeplus import InvalidKeys
 from peeweeplus import MissingKeyError
 from peeweeplus import NonUniqueValue
-from peeweeplus import PasswordTooShortError
+from peeweeplus import PasswordTooShort
 from recaptcha import VerificationError
 from wsgilib import InvalidData, JSONMessage
 
@@ -89,7 +89,7 @@ ERRORS = {
     NotAuthorized: lambda error: NOT_AUTHORIZED.update(reasons=error.args),
     PasswordResetToken.DoesNotExist: lambda _: JSONMessage(
         'Invalid token.', 400),
-    PasswordTooShortError: lambda error: PASSWORD_TOO_SHORT.update(
+    PasswordTooShort: lambda error: PASSWORD_TOO_SHORT.update(
         minlen=error.minlen),
     RecaptchaNotConfigured: lambda _: JSONMessage(
         'No ReCAPTCHA configured.', status=500),

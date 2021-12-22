@@ -8,14 +8,13 @@ from typing import Union
 from argon2.exceptions import VerifyMismatchError
 from peewee import JOIN
 from peewee import BooleanField
-from peewee import CharField
 from peewee import DateTimeField
 from peewee import ForeignKeyField
 from peewee import IntegerField
 from peewee import ModelSelect
 
 from mdb import Company, Customer, Address
-from peeweeplus import InvalidKeys, Argon2Field
+from peeweeplus import InvalidKeys, Argon2Field, EMailField, UserNameField
 
 from his.exceptions import AccountLocked
 from his.orm.common import HISModel
@@ -33,10 +32,10 @@ class Account(HISModel):    # pylint: disable=R0902
     customer = ForeignKeyField(
         Customer, column_name='customer', backref='accounts',
         on_delete='CASCADE', lazy_load=False)
-    name = CharField(64, unique=True)   # Login name.
-    full_name = CharField(255, null=True)   # Optional full user name.
+    name = UserNameField(64, unique=True)   # Login name.
+    full_name = UserNameField(255, null=True)   # Optional full user name.
     passwd = Argon2Field()
-    email = CharField(64, unique=True)
+    email = EMailField(64, unique=True)
     created = DateTimeField(default=datetime.now)
     deleted = DateTimeField(null=True)
     last_login = DateTimeField(null=True)

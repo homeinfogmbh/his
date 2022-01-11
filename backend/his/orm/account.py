@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 from datetime import datetime
-from email.utils import parseaddr
 from typing import Union
 
 from argon2.exceptions import VerifyMismatchError
@@ -63,11 +62,6 @@ class Account(HISModel):    # pylint: disable=R0902
         """Adds a new account."""
         if len(name) < 3:
             raise ValueError('Account name too short.')
-
-        _, email = parseaddr(email)
-
-        if len(email) < 6 or '@' not in email:
-            raise ValueError('Invalid email address.')
 
         account = cls(
             customer=customer, name=name, full_name=full_name, passwd=passwd,

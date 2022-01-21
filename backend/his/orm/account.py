@@ -10,7 +10,7 @@ from peewee import BooleanField
 from peewee import DateTimeField
 from peewee import ForeignKeyField
 from peewee import IntegerField
-from peewee import ModelSelect
+from peewee import Select
 
 from mdb import Company, Customer, Address
 from peeweeplus import InvalidKeys, Argon2Field, EMailField, UserNameField
@@ -70,7 +70,7 @@ class Account(HISModel):    # pylint: disable=R0902
         return account
 
     @classmethod
-    def admins(cls, customer: Union[Customer, int] = None) -> ModelSelect:
+    def admins(cls, customer: Union[Customer, int] = None) -> Select:
         """Yields administrators."""
         condition = cls.admin == 1
 
@@ -99,7 +99,7 @@ class Account(HISModel):    # pylint: disable=R0902
         return select.where(condition).get()
 
     @classmethod
-    def select(cls, *args, cascade: bool = False, **kwargs) -> ModelSelect:
+    def select(cls, *args, cascade: bool = False, **kwargs) -> Select:
         """Selects accounts."""
         if not cascade:
             return super().select(*args, **kwargs)
@@ -127,7 +127,7 @@ class Account(HISModel):    # pylint: disable=R0902
         return not self.unusable and self.failed_logins <= MAX_FAILED_LOGINS
 
     @property
-    def subjects(self) -> ModelSelect:
+    def subjects(self) -> Select:
         """Yields accounts this account can manage."""
         cls = type(self)
         condition = cls.customer == self.customer

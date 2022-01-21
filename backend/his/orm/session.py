@@ -9,7 +9,7 @@ from argon2.exceptions import VerifyMismatchError
 from peewee import BooleanField
 from peewee import DateTimeField
 from peewee import ForeignKeyField
-from peewee import ModelSelect
+from peewee import Select
 
 from mdb import Company, Customer
 from peeweeplus import Argon2Field
@@ -76,7 +76,7 @@ class Session(HISModel):
         return count
 
     @classmethod
-    def select(cls, *args, cascade: bool = False, **kwargs) -> ModelSelect:
+    def select(cls, *args, cascade: bool = False, **kwargs) -> Select:
         """Selects sessions."""
         if not cascade:
             return super().select(*args, **kwargs)

@@ -2,7 +2,7 @@
 
 from typing import Optional
 
-from peewee import ModelSelect
+from peewee import Select
 
 from mdb import Company, Customer
 from wsgilib import JSON, Binary
@@ -14,7 +14,7 @@ from his.wsgi.functions import get_customer, get_customer_settings
 __all__ = ['ROUTES']
 
 
-def get_customers() -> ModelSelect:
+def get_customers() -> Select:
     """Selects all customers."""
 
     return Customer.select(Customer, Company).join(Company).where(True)

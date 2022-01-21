@@ -6,7 +6,7 @@ from typing import Optional, Union
 
 from peewee import DateTimeField
 from peewee import ForeignKeyField
-from peewee import ModelSelect
+from peewee import Select
 
 from mdb import Company, Customer
 
@@ -51,7 +51,7 @@ class CustomerService(HISModel):
         return record
 
     @classmethod
-    def active(cls) -> ModelSelect:
+    def active(cls) -> Select:
         """Selects active customer services."""
         now = datetime.now()
         condition = (cls.start >> None) | (now >= cls.end)
@@ -59,7 +59,7 @@ class CustomerService(HISModel):
         return cls.select().where(condition)
 
     @classmethod
-    def select(cls, *args, cascade: bool = False, **kwargs) -> ModelSelect:
+    def select(cls, *args, cascade: bool = False, **kwargs) -> Select:
         """Selects customer services."""
         if not cascade:
             return super().select(*args, **kwargs)

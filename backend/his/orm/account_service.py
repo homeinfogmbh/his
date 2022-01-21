@@ -3,7 +3,7 @@
 from __future__ import annotations
 from typing import Union
 
-from peewee import ForeignKeyField, ModelSelect
+from peewee import ForeignKeyField, Select
 
 from mdb import Company, Customer
 
@@ -43,7 +43,7 @@ class AccountService(HISModel):
             return record
 
     @classmethod
-    def select(cls, *args, cascade: bool = False, **kwargs) -> ModelSelect:
+    def select(cls, *args, cascade: bool = False, **kwargs) -> Select:
         """Selects account services."""
         if not cascade:
             return super().select(*args, **kwargs)

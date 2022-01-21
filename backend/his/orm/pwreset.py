@@ -8,7 +8,7 @@ from uuid import uuid4
 from peewee import JOIN
 from peewee import DateTimeField
 from peewee import ForeignKeyField
-from peewee import ModelSelect
+from peewee import Select
 from peewee import UUIDField
 
 from mdb import Address, Company, Customer
@@ -46,13 +46,13 @@ class PasswordResetToken(HISModel):
             return record
 
     @classmethod
-    def active(cls) -> ModelSelect:
+    def active(cls) -> Select:
         """Selects active tokens."""
         condition = cls.created > (datetime.now() - VALIDITY)
         return cls.select(cascade=True).where(condition)
 
     @classmethod
-    def select(cls, *args, cascade: bool = False, **kwargs) -> ModelSelect:
+    def select(cls, *args, cascade: bool = False, **kwargs) -> Select:
         """Selects records."""
         if not cascade:
             return super().select(*args, **kwargs)

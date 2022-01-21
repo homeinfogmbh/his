@@ -3,7 +3,7 @@
 from typing import Optional
 
 from flask import request
-from peewee import ModelSelect
+from peewee import Select
 
 from mdb import Customer
 from recaptcha import verify
@@ -50,7 +50,7 @@ def get_account(ident: Optional[int]) -> Account:
     """Safely returns the respective account."""
 
     if ident is None:
-        return ACCOUNT._get_current_object()    # pylint: disable=W0212
+        return ACCOUNT._get_current_object()
 
     select = Account.select(cascade=True).where(Account.id == ident)
 
@@ -77,7 +77,7 @@ def get_account_service(ident: int) -> AccountService:
     return get_account_services().where(AccountService.id == ident).get()
 
 
-def get_account_services() -> ModelSelect:
+def get_account_services() -> Select:
     """Selects the account services of the give account."""
 
     return AccountService.select(cascade=True).where(
@@ -99,7 +99,7 @@ def get_customer(ident: Optional[int]) -> Customer:
         return customer
 
     if customer.id == CUSTOMER.id:
-        return CUSTOMER._get_current_object()   # pylint: disable=W0212
+        return CUSTOMER._get_current_object()
 
     raise Customer.DoesNotExist()
 
@@ -112,7 +112,7 @@ def get_customer_service(ident: int) -> CustomerService:
     return get_customer_services().where(CustomerService.id == ident).get()
 
 
-def get_customer_services() -> ModelSelect:
+def get_customer_services() -> Select:
     """Selects customer service mappings for the given customer."""
 
     return CustomerService.select(cascade=True).where(
@@ -138,7 +138,7 @@ def get_session(ident: Optional[int]) -> Session:
     """
 
     if ident is None:
-        return SESSION._get_current_object()    # pylint: disable=W0212
+        return SESSION._get_current_object()
 
     session = Session.select(cascade=True).get()
 

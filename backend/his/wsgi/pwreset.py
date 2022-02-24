@@ -18,6 +18,7 @@ __all__ = ['ROUTES']
 
 PASSWORD_RESET_SENT = JSONMessage('Password request sent.', status=200)
 
+
 def _request_reset() -> JSONMessage:
     """Requests a reset token."""
 
@@ -64,7 +65,8 @@ def reset_password() -> JSONMessage:
         return JSONMessage('No password specified.', status=400)
 
     token = PasswordResetToken.active().where(
-        PasswordResetToken.token == token).get()
+        PasswordResetToken.token == token
+    ).get()
     token.account.passwd = passwd
     token.account.failed_logins = 0
     token.account.save()

@@ -15,8 +15,9 @@ __all__ = [
 ]
 
 
-def set_session_cookie(response: Response, session: Session,
-                       secret: str = None) -> Response:
+def set_session_cookie(
+        response: Response, session: Session, secret: str = None
+) -> Response:
     """Sets the session cookie."""
 
     secret = get_session_secret() if secret is None else secret
@@ -39,8 +40,9 @@ def delete_session_cookie(response: Response) -> Response:
 
     for domain in (config := get_config()).get('auth', 'domains').split():
         response.delete_cookie(config.get('auth', 'session-id'), domain=domain)
-        response.delete_cookie(config.get('auth', 'session-secret'),
-                               domain=domain)
+        response.delete_cookie(
+            config.get('auth', 'session-secret'), domain=domain
+        )
 
     return response
 

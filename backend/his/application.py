@@ -1,7 +1,5 @@
 """Basic HIS application."""
 
-from flask import make_response
-
 import wsgilib
 
 from his.config import get_cors
@@ -24,9 +22,7 @@ class Application(wsgilib.Application):
     ):
         """Sets default error handlers."""
         super().__init__(*args, cors=cors, debug=debug, **kwargs)
-        self.after_request(
-            lambda response: postprocess_response(make_response(response))
-        )
+        self.after_request(postprocess_response)
 
         for exception, function in ERRORS.items():
             self.register_error_handler(exception, function)

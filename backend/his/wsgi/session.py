@@ -2,7 +2,7 @@
 
 from typing import Optional, Union
 
-from flask import request
+from flask import request, Response, make_response
 
 from wsgilib import JSON, JSONMessage, require_json
 
@@ -18,8 +18,18 @@ from his.wsgi.functions import get_session
 __all__ = ['ROUTES']
 
 
+def make_login(account: Account, duration: int) -> Response:
+    """Performs the actual login."""
+
+    session, secret = Session.open(account, duration=duration)
+    json = session.to_json()
+    json['secret'] = secret
+    response = JSON(json)
+    return set_session_cookie(make_response(response), session, secret=secret)
+
+
 @require_json(dict)
-def login() -> Union[JSON, JSONMessage]:
+def login() -> Response:
     """Opens a new session for the respective account."""
 
     account = request.json['account']
@@ -27,17 +37,13 @@ def login() -> Union[JSON, JSONMessage]:
 
     try:
         account = Account.select(cascade=True).where(
-            Account.name == account).get()
+            Account.name == account
+        ).get()
     except Account.DoesNotExist:
         raise InvalidCredentials() from None
 
     if account.login(passwd):
-        session, secret = Session.open(
-            account, duration=get_session_duration())
-        json = session.to_json()
-        json['secret'] = secret
-        response = JSON(json)
-        return set_session_cookie(response, session, secret=secret)
+        return make_login(account, get_session_duration())
 
     raise InvalidCredentials()
 
@@ -75,12 +81,11 @@ def refresh(ident: Optional[int] = None) -> JSON:
 
 
 @authenticated
-def close(ident: Optional[int] = None) -> JSON:
+def close(ident: Optional[int] = None) -> Response:
     """Closes the provided session."""
 
     get_session(ident).delete_instance()
-    response = JSON({'closed': ident})
-    return delete_session_cookie(response)
+    return delete_session_cookie(make_response(JSON({'closed': ident})))
 
 
 ROUTES = (

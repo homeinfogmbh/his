@@ -1,7 +1,6 @@
 """Common functions."""
 
 from flask import Response
-from werkzeug.http import dump_cookie
 
 from his.config import get_config
 from his.contextlocals import get_session_secret, get_session
@@ -16,20 +15,6 @@ __all__ = [
 ]
 
 
-def set_cookie(response: Response, *args, **kwargs):
-    """A workaround for explicitly setting SameSite to None
-    Until the following fix is released:
-    https://github.com/pallets/werkzeug/issues/1549
-    """
-
-    cookie = dump_cookie(*args, **kwargs)
-
-    if 'samesite' in kwargs and kwargs['samesite'] is None:
-        cookie = f'{cookie}; SameSite=None'
-
-    response.headers.add('Set-Cookie', cookie)
-
-
 def set_session_cookie(response: Response, session: Session,
                        secret: str = None) -> Response:
     """Sets the session cookie."""
@@ -37,12 +22,14 @@ def set_session_cookie(response: Response, session: Session,
     secret = get_session_secret() if secret is None else secret
 
     for domain in (config := get_config()).get('auth', 'domains').split():
-        set_cookie(
-            response, config.get('auth', 'session-id'), str(session.id),
-            expires=session.end, domain=domain, secure=True, samesite=None)
-        set_cookie(
-            response, config.get('auth', 'session-secret'), secret,
-            expires=session.end, domain=domain, secure=True, samesite=None)
+        response.set_cookie(
+            config.get('auth', 'session-id'), str(session.id),
+            expires=session.end, domain=domain, secure=True, samesite=None
+        )
+        response.set_cookie(
+            config.get('auth', 'session-secret'), secret,
+            expires=session.end, domain=domain, secure=True, samesite=None
+        )
 
     return response
 

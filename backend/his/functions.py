@@ -1,6 +1,6 @@
 """Common functions."""
 
-from flask import Response, make_response
+from flask import Response
 
 from his.config import get_config
 from his.contextlocals import get_session_secret, get_session
@@ -49,9 +49,6 @@ def delete_session_cookie(response: Response) -> Response:
 
 def postprocess_response(response: Response) -> Response:
     """Sets the session cookie on the respective response."""
-
-    if not isinstance(response, Response):
-        return postprocess_response(make_response(response))
 
     # Do not override an already set session cookie i.e. on deletion.
     if 'Set-Cookie' in response.headers:

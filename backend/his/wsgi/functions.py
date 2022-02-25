@@ -132,23 +132,19 @@ def get_service(ident: int) -> Service:
     return Service.select().where(Service.id == ident).get()
 
 
-def get_session(ident: Optional[int]) -> Session:
+def get_session(account: Account, ident: int) -> Session:
     """Returns the respective session by the
     resource identifier with authorization checks.
     """
 
-    if ident is None:
-        return SESSION._get_current_object()
+    if account.root:
+        return Session.select(cascade=True).where(Session.id == ident).get()
 
-    session = Session.select(cascade=True).get()
+    if account.admin:
+        return Session.select(cascade=True).where(
+            (Session.id == ident) & (Customer.id == account.customer)
+        ).get()
 
-    if SESSION.id == session.id:
-        return session
-
-    if ACCOUNT.root:
-        return session
-
-    if ACCOUNT.admin and session.account.customer == ACCOUNT.customer:
-        return session
-
-    raise Session.DoesNotExist()
+    return Session.select(cascade=True).where(
+        (Session.id == ident) & (Session.account == account.id)
+    ).get()

@@ -20,9 +20,10 @@ __all__ = [
     'SESSION',
     'ACCOUNT',
     'CUSTOMER',
+    'get_session',
     'get_session_duration',
-    'get_session_secret',
-    'get_session'
+    'get_session_id',
+    'get_session_secret'
 ]
 
 
@@ -49,11 +50,11 @@ def get_session_secret() -> str:
         raise NoSessionSpecified() from None
 
 
-def get_session() -> Session:
+def get_session(ident: int, secret: str) -> Session:
     """Returns the session from the cache."""
 
     now = datetime.now()
-    condition = Session.id == get_session_id()
+    condition = Session.id == ident
     condition &= Session.start < now
     condition &= Session.end > now
 
@@ -62,7 +63,7 @@ def get_session() -> Session:
     except Session.DoesNotExist:
         raise SessionExpired() from None
 
-    if session.verify(get_session_secret()):
+    if session.verify(secret):
         return session
 
     raise SessionExpired()
@@ -137,6 +138,6 @@ class ModelProxy(LocalProxy):   # pylint: disable=R0903
         return self.get_id()
 
 
-SESSION = ModelProxy(get_session)
+SESSION = ModelProxy(get_session(get_session_id(), get_session_secret()))
 ACCOUNT = ModelProxy(get_account)
 CUSTOMER = ModelProxy(get_customer)

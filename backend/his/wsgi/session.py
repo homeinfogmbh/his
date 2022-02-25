@@ -7,7 +7,7 @@ from flask import request, Response, make_response
 from wsgilib import JSON, JSONMessage, require_json
 
 from his.api import authenticated
-from his.contextlocals import ACCOUNT, get_session_duration
+from his.contextlocals import ACCOUNT, SESSION, get_session_duration
 from his.exceptions import InvalidCredentials, NotAuthorized
 from his.functions import set_session_cookie, delete_session_cookie
 from his.orm.account import Account
@@ -69,32 +69,49 @@ def list_() -> Union[JSON, JSONMessage]:
 def get(ident: Optional[int] = None) -> JSON:
     """Lists the respective session."""
 
-    return JSON(get_session(ident).to_json())
+    if ident is None:
+        return JSON(SESSION.to_json())
+
+    return JSON(get_session(ACCOUNT, ident).to_json())
 
 
 @authenticated
 def refresh(ident: Optional[int] = None) -> JSON:
-    """Refreshes an existing session."""
+    """Refreshes an existing session.
 
-    # Refresh is done by @authenricated automatically.
-    return JSON(get_session(ident).to_json())
+    Refresh is done by @authenricated automatically.
+    """
+
+    if ident is None:
+        return JSON(SESSION.to_json())
+
+    return JSON(get_session(ACCOUNT, ident).to_json())
+
+
+def close_session(session: Session) -> Response:
+    """Closes a session."""
+
+    session.delete_instance()
+    return delete_session_cookie(make_response(JSON({'closed': session.id})))
 
 
 @authenticated
 def close(ident: Optional[int] = None) -> Response:
     """Closes the provided session."""
 
-    get_session(ident).delete_instance()
-    return delete_session_cookie(make_response(JSON({'closed': ident})))
+    if ident is None:
+        return close_session(SESSION)
+
+    return close_session(get_session(ACCOUNT, ident))
 
 
 ROUTES = (
     ('POST', '/session', login),
     ('GET', '/session', list_),
     ('GET', '/session/<int:ident>', get),
-    ('GET', '/session/!', lambda: get()),   # pylint: disable=W0108
+    ('GET', '/session/!', lambda: get()),
     ('PUT', '/session/<int:ident>', refresh),
-    ('PUT', '/session/!', lambda: refresh()),   # pylint: disable=W0108
+    ('PUT', '/session/!', lambda: refresh()),
     ('DELETE', '/session/<int:ident>', close),
-    ('DELETE', '/session/!', lambda: close())   # pylint: disable=W0108
+    ('DELETE', '/session/!', lambda: close())
 )

@@ -3,7 +3,7 @@
 from flask import Response
 
 from his.config import get_config
-from his.contextlocals import get_session_secret, get_session
+from his.contextlocals import get_session, get_session_id, get_session_secret
 from his.exceptions import NoSessionSpecified, SessionExpired
 from his.orm.session import Session
 
@@ -55,7 +55,7 @@ def postprocess_response(response: Response) -> Response:
         return response
 
     try:
-        session = get_session()
+        session = get_session(get_session_id(), get_session_secret())
     except (NoSessionSpecified, SessionExpired):
         return delete_session_cookie(response)
 

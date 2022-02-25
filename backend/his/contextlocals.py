@@ -16,7 +16,14 @@ from his.orm.account import Account
 from his.orm.session import DURATION, DURATION_RANGE, Session
 
 
-__all__ = ['SESSION', 'ACCOUNT', 'CUSTOMER', 'get_session_duration']
+__all__ = [
+    'SESSION',
+    'ACCOUNT',
+    'CUSTOMER',
+    'get_session_duration',
+    'get_session_secret',
+    'get_session'
+]
 
 
 def get_session_id() -> int:

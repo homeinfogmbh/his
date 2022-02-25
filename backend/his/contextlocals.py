@@ -138,6 +138,8 @@ class ModelProxy(LocalProxy):   # pylint: disable=R0903
         return self.get_id()
 
 
-SESSION = ModelProxy(get_session(get_session_id(), get_session_secret()))
+SESSION = ModelProxy(lambda: get_session(
+    get_session_id(), get_session_secret()
+))
 ACCOUNT = ModelProxy(get_account)
 CUSTOMER = ModelProxy(get_customer)

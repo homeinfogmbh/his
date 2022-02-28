@@ -25,11 +25,11 @@ def set_session_cookie(
     for domain in (config := get_config()).get('auth', 'domains').split():
         response.set_cookie(
             config.get('auth', 'session-id'), str(session.id),
-            expires=session.end, domain=domain, secure=True, samesite=None
+            expires=session.end, domain=domain, secure=True, samesite='None'
         )
         response.set_cookie(
             config.get('auth', 'session-secret'), secret,
-            expires=session.end, domain=domain, secure=True, samesite=None
+            expires=session.end, domain=domain, secure=True, samesite='None'
         )
 
     return response

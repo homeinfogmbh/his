@@ -27,7 +27,7 @@ class ServiceDependency(HISModel):
     )
 
     @classmethod
-    def dependencies(cls, service: Union[Service, int]) -> Iterator[Service]:
+    def deps(cls, service: Union[Service, int]) -> Iterator[Service]:
         """Yields all dependencies of a service recursively."""
         dependency = Service.alias()
         select = cls.select(cls, Service, dependency).join(
@@ -37,4 +37,4 @@ class ServiceDependency(HISModel):
 
         for service_dependency in select.where(cls.service == service):
             yield service_dependency.dependency
-            yield from cls.dependencies(service_dependency.dependency)
+            yield from cls.deps(service_dependency.dependency)

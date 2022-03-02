@@ -20,7 +20,7 @@ Mapping = Union[AccountService, CustomerService]
 def get_dependencies(service: Service) -> Iterator[Service]:
     """Returns the dependencies of a service."""
 
-    return ServiceDependency.dependencies(service)
+    return ServiceDependency.deps(service)
 
 
 def check_dependency_tree(mapping: Mapping, service: Service) -> bool:

@@ -33,15 +33,19 @@ class Session(HISModel):
 
     account = ForeignKeyField(
         Account, column_name='account', backref='sessions',
-        on_delete='CASCADE', lazy_load=False)
+        on_delete='CASCADE', lazy_load=False
+    )
     secret = Argon2Field()
     start = DateTimeField()
     end = DateTimeField()
     login = BooleanField(default=True)
 
     @classmethod
-    def add(cls, account: Union[Account, int],
-            duration: timedelta) -> NewSession:
+    def add(
+            cls,
+            account: Union[Account, int],
+            duration: timedelta
+    ) -> NewSession:
         """Actually opens a new login session."""
         start = datetime.now()
         end = start + duration
@@ -76,19 +80,19 @@ class Session(HISModel):
         return count
 
     @classmethod
-    def select(cls, *args, cascade: bool = False, **kwargs) -> Select:
+    def select(cls, *args, cascade: bool = False) -> Select:
         """Selects sessions."""
         if not cascade:
-            return super().select(*args, **kwargs)
+            return super().select(*args)
 
-        args = {cls, Account, Customer, Company, *args}
-        return super().select(*args, **kwargs).join(Account).join(
-            Customer).join(Company)
+        return super().select(*{
+            cls, Account, Customer, Company, *args
+        }).join(Account).join(Customer).join(Company)
 
     def verify(self, secret: str) -> bool:
         """Verifies the session."""
         try:
-            return self.secret.verify(secret)   # pylint: disable=E1101
+            return self.secret.verify(secret)
         except VerifyMismatchError:
             return False
 
@@ -103,7 +107,7 @@ class Session(HISModel):
 
 
 class NewSession(NamedTuple):
-    """A new session, containing the the
+    """A new session, containing the
     session object and plain text secret.
     Discard this as soon as possible.
     """

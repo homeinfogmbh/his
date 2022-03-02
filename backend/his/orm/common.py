@@ -12,8 +12,8 @@ DATABASE = MySQLDatabaseProxy('his', CONFIG_FILE)
 
 
 class HISModel(JSONModel):
-    """Generic HOMEINFO Integrated Service database model."""
+    """Generic HIS database model."""
 
-    class Meta:     # pylint: disable=C0111,R0903
+    class Meta:
         database = DATABASE
         schema = database.database

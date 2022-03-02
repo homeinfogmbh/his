@@ -27,16 +27,17 @@ class Service(HISModel):
         return self.name
 
     @classmethod
-    def add(cls, name: str, description: str = None,
-            promote: bool = True) -> Service:
+    def add(
+            cls,
+            name: str,
+            description: str = None,
+            promote: bool = True
+    ) -> Service:
         """Adds a new service."""
         try:
             cls.get(cls.name == name)
         except cls.DoesNotExist:
-            service = cls()
-            service.name = name
-            service.description = description
-            service.promote = promote
+            service = cls(name=name, description=description, promote=promote)
             service.save()
             return service
 

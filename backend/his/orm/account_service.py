@@ -18,22 +18,27 @@ __all__ = ['AccountService']
 class AccountService(HISModel):
     """Many-to-many Account <-> Service mapping."""
 
-    class Meta:     # pylint: disable=C0111,R0903
+    class Meta:
         table_name = 'account_service'
 
     account = ForeignKeyField(
         Account, column_name='account', backref='account_services',
-        on_delete='CASCADE', lazy_load=False)
+        on_delete='CASCADE', lazy_load=False
+    )
     service = ForeignKeyField(
         Service, column_name='service', backref='account_services',
-        on_delete='CASCADE', lazy_load=False)
+        on_delete='CASCADE', lazy_load=False
+    )
 
     def __str__(self):
         return f'{self.account}@{self.service}'
 
     @classmethod
-    def add(cls, account: Union[Account, int],
-            service: [Service, int]) -> AccountService:
+    def add(
+            cls,
+            account: Union[Account, int],
+            service: [Service, int]
+    ) -> AccountService:
         """Adds a new account service."""
         try:
             return cls.get(account=account, service=service)
@@ -43,11 +48,11 @@ class AccountService(HISModel):
             return record
 
     @classmethod
-    def select(cls, *args, cascade: bool = False, **kwargs) -> Select:
+    def select(cls, *args, cascade: bool = False) -> Select:
         """Selects account services."""
         if not cascade:
-            return super().select(*args, **kwargs)
+            return super().select(*args)
 
-        args = {cls, Account, Customer, Company, Service}
-        return super().select(*args, **kwargs).join(Account).join(
-            Customer).join(Company).join_from(cls, Service)
+        return super().select(*{
+            cls, Account, Customer, Company, Service
+        }).join(Account).join(Customer).join(Company).join_from(cls, Service)

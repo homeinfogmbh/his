@@ -20,15 +20,17 @@ __all__ = ['CustomerService']
 class CustomerService(HISModel):
     """Many-to-many Account <-> Services mapping."""
 
-    class Meta:     # pylint: disable=C0111,R0903
+    class Meta:
         table_name = 'customer_service'
 
     customer = ForeignKeyField(
         Customer, column_name='customer', backref='customer_services',
-        on_delete='CASCADE', lazy_load=False)
+        on_delete='CASCADE', lazy_load=False
+    )
     service = ForeignKeyField(
         Service, column_name='service', backref='customer_services',
-        on_delete='CASCADE', lazy_load=False)
+        on_delete='CASCADE', lazy_load=False
+    )
     begin = DateTimeField(null=True)
     end = DateTimeField(null=True)
 
@@ -36,9 +38,13 @@ class CustomerService(HISModel):
         return f'{self.customer_id}@{self.service}'
 
     @classmethod
-    def add(cls, customer: Union[Customer, int], service: Union[Service, int],
+    def add(
+            cls,
+            customer: Union[Customer, int],
+            service: Union[Service, int],
             begin: Optional[datetime] = None,
-            end: Optional[datetime] = None) -> CustomerService:
+            end: Optional[datetime] = None
+    ) -> CustomerService:
         """Adds a new customer service."""
         try:
             record = cls.get(customer=customer, service=service)
@@ -59,11 +65,11 @@ class CustomerService(HISModel):
         return cls.select().where(condition)
 
     @classmethod
-    def select(cls, *args, cascade: bool = False, **kwargs) -> Select:
+    def select(cls, *args, cascade: bool = False) -> Select:
         """Selects customer services."""
         if not cascade:
-            return super().select(*args, **kwargs)
+            return super().select(*args)
 
-        args = {cls, Customer, Company, Service}
-        return super().select(*args, **kwargs).join(Customer).join(
-            Company).join_from(cls, Service)
+        return super().select(*{
+            cls, Customer, Company, Service
+        }).join(Customer).join(Company).join_from(cls, Service)

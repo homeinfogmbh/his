@@ -24,7 +24,7 @@ def get_dependencies(service: Service) -> Iterator[Service]:
 
 
 def check_dependency_tree(mapping: Mapping, service: Service) -> bool:
-    """Cheks the dependency tree."""
+    """Checks the dependency tree."""
 
     return service in {mapping.service, *get_dependencies(mapping.service)}
 

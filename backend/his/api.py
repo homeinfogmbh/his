@@ -22,7 +22,7 @@ def authenticated(function: Callable) -> Callable:
         """Wraps the respective function
         with preceding authentication.
         """
-        # Need to explicitely check SESSION.account,
+        # Need to explicitly check SESSION.account,
         # not ACCOUNT since it might be substituted!
         if SESSION.account.unusable:
             raise AccountLocked()

@@ -26,12 +26,13 @@ VALIDITY = timedelta(hours=1)
 class PasswordResetToken(HISModel):
     """Tokens to reset passwords."""
 
-    class Meta:     # pylint: disable=C0111,R0903
+    class Meta:
         table_name = 'password_reset_token'
 
     account = ForeignKeyField(
         Account, column_name='account', backref='password_reset_tokens',
-        on_delete='CASCADE', lazy_load=False)
+        on_delete='CASCADE', lazy_load=False
+    )
     token = UUIDField(default=uuid4)
     created = DateTimeField(default=datetime.now)
 
@@ -52,11 +53,13 @@ class PasswordResetToken(HISModel):
         return cls.select(cascade=True).where(condition)
 
     @classmethod
-    def select(cls, *args, cascade: bool = False, **kwargs) -> Select:
+    def select(cls, *args, cascade: bool = False) -> Select:
         """Selects records."""
         if not cascade:
-            return super().select(*args, **kwargs)
+            return super().select(*args)
 
-        args = {cls, Account, Customer, Company, Address, *args}
-        return super().select(*args, **kwargs).join(Account).join(
-            Customer).join(Company).join(Address, join_type=JOIN.LEFT_OUTER)
+        return super().select(*{
+            cls, Account, Customer, Company, Address, *args
+        }).join(Account).join(Customer).join(Company).join(
+            Address, join_type=JOIN.LEFT_OUTER
+        )

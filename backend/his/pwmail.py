@@ -23,11 +23,11 @@ def add_token(url: str, token: str) -> str:
     return urlunparse((scheme, netloc, path, params, query, fragment))
 
 
-def href(url: str, caption: str = None) -> str:
+def href(url: str, caption: str = None) -> Element:
     """Makes a link."""
 
     link = Element('a', attrib={'href': url})
-    link.text = caption or url
+    link.text = url if caption is None else caption
     return link
 
 
@@ -45,6 +45,8 @@ def mail_password_reset_link(token: PasswordResetToken, url: str):
     url = add_token(url, token.token.hex)
     link = tostring(href(url), encoding='unicode', method='html')
     html = template.format(account=token.account.name, link=link)
-    email = EMail(subject, sender, token.account.email, html=html)
-    email.add_header('reply-to', reply_to)
+    email = EMail(
+        subject, sender, token.account.email, html=html,
+        reply_to=reply_to
+    )
     get_mailer().send([email])

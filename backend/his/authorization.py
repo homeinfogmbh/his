@@ -11,7 +11,7 @@ from his.orm.service import Service
 from his.orm.service_dependency import ServiceDependency
 
 
-__all__ = ['check']
+__all__ = ['can_use']
 
 
 Mapping = Union[AccountService, CustomerService]
@@ -51,7 +51,7 @@ def check_account(account: Union[Account, int], service: Service) -> bool:
     return check_mappings(select, service)
 
 
-def check(account: Union[Account, int], service: Service) -> bool:
+def can_use(account: Union[Account, int], service: Service) -> bool:
     """Checks whether the account may use the given service."""
 
     if account.root:

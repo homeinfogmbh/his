@@ -99,14 +99,16 @@ class Account(HISModel):    # pylint: disable=R0902
         return select.where(condition).get()
 
     @classmethod
-    def select(cls, *args, cascade: bool = False, **kwargs) -> Select:
+    def select(cls, *args, cascade: bool = False) -> Select:
         """Selects accounts."""
         if not cascade:
-            return super().select(*args, **kwargs)
+            return super().select(*args)
 
-        args = {cls, Customer, Company, Address, *args}
-        return super().select(*args, **kwargs).join(Customer).join(
-            Company).join(Address, join_type=JOIN.LEFT_OUTER)
+        return super().select(*{
+            cls, Customer, Company, Address, *args
+        }).join(Customer).join(Company).join(
+            Address, join_type=JOIN.LEFT_OUTER
+        )
 
     @property
     def locked(self) -> bool:
@@ -169,9 +171,7 @@ class Account(HISModel):    # pylint: disable=R0902
 
     def patch_json(self, json: dict, allow: set = (), **kwargs) -> None:
         """Patches the account with fields limited to allow."""
-        invalid = {key for key in json if key not in allow} if allow else None
-
-        if invalid:
+        if invalid := (set(json) - set(allow) if allow else None):
             raise InvalidKeys(invalid)
 
         return super().patch_json(json, **kwargs)

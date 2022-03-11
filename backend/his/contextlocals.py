@@ -5,7 +5,7 @@ from datetime import datetime
 from flask import request
 from werkzeug.local import LocalProxy
 
-from mdb import Customer   # pylint: disable=E0401
+from mdb import Customer
 from wsgilib import InvalidData
 
 from his.config import get_config
@@ -98,30 +98,31 @@ def get_account() -> Account:
 def get_customer() -> Customer:
     """Gets the verified targeted customer."""
 
-    try:
-        customer_id = request.args['customer']
-    except KeyError:
+    if (customer_id := request.args.get('customer')) is None:
         return ACCOUNT.customer
+
+    if not SESSION.account.root:
+        raise NotAuthorized()
 
     try:
         customer_id = int(customer_id)
     except (TypeError, ValueError):
         raise InvalidData(int, type(customer_id)) from None
 
-    condition = Customer.id == customer_id
-
-    if SESSION.account.root:
-        return Customer.select(cascade=True).where(condition).get()
-
-    raise NotAuthorized()
+    return Customer.select(cascade=True).where(
+        Customer.id == customer_id
+    ).get()
 
 
 def get_session_duration() -> int:
     """Returns the respective session duration."""
 
+    if (duration := request.headers.get('session-duration')) is None:
+        return DURATION
+
     try:
-        duration = int(request.headers['session-duration'])
-    except (KeyError, TypeError, ValueError):
+        duration = int(duration)
+    except (TypeError, ValueError):
         return DURATION
 
     if duration in DURATION_RANGE:
@@ -130,7 +131,7 @@ def get_session_duration() -> int:
     return DURATION
 
 
-class ModelProxy(LocalProxy):   # pylint: disable=R0903
+class ModelProxy(LocalProxy):
     """Proxies ORM models."""
 
     def __int__(self):

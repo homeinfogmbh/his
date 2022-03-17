@@ -11,7 +11,6 @@ from his.api import authenticated
 from his.config import get_config
 from his.contextlocals import ACCOUNT
 from his.mail import get_mailer
-from his.wsgi.functions import check_recaptcha
 
 
 __all__ = ['ROUTES']
@@ -40,9 +39,7 @@ def gen_emails() -> Iterator[EMail]:
 def report() -> JSONMessage:
     """Reports a bug."""
 
-    if check_recaptcha():
-        get_mailer().send(gen_emails())
-
+    get_mailer().send(gen_emails())
     return JSONMessage('Bug report submitted.', status=200)
 
 

@@ -22,9 +22,7 @@ def make_login(account: Account, duration: int) -> Response:
     """Performs the actual login."""
 
     session, secret = Session.open(account, duration=duration)
-    json = session.to_json()
-    json['secret'] = secret
-    response = JSON(json)
+    response = JSON(session.to_json())
     return set_session_cookie(make_response(response), session, secret=secret)
 
 

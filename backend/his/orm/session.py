@@ -48,9 +48,7 @@ class Session(HISModel):
     ) -> NewSession:
         """Actually opens a new login session."""
         start = datetime.now()
-        start = datetime(2022, 1, 1)
         end = start + duration
-        end = datetime(2022, 3, 28)
         secret = genpw(length=32)
         session = cls(account=account, secret=secret, start=start, end=end)
         session.save()
@@ -104,7 +102,6 @@ class Session(HISModel):
             raise AccountLocked()
 
         self.end = datetime.now() + timedelta(minutes=duration)
-        self.end = datetime(2022, 3, 28)
         self.save()
         return self
 

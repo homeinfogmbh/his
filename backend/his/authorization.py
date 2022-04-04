@@ -51,7 +51,7 @@ def check_account(account: Union[Account, int], service: Service) -> bool:
     return check_mappings(select, service)
 
 
-def can_use(account: Union[Account, int], service: Service) -> bool:
+def can_use(account: Account, service: Service) -> bool:
     """Checks whether the account may use the given service."""
 
     if account.root:

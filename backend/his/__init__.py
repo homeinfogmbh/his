@@ -8,7 +8,7 @@ from his.config import get_cors
 from his.contextlocals import ACCOUNT, CUSTOMER, SESSION
 from his.crypto import genpw
 from his.mail import get_mailer
-from his.orm import Account
+from his.orm import Account, AccountService, CustomerService, Service
 from his.parsers import account, service
 
 
@@ -18,6 +18,9 @@ __all__ = [
     'SESSION',
     'Application',
     'Account',
+    'AccountService',
+    'CustomerService',
+    'Service',
     'account',
     'authenticated',
     'authorized',

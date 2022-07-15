@@ -38,17 +38,23 @@ def check_mappings(mappings: Iterable[Mapping], service: Service) -> bool:
 def check_customer(customer: Union[Customer, int], service: Service) -> bool:
     """Checks the customer services."""
 
-    select = CustomerService.select(cascade=True).where(
-        CustomerService.customer == customer)
-    return check_mappings(select, service)
+    return check_mappings(
+        CustomerService.select(cascade=True).where(
+            CustomerService.customer == customer
+        ),
+        service
+    )
 
 
 def check_account(account: Union[Account, int], service: Service) -> bool:
     """Checks the account services."""
 
-    select = AccountService.select(cascade=True).where(
-        AccountService.account == account)
-    return check_mappings(select, service)
+    return check_mappings(
+        AccountService.select(cascade=True).where(
+            AccountService.account == account
+        ),
+        service
+    )
 
 
 def can_use(account: Account, service: Service) -> bool:

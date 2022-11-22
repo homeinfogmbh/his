@@ -4,7 +4,7 @@ import wsgilib
 
 from his.config import get_cors
 from his.errors import ERRORS
-from his.functions import postprocess_response
+from his.session import postprocess_response
 
 
 __all__ = ['Application']

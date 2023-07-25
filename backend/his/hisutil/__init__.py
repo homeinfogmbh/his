@@ -10,10 +10,10 @@ from his.hisutil.service import add_service
 from his.hisutil.session import cleanup
 
 
-__all__ = ['main']
+__all__ = ["main"]
 
 
-LOG_FORMAT = '[%(levelname)s] %(name)s: %(message)s'
+LOG_FORMAT = "[%(levelname)s] %(name)s: %(message)s"
 
 
 def main():
@@ -22,15 +22,15 @@ def main():
     args = get_args()
     basicConfig(level=DEBUG if args.verbose else INFO, format=LOG_FORMAT)
 
-    if args.target == 'account':
-        if args.action == 'add':
+    if args.target == "account":
+        if args.action == "add":
             add_account(args)
-    elif args.target == 'service':
-        if args.action == 'add':
+    elif args.target == "service":
+        if args.action == "add":
             add_service(args)
-        elif args.action == 'customer':
+        elif args.action == "customer":
             add_customer_service(args)
-        elif args.action == 'account':
+        elif args.action == "account":
             add_account_service(args)
-    elif args.target == 'session-cleanup':
+    elif args.target == "session-cleanup":
         cleanup()

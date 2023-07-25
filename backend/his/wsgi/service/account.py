@@ -14,7 +14,7 @@ from his.wsgi.functions import get_account_services
 from his.wsgi.functions import get_service
 
 
-__all__ = ['ROUTES']
+__all__ = ["ROUTES"]
 
 
 @authenticated
@@ -30,15 +30,14 @@ def list_() -> JSON:
 def add() -> JSONMessage:
     """Allows the respective account to use the given service."""
 
-    account = get_account(request.json.pop('account'))
+    account = get_account(request.json.pop("account"))
 
     if account not in ACCOUNT.subjects:
         return NOT_AUTHORIZED
 
-    service = get_service(request.json.pop('service'))
+    service = get_service(request.json.pop("service"))
     account_service = AccountService.add(account, service)
-    return JSONMessage('Account service added.', id=account_service.id,
-                       status=200)
+    return JSONMessage("Account service added.", id=account_service.id, status=200)
 
 
 @authenticated
@@ -47,11 +46,11 @@ def delete(ident: int) -> JSONMessage:
     """Deletes the respective account <> service mapping."""
 
     get_account_service(ident).delete_instance()
-    return JSONMessage('Account service deleted.', status=200)
+    return JSONMessage("Account service deleted.", status=200)
 
 
 ROUTES = [
-    ('POST', '/service/account', add),
-    ('GET', '/service/account', list_),
-    ('DELETE', '/service/account/<int:ident>', delete)
+    ("POST", "/service/account", add),
+    ("GET", "/service/account", list_),
+    ("DELETE", "/service/account/<int:ident>", delete),
 ]

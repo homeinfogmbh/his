@@ -9,7 +9,7 @@ from his.exceptions import AccountLocked, NotAuthorized
 from his.orm import Service
 
 
-__all__ = ['authenticated', 'authorized', 'admin', 'root']
+__all__ = ["authenticated", "authorized", "admin", "root"]
 
 
 def authenticated(function: Callable) -> Callable:

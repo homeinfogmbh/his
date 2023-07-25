@@ -14,18 +14,18 @@ from his.orm.session import Session
 
 
 __all__ = [
-    'ALLOWED_SESSION_DURATIONS',
-    'DEFAULT_SESSION_DURATION',
-    'Account',
-    'AccountService',
-    'CustomerService',
-    'CustomerSettings',
-    'PasswordResetToken',
-    'Service',
-    'ServiceDependency',
-    'ServiceDomain',
-    'Session',
-    'create_tables'
+    "ALLOWED_SESSION_DURATIONS",
+    "DEFAULT_SESSION_DURATION",
+    "Account",
+    "AccountService",
+    "CustomerService",
+    "CustomerSettings",
+    "PasswordResetToken",
+    "Service",
+    "ServiceDependency",
+    "ServiceDomain",
+    "Session",
+    "create_tables",
 ]
 
 
@@ -38,7 +38,7 @@ MODELS = (
     AccountService,
     Session,
     CustomerSettings,
-    PasswordResetToken
+    PasswordResetToken,
 )
 
 

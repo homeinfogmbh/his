@@ -1,14 +1,14 @@
 """HIS exceptions."""
 
 __all__ = [
-    'AccountLimitReached',
-    'AccountLocked',
-    'InvalidCredentials',
-    'NoSessionSpecified',
-    'NotAuthorized',
-    'RecaptchaNotConfigured',
-    'ServiceExistsError',
-    'SessionExpired',
+    "AccountLimitReached",
+    "AccountLocked",
+    "InvalidCredentials",
+    "NoSessionSpecified",
+    "NotAuthorized",
+    "RecaptchaNotConfigured",
+    "ServiceExistsError",
+    "SessionExpired",
 ]
 
 

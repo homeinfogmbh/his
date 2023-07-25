@@ -17,7 +17,7 @@ from his.orm.account import Account
 from his.orm.common import HISModel
 
 
-__all__ = ['VALIDITY', 'PasswordResetToken']
+__all__ = ["VALIDITY", "PasswordResetToken"]
 
 
 VALIDITY = timedelta(hours=1)
@@ -27,11 +27,14 @@ class PasswordResetToken(HISModel):
     """Tokens to reset passwords."""
 
     class Meta:
-        table_name = 'password_reset_token'
+        table_name = "password_reset_token"
 
     account = ForeignKeyField(
-        Account, column_name='account', backref='password_reset_tokens',
-        on_delete='CASCADE', lazy_load=False
+        Account,
+        column_name="account",
+        backref="password_reset_tokens",
+        on_delete="CASCADE",
+        lazy_load=False,
     )
     token = UUIDField(default=uuid4)
     created = DateTimeField(default=datetime.now)
@@ -58,8 +61,11 @@ class PasswordResetToken(HISModel):
         if not cascade:
             return super().select(*args)
 
-        return super().select(*{
-            cls, Account, Customer, Company, Address, *args
-        }).join(Account).join(Customer).join(Company).join(
-            Address, join_type=JOIN.LEFT_OUTER
+        return (
+            super()
+            .select(*{cls, Account, Customer, Company, Address, *args})
+            .join(Account)
+            .join(Customer)
+            .join(Company)
+            .join(Address, join_type=JOIN.LEFT_OUTER)
         )

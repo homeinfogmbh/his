@@ -20,30 +20,30 @@ from his.orm.session import Session
 
 
 __all__ = [
-    'check_recaptcha',
-    'get_account',
-    'get_account_service',
-    'get_account_services',
-    'get_customer',
-    'get_customer_service',
-    'get_customer_services',
-    'get_customer_settings',
-    'get_service',
-    'get_session'
+    "check_recaptcha",
+    "get_account",
+    "get_account_service",
+    "get_account_services",
+    "get_customer",
+    "get_customer_service",
+    "get_customer_services",
+    "get_customer_settings",
+    "get_service",
+    "get_session",
 ]
 
 
 def check_recaptcha() -> bool:
     """Checks ReCAPTCHA."""
 
-    site_key = request.json['sitekey']
+    site_key = request.json["sitekey"]
 
     try:
         recaptcha = get_recaptcha()[site_key]
     except KeyError:
         raise RecaptchaNotConfigured() from None
 
-    return verify(recaptcha['secret'], request.json['response'])
+    return verify(recaptcha["secret"], request.json["response"])
 
 
 def get_account(ident: Optional[int]) -> Account:
@@ -60,7 +60,7 @@ def get_account(ident: Optional[int]) -> Account:
     try:
         account = select.get()
     except Account.DoesNotExist:
-        raise NotAuthorized() from None     # Prevent account name sniffing.
+        raise NotAuthorized() from None  # Prevent account name sniffing.
 
     if ACCOUNT.admin and account.customer == CUSTOMER.id:
         return account
@@ -81,14 +81,15 @@ def get_account_services() -> Select:
     """Selects the account services of the give account."""
 
     return AccountService.select(cascade=True).where(
-        AccountService.account == ACCOUNT.id)
+        AccountService.account == ACCOUNT.id
+    )
 
 
 def get_customer(ident: Optional[int]) -> Customer:
     """Returns the customer by the respective customer ID."""
 
     if ident is None:
-        return CUSTOMER._get_current_object()   # pylint: disable=W0212
+        return CUSTOMER._get_current_object()  # pylint: disable=W0212
 
     customer = Customer.select(cascade=True).where(Customer.id == ident).get()
 
@@ -116,14 +117,16 @@ def get_customer_services() -> Select:
     """Selects customer service mappings for the given customer."""
 
     return CustomerService.select(cascade=True).where(
-        CustomerService.customer == CUSTOMER.id)
+        CustomerService.customer == CUSTOMER.id
+    )
 
 
 def get_customer_settings() -> CustomerSettings:
     """Returns the respective customer settings."""
 
-    return CustomerSettings.select().where(
-        CustomerSettings.customer == CUSTOMER.id).get()
+    return (
+        CustomerSettings.select().where(CustomerSettings.customer == CUSTOMER.id).get()
+    )
 
 
 def get_service(ident: int) -> Service:
@@ -141,10 +144,14 @@ def get_session(account: Account, ident: int) -> Session:
         return Session.select(cascade=True).where(Session.id == ident).get()
 
     if account.admin:
-        return Session.select(cascade=True).where(
-            (Session.id == ident) & (Customer.id == account.customer)
-        ).get()
+        return (
+            Session.select(cascade=True)
+            .where((Session.id == ident) & (Customer.id == account.customer))
+            .get()
+        )
 
-    return Session.select(cascade=True).where(
-        (Session.id == ident) & (Session.account == account.id)
-    ).get()
+    return (
+        Session.select(cascade=True)
+        .where((Session.id == ident) & (Session.account == account.id))
+        .get()
+    )

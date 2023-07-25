@@ -6,13 +6,13 @@ from string import ascii_letters, digits
 from sys import stderr
 
 
-__all__ = ['genpw', 'read_passwd']
+__all__ = ["genpw", "read_passwd"]
 
 
 def genpw(length: int = 16, *, pool: str = ascii_letters + digits) -> str:
     """Generates a safe, radom password."""
 
-    return ''.join(choice(pool) for _ in range(length))
+    return "".join(choice(pool) for _ in range(length))
 
 
 def read_passwd() -> str:
@@ -20,17 +20,17 @@ def read_passwd() -> str:
 
     while True:
         try:
-            passwd = getpass('Password: ')
+            passwd = getpass("Password: ")
         except EOFError:
             continue
 
         try:
-            repeat = getpass('Repeat password: ')
+            repeat = getpass("Repeat password: ")
         except EOFError:
             continue
 
         if passwd and passwd == repeat:
             return passwd
 
-        print('Passwords do not match.', file=stderr)
+        print("Passwords do not match.", file=stderr)
         continue

@@ -6,18 +6,18 @@ from configlib import load_config
 
 
 __all__ = [
-    'CONFIG_FILE',
-    'CORS_FILE',
-    'RECAPTCHA_FILE',
-    'get_config',
-    'get_cors',
-    'get_recaptcha'
+    "CONFIG_FILE",
+    "CORS_FILE",
+    "RECAPTCHA_FILE",
+    "get_config",
+    "get_cors",
+    "get_recaptcha",
 ]
 
 
-CONFIG_FILE = 'his.d/his.conf'
-CORS_FILE = 'his.d/cors.json'
-RECAPTCHA_FILE = 'his.d/recaptcha.json'
+CONFIG_FILE = "his.d/his.conf"
+CORS_FILE = "his.d/cors.json"
+RECAPTCHA_FILE = "his.d/recaptcha.json"
 
 load_config = cache(load_config)
 get_config = partial(load_config, CONFIG_FILE)

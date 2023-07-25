@@ -5,7 +5,7 @@ from his.wsgi.service.customer import ROUTES as CUSTOMER_ROUTES
 from his.wsgi.service.service import ROUTES as SERVICE_ROUTES
 
 
-__all__ = ['ROUTES']
+__all__ = ["ROUTES"]
 
 
 ROUTES = (*ACCOUNT_ROUTES, *CUSTOMER_ROUTES, *SERVICE_ROUTES)

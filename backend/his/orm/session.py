@@ -20,20 +20,23 @@ from his.orm.account import Account
 from his.orm.common import HISModel
 
 
-__all__ = ['DURATION', 'DURATION_RANGE', 'Session']
+__all__ = ["DURATION", "DURATION_RANGE", "Session"]
 
 
 DURATION = 15
 DURATION_RANGE = range(120)
-LOGGER = getLogger('his.session')
+LOGGER = getLogger("his.session")
 
 
 class Session(HISModel):
     """A session related to an account."""
 
     account = ForeignKeyField(
-        Account, column_name='account', backref='sessions',
-        on_delete='CASCADE', lazy_load=False
+        Account,
+        column_name="account",
+        backref="sessions",
+        on_delete="CASCADE",
+        lazy_load=False,
     )
     secret = Argon2Field()
     start = DateTimeField()
@@ -41,11 +44,7 @@ class Session(HISModel):
     login = BooleanField(default=True)
 
     @classmethod
-    def add(
-            cls,
-            account: Union[Account, int],
-            duration: timedelta
-    ) -> NewSession:
+    def add(cls, account: Union[Account, int], duration: timedelta) -> NewSession:
         """Actually opens a new login session."""
         start = datetime.now()
         end = start + duration
@@ -55,8 +54,7 @@ class Session(HISModel):
         return NewSession(session=session, secret=secret)
 
     @classmethod
-    def open(cls, account: Union[Account, int],
-             duration: int = DURATION) -> NewSession:
+    def open(cls, account: Union[Account, int], duration: int = DURATION) -> NewSession:
         """Actually opens a new login session."""
         duration = timedelta(minutes=duration)
         session, secret = cls.add(account, duration)
@@ -75,7 +73,7 @@ class Session(HISModel):
 
         for count, session in enumerate(sessions, start=1):
             session.delete_instance()
-            LOGGER.info('Cleaned up session: %s', session)
+            LOGGER.info("Cleaned up session: %s", session)
 
         return count
 
@@ -85,9 +83,13 @@ class Session(HISModel):
         if not cascade:
             return super().select(*args)
 
-        return super().select(*{
-            cls, Account, Customer, Company, *args
-        }).join(Account).join(Customer).join(Company)
+        return (
+            super()
+            .select(*{cls, Account, Customer, Company, *args})
+            .join(Account)
+            .join(Customer)
+            .join(Company)
+        )
 
     def verify(self, secret: str) -> bool:
         """Verifies the session."""

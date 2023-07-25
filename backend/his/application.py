@@ -7,19 +7,13 @@ from his.errors import ERRORS
 from his.session import postprocess_response
 
 
-__all__ = ['Application']
+__all__ = ["Application"]
 
 
 class Application(wsgilib.Application):
     """HIS application base."""
 
-    def __init__(
-            self,
-            *args,
-            cors: callable = get_cors,
-            debug: bool = False,
-            **kwargs
-    ):
+    def __init__(self, *args, cors: callable = get_cors, debug: bool = False, **kwargs):
         """Sets default error handlers."""
         super().__init__(*args, cors=cors, debug=debug, **kwargs)
         self.after_request(postprocess_response)

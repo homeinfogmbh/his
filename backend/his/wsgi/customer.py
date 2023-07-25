@@ -11,7 +11,7 @@ from his.api import authenticated, root
 from his.wsgi.functions import get_customer, get_customer_settings
 
 
-__all__ = ['ROUTES']
+__all__ = ["ROUTES"]
 
 
 def get_customers() -> Select:
@@ -43,8 +43,8 @@ def get_logo() -> Binary:
 
 
 ROUTES = (
-    ('GET', '/customer', list_),
-    ('GET', '/customer/<int:ident>', get),
-    ('GET', '/customer/!', lambda: get()),  # pylint: disable=W0108
-    ('GET', '/customer-logo', get_logo)
+    ("GET", "/customer", list_),
+    ("GET", "/customer/<int:ident>", get),
+    ("GET", "/customer/!", lambda: get()),  # pylint: disable=W0108
+    ("GET", "/customer-logo", get_logo),
 )

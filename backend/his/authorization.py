@@ -11,7 +11,7 @@ from his.orm.service import Service
 from his.orm.service_dependency import ServiceDependency
 
 
-__all__ = ['can_use']
+__all__ = ["can_use"]
 
 
 Mapping = Union[AccountService, CustomerService]
@@ -42,7 +42,7 @@ def check_customer(customer: Union[Customer, int], service: Service) -> bool:
         CustomerService.select(cascade=True).where(
             CustomerService.customer == customer
         ),
-        service
+        service,
     )
 
 
@@ -50,10 +50,8 @@ def check_account(account: Union[Account, int], service: Service) -> bool:
     """Checks the account services."""
 
     return check_mappings(
-        AccountService.select(cascade=True).where(
-            AccountService.account == account
-        ),
-        service
+        AccountService.select(cascade=True).where(AccountService.account == account),
+        service,
     )
 
 

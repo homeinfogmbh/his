@@ -9,7 +9,7 @@ from his.exceptions import ServiceExistsError
 from his.orm.common import HISModel
 
 
-__all__ = ['Service']
+__all__ = ["Service"]
 
 
 class Service(HISModel):
@@ -27,12 +27,7 @@ class Service(HISModel):
         return self.name
 
     @classmethod
-    def add(
-            cls,
-            name: str,
-            description: str = None,
-            promote: bool = True
-    ) -> Service:
+    def add(cls, name: str, description: str = None, promote: bool = True) -> Service:
         """Adds a new service."""
         try:
             cls.get(cls.name == name)

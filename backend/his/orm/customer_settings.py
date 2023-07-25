@@ -8,18 +8,17 @@ from mdb import Customer
 from his.orm.common import HISModel
 
 
-__all__ = ['CustomerSettings']
+__all__ = ["CustomerSettings"]
 
 
 class CustomerSettings(HISModel):
     """Settings for a certain customer."""
 
     class Meta:
-        table_name = 'customer_settings'
+        table_name = "customer_settings"
 
     customer = ForeignKeyField(
-        Customer, column_name='customer', on_delete='CASCADE',
-        lazy_load=False
+        Customer, column_name="customer", on_delete="CASCADE", lazy_load=False
     )
     max_accounts = IntegerField(null=True, default=10)
-    logo = ForeignKeyField(File, column_name='logo', null=True)
+    logo = ForeignKeyField(File, column_name="logo", null=True)

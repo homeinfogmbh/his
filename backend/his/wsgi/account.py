@@ -15,39 +15,39 @@ from his.orm.customer_settings import CustomerSettings
 from his.wsgi.functions import get_account
 
 
-__all__ = ['ROUTES']
+__all__ = ["ROUTES"]
 
 
-USER_FIELDS = {'fullName', 'passwd', 'email'}
-ADMIN_FIELDS = {'name', 'fullName', 'passwd', 'email', 'admin'}
+USER_FIELDS = {"fullName", "passwd", "email"}
+ADMIN_FIELDS = {"name", "fullName", "passwd", "email", "admin"}
 
 
 @require_json(dict)
 def add_account() -> JSONMessage:
     """Adds an account for the current customer."""
 
-    name = request.json['name']
-    email = request.json['email']
-    passwd = request.json.get('passwd')
-    full_name = request.json.get('fullName')
+    name = request.json["name"]
+    email = request.json["email"]
+    passwd = request.json.get("passwd")
+    full_name = request.json.get("fullName")
 
     if not passwd:
         passwd = genpw()
 
     if ACCOUNT.root:
-        root = request.json.get('root', False)
+        root = request.json.get("root", False)
     else:
         root = False
 
     if ACCOUNT.admin:
-        admin = request.json.get('admin', False)
+        admin = request.json.get("admin", False)
     else:
         admin = False
 
-    account = Account.add(CUSTOMER.id, name, email, passwd,
-                          full_name=full_name, admin=admin, root=root)
-    return JSONMessage('Account created.', id=account.id, passwd=passwd,
-                       status=201)
+    account = Account.add(
+        CUSTOMER.id, name, email, passwd, full_name=full_name, admin=admin, root=root
+    )
+    return JSONMessage("Account created.", id=account.id, passwd=passwd, status=201)
 
 
 @require_json(dict)
@@ -58,7 +58,7 @@ def patch_account(account: Account, only: Optional[set] = None) -> JSONMessage:
 
     account.patch_json(request.json, only=only)
     account.save()
-    return JSONMessage('Account patched.', status=200)
+    return JSONMessage("Account patched.", status=200)
 
 
 @authenticated
@@ -117,10 +117,10 @@ def patch(ident: Optional[str] = None) -> JSONMessage:
 
 
 ROUTES = [
-    ('GET', '/account', list_),
-    ('GET', '/account/<int:ident>', get),
-    ('GET', '/account/!', lambda: get()),   # pylint: disable=W0108
-    ('POST', '/account', add),
-    ('PATCH', '/account/<int:ident>', patch),
-    ('PATCH', '/account/!', lambda: patch())    # pylint: disable=W0108
+    ("GET", "/account", list_),
+    ("GET", "/account/<int:ident>", get),
+    ("GET", "/account/!", lambda: get()),  # pylint: disable=W0108
+    ("POST", "/account", add),
+    ("PATCH", "/account/<int:ident>", patch),
+    ("PATCH", "/account/!", lambda: patch()),  # pylint: disable=W0108
 ]

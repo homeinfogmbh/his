@@ -10,7 +10,7 @@ from his.mail import get_mailer
 from his.orm.pwreset import PasswordResetToken
 
 
-__all__ = ['mail_password_reset_link']
+__all__ = ["mail_password_reset_link"]
 
 
 def add_token(url: str, token: str) -> str:
@@ -26,7 +26,7 @@ def add_token(url: str, token: str) -> str:
 def href(url: str, caption: str = None) -> Element:
     """Makes a link."""
 
-    link = Element('a', attrib={'href': url})
+    link = Element("a", attrib={"href": url})
     link.text = url if caption is None else caption
     return link
 
@@ -34,19 +34,16 @@ def href(url: str, caption: str = None) -> Element:
 def mail_password_reset_link(token: PasswordResetToken, url: str):
     """Mails the respective password reset link."""
 
-    reply_to = (config := get_config()).get('pwreset', 'reply_to')
-    sender = config.get('mail', 'sender')
-    subject = config.get('pwreset', 'subject')
-    template = config.get('pwreset', 'template')
+    reply_to = (config := get_config()).get("pwreset", "reply_to")
+    sender = config.get("mail", "sender")
+    subject = config.get("pwreset", "subject")
+    template = config.get("pwreset", "template")
 
-    with open(template, 'r', encoding='utf-8') as file:
+    with open(template, "r", encoding="utf-8") as file:
         template = file.read()
 
     url = add_token(url, token.token.hex)
-    link = tostring(href(url), encoding='unicode', method='html')
+    link = tostring(href(url), encoding="unicode", method="html")
     html = template.format(account=token.account.name, link=link)
-    email = EMail(
-        subject, sender, token.account.email, html=html,
-        reply_to=reply_to
-    )
+    email = EMail(subject, sender, token.account.email, html=html, reply_to=reply_to)
     get_mailer().send([email])

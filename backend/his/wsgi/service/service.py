@@ -7,7 +7,7 @@ from his.contextlocals import ACCOUNT
 from his.orm.service import Service
 
 
-__all__ = ['ROUTES']
+__all__ = ["ROUTES"]
 
 
 @authenticated
@@ -23,4 +23,4 @@ def list_() -> JSON:
     return JSON([service.to_json() for service in select.where(condition)])
 
 
-ROUTES = [('GET', '/service', list_)]
+ROUTES = [("GET", "/service", list_)]

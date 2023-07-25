@@ -19,20 +19,24 @@ from his.exceptions import AccountLocked
 from his.orm.common import HISModel
 
 
-__all__ = ['Account']
+__all__ = ["Account"]
 
 
 MAX_FAILED_LOGINS = 5
 
 
-class Account(HISModel):    # pylint: disable=R0902
+class Account(HISModel):  # pylint: disable=R0902
     """A HIS account."""
 
     customer = ForeignKeyField(
-        Customer, column_name='customer', backref='accounts',
-        on_delete='CASCADE', lazy_load=False)
-    name = UserNameField(64, unique=True)   # Login name.
-    full_name = UserNameField(255, null=True)   # Optional full user name.
+        Customer,
+        column_name="customer",
+        backref="accounts",
+        on_delete="CASCADE",
+        lazy_load=False,
+    )
+    name = UserNameField(64, unique=True)  # Login name.
+    full_name = UserNameField(255, null=True)  # Optional full user name.
     passwd = Argon2Field()
     email = EMailField(64, unique=True)
     created = DateTimeField(default=datetime.now)
@@ -53,19 +57,34 @@ class Account(HISModel):    # pylint: disable=R0902
 
     def __str__(self):
         """Returns the login name and appropriate customer."""
-        return f'{self.name}@{self.customer_id}'
+        return f"{self.name}@{self.customer_id}"
 
     @classmethod
-    def add(cls, customer: Union[Customer, int], name: str, email: str,
-            passwd: str, *, full_name: str = None, admin: bool = False,
-            root: bool = False) -> Account:
+    def add(
+        cls,
+        customer: Union[Customer, int],
+        name: str,
+        email: str,
+        passwd: str,
+        *,
+        full_name: str = None,
+        admin: bool = False,
+        root: bool = False,
+    ) -> Account:
         """Adds a new account."""
         if len(name) < 3:
-            raise ValueError('Account name too short.')
+            raise ValueError("Account name too short.")
 
         account = cls(
-            customer=customer, name=name, full_name=full_name, passwd=passwd,
-            email=email, created=datetime.now(), admin=admin, root=root)
+            customer=customer,
+            name=name,
+            full_name=full_name,
+            passwd=passwd,
+            email=email,
+            created=datetime.now(),
+            admin=admin,
+            root=root,
+        )
         account.save()
         return account
 
@@ -82,8 +101,9 @@ class Account(HISModel):    # pylint: disable=R0902
         return select.where(condition)
 
     @classmethod
-    def find(cls, id_or_name: Union[int, str],
-             customer: Union[Customer, int, None] = None) -> Account:
+    def find(
+        cls, id_or_name: Union[int, str], customer: Union[Customer, int, None] = None
+    ) -> Account:
         """Find account by primary key or login name."""
         condition = True if customer is None else cls.customer == customer
 
@@ -104,10 +124,12 @@ class Account(HISModel):    # pylint: disable=R0902
         if not cascade:
             return super().select(*args)
 
-        return super().select(*{
-            cls, Customer, Company, Address, *args
-        }).join(Customer).join(Company).join(
-            Address, join_type=JOIN.LEFT_OUTER
+        return (
+            super()
+            .select(*{cls, Customer, Company, Address, *args})
+            .join(Customer)
+            .join(Company)
+            .join(Address, join_type=JOIN.LEFT_OUTER)
         )
 
     @property
@@ -147,7 +169,7 @@ class Account(HISModel):    # pylint: disable=R0902
     @property
     def info(self) -> dict:
         """Returns brief account information."""
-        return {'id': self.id, 'email': self.email}
+        return {"id": self.id, "email": self.email}
 
     def login(self, passwd: str) -> bool:
         """Performs a login."""

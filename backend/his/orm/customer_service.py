@@ -14,36 +14,42 @@ from his.orm.common import HISModel
 from his.orm.service import Service
 
 
-__all__ = ['CustomerService']
+__all__ = ["CustomerService"]
 
 
 class CustomerService(HISModel):
     """Many-to-many Account <-> Services mapping."""
 
     class Meta:
-        table_name = 'customer_service'
+        table_name = "customer_service"
 
     customer = ForeignKeyField(
-        Customer, column_name='customer', backref='customer_services',
-        on_delete='CASCADE', lazy_load=False
+        Customer,
+        column_name="customer",
+        backref="customer_services",
+        on_delete="CASCADE",
+        lazy_load=False,
     )
     service = ForeignKeyField(
-        Service, column_name='service', backref='customer_services',
-        on_delete='CASCADE', lazy_load=False
+        Service,
+        column_name="service",
+        backref="customer_services",
+        on_delete="CASCADE",
+        lazy_load=False,
     )
     begin = DateTimeField(null=True)
     end = DateTimeField(null=True)
 
     def __str__(self):
-        return f'{self.customer_id}@{self.service}'
+        return f"{self.customer_id}@{self.service}"
 
     @classmethod
     def add(
-            cls,
-            customer: Union[Customer, int],
-            service: Union[Service, int],
-            begin: Optional[datetime] = None,
-            end: Optional[datetime] = None
+        cls,
+        customer: Union[Customer, int],
+        service: Union[Service, int],
+        begin: Optional[datetime] = None,
+        end: Optional[datetime] = None,
     ) -> CustomerService:
         """Adds a new customer service."""
         try:
@@ -70,6 +76,10 @@ class CustomerService(HISModel):
         if not cascade:
             return super().select(*args)
 
-        return super().select(*{
-            cls, Customer, Company, Service
-        }).join(Customer).join(Company).join_from(cls, Service)
+        return (
+            super()
+            .select(*{cls, Customer, Company, Service})
+            .join(Customer)
+            .join(Company)
+            .join_from(cls, Service)
+        )

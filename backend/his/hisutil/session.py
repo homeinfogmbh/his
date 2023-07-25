@@ -5,10 +5,10 @@ from logging import getLogger
 from his.orm import Session
 
 
-__all__ = ['cleanup']
+__all__ = ["cleanup"]
 
 
-LOGGER = getLogger('hisutil')
+LOGGER = getLogger("hisutil")
 
 
 def cleanup():
@@ -17,6 +17,6 @@ def cleanup():
     count = Session.cleanup()
 
     if count:
-        LOGGER.info('Deleted %i orphaned sessions.', count)
+        LOGGER.info("Deleted %i orphaned sessions.", count)
     else:
-        LOGGER.info('Nothing to do.')
+        LOGGER.info("Nothing to do.")

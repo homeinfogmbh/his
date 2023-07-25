@@ -5,10 +5,10 @@ from peeweeplus import JSONModel, MySQLDatabaseProxy
 from his.config import CONFIG_FILE
 
 
-__all__ = ['DATABASE', 'HISModel']
+__all__ = ["DATABASE", "HISModel"]
 
 
-DATABASE = MySQLDatabaseProxy('his', CONFIG_FILE)
+DATABASE = MySQLDatabaseProxy("his", CONFIG_FILE)
 
 
 class HISModel(JSONModel):

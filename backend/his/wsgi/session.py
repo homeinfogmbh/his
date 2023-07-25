@@ -15,7 +15,7 @@ from his.session import set_session_cookie, delete_session_cookie
 from his.wsgi.functions import get_session
 
 
-__all__ = ['ROUTES']
+__all__ = ["ROUTES"]
 
 
 def make_login(account: Account, duration: int) -> Response:
@@ -30,13 +30,11 @@ def make_login(account: Account, duration: int) -> Response:
 def login() -> Response:
     """Opens a new session for the respective account."""
 
-    account = request.json['account']
-    passwd = request.json['passwd']
+    account = request.json["account"]
+    passwd = request.json["passwd"]
 
     try:
-        account = Account.select(cascade=True).where(
-            Account.name == account
-        ).get()
+        account = Account.select(cascade=True).where(Account.name == account).get()
     except Account.DoesNotExist:
         raise InvalidCredentials() from None
 
@@ -90,7 +88,7 @@ def close_session(session: Session) -> Response:
     """Closes a session."""
 
     session.delete_instance()
-    return delete_session_cookie(make_response(JSON({'closed': session.id})))
+    return delete_session_cookie(make_response(JSON({"closed": session.id})))
 
 
 @authenticated
@@ -104,12 +102,12 @@ def close(ident: Optional[int] = None) -> Response:
 
 
 ROUTES = (
-    ('POST', '/session', login),
-    ('GET', '/session', list_),
-    ('GET', '/session/<int:ident>', get),
-    ('GET', '/session/!', lambda: get()),
-    ('PUT', '/session/<int:ident>', refresh),
-    ('PUT', '/session/!', lambda: refresh()),
-    ('DELETE', '/session/<int:ident>', close),
-    ('DELETE', '/session/!', lambda: close())
+    ("POST", "/session", login),
+    ("GET", "/session", list_),
+    ("GET", "/session/<int:ident>", get),
+    ("GET", "/session/!", lambda: get()),
+    ("PUT", "/session/<int:ident>", refresh),
+    ("PUT", "/session/!", lambda: refresh()),
+    ("DELETE", "/session/<int:ident>", close),
+    ("DELETE", "/session/!", lambda: close()),
 )

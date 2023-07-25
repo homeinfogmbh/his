@@ -4,10 +4,10 @@ from his.application import Application
 from his.wsgi import account, bugreport, customer, pwreset, service, session
 
 
-__all__ = ['APPLICATION']
+__all__ = ["APPLICATION"]
 
 
-APPLICATION = Application('his')
+APPLICATION = Application("his")
 APPLICATION.add_routes(account.ROUTES)
 APPLICATION.add_routes(bugreport.ROUTES)
 APPLICATION.add_routes(customer.ROUTES)

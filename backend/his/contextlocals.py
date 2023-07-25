@@ -17,13 +17,13 @@ from his.orm.session import DURATION, DURATION_RANGE, Session
 
 
 __all__ = [
-    'SESSION',
-    'ACCOUNT',
-    'CUSTOMER',
-    'get_session',
-    'get_session_duration',
-    'get_session_id',
-    'get_session_secret'
+    "SESSION",
+    "ACCOUNT",
+    "CUSTOMER",
+    "get_session",
+    "get_session_duration",
+    "get_session_id",
+    "get_session_secret",
 ]
 
 
@@ -31,7 +31,7 @@ def get_session_id() -> int:
     """Returns the session ID."""
 
     try:
-        ident = request.cookies[get_config().get('auth', 'session-id')]
+        ident = request.cookies[get_config().get("auth", "session-id")]
     except KeyError:
         raise NoSessionSpecified() from None
 
@@ -45,7 +45,7 @@ def get_session_secret() -> str:
     """Returns the session secret."""
 
     try:
-        return request.cookies[get_config().get('auth', 'session-secret')]
+        return request.cookies[get_config().get("auth", "session-secret")]
     except KeyError:
         raise NoSessionSpecified() from None
 
@@ -73,7 +73,7 @@ def get_account() -> Account:
     """Gets the verified targeted account."""
 
     try:
-        account_id = request.args['account']
+        account_id = request.args["account"]
     except KeyError:
         return SESSION.account
 
@@ -98,7 +98,7 @@ def get_account() -> Account:
 def get_customer() -> Customer:
     """Gets the verified targeted customer."""
 
-    if (customer_id := request.args.get('customer')) is None:
+    if (customer_id := request.args.get("customer")) is None:
         return ACCOUNT.customer
 
     if not SESSION.account.root:
@@ -109,15 +109,13 @@ def get_customer() -> Customer:
     except (TypeError, ValueError):
         raise InvalidData(int, type(customer_id)) from None
 
-    return Customer.select(cascade=True).where(
-        Customer.id == customer_id
-    ).get()
+    return Customer.select(cascade=True).where(Customer.id == customer_id).get()
 
 
 def get_session_duration() -> int:
     """Returns the respective session duration."""
 
-    if (duration := request.headers.get('session-duration')) is None:
+    if (duration := request.headers.get("session-duration")) is None:
         return DURATION
 
     try:
@@ -139,8 +137,6 @@ class ModelProxy(LocalProxy):
         return self.get_id()
 
 
-SESSION = ModelProxy(lambda: get_session(
-    get_session_id(), get_session_secret()
-))
+SESSION = ModelProxy(lambda: get_session(get_session_id(), get_session_secret()))
 ACCOUNT = ModelProxy(get_account)
 CUSTOMER = ModelProxy(get_customer)

@@ -26,9 +26,7 @@ def gen_emails() -> Iterator[EMail]:
     subject = request.json.pop("subject", config.get("bugreport", "subject"))
 
     with open(template, "r", encoding="utf-8") as file:
-        template = file.read()
-
-    html = template.format(account=ACCOUNT, **request.json)
+        html = file.read().format(account=ACCOUNT, **request.json)
 
     for recipient in recipients:
         yield EMail(subject, sender, recipient, html=html)

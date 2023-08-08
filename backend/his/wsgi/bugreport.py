@@ -23,11 +23,11 @@ def gen_emails() -> Iterator[EMail]:
     sender = (config := get_config()).get("bugreport", "sender")
     recipients = config.get("bugreport", "recipients").split()
     template = config.get("bugreport", "template")
+    subject = request.json.pop("subject", config.get("bugreport", "subject"))
 
     with open(template, "r", encoding="utf-8") as file:
         template = file.read()
 
-    subject = request.json.pop("subject")
     html = template.format(account=ACCOUNT, **request.json)
 
     for recipient in recipients:

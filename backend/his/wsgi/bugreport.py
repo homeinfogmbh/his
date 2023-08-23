@@ -21,7 +21,7 @@ def gen_emails() -> Iterator[EMail]:
     """Yields bug report emails."""
 
     sender = (config := get_config()).get("bugreport", "sender")
-    recipients = config.get("bugreport", "recipients").split()
+    recipients = map(str.strip, config.get("bugreport", "recipients").split(","))
     template = config.get("bugreport", "template")
     subject = request.json.pop("subject", config.get("bugreport", "subject"))
 

@@ -1,5 +1,6 @@
 """Authorization functions."""
 
+from datetime import datetime
 from typing import Iterable, Iterator, Union
 
 from mdb import Customer
@@ -38,9 +39,12 @@ def check_mappings(mappings: Iterable[Mapping], service: Service) -> bool:
 def check_customer(customer: Union[Customer, int], service: Service) -> bool:
     """Checks the customer services."""
 
+    now = datetime.now()
     return check_mappings(
         CustomerService.select(cascade=True).where(
-            CustomerService.customer == customer
+            (CustomerService.customer == customer)
+            & ((CustomerService.begin >> None) | (CustomerService.begin < now))
+            & ((CustomerService.end >> None) | (CustomerService.end > now))
         ),
         service,
     )

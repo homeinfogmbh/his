@@ -23,8 +23,8 @@ from his.orm.common import HISModel
 __all__ = ["DURATION", "DURATION_RANGE", "Session"]
 
 
-DURATION = 15
-DURATION_RANGE = range(120)
+DURATION = 720
+DURATION_RANGE = range(720)
 LOGGER = getLogger("his.session")
 
 
